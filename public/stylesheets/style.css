@@ -1,25 +1,35 @@
-.sign-up,
-.sign-up * {
+.mac-book-pro-14-1,
+.mac-book-pro-14-1 * {
     box-sizing: border-box;
 }
 
-.sign-up {
+.mac-book-pro-14-1 {
     background: #ffffff;
-    border-radius: 12px;
-    height: 1117px;
+    height: 982px;
     position: relative;
     overflow: hidden;
 }
 
-.frame-104 {
+.frame-1321314819 {
     background: var(--secondary-s75, #ebf3f8);
     border-radius: 22px;
-    padding: 110px 0px 0px 110px;
-    width: 1593px;
-    height: 982px;
+    padding: 0px 58px 0px 58px;
+    height: 912px;
     position: absolute;
-    left: 68px;
-    top: 67px;
+    right: 40px;
+    left: 41px;
+    top: calc(50% - 456px);
+}
+
+.image-16 {
+    border-radius: 12px;
+    width: 416.46px;
+    height: 12.7%;
+    position: absolute;
+    left: calc(50% - 208.5px);
+    bottom: 82.69%;
+    top: 4.61%;
+    object-fit: cover;
 }
 
 .div-section {
@@ -28,8 +38,8 @@
     width: 591px;
     height: 777px;
     position: absolute;
-    left: 110px;
-    top: 205px;
+    left: calc(50% - 295.5px);
+    top: 195px;
     overflow: hidden;
 }
 
@@ -46,16 +56,11 @@
 }
 
 .header {
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
-    align-items: center;
-    justify-content: flex-start;
     width: 591px;
     height: 67px;
     position: absolute;
-    left: 0px;
-    top: 65px;
+    left: calc(50% - 295.5px);
+    top: calc(50% - 323.5px);
 }
 
 .let-s-get-you-started {
@@ -65,7 +70,9 @@
     font-size: 12.800000190734863px;
     line-height: 22.53px;
     font-weight: 400;
-    position: relative;
+    position: absolute;
+    left: 222.5px;
+    top: 0px;
 }
 
 .create-an-account {
@@ -75,25 +82,22 @@
     font-size: 32px;
     line-height: 44px;
     font-weight: 500;
-    position: relative;
+    position: absolute;
+    left: 165.5px;
+    top: 23px;
 }
 
 .form {
-    display: flex;
-    flex-direction: column;
-    gap: 58px;
-    align-items: flex-start;
-    justify-content: flex-start;
+    width: 523px;
+    height: 268px;
     position: absolute;
-    left: 40.5px;
-    top: 195px;
+    left: calc(50% - 261.5px);
+    top: calc(50% - 213.5px);
 }
 
 .group-5 {
-    flex-shrink: 0;
-    width: 523px;
-    height: 154px;
-    position: static;
+    position: absolute;
+    inset: 0;
 }
 
 .input {
@@ -232,10 +236,8 @@
 }
 
 .btn-pry-template-1 {
-    flex-shrink: 0;
-    width: 523px;
-    height: 56px;
-    position: static;
+    position: absolute;
+    inset: 0;
 }
 
 .frame-103 {
@@ -267,6 +269,42 @@
     justify-content: center;
 }
 
+.divider-label {
+    position: absolute;
+    inset: 0;
+}
+
+.line-divider {
+    width: 488.22px;
+    height: 2.27px;
+    position: absolute;
+    left: calc(50% - 244.11px);
+    top: calc(50% - -108px);
+    overflow: visible;
+}
+
+.divider-bg {
+    background: #ffffff;
+    width: 61.67px;
+    height: 23.28px;
+    position: absolute;
+    left: calc(50% - 30.84px);
+    top: calc(50% - -97.5px);
+}
+
+.or {
+    color: #212121;
+    text-align: center;
+    font-family: 'ZenKakuGothicAntique-Bold', sans-serif;
+    font-size: 12.800000190734863px;
+    font-weight: 700;
+    position: absolute;
+    left: calc(50% - 8.99px);
+    top: calc(50% - -98.35px);
+    width: 19.27px;
+    height: 21.57px;
+}
+
 .btn-outline-vertical {
     background: #ffffff;
     display: flex;
@@ -275,8 +313,8 @@
     align-items: flex-start;
     justify-content: flex-start;
     position: absolute;
-    left: 116px;
-    top: 600px;
+    left: calc(50% - 190px);
+    top: calc(50% - -163.78px);
 }
 
 .btn-outline-template-1-copy {
@@ -293,11 +331,6 @@
     border-color: #001f31;
     border-width: 1px;
     padding: 6px 37px 6px 37px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-    justify-content: flex-start;
     width: 380px;
     height: 48px;
     position: absolute;
@@ -311,8 +344,9 @@
     gap: 0px;
     align-items: center;
     justify-content: flex-start;
-    flex-shrink: 0;
-    position: relative;
+    position: absolute;
+    left: 37px;
+    top: 6px;
 }
 
 .icons-8-google {
@@ -338,48 +372,6 @@
     justify-content: center;
 }
 
-.divider-label {
-    position: absolute;
-    inset: 0;
-}
-
-.line-divider {
-    width: 82.61%;
-    height: 0.29%;
-    position: absolute;
-    right: 8.59%;
-    left: 8.8%;
-    bottom: 30.27%;
-    top: 69.43%;
-    overflow: visible;
-}
-
-.divider-bg {
-    background: #ffffff;
-    width: 10.43%;
-    height: 3%;
-    position: absolute;
-    right: 44.67%;
-    left: 44.89%;
-    bottom: 28.92%;
-    top: 68.08%;
-}
-
-.or {
-    color: #212121;
-    text-align: center;
-    font-family: 'ZenKakuGothicAntique-Bold', sans-serif;
-    font-size: 12.800000190734863px;
-    font-weight: 700;
-    position: absolute;
-    right: 48.15%;
-    left: 48.59%;
-    width: 3.26%;
-    bottom: 29.03%;
-    top: 68.19%;
-    height: 2.78%;
-}
-
 .already-have-an-account-login {
     color: #212121;
     text-align: center;
@@ -387,12 +379,10 @@
     font-size: 12.800000190734863px;
     font-weight: 400;
     position: absolute;
-    right: 26.09%;
-    left: 26.09%;
-    width: 47.83%;
-    bottom: 7.65%;
-    top: 89.58%;
-    height: 2.78%;
+    left: calc(50% - 295.5px);
+    top: calc(50% - -254.78px);
+    width: 591px;
+    height: 21.57px;
 }
 
 .already-have-an-account-login-span {
@@ -415,70 +405,4 @@
     font-size: 12.800000190734863px;
     font-weight: 700;
     text-decoration: underline;
-}
-
-.image-16 {
-    border-radius: 12px;
-    width: 399px;
-    height: 111px;
-    position: absolute;
-    left: 207px;
-    top: 55px;
-    object-fit: cover;
-}
-
-.figure {
-    width: 716px;
-    height: 881px;
-    position: absolute;
-    left: calc(50% - -23px);
-    top: calc(50% - 435.5px);
-}
-
-.blinkstore-print-on-demand-india-webp {
-    position: absolute;
-    right: 0px;
-    left: 0px;
-    bottom: -35px;
-    top: -51px;
-    overflow: hidden;
-    object-fit: cover;
-}
-
-.container {
-    display: flex;
-    flex-direction: row;
-    gap: 0px;
-    align-items: flex-start;
-    justify-content: flex-end;
-    width: 300px;
-    position: sticky;
-    left: 1303px;
-    bottom: 99px;
-}
-
-.button {
-    background: #ffffff;
-    border-radius: 24px;
-    border-style: solid;
-    border-color: #ffffff;
-    border-width: 1px;
-    padding: 12px;
-    display: flex;
-    flex-direction: row;
-    gap: 0px;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    position: relative;
-}
-
-.support-agent {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    position: relative;
-    overflow: visible;
 }
