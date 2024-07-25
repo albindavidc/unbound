@@ -12,21 +12,20 @@ const userSchema = new Schema({
         unique: true,
     },
     phone: {
-        type: String,
-        required: false,
-        unique: false,
-        sparse: true,
-        default: null,
-    },
-    goodgleId: {
-        type: String,
+        type: Number,
+        required: true,
         unique: true,
-
     },
     password: {
         type: String,
-        required: false,
+        required: true,
     },
+
+    isVerified:{
+        type:Boolean,
+        default: false,
+    },
+
     isBlocked: {
         type: Boolean,
         default: false
@@ -35,50 +34,10 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    cart: [{
-        type: Schema.Types.ObjectId,
-        ref: "Cart",
-    }],
-    wallet: {
-        type: Number,
-        default: 0,
-    },
-    wishlist: {
 
-    },
-    orderHistory:[{
-        type: Schema.Types.ObjectId,
-        ref: "Order",
-    }],
-    createdOn: {
-        type: Date,
-        default: Date.now,
-    },
-    referalCode: {
-        type: String,
-    },
-    redeemed: {
-        type: Boolean,
-    },
-    redeemedUser: [{
-        type: Schema.Types.ObjectId,
-        ref: "User",
-    }],
-    searchHistory: [{
-        category: {
-            type: Schema.Types.ObjectId,
-            ref: "Category",
-        },
-        brand: {
-            type: String,
-        },
-        searchOn: {
-            type: Date,
-            default: Date.now,
-        }
-    }]
-})
 
-const user = mongoose.model("User", userSchema);
+}, {timestamps:true})
+
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;
