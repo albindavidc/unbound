@@ -1,72 +1,235 @@
-
-<link rel="stylesheet" href="/css/user/login.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+<link rel="stylesheet" href="/css/user/login.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
 
 <div class="container" id="container">
-	<div class="form-container sign-up-container">
-		<form method="post" action="/signup">
-			<h1>Create Account</h1>
-			<div class="social-container">
-				<!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
-				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-			</div>
-			<span>or use your email for registration</span>
-			<input type="text" id="name" name="name" placeholder="Full Name" />
-			<input type="email" id="email" name="email" placeholder="Email Address" />
-			<input type="phone" id="phone" name="phone" placeholder="Phone Number" />
-			<input type="password" id="password" name="password" placeholder="Password" />
-			<input type="password" id="confirm-password" name="cPassword" placeholder="Confirm Password" />
+  <div class="form-container sign-up-container">
+    <form id="signform" method="post" action="/signup">
+      <h1>Create Account</h1>
+      <div class="social-container">
+        <!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
+        <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+      </div>
+      <span>or use your email for registration</span>
 
-			<button type="submit" style="margin-top: 5%;">Sign Up</button>
-		</form>
-	</div>
-	<div class="form-container sign-in-container">
-		<form action="#">
-			<h1>Sign in</h1>
-			<div class="social-container">
-				<!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
-				<a href="#" class="social">
-					<i class="fab fa-google"></i>
-				</a>
-				
-				
-			</div>
-			<span>or use your account</span>
-			<input type="email" placeholder="Email" />
-			<input type="password" placeholder="Password" />
-			<a href="#">Forgot your password?</a>
-			<button>Sign In</button>
-		</form>
-	</div>
-	<div class="overlay-container">
-		<div class="overlay">
-			<div class="overlay-panel overlay-left">
-				<h1>Welcome Back!</h1>
-				<p>To keep connected with us please login with your personal info</p>
-				<button class="ghost" id="signIn">Sign In</button>
-			</div>
-			<div class="overlay-panel overlay-right">
-				<h1>Hello, Friend!</h1>
-				<p>Enter your personal details and start journey with us</p>
-				<button class="ghost" id="signUp">Sign Up</button>
-			</div>
-		</div>
-	</div>
+      <div class="elementsField">
+        <input type="text" id="name" name="name" placeholder="Full Name" />
+        <div id="error1" class="error-message"></div>
+      </div>
+      <div class="elementsField">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email Address"
+        />
+        <div id="error2" class="error-message"></div>
+      </div>
+      <div class="elementsField">
+        <input
+          type="phone"
+          id="phone"
+          name="phone"
+          placeholder="Phone Number"
+        />
+        <div id="error3" class="error-message"></div>
+      </div>
+
+      <div class="elementsField">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+        />
+        <div id="error4" class="error-message"></div>
+      </div>
+
+      <div class="elementsField">
+        <input
+          type="password"
+          id="confirm-password"
+          name="cPassword"
+          placeholder="Confirm Password"
+        />
+        <div id="error5" class="error-message"></div>
+      </div>
+
+      <button type="submit" style="margin-top: 5%">Sign Up</button>
+    </form>
+  </div>
+  <div class="form-container sign-in-container">
+    <form id="signform" method="post" action="/signin">
+      <h1>Sign in</h1>
+      <div class="social-container">
+        <!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
+        <a href="#" class="social">
+          <i class="fab fa-google"></i>
+        </a>
+      </div>
+      <span>or use your account</span>
+
+      <div class="elementsField">
+        <input type="email" placeholder="Email" />
+      </div>
+
+      <div class="elementsField">
+        <input type="password" placeholder="Password" />
+      </div>
+
+      <a href="#">Forgot your password?</a>
+      <button>Sign In</button>
+    </form>
+  </div>
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-panel overlay-left">
+        <h1>Welcome Back!</h1>
+        <p>To keep connected with us please login with your personal info</p>
+        <button class="ghost" id="signIn">Sign In</button>
+      </div>
+      <div class="overlay-panel overlay-right">
+        <h1>Hello, Friend!</h1>
+        <p>Enter your personal details and start journey with us</p>
+        <button class="ghost" id="signUp">Sign Up</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const signUpButton = document.getElementById('signUp');
-		const signInButton = document.getElementById('signIn');
-		const container = document.getElementById('container');
+  document.addEventListener("DOMContentLoaded", function () {
+    const signUpButton = document.getElementById("signUp");
+    const signInButton = document.getElementById("signIn");
+    const container = document.getElementById("container");
 
-		signUpButton.addEventListener('click', () => {
-			container.classList.add("right-panel-active");
-		});
+    signUpButton.addEventListener("click", () => {
+      container.classList.add("right-panel-active");
+    });
 
-		signInButton.addEventListener('click', () => {
-			container.classList.remove("right-panel-active");
-		});
-	});
+    signInButton.addEventListener("click", () => {
+      container.classList.remove("right-panel-active");
+    });
+  });
+
+  const nameId = document.getElementById("name");
+  const emailId = document.getElementById("email");
+  const phoneId = document.getElementById("phone");
+  const passId = document.getElementById("password");
+  const cPassId = document.getElementById("confirm-password");
+
+  const error1 = document.getElementById("error1");
+  const error2 = document.getElementById("error2");
+  const error3 = document.getElementById("error3");
+  const error4 = document.getElementById("error4");
+  const error5 = document.getElementById("error5");
+
+  const signForm = document.getElementById("signform");
+
+  function nameValidateChecking(e) {
+    const nameVal = nameId.value;
+    const namePattern = /^[A-Za-z\s]+$/;
+
+    if (nameVal.trim() === "") {
+      error1.style.display = "block";
+      error1.innerHTML = "Please enter a valid name";
+    } else if (!namePattern.test(nameVal)) {
+      error1.style.display = "block";
+      error1.innerHTML = "Name can only contain alphabets and spaces";
+    } else {
+      error1.style.display = "none";
+      error1.innerHTML = "";
+    }
+  }
+
+  function emailValidateChecking(e) {
+    const emailVal = emailId.value;
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailPattern.test(emailVal)) {
+      error2.style.display = "block";
+      error2.innerHTML = "Invalid Format";
+    } else {
+      error2.style.display = "none";
+      error2.innerHTML = "";
+    }
+  }
+
+  function phoneValidateChecking(e) {
+    const phoneVal = phoneId.value;
+
+    if (phoneVal.trim() === "") {
+      error3.style.display = "block";
+      error3.innerHTML = "Enter valid number";
+    } else if (phoneVal.length < 10 || phoneVal.length > 10) {
+      error3.style.display = "block";
+      error3.innerHTML = "Enter 10 digit";
+    } else {
+      error3.style.display = "none";
+      error3.innerHTML = "";
+    }
+  }
+
+  function passValidateChecking(e) {
+    const passVal = passId.value;
+    const cPassVal = cPassId.value;
+    const alpha = /[a-zA-Z]/;
+    const digit = /\d/;
+
+    if (passVal.length < 8) {
+      error4.style.display = "block";
+      error4.innerHTML = "Password should contain minimum 8 characters";
+    } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+      error4.style.display = "block";
+      error4.innerHTML = "Password should contain numbers and alphabets";
+    } else {
+      error4.style.display = "none";
+      error4.innerHTML = "";
+    }
+
+    if (passVal !== cPassVal) {
+      error5.style.display = "block";
+      error5.innerHTML = "Password is not match";
+    } else {
+      error5.style.display = "none";
+      error5.innerHTML = "";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    signForm.addEventListener("submit", function (e) {
+      nameValidateChecking();
+      emailValidateChecking();
+      phoneValidateChecking();
+      passValidateChecking();
+
+      if (
+        !nameId ||
+        !emailId ||
+        !phoneId ||
+        !passId ||
+        !cPassId ||
+        !error1 ||
+        !error2 ||
+        !error3 ||
+        !error4 ||
+        !error5 ||
+        !signForm
+      ) {
+        console.error("One or more elements not found");
+      }
+
+      if (
+        error1.innerHTML ||
+        error2.innerHTML ||
+        error3.innerHTML ||
+        error4.innerHTML ||
+        error5.innerHTML
+      ) {
+        e.preventDefault();
+      }
+    });
+  });
 </script>
