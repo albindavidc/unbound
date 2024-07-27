@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const User = require("../../models/userSchema");
 const nodemailer = require("nodemailer");
@@ -29,6 +29,8 @@ const loadSignup = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+// Signup - Generate OTP - Send Verification Email
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -126,18 +128,15 @@ const verifyOtp = async (req, res) => {
       });
 
       if (!req.session.userOtp || !req.session.userData) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Session expired, please try again.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Session expired, please try again.",
+        });
       }
 
       await saveUserData.save();
       req.session.user = saveUserData._id;
-      res.json({success:true, redirectUrl:"/"})
-
+      res.json({ success: true, redirectUrl: "/" });
     } else {
       res.status(400).json({
         success: false,
@@ -146,10 +145,16 @@ const verifyOtp = async (req, res) => {
     }
   } catch (error) {
     console.error("Error Verifying OTP", error);
-    res.status(500).json({ success: false, message: "An unexpected error occurred. Please try again later." });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "An unexpected error occurred. Please try again later.",
+      });
   }
 };
 
+// Resend OTP
 const resendOtp = async (req, res) => {
   try {
     const { email } = req.session.userData;
@@ -171,28 +176,67 @@ const resendOtp = async (req, res) => {
         .status(200)
         .json({ success: true, message: "OTP Resend Successfully" });
     } else {
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Failed to resend OTP. Please try again",
-        });
+      res.status(500).json({
+        success: false,
+        message: "Failed to resend OTP. Please try again",
+      });
     }
   } catch (error) {
     console.error("Error resending OTP", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error. Please try again",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error. Please try again",
+    });
   }
-
-
 };
 
-//Load Shopping
+//Load Login - Redirect Login
+const loadLogin = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.render("user/signup");
+    } else {
+      res.render("/");
+    }
+  } catch (error) {
+    res.redirect("/pageNotFound");
+  }
+};
 
+const login = async (req,res) => {
+  try {
+    
+    const {email, password} = req.body;
+
+    const findUser = await User.findOne({isAdmin:0,email: email});
+
+    if(!findUser) {
+      return res.render("user/signup", {message: "User not found"});
+    }
+
+    if(findUser.isBlocked) {
+      return res.render("user/signup", {message: "User is blocked by the admin"});
+    }
+
+    const passwordMatch = await bcrypt.compare(password, findUser.password);
+
+    if(!passwordMatch){
+      return res.render("user/signup", {message: "Entered Incorrect password"});
+    }
+
+    req.session.user = findUser._id;
+
+    res.redirect("/");
+
+  } catch (error) {
+
+    console.error("Login error", error);
+    res.render("user/signup", {message: "Login failed. Please try again later"});
+
+  }
+}
+
+//Load Shopping
 const loadShopping = async (req, res) => {
   try {
     return res.render("shop");
@@ -209,6 +253,8 @@ module.exports = {
   signup,
   verifyOtp,
   resendOtp,
+  loadLogin,
+  login,
 
   loadShopping,
 };

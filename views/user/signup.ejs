@@ -10,7 +10,9 @@
       <h1>Create Account</h1>
       <div class="social-container">
         <!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
-        <a href="/auth/google" class="social"><i class="fab fa-google-plus-g"></i></a>
+        <a href="/auth/google" class="social"
+          ><i class="fab fa-google-plus-g"></i
+        ></a>
       </div>
       <span>or use your email for registration</span>
 
@@ -57,11 +59,15 @@
         <div id="error5" class="error-message"></div>
       </div>
 
+      <%if(locals.message && message.length>0){%>
+      <div class="alert alert-danger text-center"><%=message%></div>
+      <%}%>
+
       <button type="submit" style="margin-top: 5%">Sign Up</button>
     </form>
   </div>
   <div class="form-container sign-in-container">
-    <form id="signform" method="post" action="/signin">
+    <form id="loginform" method="post" action="/login">
       <h1>Sign in</h1>
       <div class="social-container">
         <!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
@@ -72,15 +78,33 @@
       <span>or use your account</span>
 
       <div class="elementsField">
-        <input type="email" placeholder="Email" />
+        <input
+          type="email"
+          class="form-control"
+          name="email"
+          id="email"
+          placeholder="Enter email"
+        />
+        <div id="error1" class="error-message"></div>
+      </div>
+      <div class="elementsField">
+        <input
+          type="password"
+          class="form-control"
+          name="password"
+          id="password"
+          placeholder="Password"
+        />
+        <div id="error2" class="error-message"></div>
       </div>
 
-      <div class="elementsField">
-        <input type="password" placeholder="Password" />
-      </div>
+      <%if(locals.message && message.length>0){%>
+      <div class="alert alert-danger text-center"><%=message%></div>
+      <%}%>
 
       <a href="#">Forgot your password?</a>
-      <button>Sign In</button>
+
+      <button type="submit" class="btn btn-primary">Sign In</button>
     </form>
   </div>
   <div class="overlay-container">
