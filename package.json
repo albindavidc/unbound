@@ -21,6 +21,8 @@
     "morgan": "~1.9.1",
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
     "sweetalert": "^2.1.2"
   },
   "description": "",
