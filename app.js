@@ -7,6 +7,7 @@ const session = require("express-session");
 const db = require("./config/db");
 const passport = require("./config/passport");
 const userRouter = require("./routes/userRouter");
+const adminRouter = require("./routes/adminRouter");
 
 const port = process.env.PORT || 8080;
 const app = express();
@@ -28,6 +29,7 @@ app.use(
       maxAge: 72 * 60 * 60 * 1000,
     },
   })
+  
 );
 
 app.use(passport.initialize());
@@ -46,6 +48,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
 
 app.use("/", userRouter);
+app.use("/admin", adminRouter);
 
 app.listen(port, () => {
   console.log("The server is up and running");

@@ -14,7 +14,18 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
-    return res.render("user/home");
+    res.render("user/home",{
+      user:req.session.user,
+    });
+
+
+
+    // if (user) {
+    //   res.render("user/home", { user: req.session.user });
+    // } else {
+      
+    //   return res.render("user/home");
+    // }
   } catch (error) {
     console.log(`Home page is not available`);
     res.status(500).send(`Server error`);
@@ -145,12 +156,10 @@ const verifyOtp = async (req, res) => {
     }
   } catch (error) {
     console.error("Error Verifying OTP", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An unexpected error occurred. Please try again later.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An unexpected error occurred. Please try again later.",
+    });
   }
 };
 
@@ -203,38 +212,56 @@ const loadLogin = async (req, res) => {
   }
 };
 
-const login = async (req,res) => {
+const login = async (req, res) => {
   try {
-    
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
-    const findUser = await User.findOne({isAdmin:0,email: email});
+    const findUser = await User.findOne({ isAdmin: 0, email: email });
 
-    if(!findUser) {
-      return res.render("user/signup", {message: "User not found"});
+    if (!findUser) {
+      return res.render("user/signup", { message: "User not found" });
     }
 
-    if(findUser.isBlocked) {
-      return res.render("user/signup", {message: "User is blocked by the admin"});
+    if (findUser.isBlocked) {
+      return res.render("user/signup", {
+        message: "User is blocked by the admin",
+      });
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
 
-    if(!passwordMatch){
-      return res.render("user/signup", {message: "Entered Incorrect password"});
+    if (!passwordMatch) {
+      return res.render("user/signup", {
+        message: "Entered Incorrect password",
+      });
     }
 
     req.session.user = findUser._id;
 
     res.redirect("/");
-
   } catch (error) {
-
     console.error("Login error", error);
-    res.render("user/signup", {message: "Login failed. Please try again later"});
-
+    res.render("user/signup", {
+      message: "Login failed. Please try again later",
+    });
   }
-}
+};
+
+//Logout
+const logout = async (req, res) => {
+  try {
+    req.session.destroy((err) => {
+      if (err) {
+        console.log("Session destruction error", err.message);
+        return res.redirect("/pageNotFound");
+      }
+      return res.redirect("/signup");
+    });
+  } catch (error) {
+    console.log("Logout error", error);
+    res.redirect("/pageNotFound");
+  }
+};
 
 //Load Shopping
 const loadShopping = async (req, res) => {
@@ -255,6 +282,7 @@ module.exports = {
   resendOtp,
   loadLogin,
   login,
+  logout,
 
   loadShopping,
 };

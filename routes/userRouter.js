@@ -6,6 +6,7 @@ const userController = require("../controllers/user/userController");
 //Home page - Page not found
 router.get("/", userController.loadHomepage);
 router.get("/pageNotFound", userController.pageNotFound);
+router.get("/logout", userController.login);
 
 //Signup Managment
 router.get("/user/signup", userController.loadSignup);
@@ -31,5 +32,13 @@ router.post("/login", userController.login);
 
 
 router.get("/shop", userController.loadShopping);
+
+
+
+
+
+
+
+
 
 module.exports = router;
