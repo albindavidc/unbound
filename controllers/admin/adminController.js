@@ -2,6 +2,15 @@ const User = require("../../models/userSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
+//Page-error
+
+const pageerror = async (req,res) =>{
+    res.render("admin-error");
+}
+
+
+//Load login page
+
 const loadLogin = (req, res) => {
   if (req.session.admin) {
     return res.redirect("/admin/dashboard");
@@ -29,7 +38,7 @@ const login = async (req, res) => {
     }
   } catch (error) {
     console.log("Login error", error);
-    return res.redirect("/page-404");
+    return res.redirect("/pageerror");
   }
 };
 
@@ -41,7 +50,7 @@ const loadDashboard = async (req,res) =>{
         try {
             res.render("admin/dashboard");
         } catch (error) {
-            res.redirect("/page-404")
+            res.redirect("/pageerror")
         }
     }
 }
@@ -50,4 +59,5 @@ module.exports = {
   loadLogin,
   login,
   loadDashboard,
+  pageerror,
 };
