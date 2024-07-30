@@ -9,7 +9,7 @@ const pageerror = async (req,res) =>{
 }
 
 
-//Load login page
+//Load - login page
 
 const loadLogin = (req, res) => {
   if (req.session.admin) {
