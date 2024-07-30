@@ -51,6 +51,8 @@ app.use(morgan("dev"));
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
+app.use("/admin-assets", express.static("public/admin-assets"))
+
 app.listen(port, () => {
   console.log("The server is up and running");
 });
