@@ -25,7 +25,7 @@ const adminAuth = (req, res, next) => {
       if (data) {
         next();
       } else {
-        res.redirect("/admin/login");
+        res.redirect("/admin/login"); // Ensure this redirection is intended
       }
     })
     .catch((error) => {
@@ -33,6 +33,8 @@ const adminAuth = (req, res, next) => {
       res.status(500).send("Internal Server Error");
     });
 };
+
+
 
 module.exports = {
   userAuth,

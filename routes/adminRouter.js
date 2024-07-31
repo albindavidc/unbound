@@ -23,10 +23,13 @@ router.get("/unblockCustomer", adminAuth, customerController.customerunBlocked);
 
 //Category - Management
 router.get("/category", adminAuth, categoryController.categoryInfo); 
-router.post("/addCategory", adminAuth, categoryController.addCategory);
-
 router.get("/category/:id", adminAuth, categoryController.getCategoryDetails);
+
+router.post("/addCategory", adminAuth, categoryController.addCategory);
 router.post("/editCategory", adminAuth, categoryController.editCategory);
+router.get("/category/:id/list", adminAuth, categoryController.categoryListed);
+router.get("/category/:id/unlist", adminAuth, categoryController.categoryUnlisted);
+
 
 
 module.exports = router;

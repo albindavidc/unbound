@@ -1,30 +1,50 @@
 const Category = require("../../models/categorySchema");
 
+// Fetch category data with pagination and search
 const categoryInfo = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
+    let search = "";
+    if (req.query.search) {
+      search = req.query.search;
+    }
+
+    let page = 1;
+    if (req.query.page) {
+      page = req.query.page;
+    }
+
     const limit = 4;
-    const skip = (page - 1) * limit;
 
-    const categoryData = await Category.find({})
-      .select("_id name description")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    // Fetch category data
+    const categoryData = await Category.find({
+      $or: [
+        { name: { $regex: ".*" + search + ".*", $options: "i" } },
+        { description: { $regex: ".*" + search + ".*", $options: "i" } },
+      ],
+    })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
 
-    const totalCategories = await Category.countDocuments();
-    const totalPages = Math.ceil(totalCategories / limit);
-    res.render("admin/category", {
-      cat: categoryData,
-      currentPage: page,
-      totalPages: totalPages,
-      totalCategories: totalCategories,
-    });
+    // Count documents
+    const count = await Category.find({
+      $or: [
+        { name: { $regex: ".*" + search + ".*", $options: "i" } },
+        { description: { $regex: ".*" + search + ".*", $options: "i" } },
+      ],
+    }).countDocuments();
+
+    // Calculate total pages
+    const totalPages = Math.ceil(count / limit);
+
+    // Render the EJS template with data
+    res.render("admin/category", { cat: categoryData, totalPages, currentPage: page });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching category data:', error);
     res.redirect("/pageerror");
   }
 };
+
 const addCategory = async (req, res) => {
   const { name, description } = req.body;
   try {
@@ -77,9 +97,35 @@ const editCategory = async (req, res) => {
   }
 };
 
+// List Category
+const categoryListed = async (req, res) => {
+  try {
+    let id = req.params.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: true } });
+    res.redirect("/admin/category");
+  } catch (error) {
+    console.error('Error listing category:', error);
+    res.redirect("/pageerror");
+  }
+};
+
+// Unlist Category
+const categoryUnlisted = async (req, res) => {
+  try {
+    let id = req.params.id;
+    await Category.updateOne({ _id: id }, { $set: { isListed: false } });
+    res.redirect("/admin/category");
+  } catch (error) {
+    console.error('Error unlisting category:', error);
+    res.redirect("/pageerror");
+  }
+};
+
 module.exports = {
   categoryInfo,
   addCategory,
   editCategory,
   getCategoryDetails,
+  categoryListed,
+  categoryUnlisted,
 };

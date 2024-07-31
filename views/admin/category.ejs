@@ -93,74 +93,15 @@
         </div>
       </form>
     </header>
-    <div class="card">
-      <div class="card-body">
-        <div class="row">
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Status</th>
-                  <th>List/Unlist</th>
-                  <th class="text-start">Edit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% cat.reverse().forEach((category, index) => { %>
 
-                <tr>
-                  <td class="text-start"><%= category.name %></td>
-                  <td class="text-start"><%= category.description %></td>
-
-
-
-                  <td class="text-start">
-                    <span
-                      class="badge rounded-pill alert-success"
-                      style="margin: 10px 0px; width: 60px"
-                      >Listed</span
-                    >
-                    <span
-                      class="badge rounded-pill alert-danger"
-                      style="margin: 10px 0px; width: 60px"
-                      >Unlisted</span
-                    >
-                  </td>
-
-                  <td class="text-start">
-                    <button
-                      class="btn btn-danger"
-                      style="margin: 10px 0px; width: 70px"
-                    >
-                      <a href="#" class="text-white">Unlist</a>
-                    </button>
-                    <button
-                      class="btn btn-success"
-                      style="margin: 10px 0px; width: 70px"
-                    >
-                      <a href="" class="text-white">List</a>
-                    </button>
-                  </td>
-
-                  <td class="text-start">
-                    <button
-                      class="btn btn-info"
-                      data-id="<%= category._id %>"
-                      onclick="openEditForm(this.getAttribute('data-id'))"
-                    >
-                      <a href="#" class="text-white">Edit</a>
-                    </button>
-                  </td>
-                </tr>
-
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <div class="text-center" style="padding: 0 0 0 700px">
+      <button
+        class="btn btn-primary"
+        id="new-category-button"
+        style="margin-top: 20px"
+      >
+        New Category
+      </button>
     </div>
 
     <div id="add-category-form" style="display: none; margin-top: 20px">
@@ -233,14 +174,76 @@
       </form>
     </div>
 
-    <div class="text-center">
-      <button
-        class="btn btn-primary"
-        id="new-category-button"
-        style="margin-top: 20px"
-      >
-        New Category
-      </button>
+    <div class="card" style="margin: 50px 0">
+      <div class="card-body">
+        <div class="row">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>
+                    <span style="margin: 0px 40px"> Status </span>
+                    <span style="margin: 0px 30px">List/Unlist</span>
+                  </th>
+                  <th class="text-start">Edit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (let i = 0; i < cat.length; i++) { %>
+                <tr>
+                  <td><%= cat[i].name %></td>
+                  <td><%= cat[i].description %></td>
+                  <td>
+                    <% if (cat[i].isListed === false) { %>
+
+                    <span
+                      class="badge rounded-pill alert-danger"
+                      style="width: 60px; margin: 0px 40px"
+                      >Unlisted</span
+                    >
+                    <button class="btn btn-success" style="width: 80px">
+                      <a
+                        href="/admin/category/<%= cat[i]._id %>/list"
+                        class="text-white"
+                        style="text-decoration: none"
+                        >List</a
+                      >
+                    </button>
+                    <% } else { %>
+
+                    <span
+                      class="badge rounded-pill alert-success"
+                      style="width: 60px; margin: 0px 40px"
+                      >Listed</span
+                    >
+                    <button class="btn btn-danger" style="width: 80px">
+                      <a
+                        href="/admin/category/<%= cat[i]._id %>/unlist"
+                        class="text-white"
+                        style="text-decoration: none"
+                        >Unlist</a
+                      >
+                    </button>
+                    <% } %>
+                  </td>
+                  <td class="text-start">
+                    <button
+                      class="btn btn-info"
+                      data-id="<%= cat[i]._id %>"
+                      onclick="openEditForm(this.getAttribute('data-id'))"
+                    >
+                      <a href="#" class="text-white">Edit</a>
+                    </button>
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="pagination-container" style="padding: 50px 0px">
@@ -273,12 +276,23 @@
               category.description;
             document.getElementById("edit-category-form").style.display =
               "block";
+            document.getElementById("add-category-form").style.display = "none"; // Hide add form
+            document.getElementById("new-category-button").style.display =
+              "none"; // Hide new category button
           })
           .catch((error) => {
             console.error("Error fetching category details:", error);
           });
       }
 
+      // Function to show the form for creating a new category
+      function showNewCategoryForm() {
+        document.getElementById("add-category-form").style.display = "block";
+        document.getElementById("edit-category-form").style.display = "none"; // Hide edit form
+        document.getElementById("new-category-button").style.display = "none"; // Hide new category button
+      }
+
+      // Function to handle form submission for adding a category
       function handleAddFormSubmit(event) {
         event.preventDefault();
         const name = document.getElementById("product_name").value;
@@ -307,6 +321,9 @@
             Swal.fire({
               icon: "success",
               title: "Success",
+              timer: 3000,
+              showConfirmButton: false,
+
               text: "Category added successfully!",
             }).then(() => location.reload());
           })
@@ -314,6 +331,9 @@
             Swal.fire({
               icon: "error",
               title: "Oops",
+              timer: 3000,
+              showConfirmButton: false,
+
               text:
                 error.message || "An error occurred while adding the category",
             });
@@ -350,6 +370,10 @@
             Swal.fire({
               icon: "success",
               title: "Success",
+              timer: 3000,
+              showConfirmButton: false,
+
+
               text: "Category updated successfully!",
             }).then(() => location.reload());
           })
@@ -357,6 +381,10 @@
             Swal.fire({
               icon: "error",
               title: "Oops",
+              timer: 3000,
+              showConfirmButton: false,
+
+
               text:
                 error.message ||
                 "An error occurred while updating the category",
@@ -405,11 +433,6 @@
         });
       }
 
-      // Function to show the form for creating a new category
-      function showNewCategoryForm() {
-        document.getElementById("add-category-form").style.display = "block";
-      }
-
       // Attach event listener to add and edit forms
       document
         .getElementById("add-category-form")
@@ -418,6 +441,11 @@
         .getElementById("edit-category-form")
         .addEventListener("submit", handleEditFormSubmit);
 
+      // Attach event listener to new category button
+      document
+        .getElementById("new-category-button")
+        .addEventListener("click", showNewCategoryForm);
+
       // Attach event listener to category edit buttons
       document.querySelectorAll(".btn-info").forEach((button) => {
         button.addEventListener("click", function () {
@@ -425,11 +453,6 @@
           openEditForm(id);
         });
       });
-
-      // Attach event listener to new category button
-      document
-        .getElementById("new-category-button")
-        .addEventListener("click", showNewCategoryForm);
     });
   </script>
 

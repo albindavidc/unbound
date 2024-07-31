@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const {Schema} = mongoose;
 
-const categorySchema = new mongoose.Schema({
+const categorySchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -14,11 +14,6 @@ const categorySchema = new mongoose.Schema({
     isListed: {
         type: Boolean,
         default: true,
-    },
-    categoryOffer: {
-        type: Number, 
-        default: 0,
-        min: [0, "Offer price must be positive"],
     },
 }, {timestamps: true});
 
