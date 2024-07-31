@@ -16,13 +16,12 @@ const categorySchema = new mongoose.Schema({
         default: true,
     },
     categoryOffer: {
-        type: Number, default: 0,
+        type: Number, 
+        default: 0,
+        min: [0, "Offer price must be positive"],
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    }
-})
+}, {timestamps: true});
+
 
 const Category = mongoose.model("Category", categorySchema);
 module.exports = Category;
