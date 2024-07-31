@@ -9,9 +9,11 @@ const { userAuth, adminAuth } = require("../middlewares/auth");
 router.get("/pageerror", adminController.pageerror);
 
 //Login - Management
+
 router.get("/login", adminController.loadLogin);
+router.get("/", adminController.redirectToLogin);
 router.post("/login", adminController.login);
-router.get("/", adminAuth, adminController.loadDashboard);
+router.get("/dashboard", adminAuth, adminController.loadDashboard);
 router.get("/logout", adminController.logout);
 
 //Customer - Management

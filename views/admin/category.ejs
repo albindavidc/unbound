@@ -102,8 +102,6 @@
                 <tr>
                   <th>Name</th>
                   <th>Description</th>
-                  <th>Offer Price</th>
-                  <th>Offer</th>
                   <th>Status</th>
                   <th>List/Unlist</th>
                   <th class="text-start">Edit</th>
@@ -116,22 +114,7 @@
                   <td class="text-start"><%= category.name %></td>
                   <td class="text-start"><%= category.description %></td>
 
-                  <td class="text-start"></td>
 
-                  <td class="text-start">
-                    <button
-                      class="btn btn-info"
-                      style="margin: 10px 0px; padding: 10px; width: 100px"
-                    >
-                      <a href="#" class="text-white">Add Offer</a>
-                    </button>
-                    <button
-                      class="btn btn-info"
-                      style="margin: 10px 0px; width: 100px"
-                    >
-                      <a href="#" class="text-white">Remove</a>
-                    </button>
-                  </td>
 
                   <td class="text-start">
                     <span
@@ -297,142 +280,157 @@
       }
 
       function handleAddFormSubmit(event) {
-    event.preventDefault();
-    const name = document.getElementById("product_name").value;
-    const description = document.getElementById("descriptionId").value;
+        event.preventDefault();
+        const name = document.getElementById("product_name").value;
+        const description = document.getElementById("descriptionId").value;
 
-    if (!validateForm(name, description)) {
-      return;
-    }
-
-    fetch("/admin/addCategory", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, description }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((err) => {
-            throw new Error(err.error);
-          });
+        if (!validateForm(name, description)) {
+          return;
         }
-        return response.json();
-      })
-      .then(() => {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Category added successfully!",
-        }).then(() => location.reload());
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops",
-          text: error.message || "An error occurred while adding the category",
+
+        fetch("/admin/addCategory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, description }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((err) => {
+                throw new Error(err.error);
+              });
+            }
+            return response.json();
+          })
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Category added successfully!",
+            }).then(() => location.reload());
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops",
+              text:
+                error.message || "An error occurred while adding the category",
+            });
+          });
+      }
+
+      // Function to handle form submission for editing a category
+      function handleEditFormSubmit(event) {
+        event.preventDefault();
+        const id = document.getElementById("editCategoryId").value;
+        const name = document.getElementById("editName").value;
+        const description = document.getElementById("editDescription").value;
+
+        if (!validateForm(name, description)) {
+          return;
+        }
+
+        fetch("/admin/editCategory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id, name, description }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((err) => {
+                throw new Error(err.error);
+              });
+            }
+            return response.json();
+          })
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Category updated successfully!",
+            }).then(() => location.reload());
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops",
+              text:
+                error.message ||
+                "An error occurred while updating the category",
+            });
+          });
+      }
+
+      // Function to validate form inputs
+      function validateForm(name, description) {
+        clearErrorMessages();
+        let isValid = true;
+
+        if (!name.trim()) {
+          displayErrorMessage("name-error", "Please enter a name");
+          isValid = false;
+        } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+          displayErrorMessage(
+            "name-error",
+            "Category name should contain only alphabetic characters"
+          );
+          isValid = false;
+        }
+        if (!description.trim()) {
+          displayErrorMessage(
+            "description-error",
+            "Please enter a valid description"
+          );
+          isValid = false;
+        }
+        return isValid;
+      }
+
+      // Function to display error messages
+      function displayErrorMessage(elementId, message) {
+        var errorElement = document.getElementById(elementId);
+        errorElement.innerHTML = message;
+        errorElement.style.display = "block";
+      }
+
+      // Function to clear error messages
+      function clearErrorMessages() {
+        const errorElements = document.getElementsByClassName("error-message");
+        Array.from(errorElements).forEach((element) => {
+          element.innerText = "";
+          element.style.display = "none";
+        });
+      }
+
+      // Function to show the form for creating a new category
+      function showNewCategoryForm() {
+        document.getElementById("add-category-form").style.display = "block";
+      }
+
+      // Attach event listener to add and edit forms
+      document
+        .getElementById("add-category-form")
+        .addEventListener("submit", handleAddFormSubmit);
+      document
+        .getElementById("edit-category-form")
+        .addEventListener("submit", handleEditFormSubmit);
+
+      // Attach event listener to category edit buttons
+      document.querySelectorAll(".btn-info").forEach((button) => {
+        button.addEventListener("click", function () {
+          const id = this.dataset.id;
+          openEditForm(id);
         });
       });
-  }
 
-  // Function to handle form submission for editing a category
-  function handleEditFormSubmit(event) {
-    event.preventDefault();
-    const id = document.getElementById("editCategoryId").value;
-    const name = document.getElementById("editName").value;
-    const description = document.getElementById("editDescription").value;
-
-    if (!validateForm(name, description)) {
-      return;
-    }
-
-    fetch("/admin/editCategory", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id, name, description }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((err) => {
-            throw new Error(err.error);
-          });
-        }
-        return response.json();
-      })
-      .then(() => {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Category updated successfully!",
-        }).then(() => location.reload());
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops",
-          text: error.message || "An error occurred while updating the category",
-        });
-      });
-  }
-
-  // Function to validate form inputs
-  function validateForm(name, description) {
-    clearErrorMessages();
-    let isValid = true;
-
-    if (!name.trim()) {
-      displayErrorMessage("name-error", "Please enter a name");
-      isValid = false;
-    } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-      displayErrorMessage("name-error", "Category name should contain only alphabetic characters");
-      isValid = false;
-    }
-    if (!description.trim()) {
-      displayErrorMessage("description-error", "Please enter a valid description");
-      isValid = false;
-    }
-    return isValid;
-  }
-
-  // Function to display error messages
-  function displayErrorMessage(elementId, message) {
-    var errorElement = document.getElementById(elementId);
-    errorElement.innerHTML = message;
-    errorElement.style.display = "block";
-  }
-
-  // Function to clear error messages
-  function clearErrorMessages() {
-    const errorElements = document.getElementsByClassName("error-message");
-    Array.from(errorElements).forEach((element) => {
-      element.innerText = "";
-      element.style.display = "none";
+      // Attach event listener to new category button
+      document
+        .getElementById("new-category-button")
+        .addEventListener("click", showNewCategoryForm);
     });
-  }
-
-  // Function to show the form for creating a new category
-  function showNewCategoryForm() {
-    document.getElementById("add-category-form").style.display = "block";
-  }
-
-  // Attach event listener to add and edit forms
-  document.getElementById("add-category-form").addEventListener("submit", handleAddFormSubmit);
-  document.getElementById("edit-category-form").addEventListener("submit", handleEditFormSubmit);
-
-  // Attach event listener to category edit buttons
-  document.querySelectorAll(".btn-info").forEach((button) => {
-    button.addEventListener("click", function () {
-      const id = this.dataset.id;
-      openEditForm(id);
-    });
-  });
-
-  // Attach event listener to new category button
-  document.getElementById("new-category-button").addEventListener("click", showNewCategoryForm);
-});
   </script>
 
   <%- include("../../views/partials/admin/footer") %>
