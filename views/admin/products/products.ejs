@@ -1,0 +1,372 @@
+<%- include("../../partials/admin/header") %>
+
+
+
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+  <style>
+    .col-md-3 {
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 10px;
+    }
+
+    .form-label {
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .d-grid {
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: #fff;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .pagination-container {
+      text-align: center;
+    }
+
+    .pagination {
+      display: inline-block;
+    }
+
+    .pagination a,
+    .pagination .current-page {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 0 2px;
+      border: 1px solid #ddd;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .pagination a:hover {
+      background-color: #f5f5f5;
+    }
+
+    .error-message {
+      color: red;
+    }
+
+    /* Cropper Modal Styling */
+    #cropperModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1000;
+      display: none;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    #cropperModal img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    #cropImageButton {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #cropImageButton:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+
+
+<body>
+  <section class="content-main">
+    <section class="breadcrumb-option">
+      <div class="container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-2">
+            <li class="breadcrumb-item">
+              <a class="link-body-emphasis" href="/admin">
+                <svg class="bi" width="16" height="16">
+                  <use xlink:href="#house-door-fill"></use>
+                </svg>
+                <span class="visually-hidden">Dashboard</span>
+              </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+              Products
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2"><%= locals.title ? locals.title : 'Dashboard' %></h1>
+      <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/stocks">
+          <button type="button" class="btn btn-sm btn-outline-info">
+            Manage Stocks
+          </button>
+        </a>
+        <a href="/admin/product-offers">
+          <button type="button" class="btn btn-sm btn-outline-info">
+            Manage Offers
+          </button>
+        </a>
+        <a href="/admin/products/add-product">
+          <button type="button" class="btn btn-sm btn-outline-primary">
+            Add Product
+          </button>
+        </a>
+      </div>
+    </div>
+
+    <div class="container table-responsive text-capitalize">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Image</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-center">List/Unlist</th>
+            <th scope="col" class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (products && products.length > 0) { %>
+            <% products.forEach((product, index) => { %>
+              <tr class="align-middle">
+                <td><%= index + 1 %></td>
+                <td class="justify-content-center">
+                  <img class="img-fluid img-thumbnail" src="/uploads/product-images/<%- product.primary_image ? product.primary_image.name : product.secondary_images[0].name %>" width="70rem" alt="">
+                </td>
+                <td><%= product.product_name %></td>
+                <td><%= product.category[0].name %></td>
+                <td>
+                  <% if (product.isActive) { %>
+                    <span class="badge rounded-pill bg-success">Listed</span>
+                  <% } else { %>
+                    <span class="badge rounded-pill bg-info">Unlisted</span>
+                  <% } %>
+                </td>
+                <td class="text-center">
+                  <div class="d-flex flex-row justify-content-center">
+                    <% if (product.isActive) { %>
+                      <button onclick="toggleListing('<%- product._id %>', '<%- product.isActive %>', '<%- product.product_name %>')" class="btn btn-danger btn-sm">
+                        <i class="bi bi-slash-circle-fill"></i> Unlist
+                      </button>
+                    <% } else { %>
+                      <button onclick="toggleListing('<%- product._id %>', '<%- product.isActive %>', '<%- product.product_name %>')" class="btn btn-success btn-sm">
+                        <i class="bi bi-check-circle-fill"></i> List
+                      </button>
+                    <% } %>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group">
+                    <a href="/admin/products/edit-product/<%- product._id %>">
+                      <button class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    </a>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProduct('<%- product._id %>')">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-danger">No products Available - Add new products</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+      <!-- Pagination-->
+      <% if (products.length > 0 && (nextPage || current === pages)) { %>
+        <nav aria-label="Product Pagination">
+          <ul class="pagination justify-content-center mt-5">
+            <% if (current === 1) { %>
+              <li class="page-item disabled">
+                <a href="#" class="page-link">First</a>
+              </li>
+            <% } else { %>
+              <li class="page-item">
+                <a href="/admin/products/?page=1" class="page-link">First</a>
+              </li>
+            <% } %>
+
+            <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+            <% if (i !== 1) { %>
+              <li class="page-item disabled">
+                <a href="#" class="page-link">...</a>
+              </li>
+            <% } %>
+
+            <% for (; i < Number(current) + 4 && i <= pages; i++) { %>
+              <% if (i === current) { %>
+                <li class="page-item disabled">
+                  <a href="#" class="page-link"><%= i %></a>
+                </li>
+              <% } else { %>
+                <li class="page-item">
+                  <a href="/admin/products?page=<%= i %>" class="page-link"><%= i %></a>
+                </li>
+              <% } %>
+              <% if (i === Number(current) + 4 && i < pages) { %>
+                <li class="page-item disabled">
+                  <a href="#" class="page-link">...</a>
+                </li>
+              <% } %>
+            <% } %>
+
+            <% if (current === pages) { %>
+              <li class="page-item disabled">
+                <a href="#" class="page-link">Last</a>
+              </li>
+            <% } else { %>
+              <li class="page-item">
+                <a href="/admin/products?page=<%= pages %>" class="page-link">Last</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      <% } %>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+  <script defer>
+    const toggleListing = async (productId, isActive, productName) => {
+      const confirmed = await Swal.fire({
+        title: 'Are you sure?',
+        text: `You want to ${isActive === 'true' ? 'unlist' : 'list'} the product ${productName}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${isActive === 'true' ? 'unlist' : 'list'}!`,
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      });
+
+      if (confirmed.isConfirmed) {
+        const response = await fetch(`/admin/products/toggle-listing/${productId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          Swal.fire({
+            title: 'Success!',
+            text: `Product has been ${isActive === 'true' ? 'unlisted' : 'listed'}!.`,
+            icon: 'success',
+            timer: 1500
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong.',
+            icon: 'error',
+            timer: 1500
+          });
+        }
+      }
+    };
+
+    const deleteProduct = async (productId, productName) => {
+      const confirmed = await Swal.fire({
+        title: 'Are you sure?',
+        text: `You want to delete the product ${productName}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      });
+
+      if (confirmed.isConfirmed) {
+        try {
+          const response = await fetch(`/admin/products/delete-product/${productId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.message || 'Something went wrong.');
+          }
+
+          if (data.success) {
+            Swal.fire({
+              title: 'Success!',
+              text: 'Product has been deleted!',
+              icon: 'success',
+              timer: 1500
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message || 'Something went wrong.',
+              icon: 'error',
+              timer: 1500
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          Swal.fire({
+            title: 'Error!',
+            text: error.message || 'Something went wrong.',
+            icon: 'error',
+            timer: 1500
+          });
+        }
+      }
+    };
+  </script>
+
+<%- include("../../partials/admin/footer") %>

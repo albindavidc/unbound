@@ -1,8 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 const session = require("express-session");
+const flash = require("connect-flash");
+const MongoStore = require("connect-mongo");
+const nocache = require("nocache");
+const methodOverride = require("method-override");
 
 const db = require("./config/db");
 const passport = require("./config/passport");
@@ -14,16 +19,13 @@ const app = express();
 db();
 
 
-//
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: {
       secure: false,
       httpOnly: true,
@@ -36,6 +38,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(flash());
+app.use(nocache());
+
 app.use((req, res, next) => {
   res.set("cache-control", "no-store");
   next();
@@ -45,13 +50,22 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/admin-assets", express.static("public/admin-assets"))
 
-app.use(morgan("dev"));
+
+//Middlewares
+app.use(logger("dev"));
+app.use(express.json());
+app.use(methodOverride("_method"));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 
-app.use("/admin-assets", express.static("public/admin-assets"))
+
+
 
 app.listen(port, () => {
   console.log("The server is up and running");
