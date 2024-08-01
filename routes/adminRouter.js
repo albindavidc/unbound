@@ -5,83 +5,66 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
-const {productUpload} = require('../middlewares/multer'); // Adjust path accordingly
+const { productUpload } = require('../config/multer'); // Adjust path accordingly
 
-
-//Error - page
+// Error page
 router.get("/pageerror", adminController.pageerror);
 
-//Login - Management
-
+// Login Management
 router.get("/login", adminController.loadLogin);
 router.get("/", adminController.redirectToLogin);
 router.post("/login", adminController.login);
 router.get("/dashboard", adminAuth, adminController.loadDashboard);
 router.get("/logout", adminController.logout);
 
-//Customer - Management
+// Customer Management
 router.get("/users", adminAuth, customerController.customerInfo);
 router.get("/blockCustomer", adminAuth, customerController.customerBlocked);
 router.get("/unblockCustomer", adminAuth, customerController.customerunBlocked);
 
-//Category - Management
-router.get("/category", adminAuth, categoryController.categoryInfo); 
+// Category Management
+router.get("/category", adminAuth, categoryController.categoryInfo);
 router.get("/category/:id", adminAuth, categoryController.getCategoryDetails);
-
 router.post("/addCategory", adminAuth, categoryController.addCategory);
 router.post("/editCategory", adminAuth, categoryController.editCategory);
 router.get("/category/:id/list", adminAuth, categoryController.categoryListed);
 router.get("/category/:id/unlist", adminAuth, categoryController.categoryUnlisted);
 
+
 // Product Management Routes
-router.get("/products", productController.getProductInfo);
-
-router.get("/stocks", productController.getStocks);
-router.patch("/update-stock/", productController.updateStock);
-
+router.get('/products', adminAuth, productController.getProducts);
+router.get('/products/editProducts', adminAuth, productController.getEditProducts);
+router.get('/products/deleteProduct/:id', adminAuth, productController.deleteProduct);
+router.get("/products/stocks",adminAuth, productController.getStocks)
 router
-  .route("/products/add-product")
-  .get(productController.getAddProduct)
+  .route("/add-product")
+  .get(adminAuth, productController.getAddProducts)
   .post(
-    productUpload.fields([{ name: "images", maxCount: 3 }, { name: "primaryImage" }]),
-    productController.addProduct
-  );
-
-router
-  .route("/products/edit-product/:id")
-  .get(productController.getEditProduct)
-  .post(
+    adminAuth,
     productUpload.fields([
-      { name: "image2", maxCount: 1 }, 
-      { name: "image3", maxCount: 1 }, 
-      { name: "image4", maxCount: 1 }, 
-      { name: "primaryImage" }
+      { name: "images", maxCount: 4 },
+      { name: "primaryImage", maxCount: 1 }
+    ]),
+    productController.addProducts
+  );
+  
+  router
+  .route("/edit-product/:id")
+  .get(adminAuth, productController.getEditProducts)
+  .post(
+    adminAuth,
+    productUpload.fields([
+      { name: 'primaryImage', maxCount: 1 },
+      { name: 'image2', maxCount: 1 },
+      { name: 'image3', maxCount: 1 },
+      { name: 'image4', maxCount: 1 }
     ]),
     productController.editProduct
   );
 
-  
-// list/unlist product
-router.patch("/products/toggle-listing/:id", productController.toggleListing);
+router.post("/product/action",productController.listOrUnlistProduct)
+router.delete("/product/deleteProduct",productController.deleteProduct)
 
-// Product Delete
-router.delete("/products/delete-product/:id", productController.deleteProduct);
-
-// Product Image Delete
-router.delete("/products/delete-image/", productController.deleteImage);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+router.post("/product/updateStock",productController.updateStocks)
 
 module.exports = router;

@@ -1,546 +1,428 @@
-const fs = require("fs");
-const path = require("path");
-
 const sharp = require("sharp");
-
-const layout = "./layouts/adminLayout.ejs";
-const Product = require("../../models/productSchema")
+const adminLayout = "./layouts/adminLayouts";
 const Category = require("../../models/categorySchema");
-const Color = require("../../models/attributes/colorSchema");
-const Size = require("../../models/attributes/sizeSchema");
-const Brands = require("../../models/attributes/brandSchema");
-const Order = require("../../models/orderSchema");
-
+const Product = require("../../models/productSchema");
+const path = require("path");
+const fs = require("fs");
+const { configDotenv } = require("dotenv");
 
 module.exports = {
-  getProductInfo: async (req, res) => {
-    let perPage = 9;
-    let page = req.query.page || 1;
-
-    const products = await Product.aggregate([
-      { $sort: { createdAt: -1 } },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
-        },
-      },
-    ])
-      .skip(perPage * page - perPage)
-      .limit(perPage)
-      .exec();
-
-    const count = await Product.find().countDocuments();
-    const nextPage = parseInt(page) + 1;
-    const hasNextPage = nextPage <= Math.ceil(count / perPage);
-
-    res.render("admin/products/products", {
-      layout,
-      products,
-      current: page,
-      pages: Math.ceil(count / perPage),
-      nextPage: hasNextPage ? nextPage : null,
-      currentRoute: "/admin/products/",
-    });
-  },
-  getAddProduct: async (req, res) => {
-    const categories = await Category.find({ isActive: true });
-    const colors = await Color.find({ isDeleted: false });
-    const sizes = await Size.find({ isDeleted: false });
-    const brands = await Brands.find({ isActive: false });
-
-    res.render("admin/products/addProduct", {
-      layout,
-      brands,
-      categories,
-      colors,
-      sizes,
-    });
-  },
-  getEditProduct: async (req, res) => {
-    const product = await Product.findById(req.params.id)
-      .populate("category")
-      .populate("brand");
-    const categories = await Category.find({ isActive: true });
-    const brands = await Brands.find({ isActive: false });
-
-    // console.log(product);
-    res.render("admin/products/editProduct", {
-      layout,
-      product,
-      brands,
-      categories,
-    });
-  },
-
-  addProduct: async (req, res) => {
+  getProducts: async (req, res) => {
+    const locals = {
+      title: "Products",
+    };
     try {
-      console.log(req.body, req.files);
+      let perPage = 7;
+      let page = req.query.page || 1;
+      const product = await Product.find()
+        .populate("category")
+        .sort({ createdAt: -1 })
+        .skip(perPage * page - perPage)
+        .limit(perPage)
+        .exec();
+      const count = await Product.find().countDocuments({});
+      const nextPage = parseInt(page) + 1;
+      const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
-      // check if the product already exists
-      const productExists = await Product.findOne({
-        product_name: req.body.product_name.toLowerCase(),
+      const breadcrumbs = [
+        { name: 'Home', url: '/admin' },
+        { name: 'Products', url: '/admin/products' },
+        { name: `Page ${page}`, url: `/admin/products?page=${page}` }
+    ];
+
+      res.render("admin/products/products", {
+        locals,
+        layout: adminLayout,
+        product,
+        current: page,
+        perPage: perPage,
+        pages: Math.ceil(count / perPage),
+        nextPage: hasNextPage ? nextPage : null,
+        breadcrumbs,
       });
-      if (productExists) {
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  getAddProducts: async (req, res) => {
+    const locals = {
+      title: "Products",
+    };
+
+    
+    const categories = await Category.find({ isListed: true });
+    const breadcrumbs = [
+      { name: 'Home', url: '/admin' },
+      { name: 'Products', url: '/admin/products' },
+      { name: "Add Product",url: "/add-product" }
+  ];
+
+    res.render("admin/products/addProducts", {
+      locals,
+      layout: adminLayout,
+      categories,
+      breadcrumbs,
+    });
+  },
+
+  addProducts: async (req, res) => {
+
+    console.log("111111111111111");
+    console.log("222222222222222");
+    console.log("3333333333333333");
+
+
+
+    console.log(req.body);
+    try {
+      const existProduct = await Product.findOne({
+        name: req.body.productName.toLowerCase(),
+      });
+      if (existProduct) {
         return res
           .status(400)
-          .json({ success: false, message: "Product already exists." });
+          .json({ success: false, message: "Product already exist" });
       }
 
-      const variants = [];
 
-      // Iterate over the keys in the request body
-      for (const key in req.body) {
-        // Check if the key starts with 'variants['
-        if (key.startsWith("variants[")) {
-          // Extract the variant index and property from the key
-          const match = key.match(/variants\[(\d+)\]\.(.+)/);
-          if (match) {
-            const index = parseInt(match[1], 10);
-            const property = match[2];
 
-            // Initialize the variant object if it doesn't exist
-            if (!variants[index]) {
-              variants[index] = {};
-            }
 
-            // Assign the value to the variant object
-            variants[index][property] = req.body[key];
-          }
-        }
-      }
-      console.log(variants);
-
-      // Check for duplicate color and size combinations
-      const uniqueCombinations = new Set();
-      for (const variant of variants) {
-        const combination = `${variant.color}-${variant.size}`;
-        if (uniqueCombinations.has(combination)) {
-          // Duplicate found, respond with an error
-          return res.status(400).json({
-            success: false,
-            message: "Duplicate variant color and size combination found.",
-          });
-        }
-        uniqueCombinations.add(combination);
+      // Ensure req.files is defined and contains the expected fields
+      if (!req.files || !req.files.images || !req.files.primaryImage) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Images are required" });
       }
 
-      let seconaryImages = [];
+      let secondaryImages = [];
       req.files.images.forEach((e) => {
-        seconaryImages.push({
+        secondaryImages.push({
           name: e.filename,
           path: e.path,
         });
       });
 
-      seconaryImages.forEach(async (e) => {
+      secondaryImages.forEach(async (e) => {
         await sharp(
-          path.join(__dirname, "../../public/uploads/product-images/") + e.name
+          path.join(__dirname, "../../public/uploads/products-images/") + e.name
         )
           .resize(500, 500)
           .toFile(
-            path.join(__dirname, "../../public/uploads/product-images/crp/") +
+            path.join(__dirname, "../../public/uploads/products-images/crp/") +
               e.name
           );
       });
 
-      let PrimaryImage;
+      let primaryImage = [];
       req.files.primaryImage.forEach((e) => {
-        PrimaryImage = {
+        primaryImage = {
           name: e.filename,
           path: e.path,
         };
       });
 
+
+
+
       await sharp(
-        path.join(__dirname, "../../public/uploads/product-images/") +
-          PrimaryImage.name
+        path.join(__dirname, "../../public/uploads/products-images/") +
+          primaryImage.name
       )
         .resize(500, 500)
         .toFile(
-          path.join(__dirname, "../../public/uploads/product-images/crp/") +
-            PrimaryImage.name
+          path.join(__dirname, "../../public/uploads/products-images/crp/") +
+            primaryImage.name
         );
 
-      
-
       const product = new Product({
-        product_name: req.body.product_name.toLowerCase(),
-        brand: req.body.brand,
-        markdown1: req.body.description,
-        markdown2: req.body.details,
-        category: req.body.category,
-        variants: variants,
-        actualPrice: req.body.actualPrice,
-        sellingPrice: req.body.sellingPrice,
-        primary_image: PrimaryImage,
-        secondary_images: seconaryImages,
+        product_name: req.body.productName.toLowerCase(),
+        category: req.body.categoryName,
+        description: req.body.productDespt,
+        stock: req.body.productStock,
+        price: req.body.price,
+        oldPrice: req.body.oldPrice,
+        Colour: req.body.colour,
+        displaySize: req.body.displaySize,
+        resolution: req.body.resolution,
+        Processor: req.body.processor,
+        ramSize: req.body.ramSize,
+        hardDriveSize: req.body.hdSize,
+        hardDiskDescription: req.body.hdDescription,
+        graphicsChipsetBrand: req.body.graphics,
+        operatingSystem: req.body.os,
+        audioDetails: req.body.audioDetails,
+        numberofUSB: req.body.usbPort,
+        countryofOrigin: req.body.countryofOrigin,
+        itemWeight: req.body.weight,
+        primaryImages: primaryImage,
+        secondaryImages: secondaryImages,
       });
 
       await product.save();
-      // Example response for successful creation
-      res.status(200).json({
-        success: true,
-        message: "Product added successfully.",
-      });
+      req.flash("success", "Product added successfully");
+      res.redirect("/admin/products");
     } catch (error) {
-      // Handle any errors
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Server error.",
-      });
+      console.log(error);
+      //   res.status(500).json({ message: 'Server error' });
+      req.flash("error", error.message);
+      return res.redirect("/admin/add-product");
     }
   },
+
+  getEditProducts: async (req, res) => {
+    const locals = {
+      title: "Products",
+    };
+
+    const product = await Product.findById(req.params.id).populate("category");
+    const categories = await Category.find({ isActive: true });
+    const breadcrumbs = [
+      { name: 'Home', url: '/admin' },
+      { name: 'Products', url: '/admin/products' },
+      { name: "Edit Product",url: "/products/editProducts" }
+  ];
+    res.render("admin/products/editProducts", {
+      locals,
+      layout: adminLayout,
+      product,
+      categories,
+      breadcrumbs,
+    });
+  },
+
   editProduct: async (req, res) => {
     try {
-      console.log(req.files, req.body);
       const productId = req.params.id;
       const product = await Product.findById(productId);
-
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
 
-      let primaryImage = product.primary_image;
-      let secondaryImages = product.secondary_images;
-
-      if (req.files) {
-        if (req.files.primaryImage) {
-          primaryImage = {
+      // Handle primary image
+      let primaryImage = product.primaryImages;
+      if (req.files.primaryImage) {
+        primaryImage = [
+          {
             name: req.files.primaryImage[0].filename,
             path: req.files.primaryImage[0].path,
-          };
+          },
+        ];
 
-          await sharp(
-            path.join(__dirname, "../../public/uploads/product-images/") +
-              primaryImage.name
-          )
-            .resize(500, 500)
-            .toFile(
-              path.join(__dirname, "../../public/uploads/product-images/crp/") +
-                primaryImage.name
-            );
-        }
-
-        if (req.files.image2 || req.files.image3 || req.files.image4) {
-          if (req.files.image2) {
-
-            await sharp(
-              path.join(__dirname, "../../public/uploads/product-images/") +
-                req.files.image2[0].filename
+        await sharp(req.files.primaryImage[0].path)
+          .resize(500, 500)
+          .toFile(
+            path.join(
+              __dirname,
+              "../../public/uploads/products-images/crp/",
+              req.files.primaryImage[0].filename
             )
-              .resize(500, 500)
-              .toFile(
-                path.join(
-                  __dirname,
-                  "../../public/uploads/product-images/crp/"
-                ) + req.files.image2[0].filename
-              );
-          }
-          if (req.files.image3) {
-
-
-            await sharp(
-              path.join(__dirname, "../../public/uploads/product-images/") +
-                req.files.image3[0].filename
-            )
-              .resize(500, 500)
-              .toFile(
-                path.join(
-                  __dirname,
-                  "../../public/uploads/product-images/crp/"
-                ) + req.files.image3[0].filename
-              );
-          }
-          if (req.files.image4) {
-
-            await sharp(
-              path.join(__dirname, "../../public/uploads/product-images/") +
-                req.files.image4[0].filename
-            )
-              .resize(500, 500)
-              .toFile(
-                path.join(
-                  __dirname,
-                  "../../public/uploads/product-images/crp/"
-                ) + req.files.image4[0].filename
-              );
-          }
-
-          secondaryImages = [
-            {
-              name: req.files.image2
-                ? req.files.image2[0].filename
-                : product.secondary_images[0].name,
-              path: req.files.image2
-                ? req.files.image2[0].path
-                : product.secondary_images[0].path,
-            },
-            {
-              name: req.files.image3
-                ? req.files.image3[0].filename
-                : product.secondary_images[1].name,
-              path: req.files.image3
-                ? req.files.image3[0].path
-                : product.secondary_images[1].path,
-            },
-            {
-              name: req.files.image4
-                ? req.files.image4[0].filename
-                : product.secondary_images[2].name,
-              path: req.files.image4
-                ? req.files.image4[0].path
-                : product.secondary_images[2].path,
-            },
-          ];
-        }
+          );
       }
 
-      // Prepare the update object
-      // console.log(req.body);
-      const update = {
-        product_name: req.body.product_name || product.product_name,
-        brand: req.body.brand || product.brand,
-        markdown1: req.body.description,
-        markdown2: req.body.details,
-        description: dompurify.sanitize(marked.parse(req.body.description)),
-        details: dompurify.sanitize(marked.parse(req.body.details)),
-        category: req.body.category || product.category,
-        actualPrice: req.body.actualPrice || product.actualPrice,
-        sellingPrice: req.body.sellingPrice || product.sellingPrice,
-        isActive: req.body.status || product.isActive,
-        primary_image: primaryImage,
-        secondary_images: secondaryImages || product.secondary_images,
+      // Handle secondary images
+      let secondaryImages = [];
+      if (req.files.image2) {
+        await sharp(req.files.image2[0].path)
+          .resize(500, 500)
+          .toFile(
+            path.join(
+              __dirname,
+              "../../public/uploads/products-images/crp/",
+              req.files.image2[0].filename
+            )
+          );
+        secondaryImages.push({
+          name: req.files.image2[0].filename,
+          path: req.files.image2[0].path,
+        });
+      } else if (product.secondaryImages[0]) {
+        secondaryImages.push(product.secondaryImages[0]);
+      }
+
+      if (req.files.image3) {
+        await sharp(req.files.image3[0].path)
+          .resize(500, 500)
+          .toFile(
+            path.join(
+              __dirname,
+              "../../public/uploads/products-images/crp/",
+              req.files.image3[0].filename
+            )
+          );
+        secondaryImages.push({
+          name: req.files.image3[0].filename,
+          path: req.files.image3[0].path,
+        });
+      } else if (product.secondaryImages[1]) {
+        secondaryImages.push(product.secondaryImages[1]);
+      }
+      if (req.files.image4) {
+        await sharp(req.files.image4[0].path)
+          .resize(500, 500)
+          .toFile(
+            path.join(
+              __dirname,
+              "../../public/uploads/products-images/crp/",
+              req.files.image3[0].filename
+            )
+          );
+        secondaryImages.push({
+          name: req.files.image4[0].filename,
+          path: req.files.image4[0].path,
+        });
+      } else if (product.secondaryImages[1]) {
+        secondaryImages.push(product.secondaryImages[1]);
+      }
+
+      // Update the product
+      const updateProduct = {
+        product_name: req.body.productName.toLowerCase(),
+        category: req.body.categoryName,
+        description: req.body.productDespt,
+        stock: req.body.productStock,
+        price: req.body.price,
+        oldPrice: req.body.oldPrice,
+        Colour: req.body.colour,
+        displaySize: req.body.displaySize,
+        resolution: req.body.resolution,
+        Processor: req.body.processor,
+        ramSize: req.body.ramSize,
+        hardDriveSize: req.body.hdSize,
+        hardDiskDescription: req.body.hdDescription,
+        graphicsChipsetBrand: req.body.graphics,
+        operatingSystem: req.body.os,
+        audioDetails: req.body.audioDetails,
+        numberofUSB: req.body.usbPort,
+        countryofOrigin: req.body.countryofOrigin,
+        itemWeight: req.body.weight,
+        primaryImages: primaryImage,
+        secondaryImages: secondaryImages,
       };
 
-      // Perform the update operation
-      await Product.updateOne({ _id: productId }, update, { new: true });
-
+      await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
       req.flash("success", "Product edited successfully");
       res.redirect("/admin/products");
     } catch (error) {
       console.error(error);
-      req.flash("error", error.message);
-      res.redirect("/admin/products");
+
+      res.redirect("/products/editProducts").status(500).json({ message: "Server error" });
     }
   },
 
-  /**
-   * Variant Product Stock Management
-   */
+  listOrUnlistProduct: async (req, res) => {
+    const productId = req.body.productId;
+    const shouldList = req.body.shouldList;
 
-  getStocks: async (req, res) => {
+    console.log(
+      `Received request to ${
+        shouldList ? "list" : "unlist"
+      } product with ID: ${productId}`
+    );
+
     try {
-      let perPage = 9;
-      let page = req.query.page || 1;
-
-      const products = await Product.find()
-        .sort({ createdAt: -1 })
-        .populate("brand")
-        .populate("category")
-        .populate("variants.color")
-        .populate("variants.size")
-        .skip(perPage * page - perPage)
-        .limit(perPage)
-        .exec();
-
-      const count = await Product.find().countDocuments();
-      const nextPage = parseInt(page) + 1;
-      const hasNextPage = nextPage <= Math.ceil(count / perPage);
-
-      // console.log(products);
-      console.log(products[0]);
-      res.render("admin/products/stocks", {
-        products,
-        layout,
-        current: page,
-        pages: Math.ceil(count / perPage),
-        nextPage: hasNextPage ? nextPage : null,
-        currentRoute: "/admin/products/",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  },
-  updateStock: async (req, res) => {
-    try {
-      console.log(req.body);
-      const { variantId, stock } = req.body;
-
-      // First, check if the product and variant exist
-      const product = await Product.findOne({ "variants._id": variantId });
+      const product = await Product.findById(productId);
       if (!product) {
+        console.log("Product not found");
         return res
           .status(404)
-          .json({ message: "Product or variant not found." });
+          .json({ success: false, message: "Product not found" });
       }
 
-      // Attempt to update the stock
-      const updateVariantStock = await Product.findOneAndUpdate(
-        { "variants._id": variantId },
-        { $set: { "variants.$.stock": stock } },
-        { new: true }
-      );
+      product.isActive = shouldList;
+      await product.save();
 
-      // Check if the update was successful
-      if (updateVariantStock) {
-        res.json({
-          message: "Stock updated successfully.",
-          product: updateVariantStock,
-        });
-      } else {
-        res.status(400).json({ message: "Failed to update stock." });
-      }
+      console.log("Product status updated successfully");
+      return res
+        .status(200)
+        .json({ success: true, message: "Product status updated" });
     } catch (error) {
-      console.error(error);
-      res
+      console.error("Error updating product status:", error);
+      return res
         .status(500)
-        .json({ message: "An error occurred while updating the stock." });
+        .json({ success: false, message: "Server error", error });
     }
   },
-
   deleteProduct: async (req, res) => {
-    console.log(req.params);
-
     try {
-      const product = await Product.findById(req.params.id);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      // check if the product is already used in any order
-      const orders = await Order.find({ "items.product_id": req.params.id });
-      if (orders.length > 0) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Cannot delete product as it is used in an order, you can only delete products which are not used in any order",
-          });
-      }
+      const productId = req.body.productId;
+      console.log(`Received request to delete product with ID: ${productId}`);
 
-      // Delete primary image
-      if (product.primary_image && product.primary_image.path) {
-        fs.unlink(
-          path.join(__dirname, "..", product.primary_image.path),
-          (err) => {
-            if (err) console.error(err);
-          }
-        );
-      }
-
-      // Delete secondary images
-      if (product.secondary_images && product.secondary_images.length > 0) {
-        product.secondary_images.forEach((image) => {
-          fs.unlink(path.join(__dirname, "..", image.path), (err) => {
-            if (err) console.error(err);
-          });
-        });
-      }
-
-      // Delete the product from the database
-      await Product.deleteOne({ _id: req.params.id });
-      res.status(200).json({ message: "Product deleted successfully" });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: "Server error" });
-    }
-  },
-
-  // List / Unlist - Products (Soft Delete)
-  toggleListing: async (req, res) => {
-    try {
-      const product = await Product.findById(req.params.id);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      product.isActive = !product.isActive;
-      await product.save();
-      res.status(200).json({
-        message: product.isActive
-          ? "Product listed successfully"
-          : "Product unlisted successfully",
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Server error" });
-    }
-  },
-
-  // Delete Individual Images
-  deleteImage: async (req, res) => {
-    try {
-      const product = await Product.findById(req.query.productId);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-
-      const imageId = req.query.imageId; // Assuming you have an imageId query
-      let imageToDelete;
-
-      // Check if the image is a primary image
-      if (product.primary_image.name === imageId) {
-        imageToDelete = product.primary_image;
-        product.primary_image.name = ""; // Remove reference to the primary image
-        product.primary_image.path = ""; // Remove reference to the primary image
-      } else {
-        // Check if the image is a secondary image
-        const secondaryImageIndex = product.secondary_images.findIndex(
-          (image) => image.name === imageId
-        );
-        if (secondaryImageIndex !== -1) {
-          imageToDelete = product.secondary_images[secondaryImageIndex];
-          // product.secondary_images.splice(secondaryImageIndex, 1); // Remove the secondary image from the array
-          product.secondary_images[secondaryImageIndex].name = "";
-          product.secondary_images[secondaryImageIndex].path = "";
-        } else {
-          return res.status(404).json({ message: "Image not found" });
-        }
-      }
-
-      // Delete the image file from the server
-      fs.unlink(
-        path.join(__dirname, "../../public/uploads/product-images") +
-          imageToDelete.name,
-        (err) => {
-          if (err) {
-            console.error(err);
-            // return res
-            //   .status(500)
-            //   .json({ message: "Failed to delete image file" });
-          }
-        }
-      );
-
-      // Save the updated product document
-      await product.save();
-      res.status(200).json({ message: "Image deleted successfully" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Server error" });
-    }
-  },
-
-  // get product details for Offer
-  getProdDetails: async (req, res) => {
-    const productId = req.params.id;
-    try {
-      const product = await Product.findOne({ _id: productId });
-
+      const product = await Product.findById(productId);
       if (!product) {
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });
       }
 
-      return res.status(200).json({ success: true, product });
+      await Product.findByIdAndDelete(productId);
+      console.log("Product successfully deleted");
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Product successfully deleted" });
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting product:", error);
       return res
         .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+        .json({ success: false, message: "Server error", error });
+    }
+  },
+
+  getStocks: async (req, res) => {
+    try {
+        const perPage = 7;
+        const page = parseInt(req.query.page) || 1;
+        const products = await Product.find()
+            .sort({ createdAt: -1 })
+            .populate("category")
+            .skip(perPage * (page - 1))
+            .limit(perPage)
+            .exec();
+        const count = await Product.countDocuments({});
+        const nextPage = page + 1;
+        const hasNextPage = nextPage <= Math.ceil(count / perPage);
+
+        const breadcrumbs = [
+            { name: 'Home', url: '/admin' },
+            { name: 'Products', url: '/admin/products' },
+            { name: 'Stock', url: '/admin/products/stocks' },
+            { name: `Page ${page}`, url: `/admin/products/stocks?page=${page}` }
+        ];
+
+        res.render("admin/products/stock", {
+            products,
+            layout: adminLayout,
+            current: page,
+            perPage: perPage,
+            pages: Math.ceil(count / perPage),
+            nextPage: hasNextPage ? nextPage : null,
+            breadcrumbs,
+        });
+    } catch (error) {
+        console.error(error); 
+        res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+
+  updateStocks: async (req, res) => {
+    const { productId, newStock } = req.body;
+
+    try {
+      if (newStock < 0) {
+        return res.json({
+          success: false,
+          error: "Stock value cannot be negative.",
+        });
+      }
+
+      await Product.findByIdAndUpdate(productId, { stock: newStock });
+      res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      res.redirect("/products")
+      res.json({ success: false });
     }
   },
 };

@@ -1,0 +1,403 @@
+<%- include("../../partials/admin/header") %>
+
+
+<section class="content-main">
+    <ol class="breadcrumb">
+        <% breadcrumbs.forEach(function(crumb, index) { %>
+            <% if (index === breadcrumbs.length - 1) { %>
+                <li class="breadcrumb-item active"><%= crumb.name %></li>
+            <% } else { %>
+                <li class="breadcrumb-item"><a href="<%= crumb.url %>"><%= crumb.name %></a></li>
+            <% } %>
+        <% }); %>
+    </ol>
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Edit Product - <%= product.product_name %>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <form id="addProductForm" action="/admin/edit-product/<%= product._id %>" method="post"
+        enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Product Name</label>
+                            <input type="text" value="<%= product.product_name %>" placeholder="Type here"
+                                class="form-control" name="productName" id="product_name">
+                        </div>
+                        <div class="mb-4">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" name="status" aria-label="List or Unlist">
+                                <% if (!product.isDeleted) { %>
+                                    <option value="false">Listed</option>
+                                    <option value="true">Unlisted</option>
+                                    <% } else { %>
+                                        <option value="true">Unlisted</option>
+                                        <option value="false">Listed</option>
+                                        <% } %>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="category_name" class="form-label">Categories</label>
+                            <select name="categoryName" id="categoryName" class="form-select">
+                                <option value="<%= product.category._id %>">
+                                    <%= product.category.name %>
+                                </option>
+                                <% categories.forEach(category=> { %>
+                                    <% if (category.name !==product.category.name) { %>
+                                        <option value="<%= category._id %>">
+                                            <%= category.name %>
+                                        </option>
+                                        <% } %>
+                                            <% }) %>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Full description</label>
+                            <textarea placeholder="Type here" class="form-control" name="productDespt"
+                                rows="4"><%= product.description %></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Stock</label>
+                                    <div class="row gx-2">
+                                        <input placeholder="Enter stock" name="productStock"
+                                            value="<%= product.stock %>" type="number" class="form-control">
+                                        <small></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Price</label>
+                                    <div class="row gx-2">
+                                        <input placeholder="Enter price" value="<%= product.price %>" name="price"
+                                            type="number" class="form-control">
+                                        <small></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Old Price</label>
+                                    <input placeholder="₹" value="<%= product.oldPrice %>" class="form-control"  name="oldPrice" min="0">
+                                    
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Colour</label>
+                                    <input placeholder="" value="<%= product.Colour %>" class="form-control" name="colour">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Display size</label>
+                                    <input placeholder="" value="<%= product.displaySize %>" class="form-control" name="displaySize" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Resolution</label>
+                                    <input placeholder="" value="<%= product.resolution %>" class="form-control" name="resolution">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Processor</label>
+                                    <input placeholder="i5" value="<%= product.Processor %>" class="form-control" name="processor">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">RAM Size</label>
+                                    <input placeholder="4" value="<%= product.ramSize %>" class="form-control" name="ramSize" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Hard Drive Size</label>
+                                    <input placeholder="128" value="<%= product.hardDriveSize %>" class="form-control" name="hdSize" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Hard Disk Description</label>
+                                    <input placeholder="SSD" value="<%= product.hardDiskDescription %>" class="form-control" name="hdDescription">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Graphics Chipset Brand</label>
+                                    <input placeholder="NVIDIA" value="<%= product.graphicsChipsetBrand %>" class="form-control" name="graphics">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Operating System</label>
+                                    <input placeholder="Windows" value="<%= product.operatingSystem %>" class="form-control" name="os">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Number of USB 3.0 Ports</label>
+                                    <input placeholder="1" value="<%= product.numberofUSB %>" class="form-control" name="usbPort" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Audio Details</label>
+                                    <input placeholder="Speaker" value="<%= product.audioDetails %>" class="form-control" name="audioDetails">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Country of Origin</label>
+                                    <input placeholder="IND" value="<%= product.countryofOrigin %>" class="form-control" name="countryofOrigin">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Item Weight</label>
+                                    <input placeholder="1.5 KG" value="<%= product.itemWeight %>" class="form-control" name="weight" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+        </div>
+        <div class="row">
+            <!-- Primary image upload with cropping -->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Primary Image</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="input-upload">
+                            <label for="image1" class="form-label">
+                                <% if (product.primaryImages[0]) { %>
+                                    <img id="preview1"
+                                        src="/uploads/products-images/crp/<%- product.primaryImages[0].name %>" alt=""
+                                        width="150px">
+                                    <% } else {%>
+                                        <img id="preview1" src="../../assets/imgs/theme/upload.svg" alt=""
+                                            width="150px">
+                                        <% } %>
+                            </label>
+                            <input type="file" class="form-control" id="image1" name="primaryImage">
+                        </div>
+                        <button type="button" class="btn btn-md rounded font-sm"
+                            onclick="document.getElementById('image1').click();">Upload Image</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Secondary images upload -->
+            <div class="col-lg-4"> 
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Secondary Image 1</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="input-upload">
+                            <label for="image2" class="form-label">
+                                <% if (product.secondaryImages[0]) { %>
+                                    <img id="preview2"
+                                        src="/uploads/products-images/crp/<%-product.secondaryImages[0].name %>" alt=""
+                                        width="150px">
+                                    <% } else {%>
+                                        <img id="preview2" src="../../assets/imgs/theme/upload.svg" alt=""
+                                            width="150px">
+                                        <% } %>
+                            </label>
+                            <input type="file" class="form-control" id="image2" name="image2">
+                        </div>
+                        <button type="button" class="btn btn-md rounded font-sm"
+                            onclick="document.getElementById('image2').click();">Upload Image</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Secondary Image 2</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="input-upload">
+                            <label for="image3" class="form-label">
+                                <% if (product.secondaryImages[1]) { %>
+                                    <img id="preview3"
+                                        src="/uploads/products-images/crp/<%-product.secondaryImages[1].name %>" alt=""
+                                        width="150px">
+                                    <% } else {%>
+                                        <img id="preview3" src="../../assets/imgs/theme/upload.svg" alt=""
+                                            width="150px">
+                                        <% } %>
+                            </label>
+                            
+                            <input type="file" class="form-control" id="image3" name="image3">
+                        </div>
+                        <button type="button" class="btn btn-md rounded font-sm"
+                            onclick="document.getElementById('image3').click();">Upload Image</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4"> 
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Secondary Image 3</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="input-upload">
+                            <label for="image4" class="form-label">
+                                <% if (product.secondaryImages[0]) { %>
+                                    <img id="preview4"
+                                        src="/uploads/products-images/crp/<%-product.secondaryImages[2].name %>" alt=""
+                                        width="150px">
+                                    <% } else {%>
+                                        <img id="preview4" src="../../assets/imgs/theme/upload.svg" alt=""
+                                            width="150px">
+                                        <% } %>
+                            </label>
+                            <input type="file" class="form-control" id="image4" name="image4">
+                        </div>
+                        <button type="button" class="btn btn-md rounded font-sm"
+                            onclick="document.getElementById('image4').click();">Upload Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-md rounded font-sm" type="submit">Update</button>
+                <a href="/admin/products" class="btn btn-light rounded font-sm">Cancel</a>
+            </div>
+        </div>
+    </form>
+</section> <!-- content-main end// -->
+
+<!-- Image Crop Modal -->
+<div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="imageCropModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageCropModalLabel">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img id="imageToCrop" src="" alt="Crop this image" style="max-width: 100%;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="cropImageBtn">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .cropper-bg {
+        max-width: 100%;
+    }
+</style>
+
+
+<!-- Cropper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js"></script>
+<script defer>
+    let currentInputId, currentPreviewId, cropper;
+    let croppedImages = {};
+    let originalFileNames = {};
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById('image1').addEventListener('change', function () { prepareImageForCropping('image1', 'preview1'); });
+        document.getElementById('image2').addEventListener('change', function () { prepareImageForCropping('image2', 'preview2'); });
+        document.getElementById('image3').addEventListener('change', function () { prepareImageForCropping('image3', 'preview3'); });
+        document.getElementById('image4').addEventListener('change', function () { prepareImageForCropping('image4', 'preview4'); });
+
+
+
+        document.getElementById('cropImageBtn').addEventListener('click', function () {
+            performCropping();
+        });
+
+        $('#imageCropModal').on('shown.bs.modal', function () {
+            let image = document.getElementById('imageToCrop');
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: "move",
+                minContainerWidth: 450,
+                minContainerHeight: 500,
+                minCropBoxWidth: 400,
+                minCropBoxHeight: 400,
+                minCanvasHeight: 500,
+                minCanvasWidth: 500,
+            });
+        });
+
+        $('#imageCropModal').on('hidden.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        });
+    });
+
+    function prepareImageForCropping(inputId, previewId) {
+        currentInputId = inputId;
+        currentPreviewId = previewId;
+        const input = document.getElementById(inputId);
+        const file = input.files[0];
+        const newDate = new Date().getTime();
+        originalFileNames[inputId] = `${ file.name }_${ newDate }`
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('imageToCrop').src = e.target.result;
+            $('#imageCropModal').modal('show');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function performCropping() {
+        if (!cropper) {
+            console.error("Cropper is not initialized.");
+            return;
+        }
+
+        cropper.getCroppedCanvas().toBlob((blob) => {
+
+
+            const previewId = currentPreviewId;
+            const file = new File([blob], originalFileNames[currentInputId], { type: 'image/png' });
+
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            document.getElementById(currentInputId).files = dataTransfer.files;
+
+
+            const preview = document.getElementById(currentPreviewId);
+
+            preview.src = URL.createObjectURL(blob);
+
+
+            croppedImages[currentInputId] = blob;
+            $('#imageCropModal').modal('hide');
+
+
+        }, 'image/png');
+
+    }
+
+
+
+</script>
+
+<%- include("../../partials/admin/footer") %>

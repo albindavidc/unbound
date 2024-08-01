@@ -1,159 +1,119 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const mongoose = require('mongoose')
 
-const productSchema = new Schema(
-  {
-    product_name: {
-      type: String,
-      required: true,
-      trim: true,
-      unique: true, // Ensures the product name is unique
+const productSchema = new mongoose.Schema({
+ 
+    product_name:{
+        type:String,
+        require:true,
     },
-    description: {
-      type: String,
-      required: true,
-      trim: true,
+    oldPrice:{
+        type:Number,
+        require:true,
     },
-    brand: {
-      type: String,
-      ref: "Brand",
-      required: true,
-
-      trim: true,
+    price:{
+        type:Number,
+        require:true,
+    },
+    description:{
+        type:String,
     },
     category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
     },
-
-    markdown1: {
-      type: String,
-      required: true,
+    isActive:{
+        type:Boolean,
+        default:true
     },
-    details: {
-      type: String,
-      required: true,
+    stock:{
+        type:Number,
+        min:0,
+        requires:true,
+        default:0
     },
-    markdown2: {
-      type: String,
-      required: true,
+    Colour:{
+        type:String,   
     },
-    product_image: {
-      type: [String],
-      required: true,
-      validate: {
-        validator: function (value) {
-          return value.length > 0; // Ensures there is at least one image
+    displaySize:{
+        type: Number,
+        require:true,
+    },
+    resolution:{
+        type: String,
+        require:true,
+    },
+    Processor:{
+        type: String,
+        require:true,
+    },
+    ramSize:{
+        type:  Number,
+        require:true,
+    },
+    hardDriveSize:{
+        type: Number,
+        require:true,
+    },
+    hardDiskDescription:{
+        type: String,
+        require:true,
+    },
+    graphicsChipsetBrand:{
+        type: String,
+        require:true,
+    }, 
+    operatingSystem:{
+        type: String,
+        require:true,
+    },
+    numberofUSB:{
+        type:  Number,
+        require:true,
+    },
+    audioDetails:{
+        type: String,
+        require:true,
+    },
+    countryofOrigin:{
+        type: String,
+        require:true,
+    },
+    itemWeight:{
+        type:  String,
+        require:true,
+    },
+    reviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Review',
         },
-        message: "Product must have at least one image",
-      },
-    },
-    // variants: [
-    //   {
-    //     color: {
-    //       type: ObjectId,
-    //       ref: "Color",
-    //       required: true,
-    //     },
-    //     size: {
-    //       type: ObjectId,
-    //       ref: "Size",
-    //       required: true,
-    //     },
-    //     stock: {
-    //       type: Number,
-    //       required: true,
-    //     },
-    //   },
-    // ],
-    // reviews: [
-    //   {
-        // user: {
-        //   user_id: {
-        //     type: ObjectId,
-        //     ref: "User",
-        //   },
-        //   name: {
-        //     type: String,
-        //   },
-        //   email: {
-        //     type: String,
-        //   },
-        // },
-
-        // rating: {
-        //   type: Number,
-        // },
-        // comment: {
-        //   type: String,
-        // },
-
-        // product: {
-        //   id: {
-        //     type: ObjectId,
-        //     ref: "Product",
-        //   },
-        //   name: {
-        //     type: String,
-        //   },
-        //   color: {
-        //     type: String,
-        //   },
-        //   size: {
-        //     type: Number,
-        //   },
-        // },
-
-    //     data: {
-    //       type: Date,
-    //       default: Date.now,
-    //     },
-    //   },
-    // ],
-
-    price: {
-      type: Number,
-    },
-
-    actualPrice: {
-      type: Number,
-      required: true,
-    },
-    sellingPrice: {
-      type: Number,
-      required: true,
-    },
-    onOffer: {
-      type: Boolean,
-      default: false,
-    },
-    offerDiscountPrice: {
-      type: Number,
-      min: 0,
-      default: 0
-    },
-    offerDiscountPrice: {
-      type: Number,
-      min: 0,
-      default: 0
-    },
-
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    status: {
-      type: String,
-      enum: ["Available", "Out of stock", "Discontinued"],
-      default: "Available",
-    },
-
-  },
-  { timestamps: true,
+    ],
+    primaryImages:[
+        {
+            name:{
+                type:String,
+            },
+            path:{
+                type:String
+            }
+        }
+    ],
+    secondaryImages:[
+        {
+            name:{
+                type:String,
+            },
+            path:{
+                type:String
+            }
+        }
+    ],
+    
+},
+{
+    timestamps: true,
     strict: false,
-   }
-);
-
-const Product = mongoose.model("Product", productSchema);
-module.exports = Product;
+  },
+)
+module.exports = mongoose.model("Product", productSchema);
