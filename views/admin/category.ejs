@@ -246,18 +246,18 @@
       </div>
     </div>
 
-    <div class="pagination-container" style="padding: 50px 0px">
-      <% if (currentPage >1) { %>
-      <a href="?page=<%= currentPage -1 %>">&laquo; Previous</a>
-      <% } %> <% for( let i = 1; i <= totalPages; i++ ) { %> <% if (i ===
-      currentPage) { %>
-      <span class="current-page"> <%= i %>,</span>
-      <% } else { %>
-      <a href="?page=<%= i %>"><%= i %>,</a>
-      <% } %> <% } %> <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>"> Next &raquo;</a>
-      <% } %>
+    <div class="container mt-3 d-flex justify-content-center">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mb-20">
+          <% for(let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>"> <%= i %> </a>
+          </li>
+          <% } %>
+        </ul>
+      </nav>
     </div>
+    
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>

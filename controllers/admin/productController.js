@@ -1,7 +1,8 @@
 const sharp = require("sharp");
-const adminLayout = "./layouts/adminLayouts";
-const Category = require("../../models/categorySchema");
+
 const Product = require("../../models/productSchema");
+const Category = require("../../models/categorySchema");
+
 const path = require("path");
 const fs = require("fs");
 const { configDotenv } = require("dotenv");
@@ -15,9 +16,9 @@ module.exports = {
       let perPage = 7;
       let page = req.query.page || 1;
       const product = await Product.find()
-        .populate("category")
+        .populate("category") // Adjust to populate `categoryid` as it references the `Category` model
         .sort({ createdAt: -1 })
-        .skip(perPage * page - perPage)
+        .skip(perPage * (page - 1))
         .limit(perPage)
         .exec();
       const count = await Product.find().countDocuments({});
@@ -25,14 +26,13 @@ module.exports = {
       const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
       const breadcrumbs = [
-        { name: 'Home', url: '/admin' },
-        { name: 'Products', url: '/admin/products' },
-        { name: `Page ${page}`, url: `/admin/products?page=${page}` }
-    ];
+        { name: "Home", url: "/admin" },
+        { name: "Products", url: "/admin/products" },
+        { name: `Page ${page}`, url: `/admin/products?page=${page}` },
+      ];
 
       res.render("admin/products/products", {
         locals,
-        layout: adminLayout,
         product,
         current: page,
         perPage: perPage,
@@ -42,151 +42,90 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
 
-  getAddProducts: async (req, res) => {
-    const locals = {
-      title: "Products",
-    };
-
-    
-    const categories = await Category.find({ isListed: true });
-    const breadcrumbs = [
-      { name: 'Home', url: '/admin' },
-      { name: 'Products', url: '/admin/products' },
-      { name: "Add Product",url: "/add-product" }
-  ];
-
-    res.render("admin/products/addProducts", {
-      locals,
-      layout: adminLayout,
-      categories,
-      breadcrumbs,
-    });
-  },
-
-  addProducts: async (req, res) => {
-
-    console.log("111111111111111");
-    console.log("222222222222222");
-    console.log("3333333333333333");
-
-
-
-    console.log(req.body);
+  async getAddProducts(req, res) {
     try {
-      const existProduct = await Product.findOne({
-        name: req.body.productName.toLowerCase(),
-      });
-      if (existProduct) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Product already exist" });
-      }
+        
+      const categories = await Category.find();
+      
+      console.log("add product",req.body)
+      // Render the form with categories data
+      res.render('admin/products/add-product', { categories });
+      
 
 
-
-
-      // Ensure req.files is defined and contains the expected fields
-      if (!req.files || !req.files.images || !req.files.primaryImage) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Images are required" });
-      }
-
-      let secondaryImages = [];
-      req.files.images.forEach((e) => {
-        secondaryImages.push({
-          name: e.filename,
-          path: e.path,
-        });
-      });
-
-      secondaryImages.forEach(async (e) => {
-        await sharp(
-          path.join(__dirname, "../../public/uploads/products-images/") + e.name
-        )
-          .resize(500, 500)
-          .toFile(
-            path.join(__dirname, "../../public/uploads/products-images/crp/") +
-              e.name
-          );
-      });
-
-      let primaryImage = [];
-      req.files.primaryImage.forEach((e) => {
-        primaryImage = {
-          name: e.filename,
-          path: e.path,
-        };
-      });
-
-
-
-
-      await sharp(
-        path.join(__dirname, "../../public/uploads/products-images/") +
-          primaryImage.name
-      )
-        .resize(500, 500)
-        .toFile(
-          path.join(__dirname, "../../public/uploads/products-images/crp/") +
-            primaryImage.name
-        );
-
-      const product = new Product({
-        product_name: req.body.productName.toLowerCase(),
-        category: req.body.categoryName,
-        description: req.body.productDespt,
-        stock: req.body.productStock,
-        price: req.body.price,
-        oldPrice: req.body.oldPrice,
-        Colour: req.body.colour,
-        displaySize: req.body.displaySize,
-        resolution: req.body.resolution,
-        Processor: req.body.processor,
-        ramSize: req.body.ramSize,
-        hardDriveSize: req.body.hdSize,
-        hardDiskDescription: req.body.hdDescription,
-        graphicsChipsetBrand: req.body.graphics,
-        operatingSystem: req.body.os,
-        audioDetails: req.body.audioDetails,
-        numberofUSB: req.body.usbPort,
-        countryofOrigin: req.body.countryofOrigin,
-        itemWeight: req.body.weight,
-        primaryImages: primaryImage,
-        secondaryImages: secondaryImages,
-      });
-
-      await product.save();
-      req.flash("success", "Product added successfully");
-      res.redirect("/admin/products");
     } catch (error) {
-      console.log(error);
-      //   res.status(500).json({ message: 'Server error' });
-      req.flash("error", error.message);
-      return res.redirect("/admin/add-product");
+        console.log(error.message);
     }
-  },
+   
+},
+
+async addProducts(req, res) {
+    console.log("add product req.files",req.files)
+     console.log("add product",req.body)
+
+     try {
+        const {productName,productdescription,brandname,price,quantity,volume,color,categoryname}= req.body
+      
+        const productExists = await productModel.findOne({ name:productName })
+        if (!productExists) {
+            const images = []
+            if (req.files && req.files.length > 0) {
+                for (let i = 0; i < req.files.length; i++) {
+                    images.push(req.files[i].filename);
+                }
+            }
+
+            const newProduct = new productModel({
+                name:productName,
+                description: productdescription,
+                brand: brandname,
+                category: categoryname,
+                regularprice:price,
+                price:price,
+                quantity:quantity,
+                volume:volume,
+                color:color,
+                image: images
+            })
+            await newProduct.save()
+            res.json({isvalid:true});
+        } else {
+
+            res.json({isvalid:false});
+        }
+
+    } catch (error) {
+        console.log(error.message);
+    }
+
+  
+},
 
   getEditProducts: async (req, res) => {
     const locals = {
-      title: "Products",
+      title: "Edit Product",
     };
 
-    const product = await Product.findById(req.params.id).populate("category");
-    const categories = await Category.find({ isActive: true });
+    const product = await Product.findById(req.params.id).populate(
+      "categoryid"
+    );
+    const categories = await Category.find({ isListed: true });
+    const brands = await Brand.find({ isListed: true }); // Assuming you have a `Brand` model
     const breadcrumbs = [
-      { name: 'Home', url: '/admin' },
-      { name: 'Products', url: '/admin/products' },
-      { name: "Edit Product",url: "/products/editProducts" }
-  ];
-    res.render("admin/products/editProducts", {
+      { name: "Home", url: "/admin" },
+      { name: "Products", url: "/admin/products" },
+      { name: "Edit Product", url: `/admin/products/edit/${req.params.id}` },
+    ];
+
+    res.render("admin/products/edit-product", {
       locals,
-      layout: adminLayout,
       product,
       categories,
+      brands,
       breadcrumbs,
     });
   },
@@ -200,104 +139,57 @@ module.exports = {
       }
 
       // Handle primary image
-      let primaryImage = product.primaryImages;
+      let primaryImage =
+        product.image.find(
+          (img) => img.name === req.files.primaryImage[0]?.filename
+        ) || {};
       if (req.files.primaryImage) {
-        primaryImage = [
-          {
-            name: req.files.primaryImage[0].filename,
-            path: req.files.primaryImage[0].path,
-          },
-        ];
-
-        await sharp(req.files.primaryImage[0].path)
+        primaryImage = {
+          name: req.files.primaryImage[0].filename,
+          path: req.files.primaryImage[0].path,
+        };
+        await sharp(primaryImage.path)
           .resize(500, 500)
           .toFile(
             path.join(
               __dirname,
               "../../public/uploads/products-images/crp/",
-              req.files.primaryImage[0].filename
+              primaryImage.name
             )
           );
       }
 
       // Handle secondary images
-      let secondaryImages = [];
-      if (req.files.image2) {
-        await sharp(req.files.image2[0].path)
-          .resize(500, 500)
-          .toFile(
-            path.join(
-              __dirname,
-              "../../public/uploads/products-images/crp/",
-              req.files.image2[0].filename
-            )
-          );
-        secondaryImages.push({
-          name: req.files.image2[0].filename,
-          path: req.files.image2[0].path,
+      let secondaryImages =
+        product.image.filter(
+          (img) => img.name !== req.files.primaryImage[0]?.filename
+        ) || [];
+      if (req.files.images) {
+        req.files.images.forEach(async (file) => {
+          secondaryImages.push({ name: file.filename, path: file.path });
+          await sharp(file.path)
+            .resize(500, 500)
+            .toFile(
+              path.join(
+                __dirname,
+                "../../public/uploads/products-images/crp/",
+                file.filename
+              )
+            );
         });
-      } else if (product.secondaryImages[0]) {
-        secondaryImages.push(product.secondaryImages[0]);
       }
 
-      if (req.files.image3) {
-        await sharp(req.files.image3[0].path)
-          .resize(500, 500)
-          .toFile(
-            path.join(
-              __dirname,
-              "../../public/uploads/products-images/crp/",
-              req.files.image3[0].filename
-            )
-          );
-        secondaryImages.push({
-          name: req.files.image3[0].filename,
-          path: req.files.image3[0].path,
-        });
-      } else if (product.secondaryImages[1]) {
-        secondaryImages.push(product.secondaryImages[1]);
-      }
-      if (req.files.image4) {
-        await sharp(req.files.image4[0].path)
-          .resize(500, 500)
-          .toFile(
-            path.join(
-              __dirname,
-              "../../public/uploads/products-images/crp/",
-              req.files.image3[0].filename
-            )
-          );
-        secondaryImages.push({
-          name: req.files.image4[0].filename,
-          path: req.files.image4[0].path,
-        });
-      } else if (product.secondaryImages[1]) {
-        secondaryImages.push(product.secondaryImages[1]);
-      }
-
-      // Update the product
       const updateProduct = {
-        product_name: req.body.productName.toLowerCase(),
+        name: req.body.productName.toLowerCase(),
+        brand: req.body.brandName,
         category: req.body.categoryName,
         description: req.body.productDespt,
-        stock: req.body.productStock,
+        quantity: req.body.productStock,
         price: req.body.price,
-        oldPrice: req.body.oldPrice,
-        Colour: req.body.colour,
-        displaySize: req.body.displaySize,
-        resolution: req.body.resolution,
-        Processor: req.body.processor,
-        ramSize: req.body.ramSize,
-        hardDriveSize: req.body.hdSize,
-        hardDiskDescription: req.body.hdDescription,
-        graphicsChipsetBrand: req.body.graphics,
-        operatingSystem: req.body.os,
-        audioDetails: req.body.audioDetails,
-        numberofUSB: req.body.usbPort,
-        countryofOrigin: req.body.countryofOrigin,
-        itemWeight: req.body.weight,
-        primaryImages: primaryImage,
-        secondaryImages: secondaryImages,
+        regularprice: req.body.regularPrice,
+        offerpercentage: req.body.offerPercentage || 0,
+        color: req.body.color.split(","), // Assuming color is a comma-separated string
+        image: [primaryImage, ...secondaryImages],
       };
 
       await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
@@ -305,8 +197,8 @@ module.exports = {
       res.redirect("/admin/products");
     } catch (error) {
       console.error(error);
-
-      res.redirect("/products/editProducts").status(500).json({ message: "Server error" });
+      req.flash("error", error.message);
+      return res.redirect(`/admin/products/edit/${productId}`);
     }
   },
 
@@ -314,16 +206,9 @@ module.exports = {
     const productId = req.body.productId;
     const shouldList = req.body.shouldList;
 
-    console.log(
-      `Received request to ${
-        shouldList ? "list" : "unlist"
-      } product with ID: ${productId}`
-    );
-
     try {
       const product = await Product.findById(productId);
       if (!product) {
-        console.log("Product not found");
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });
@@ -332,7 +217,6 @@ module.exports = {
       product.isActive = shouldList;
       await product.save();
 
-      console.log("Product status updated successfully");
       return res
         .status(200)
         .json({ success: true, message: "Product status updated" });
@@ -343,10 +227,10 @@ module.exports = {
         .json({ success: false, message: "Server error", error });
     }
   },
+
   deleteProduct: async (req, res) => {
     try {
       const productId = req.body.productId;
-      console.log(`Received request to delete product with ID: ${productId}`);
 
       const product = await Product.findById(productId);
       if (!product) {
@@ -356,8 +240,6 @@ module.exports = {
       }
 
       await Product.findByIdAndDelete(productId);
-      console.log("Product successfully deleted");
-
       return res
         .status(200)
         .json({ success: true, message: "Product successfully deleted" });
@@ -371,40 +253,39 @@ module.exports = {
 
   getStocks: async (req, res) => {
     try {
-        const perPage = 7;
-        const page = parseInt(req.query.page) || 1;
-        const products = await Product.find()
-            .sort({ createdAt: -1 })
-            .populate("category")
-            .skip(perPage * (page - 1))
-            .limit(perPage)
-            .exec();
-        const count = await Product.countDocuments({});
-        const nextPage = page + 1;
-        const hasNextPage = nextPage <= Math.ceil(count / perPage);
+      const perPage = 7;
+      const page = parseInt(req.query.page) || 1;
+      const products = await Product.find()
+        .sort({ createdAt: -1 })
+        .populate("categoryid")
+        .skip(perPage * (page - 1))
+        .limit(perPage)
+        .exec();
+      const count = await Product.countDocuments({});
+      const nextPage = page + 1;
+      const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
-        const breadcrumbs = [
-            { name: 'Home', url: '/admin' },
-            { name: 'Products', url: '/admin/products' },
-            { name: 'Stock', url: '/admin/products/stocks' },
-            { name: `Page ${page}`, url: `/admin/products/stocks?page=${page}` }
-        ];
+      const breadcrumbs = [
+        { name: "Home", url: "/admin" },
+        { name: "Products", url: "/admin/products" },
+        { name: "Stock", url: "/admin/products/stocks" },
+        { name: `Page ${page}`, url: `/admin/products/stocks?page=${page}` },
+      ];
 
-        res.render("admin/products/stock", {
-            products,
-            layout: adminLayout,
-            current: page,
-            perPage: perPage,
-            pages: Math.ceil(count / perPage),
-            nextPage: hasNextPage ? nextPage : null,
-            breadcrumbs,
-        });
+      res.render("admin/products/stock", {
+        products,
+        layout: adminLayout,
+        current: page,
+        perPage: perPage,
+        pages: Math.ceil(count / perPage),
+        nextPage: hasNextPage ? nextPage : null,
+        breadcrumbs,
+      });
     } catch (error) {
-        console.error(error); 
-        res.status(500).json({ message: "Internal server error" });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
     }
   },
-
 
   updateStocks: async (req, res) => {
     const { productId, newStock } = req.body;
@@ -417,11 +298,11 @@ module.exports = {
         });
       }
 
-      await Product.findByIdAndUpdate(productId, { stock: newStock });
+      await Product.findByIdAndUpdate(productId, { quantity: newStock });
       res.json({ success: true });
     } catch (error) {
       console.error(error);
-      res.redirect("/products")
+      res.redirect("/products");
       res.json({ success: false });
     }
   },

@@ -1,50 +1,36 @@
 const multer = require('multer');
 const path = require('path');
 
-// General storage configuration for images
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, path.join(__dirname, '../../public/uploads/images/'));
-//   },
-//   filename: (req, file, cb) => {
-//     const uniqueName = Date.now() + '-' + file.originalname;
-//     cb(null, uniqueName);
-//   },
-// });
-
 // Specific storage configuration for product images
 const productStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, 'public/uploads/products/');
+    cb(null, path.join(__dirname, "../../public/uploads/images")); // Destination folder
   },
   filename: function (req, file, cb) {
-      cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + path.extname(file.originalname)); // File naming convention
   }
 });
 
-const productUpload = multer({
-  storage: productStorage,
-  limits: { fileSize: 1000000 }, // 1MB file size limit
-  fileFilter: (req, file, cb) => {
-      checkFileType(file, cb);
-  }
-});
-
-
-function checkFileType(file, cb) {
-  const filetypes = /jpeg|jpg|png|gif/;
+// Define the file filter
+const productFileFilter = (req, file, cb) => {
+  const filetypes = /jpeg|jpg|png|gif/; // Allowed file types
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
-      return cb(null, true);
+    cb(null, true);
   } else {
-      cb('Error: Images Only!');
+    cb(new Error('Error: Images Only!'));
   }
-}
+};
 
+// Initialize upload middleware for single file upload
+const productUpload = multer({
+  storage: productStorage,
+  limits: { fileSize: 1 * 1024 * 1024 }, // 1MB file size limit
+  fileFilter: productFileFilter
+});
 
 module.exports = {
-  // upload: multer({ storage: storage }),
-  productUpload,
+  productUpload
 };

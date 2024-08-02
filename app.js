@@ -51,6 +51,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/admin-assets", express.static("public/admin-assets"))
+app.use('/public', express.static('public')); // Static files for uploaded images
 
 
 //Middlewares

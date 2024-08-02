@@ -31,7 +31,9 @@ router.get("/login", userController.loadLogin);
 router.post("/login", userController.login);
 
 
-router.get("/shop", userController.loadShopping);
+
+router.get("/user/product-list", userController.loadProductList);
+router.get("/user/product-details", userController.loadProductDetails);
 
 
 

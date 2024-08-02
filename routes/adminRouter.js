@@ -30,41 +30,52 @@ router.post("/editCategory", adminAuth, categoryController.editCategory);
 router.get("/category/:id/list", adminAuth, categoryController.categoryListed);
 router.get("/category/:id/unlist", adminAuth, categoryController.categoryUnlisted);
 
-
 // Product Management Routes
+
 router.get('/products', adminAuth, productController.getProducts);
 router.get('/products/editProducts', adminAuth, productController.getEditProducts);
 router.get('/products/deleteProduct/:id', adminAuth, productController.deleteProduct);
-router.get("/products/stocks",adminAuth, productController.getStocks)
+router.get("/products/stocks", adminAuth, productController.getStocks);
+
 router
-  .route("/add-product")
-  .get(adminAuth, productController.getAddProducts)
+  .route('/add-product')
+  .get(adminAuth, productController.getAddProducts);
+
+
+router
+  .route("/admin/add-product")
   .post(
     adminAuth,
     productUpload.fields([
-      { name: "images", maxCount: 4 },
-      { name: "primaryImage", maxCount: 1 }
+      { name: "primaryImage", maxCount: 1 },
+      { name: "images", maxCount: 4 }
     ]),
+
     productController.addProducts
   );
-  
-  router
+
+router
   .route("/edit-product/:id")
   .get(adminAuth, productController.getEditProducts)
   .post(
     adminAuth,
     productUpload.fields([
-      { name: 'primaryImage', maxCount: 1 },
-      { name: 'image2', maxCount: 1 },
-      { name: 'image3', maxCount: 1 },
-      { name: 'image4', maxCount: 1 }
+      { name: "primaryImage", maxCount: 1 },
+      { name: "image2", maxCount: 1 },
+      { name: "image3", maxCount: 1 },
+      { name: "image4", maxCount: 1 }
     ]),
+    (req, res, next) => {
+      console.log(req.files); // Log the files being uploaded
+      console.log(req.body);  // Log the body of the request
+      next();
+    },
     productController.editProduct
   );
 
-router.post("/product/action",productController.listOrUnlistProduct)
-router.delete("/product/deleteProduct",productController.deleteProduct)
+router.post("/product/action", productController.listOrUnlistProduct);
+router.delete("/product/deleteProduct", productController.deleteProduct);
+router.post("/product/updateStock", productController.updateStocks);
 
-router.post("/product/updateStock",productController.updateStocks)
 
 module.exports = router;

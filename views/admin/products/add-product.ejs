@@ -1,0 +1,397 @@
+<%- include("../../partials/admin/header") %>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="/css/admin_panel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css ">
+
+    <title>SheShop</title>
+    <style>
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cropped-img-container {
+            display: inline-block;
+            position: relative;
+            margin: 10px;
+        }
+
+        .cropped-img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .imagemodal {
+            display: none; /* Ensure the modal is hidden by default */
+        }
+
+    </style>
+
+
+</head>
+
+<body>
+
+
+
+    <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="img-container">
+                        <img id="imageToCrop" src="/images/hero.jpg">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="closeImageButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="cropButton">Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="content">
+        <main>
+            <div class="bottom-data">
+                <div class="orders">
+                    <div class="header">
+                        <h3 style="padding: 70px;"> Add Product </h3>
+                    </div>
+                    <div class="form-container">
+                        <div class="form-wrapper">
+                            <form id="addProductForm" action="/admin/add-product"  method="POST" enctype="multipart/form-data" onsubmit="addproduct(event)">
+                                <button type="button" class="btn btn-primary" id="addImageButton">Add Image</button>
+                                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                                <div id="croppedImages"></div>
+                                <hr>
+                                <div class="margin-custom">
+                                    <label for="productName" class="form-label">Name</label>
+                                    <input type="text" name="productName" id="productName" placeholder="Product name"
+                                        class="form-control border" required />
+                                    <div id="productNameError" class="error-div"></div>
+                                </div>
+                                <div class="mb-4 mt-5">
+                                    <label class="form-label">Description of Product</label>
+                                    <textarea name="productdescription" id="productdescription"
+                                        class="form-control border" required></textarea>
+                                    <div id="productdescriptionError" class="error-div"></div>
+                                </div>
+                                <div class="mb-4 mt-5">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="mb-4">
+                                                <label class="form-label">Price of Product</label>
+                                                <input placeholder="$" name="price" type="text" class="form-control border">
+                                                <div id="price-error" class="error-message error-div"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="mb-4">
+                                                <label class="form-label">Quantity of Product</label>
+                                                <input placeholder="Quantity" name="quantity" type="text"
+                                                    class="form-control border">
+                                                <div id="quantity-error" class="error-message error-div"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4 mt-5">
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="mb-4">
+                                                <label class="form-label">Max Product/Person</label>
+                                                <input placeholder="Volume" name="volume" type="text"
+                                                    class="form-control border">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="mb-4">
+                                                <label class="form-label">Color of Product</label>
+                                                <input placeholder="Color" name="color" type="text" class="form-control border">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="brand" class="form-label">Brand Name</label>
+                                    <% 
+                                        const customBrands = [
+                                            { _id: "custom1", name: "Nike" },
+                                            { _id: "custom2", name: "Puma" },
+                                            { _id: "custom3", name: "Woodland" },
+                                            { _id: "custom4", name: "American Tourister" },
+                                            { _id: "custom5", name: "Adidas" },
+                                            { _id: "custom6", name: "Reebok" },
+                                            { _id: "custom7", name: "Louis Vuitton" },
+                                            { _id: "custom8", name: "Prada" },
+                                            { _id: "custom9", name: "Gucci" },
+                                            { _id: "custom10", name: "Saint Laurent" },
+                                            { _id: "custom11", name: "Marc Jacobs" },
+                                            { _id: "custom12", name: "Versace" },
+                                            { _id: "custom13", name: "Ralph Lauren" },
+                                            { _id: "custom14", name: "Hermes" },
+                                            { _id: "custom15", name: "Chanel" }
+                                        ];
+                                    %>
+                                    <select class="form-control border" name="brand" id="brand" required>
+                                        <option value="">Select Brand</option>
+                                        <% customBrands.forEach((brand) => { %>
+                                        <option value="<%= brand._id %>"><%= brand.name %></option>
+                                        <% }); %>
+                                    </select>
+                                    <div id="brandError" class="error-div"></div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="category" class="form-label">Category Name</label>
+                                    <select class="form-control border" name="category" id="category" required>
+                                        <option value="">Select Category</option>
+                                        <% categories.forEach((category) => { %>
+                                        <option value="<%= category._id %>"><%= category.name %></option>
+                                        <% }); %>
+                                    </select>
+                                    <div id="categoryError" class="error-div"></div>
+                                </div>
+                                <div class="d-flex justify-content-center mt-5" style="padding: 40px;">
+                                    <div class="d-grid col-md-5">
+                                        <button class="btn btn-primary" type="submit">Add Product</button>
+                                    </div>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/javascript/admin_panel.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js
+    ">
+</script>
+
+    <script>
+  const maxImages = 5;
+        const croppedImagesDiv = document.getElementById('croppedImages');
+        let currentImages = 0;
+        let cropper;
+
+        document.getElementById('addImageButton').addEventListener('click', function() {
+            if (currentImages < maxImages) {
+                document.getElementById('imageInput').click();
+            } else {
+                alert(`You can only add up to ${maxImages} images.`);
+            }
+        });
+
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imageToCrop').src = e.target.result;
+                    document.getElementById('cropImageModal').style.display = 'block';
+
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    const image = document.getElementById('imageToCrop');
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 3,
+                       
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+      
+
+    document.getElementById('cropButton').addEventListener('click', function() {
+    const canvas = cropper.getCroppedCanvas();
+    canvas.toBlob(function(blob) {
+
+        const imgContainer = document.createElement('div');
+    imgContainer.classList.add('cropped-img-container');
+
+        const imgElement = document.createElement('img');
+        const url = URL.createObjectURL(blob);
+        imgElement.src = url;
+        imgElement.classList.add('cropped-img');
+        imgElement.dataset.blob = url;
+
+        const removeButton = document.createElement('button');
+    removeButton.classList.add('remove-btn');
+    removeButton.innerHTML = 'X';
+    removeButton.addEventListener('click', function() {
+        currentImages--;
+        imgContainer.remove();
+    });
+
+    imgContainer.appendChild(imgElement);
+    imgContainer.appendChild(removeButton);
+
+
+        // Store the Blob URL in a data attribute
+        imgElement.dataset.blob = url;
+        croppedImagesDiv.appendChild(imgContainer);
+        currentImages++;
+
+        document.getElementById('cropImageModal').style.display = 'none';
+    }, 'image/png');
+});
+
+
+        document.getElementById('closeImageButton').addEventListener('click', function() {
+            document.getElementById('cropImageModal').style.display = 'none';
+        });
+
+        // document.querySelector('.close').addEventListener('click', function() {
+        //     document.getElementById('cropImageModal').style.display = 'none';
+        // });
+
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('cropImageModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+
+ async function addproduct(event) {
+    event.preventDefault(); 
+    if(!validateForm()){
+        return;
+    }
+    if (document.getElementById('croppedImages').childElementCount === 0) {
+        alert('Please add an image to the form before submitting.'); 
+        return; 
+    }
+
+    var formData = new FormData(document.getElementById('addProductForm'));
+
+var images = document.getElementById('croppedImages').children;
+
+console.log("images",images,images.length)
+for (var i = 0; i < images.length; i++) {
+    const blobUrl = images[i].querySelector('img').dataset.blob;
+    console.log('blobUrl', blobUrl);
+    const blob = await fetch(blobUrl).then(r => r.blob());
+    formData.append('myFile', blob, `image${i}.png`);  
+}
+
+    try {
+        const response = await fetch('/admin/add-product', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        if(data.isvalid){
+            const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+            window.location.href = `${API_BASE_URL}/admin/products`;
+        }
+        else{
+            alert('product adding failed...!')
+        }
+        console.log(data);
+    } catch (error) {
+        console.error(error);
+    };
+};
+
+
+       function validateForm() {
+        let isValid = true;
+
+        // Validate price
+        const price = document.querySelector('input[name="price"]').value;
+        if (isNaN(price) || price < 0) {
+            document.getElementById('price-error').innerText = 'Price must be a number greater than or equal to 0.';
+            isValid = false;
+        } else {
+            document.getElementById('price-error').innerText = '';
+        }
+
+        // Validate quantity
+        const quantity = document.querySelector('input[name="quantity"]').value;
+        if (isNaN(quantity) || quantity <= 0) {
+            document.getElementById('quantity-error').innerText = 'Quantity must be a number greater than 0.';
+            isValid = false;
+        } else {
+            document.getElementById('quantity-error').innerText = '';
+        }
+         // Validate product name
+         const productName = document.querySelector('input[name="productName"]').value;
+        if (productName.trim() === "") {
+            document.getElementById('productNameError').innerText = 'Product name is required.';
+            isValid = false;
+        } else {
+            document.getElementById('productNameError').innerText = '';
+        }
+
+        // Validate product description
+        const productDescription = document.querySelector('textarea[name="productdescription"]').value;
+        if (productDescription.trim() === "") {
+            document.getElementById('productdescriptionError').innerText = 'Product description is required.';
+            isValid = false;
+        } else {
+            document.getElementById('productdescriptionError').innerText = '';
+        }
+        // Validate file inputs
+        // const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        // for (let i = 1; i <= 3; i++) {
+        //     const fileInput = document.getElementById(myFile${i});
+        //     const filePath = fileInput.value;
+        //     const fileExtension = filePath.split('.').pop().toLowerCase();
+
+        //     if (!allowedExtensions.includes(fileExtension)) {
+        //         alert(File ${i} is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(', ')}.);
+        //         isValid = false;
+        //         break;
+        //     }
+        // }
+
+        return isValid;
+    }
+
+    </script>
+</body>
+
+
+<%- include("../../partials/admin/footer") %>

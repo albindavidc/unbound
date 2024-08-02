@@ -1,119 +1,64 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const productSchema = new mongoose.Schema({
- 
-    product_name:{
-        type:String,
-        require:true,
+const RatingSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the user who submitted the rating
+    rating: { type: Number, required: true }, // Rating value (e.g., 1-5 stars)
+    review: { type: String }, 
+  }, { timestamps: true });
+
+const ProductSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true
     },
-    oldPrice:{
-        type:Number,
-        require:true,
-    },
-    price:{
-        type:Number,
-        require:true,
-    },
-    description:{
-        type:String,
+    brand: {
+        type: String,
+        required: true,
+      
     },
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
+        type: String,
         required: true,
     },
-    isActive:{
-        type:Boolean,
-        default:true
+    description: {
+        type: String,
+        required: true,
     },
-    stock:{
-        type:Number,
-        min:0,
-        requires:true,
-        default:0
+    image: {
+        type: Array,
+        required: true
     },
-    Colour:{
-        type:String,   
+    categoryid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'
     },
-    displaySize:{
+    brandid:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Brand'
+    },
+    quantity: {
+        type: Number
+    },
+
+    color: {
+        type: Array
+    },
+    regularprice: {
         type: Number,
-        require:true,
+        required: true
     },
-    resolution:{
-        type: String,
-        require:true,
-    },
-    Processor:{
-        type: String,
-        require:true,
-    },
-    ramSize:{
-        type:  Number,
-        require:true,
-    },
-    hardDriveSize:{
+    offerpercentage: {
         type: Number,
-        require:true,
+        default: 0
     },
-    hardDiskDescription:{
-        type: String,
-        require:true,
+    price: {
+        type: Number,
+        required: true
     },
-    graphicsChipsetBrand:{
-        type: String,
-        require:true,
-    }, 
-    operatingSystem:{
-        type: String,
-        require:true,
-    },
-    numberofUSB:{
-        type:  Number,
-        require:true,
-    },
-    audioDetails:{
-        type: String,
-        require:true,
-    },
-    countryofOrigin:{
-        type: String,
-        require:true,
-    },
-    itemWeight:{
-        type:  String,
-        require:true,
-    },
-    reviews: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Review',
-        },
-    ],
-    primaryImages:[
-        {
-            name:{
-                type:String,
-            },
-            path:{
-                type:String
-            }
-        }
-    ],
-    secondaryImages:[
-        {
-            name:{
-                type:String,
-            },
-            path:{
-                type:String
-            }
-        }
-    ],
-    
+    ratings: [RatingSchema] 
 },
-{
-    timestamps: true,
-    strict: false,
-  },
-)
-module.exports = mongoose.model("Product", productSchema);
+    { timestamps: true }
+);
+
+module.exports = mongoose.model('Product', ProductSchema);
