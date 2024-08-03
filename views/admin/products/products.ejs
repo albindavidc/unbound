@@ -1,255 +1,227 @@
 <%- include("../../partials/admin/header") %>
 
-
 <style>
   .table thead th {
-      background-color: #f8f9fa; /* Change this to your desired color */
-      color: #000; /* Optional: change the text color if needed */
-      text-align: left; /* Optional: change the text alignment if needed */
-      padding: 10px; /* Optional: change the padding if needed */
+    background-color: #f8f9fa; /* Change this to your desired color */
+    color: #000; /* Optional: change the text color if needed */
+    text-align: left; /* Optional: change the text alignment if needed */
+    padding: 10px; /* Optional: change the padding if needed */
   }
 </style>
 
 <section class="content-main">
-<div class="content-header">
+  <div class="content-header">
     <div>
-        <h2 class="content-title card-title">Products List</h2>
-      
+      <h2 class="content-title card-title">Products List</h2>
     </div>
     <div>
-        <a href="/admin/products/stocks" class="btn btn-primary btn-sm rounded">Manage Stocks</a>
-        <a href="/admin/add-product" class="btn btn-primary btn-sm rounded">Add products</a>
+      <a href="/admin/products/stocks" class="btn btn-primary btn-sm rounded"
+        >Manage Stocks</a
+      >
+      <a href="/admin/add-product" class="btn btn-primary btn-sm rounded"
+        >Add products</a
+      >
     </div>
-</div>
+  </div>
 
-<div class="card mb-4">
+  <div class="card mb-4">
     <div class="card-body">
-        <div class="table-responsive">
-            <table class="table text-capitalize table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Stocks</th>
-                        <th>Status</th>
-                        <th>Edit Product</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (product && product.length > 0) { %>
-                        <% product.forEach((product, index) => { %>
-                            <tr>
-                                <td>
-                                    <%= (current - 1) * perPage + index + 1 %>
-                                </td>
-                                <td>
-                                    <img class="img-fluid img-thumbnail" src="/uploads/images/<%= product.primaryImages.length > 0 ? product.primaryImages[0].name : (product.secondaryImages.length > 0 ? product.secondaryImages[0].name : 'default.jpg') %>" width="70rem" alt="">
-                                </td>
-                                <td>
-                                    <%= product.name %>
-                                </td>
-                                <td>
-                                    <%= product.category.name %>
-                                </td>
-                                <td>
-                                    <%= product.price %>
-                                </td>
-                                <td>
-                                    <% if (product.quantity === 0 || product.quantity < 0) { %>
-                                        <span class="text text-danger">Out Of Stock</span>
-                                    <% } else { %>
-                                        <%= product.quantity %>
-                                    <% } %>
-                                </td>
-                                <td>
-                                    <% if (product.isActive) { %>
-                                        <span class="badge rounded-pill alert-success">Listed</span>
-                                    <% } else { %>
-                                        <span class="badge rounded-pill alert-danger">Unlisted</span>
-                                    <% } %>
-                                </td>
-                                <td>
-                                    <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
-                                        <i class="material-icons md-edit"></i> Edit
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <% if (product.isActive) { %>
-                                        <button class="btn btn-danger btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'unlist', '<%= product.name %>')">
-                                            <i class="material-icons"></i> Unlist
-                                        </button>
-                                    <% } else { %>
-                                        <button class="btn btn-warning btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')">
-                                            <i class="material-icons"></i> List
-                                        </button>
-                                    <% } %>
-                                    <button class="btn btn-danger" onclick="confirmAction('<%= product._id %>', 'delete', '<%= product.name %>')">
-                                        <i class="material-icons md-delete_forever"></i> Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    <% } else { %>
-                        <tr>
-                            <td colspan="9" class="text-center">No products found</td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<% if (product.length > 0 && (nextPage || current == pages)) { %>
-    <nav aria-label="Dashboard pagination">
-        <ul class="pagination justify-content-center mt-5">
-            <% if (current == 1) { %>
-                <li class="page-item disabled"><a href="#" class="page-link">First</a></li>
-            <% } else { %>
-                <li class="page-item"><a href="/admin/products/?page=1" class="page-link">First</a></li>
-            <% } %>
-            <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
-            <% if (i !== 1) { %>
-                <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
-            <% } %>
-            <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
-                <% if (i == current) { %>
-                    <li class="page-item disabled"><a href="#" class="page-link"><%= i %></a></li>
+      <div class="table-responsive">
+        <table class="table text-capitalize table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stocks</th>
+              <th>Status</th>
+              <th>Edit Product</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (product && product.length > 0) { %> <%
+            product.forEach((product, index) => { %>
+            <tr>
+              <td><%= (current - 1) * perPage + index + 1 %></td>
+              <td>
+                <img
+                  class="img-fluid img-thumbnail"
+                  src="/uploads/images/<%= product.primaryImages.length > 0 ? product.primaryImages[0].path : 'default.jpg' %>"
+                  width="70rem"
+                  alt=""
+                />
+              </td>
+              <td><%= product.name %></td>
+              <td><%= product.category.name %></td>
+              <td><%= product.price %></td>
+              <td>
+                <% if (product.quantity === 0 || product.quantity < 0) { %>
+                <span class="text text-danger">Out Of Stock</span>
+                <% } else { %> <%= product.quantity %> <% } %>
+              </td>
+              <td>
+                <% if (product.isActive) { %>
+                <span class="badge rounded-pill alert-success">Listed</span>
                 <% } else { %>
-                    <li class="page-item"><a href="/admin/products?page=<%= i %>" class="page-link"><%= i %></a></li>
+                <span class="badge rounded-pill alert-danger">Unlisted</span>
                 <% } %>
-            <% if (i == Number(current) + 4 && i < pages) { %>
-                <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
+              </td>
+              <td>
+                <a
+                  href="/admin/edit-product/<%= product._id %>"
+                  class="btn btn-sm font-sm rounded btn-brand"
+                >
+                  <i class="material-icons md-edit"></i> Edit
+                </a>
+              </td>
+              <td class="text-center">
+                <% if (product.isActive) { %>
+                <button
+                  class="btn btn-danger btn-sm rounded"
+                  onclick="confirmAction('<%= product._id %>', 'unlist', '<%= product.name %>')"
+                >
+                  <i class="material-icons"></i> Unlist
+                </button>
+                <% } else { %>
+                <button
+                  class="btn btn-warning btn-sm rounded"
+                  onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')"
+                >
+                  <i class="material-icons"></i> List
+                </button>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="9" class="text-center">No products found</td>
+            </tr>
             <% } %>
-            <% } %>
-            <% if (current == pages) { %>
-                <li class="page-item disabled"><a href="#" class="page-link">Last</a></li>
-            <% } else { %>
-                <li class="page-item"><a href="/admin/products/?page=<%= pages %>" class="page-link">Last</a></li>
-            <% } %>
-        </ul>
-    </nav>
-<% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <% if (product.length > 0 && (nextPage || current == pages)) { %>
+  <nav aria-label="Dashboard pagination">
+    <ul class="pagination justify-content-center mt-5">
+      <% if (current == 1) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link">First</a>
+      </li>
+      <% } else { %>
+      <li class="page-item">
+        <a href="/admin/products/?page=1" class="page-link">First</a>
+      </li>
+      <% } %> <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %> <%
+      if (i !== 1) { %>
+      <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
+      <% } %> <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %> <%
+      if (i == current) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link"><%= i %></a>
+      </li>
+      <% } else { %>
+      <li class="page-item">
+        <a href="/admin/products?page=<%= i %>" class="page-link"><%= i %></a>
+      </li>
+      <% } %> <% if (i == Number(current) + 4 && i < pages) { %>
+      <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
+      <% } %> <% } %> <% if (current == pages) { %>
+      <li class="page-item disabled"><a href="#" class="page-link">Last</a></li>
+      <% } else { %>
+      <li class="page-item">
+        <a href="/admin/products/?page=<%= pages %>" class="page-link">Last</a>
+      </li>
+      <% } %>
+    </ul>
+  </nav>
+  <% } %>
+</section>
 
-</section> <!-- content-main end// -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-const confirmAction = (productId, action, productName) => {
+    const confirmAction = (productId, action, productName) => {
     let actionText, confirmButtonText;
     switch (action) {
-        case 'list':
-            actionText = 'list';
-            confirmButtonText = 'Yes, List it!';
-            break;
-        case 'unlist':
-            actionText = 'unlist';
-            confirmButtonText = 'Yes, Unlist it!';
-            break;
-        case 'delete':
-            actionText = 'delete';
-            confirmButtonText = 'Yes, Delete it!';
-            break;
-        default:
-            return;
+      case "list":
+        actionText = "list";
+        confirmButtonText = "Yes, List it!";
+        break;
+      case "unlist":
+        actionText = "unlist";
+        confirmButtonText = "Yes, Unlist it!";
+        break;
+      default:
+        return;
     }
 
     Swal.fire({
-        title: 'Are you sure?',
-        text: `Do you want to ${actionText} the product: ${productName}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: confirmButtonText,
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true
+      title: "Are you sure?",
+      text: `Do you want to ${actionText} the product: ${productName}?`,
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: "No, cancel!",
+      confirmButtonText: confirmButtonText,
+      showConfirmButton: true, // Hide the confirm button
+      reverseButtons: true,
+      timerProgressBar: true // Optional: Show a progress bar
     }).then((result) => {
-        if (result.isConfirmed) {
-            if (action === 'delete') {
-                deleteProduct(productId);
-            } else {
-                const shouldList = action === 'list';
-                unlistOrListProduct(productId, shouldList);
-            }
-        }
+      if (result.isConfirmed) {
+        const shouldList = action === "list";
+        unlistOrListProduct(productId, shouldList);
+      }
     });
 };
 
-const unlistOrListProduct = async (productId, shouldList) => {
-    try {   
-        const response = await fetch('/admin/product/action', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productId, shouldList })
-        });
-        const result = await response.json();
-        if (result.success) {
-            Swal.fire({
-                title: 'Success!',
-                text: shouldList ? 'Product has been listed.' : 'Product has been unlisted.',
-                icon: 'success',
-                timer: 1500
-            }).then(() => {
-                location.reload();
-            });
-        } else {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Something went wrong.',
-                icon: 'error',
-                timer: 1500
-            });
-        }
-    } catch (error) {
-        Swal.fire({
-            title: 'Error!',
-            text: 'Something went wrong.',
-            icon: 'error',
-            timer: 1500
-        });
-    }
-};
 
-const deleteProduct = async (productId) => {
+  const unlistOrListProduct = async (productId, shouldList) => {
     try {
-        const response = await fetch('/admin/product/deleteProduct', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productId })
-        });
-        const result = await response.json();
-        if (result.success) {
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'Product has been deleted.',
-                icon: 'success',
-                timer: 1500
-            }).then(() => {
-                location.reload();
-            });
-        } else {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Something went wrong.',
-                icon: 'error',
-                timer: 1500
-            });
-        }
-    } catch (error) {
+      const response = await fetch("/admin/product/action", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId, shouldList }),
+      });
+      const result = await response.json();
+      if (result.success) {
         Swal.fire({
-            title: 'Error!',
-            text: 'Something went wrong.',
-            icon: 'error',
-            timer: 1500
-        });
-    }
-};
-</script>
+          title: "Success!",
+          text: shouldList
+            ? "Product has been listed."
+            : "Product has been unlisted.",
+          icon: "success",
+          showConfirmButton: false,
 
+          timer: 1500,
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong.",
+          icon: "error",
+          showConfirmButton: false,
+
+          timer: 1500,
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Something went wrong.",
+        icon: "error",
+        showConfirmButton: false,
+
+        timer: 1500,
+      });
+    }
+  };
+</script>
 
 <%- include("../../partials/admin/footer") %>

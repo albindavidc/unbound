@@ -325,197 +325,199 @@
     "></script>
 
   <script>
-   const cropImageModal = document.getElementById("cropImageModal");
-const primaryInput = document.getElementById("primaryInput");
-const secondaryInput = document.getElementById("imageInput");
-const addPrimaryImageButton = document.getElementById("addPrimaryImageButton");
-const addSecondaryImageButton = document.getElementById("addSecondaryImageButton");
-const cropButton = document.getElementById("cropButton");
-const closeImageButton = document.getElementById("closeImageButton");
-const imageToCrop = document.getElementById("imageToCrop");
-const croppedPrimaryImagesDiv = document.getElementById("croppedPrimaryImages");
-const croppedSecondaryImagesDiv = document.getElementById("croppedImages");
-let cropper;
-let croppingPrimary = false;
-const maxSecondaryImages = 4;
-let currentSecondaryImages = 0;
+    const cropImageModal = document.getElementById("cropImageModal");
+    const primaryInput = document.getElementById("primaryInput");
+    const secondaryInput = document.getElementById("imageInput");
+    const addPrimaryImageButton = document.getElementById(
+      "addPrimaryImageButton"
+    );
+    const addSecondaryImageButton = document.getElementById(
+      "addSecondaryImageButton"
+    );
+    const cropButton = document.getElementById("cropButton");
+    const closeImageButton = document.getElementById("closeImageButton");
+    const imageToCrop = document.getElementById("imageToCrop");
+    const croppedPrimaryImagesDiv = document.getElementById(
+      "croppedPrimaryImages"
+    );
+    const croppedSecondaryImagesDiv = document.getElementById("croppedImages");
+    let cropper;
+    let croppingPrimary = false;
+    const maxSecondaryImages = 4;
+    let currentSecondaryImages = 0;
 
-// Handle primary and secondary image button clicks
-addPrimaryImageButton.addEventListener("click", function () {
-  croppingPrimary = true;
-  primaryInput.click();
-});
-
-addSecondaryImageButton.addEventListener("click", function () {
-  if (currentSecondaryImages < maxSecondaryImages) {
-    croppingPrimary = false;
-    secondaryInput.click();
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "You can only upload up to 4 secondary images in total!",
+    // Handle primary and secondary image button clicks
+    addPrimaryImageButton.addEventListener("click", function () {
+      croppingPrimary = true;
+      primaryInput.click();
     });
-  }
-});
 
-// Handle file input change event
-function handleFileInputChange(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      openCropModal(e.target.result);
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-primaryInput.addEventListener("change", handleFileInputChange);
-secondaryInput.addEventListener("change", handleFileInputChange);
-
-// Open the cropping modal
-function openCropModal(imageSrc) {
-  imageToCrop.src = imageSrc;
-  cropImageModal.style.display = "block";
-
-  if (cropper) {
-    cropper.destroy();
-  }
-
-  cropper = new Cropper(imageToCrop, {
-    aspectRatio: 1,
-    viewMode: 3,
-  });
-}
-
-// Crop the image and add it to the appropriate container
-cropButton.addEventListener("click", function () {
-  const canvas = cropper.getCroppedCanvas();
-  canvas.toBlob(function (blob) {
-    const imgContainer = document.createElement("div");
-    imgContainer.classList.add("cropped-img-container");
-
-    const imgElement = document.createElement("img");
-    const url = URL.createObjectURL(blob);
-    imgElement.src = url;
-    imgElement.classList.add("cropped-img");
-    imgElement.dataset.blob = url;
-
-    const removeButton = document.createElement("button");
-    removeButton.classList.add("remove-btn");
-    removeButton.innerHTML = "X";
-    removeButton.addEventListener("click", function () {
-      imgContainer.remove();
-      if (!croppingPrimary) {
-        currentSecondaryImages--;
+    addSecondaryImageButton.addEventListener("click", function () {
+      if (currentSecondaryImages < maxSecondaryImages) {
+        croppingPrimary = false;
+        secondaryInput.click();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "You can only upload up to 4 secondary images in total!",
+        });
       }
     });
 
-    imgContainer.appendChild(imgElement);
-    imgContainer.appendChild(removeButton);
-
-    if (croppingPrimary) {
-      croppedPrimaryImagesDiv.innerHTML = "";
-      croppedPrimaryImagesDiv.appendChild(imgContainer);
-    } else {
-      croppedSecondaryImagesDiv.appendChild(imgContainer);
-      currentSecondaryImages++;
+    // Handle file input change event
+    function handleFileInputChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          openCropModal(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
-    cropImageModal.style.display = "none";
-  }, "image/png");
-});
+    primaryInput.addEventListener("change", handleFileInputChange);
+    secondaryInput.addEventListener("change", handleFileInputChange);
 
-// Close the cropping modal
-closeImageButton.addEventListener("click", function () {
-  cropImageModal.style.display = "none";
-});
+    // Open the cropping modal
+    function openCropModal(imageSrc) {
+      imageToCrop.src = imageSrc;
+      cropImageModal.style.display = "block";
 
-// Close the cropping modal when clicking outside of it
-window.addEventListener("click", function (event) {
-  if (event.target === cropImageModal) {
-    cropImageModal.style.display = "none";
-  }
-});
+      if (cropper) {
+        cropper.destroy();
+      }
 
-// Add product function
-async function addproduct(event) {
-  event.preventDefault();
-
-  if (!validateForm()) {
-    return;
-  }
-
-  if (croppedPrimaryImagesDiv.childElementCount === 0) {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Please add a primary image before submitting.",
-    });
-    return;
-  }
-
-  if (croppedSecondaryImagesDiv.childElementCount === 0) {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Please add at least one secondary image before submitting.",
-    });
-    return;
-  }
-
-  let form = document.getElementById("addProductForm")
-
-  var formData = new FormData(form);
-
-
-  // Add primary image to formData
-  const primaryImage = croppedPrimaryImagesDiv.children[0].querySelector("img");
-  const primaryBlobUrl = primaryImage.dataset.blob;
-  const primaryBlob = await fetch(primaryBlobUrl).then((r) => r.blob());
-  formData.append("primaryImage", primaryBlob, "primaryImage.png");
-
-
-  // Add secondary images to formData
-  const secondaryImages = croppedSecondaryImagesDiv.children;
-  for (let i = 0; i < secondaryImages.length; i++) {
-    const blobUrl = secondaryImages[i].querySelector("img").dataset.blob;
-    const blob = await fetch(blobUrl).then((r) => r.blob());
-    formData.append("images", blob, `secondaryImage${i}.png`);
-  }
-
-  try {
-
-
-    console.log(formData.entries());
-
-    const response = await fetch("/admin/add-product", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await response.json();
-
-    if (data.isvalid) {
-      const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
-      window.location.href = `${API_BASE_URL}/admin/products`;
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Product adding failed...!",
+      cropper = new Cropper(imageToCrop, {
+        aspectRatio: 1,
+        viewMode: 3,
       });
     }
-  } catch (error) {
-    console.error(error);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "An error occurred while adding the product.",
-    });
-  }
-}
 
+    // Crop the image and add it to the appropriate container
+    cropButton.addEventListener("click", function () {
+      const canvas = cropper.getCroppedCanvas();
+      canvas.toBlob(function (blob) {
+        const imgContainer = document.createElement("div");
+        imgContainer.classList.add("cropped-img-container");
+
+        const imgElement = document.createElement("img");
+        const url = URL.createObjectURL(blob);
+        imgElement.src = url;
+        imgElement.classList.add("cropped-img");
+        imgElement.dataset.blob = url;
+
+        const removeButton = document.createElement("button");
+        removeButton.classList.add("remove-btn");
+        removeButton.innerHTML = "X";
+        removeButton.addEventListener("click", function () {
+          imgContainer.remove();
+          if (!croppingPrimary) {
+            currentSecondaryImages--;
+          }
+        });
+
+        imgContainer.appendChild(imgElement);
+        imgContainer.appendChild(removeButton);
+
+        if (croppingPrimary) {
+          croppedPrimaryImagesDiv.innerHTML = "";
+          croppedPrimaryImagesDiv.appendChild(imgContainer);
+        } else {
+          croppedSecondaryImagesDiv.appendChild(imgContainer);
+          currentSecondaryImages++;
+        }
+
+        cropImageModal.style.display = "none";
+      }, "image/png");
+    });
+
+    // Close the cropping modal
+    closeImageButton.addEventListener("click", function () {
+      cropImageModal.style.display = "none";
+    });
+
+    // Close the cropping modal when clicking outside of it
+    window.addEventListener("click", function (event) {
+      if (event.target === cropImageModal) {
+        cropImageModal.style.display = "none";
+      }
+    });
+
+    // Add product function
+    async function addproduct(event) {
+      event.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      if (croppedPrimaryImagesDiv.childElementCount === 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Please add a primary image before submitting.",
+        });
+        return;
+      }
+
+      if (croppedSecondaryImagesDiv.childElementCount === 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Please add at least one secondary image before submitting.",
+        });
+        return;
+      }
+
+      let form = document.getElementById("addProductForm");
+
+      var formData = new FormData(form);
+
+      // Add primary image to formData
+      const primaryImage =
+        croppedPrimaryImagesDiv.children[0].querySelector("img");
+      const primaryBlobUrl = primaryImage.dataset.blob;
+      const primaryBlob = await fetch(primaryBlobUrl).then((r) => r.blob());
+      formData.append("primaryImage", primaryBlob, "primaryImage.png");
+
+      // Add secondary images to formData
+      const secondaryImages = croppedSecondaryImagesDiv.children;
+      for (let i = 0; i < secondaryImages.length; i++) {
+        const blobUrl = secondaryImages[i].querySelector("img").dataset.blob;
+        const blob = await fetch(blobUrl).then((r) => r.blob());
+        formData.append("images", blob, `secondaryImage${i}.png`);
+      }
+
+      try {
+        console.log(formData.entries());
+
+        const response = await fetch("/admin/add-product", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await response.json();
+
+        if (data.isvalid) {
+          const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+          window.location.href = `${API_BASE_URL}/admin/products`;
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Product adding failed...!",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while adding the product.",
+        });
+      }
+    }
 
     function validateForm() {
       let isValid = true;

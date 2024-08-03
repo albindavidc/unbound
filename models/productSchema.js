@@ -55,8 +55,16 @@ const ProductSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
+
+    image: [imageSchema],
+    
     primaryImages: [imageSchema],
     secondaryImages: [imageSchema],
+    isActive:{
+      type: Boolean,
+      default: true,
+
+    },
     offerpercentage: {
       type: Number,
       default: 0,
