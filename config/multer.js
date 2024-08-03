@@ -4,7 +4,7 @@ const path = require('path');
 // Specific storage configuration for product images
 const productStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../../public/uploads/images")); // Destination folder
+    cb(null, path.join(__dirname, "../public/uploads/images")); // Destination folder
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname)); // File naming convention
@@ -27,7 +27,7 @@ const productFileFilter = (req, file, cb) => {
 // Initialize upload middleware for single file upload
 const productUpload = multer({
   storage: productStorage,
-  limits: { fileSize: 1 * 1024 * 1024 }, // 1MB file size limit
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB file size limit
   fileFilter: productFileFilter
 });
 

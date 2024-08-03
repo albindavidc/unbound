@@ -64,13 +64,16 @@ module.exports = {
 },
 
 async addProducts(req, res) {
+
+  console.log("22222222222222222")
+
     console.log("add product req.files",req.files)
      console.log("add product",req.body)
 
      try {
-        const {productName,productdescription,brandname,price,quantity,volume,color,categoryname}= req.body
+        const {productName,productdescription,brandname,price,quantity,color,category}= req.body
       
-        const productExists = await productModel.findOne({ name:productName })
+        const productExists = await Product.findOne({ name:productName })
         if (!productExists) {
             const images = []
             if (req.files && req.files.length > 0) {
@@ -79,27 +82,29 @@ async addProducts(req, res) {
                 }
             }
 
-            const newProduct = new productModel({
+            const newProduct = new Product({
                 name:productName,
                 description: productdescription,
                 brand: brandname,
-                category: categoryname,
+                category,
                 regularprice:price,
                 price:price,
                 quantity:quantity,
-                volume:volume,
                 color:color,
                 image: images
             })
             await newProduct.save()
             res.json({isvalid:true});
+            
         } else {
 
             res.json({isvalid:false});
         }
 
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
+        res.status(500).json({message: error.message});
+
     }
 
   

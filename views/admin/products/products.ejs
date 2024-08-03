@@ -47,10 +47,10 @@
                                     <%= (current - 1) * perPage + index + 1 %>
                                 </td>
                                 <td>
-                                    <img class="img-fluid img-thumbnail" src="/uploads/products-images/crp/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>" width="70rem" alt="">
+                                    <img class="img-fluid img-thumbnail" src="/uploads/images/<%= product.primaryImages.length > 0 ? product.primaryImages[0].name : (product.secondaryImages.length > 0 ? product.secondaryImages[0].name : 'default.jpg') %>" width="70rem" alt="">
                                 </td>
                                 <td>
-                                    <%= product.product_name %>
+                                    <%= product.name %>
                                 </td>
                                 <td>
                                     <%= product.category.name %>
@@ -59,10 +59,10 @@
                                     <%= product.price %>
                                 </td>
                                 <td>
-                                    <% if (product.stock === 0 || product.stock < 0) { %>
+                                    <% if (product.quantity === 0 || product.quantity < 0) { %>
                                         <span class="text text-danger">Out Of Stock</span>
                                     <% } else { %>
-                                        <%= product.stock %>
+                                        <%= product.quantity %>
                                     <% } %>
                                 </td>
                                 <td>

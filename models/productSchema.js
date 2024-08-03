@@ -1,64 +1,69 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const RatingSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to the user who submitted the rating
+const RatingSchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Reference to the user who submitted the rating
     rating: { type: Number, required: true }, // Rating value (e.g., 1-5 stars)
-    review: { type: String }, 
-  }, { timestamps: true });
-
-const ProductSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    brand: {
-        type: String,
-        required: true,
-      
-    },
-    category: {
-        type: String,
-        required: true,
-    },
-    description: {
-        type: String,
-        required: true,
-    },
-    image: {
-        type: Array,
-        required: true
-    },
-    categoryid: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
-    },
-    brandid:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Brand'
-    },
-    quantity: {
-        type: Number
-    },
-
-    color: {
-        type: Array
-    },
-    regularprice: {
-        type: Number,
-        required: true
-    },
-    offerpercentage: {
-        type: Number,
-        default: 0
-    },
-    price: {
-        type: Number,
-        required: true
-    },
-    ratings: [RatingSchema] 
-},
-    { timestamps: true }
+    review: { type: String },
+  },
+  { timestamps: true }
 );
 
-module.exports = mongoose.model('Product', ProductSchema);
+const imageSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  path: { type: String, required: true },
+  type: { type: String, enum: ["primary", "secondary"], required: true },
+});
+
+const ProductSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    brand: {
+      type: String,
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true,
+    },
+
+    regularprice: {
+      type: Number,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    volume: {
+      type: Number,
+   
+    },
+    quantity: {
+      type: Number,
+      required: true,
+    },
+    color: {
+      type: [String],
+      required: true,
+    },
+    primaryImages: [imageSchema],
+    secondaryImages: [imageSchema],
+    offerpercentage: {
+      type: Number,
+      default: 0,
+    },
+    ratings: [RatingSchema],
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Product", ProductSchema);
