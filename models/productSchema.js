@@ -54,12 +54,9 @@ const ProductSchema = new mongoose.Schema(
     color: {
       type: [String],
       required: true,
-    },
-
-    image: [imageSchema],
-    
-    primaryImages: [imageSchema],
-    secondaryImages: [imageSchema],
+    },    
+    primaryImages: { type: [imageSchema]},
+    secondaryImages: { type: [imageSchema]},
     isActive:{
       type: Boolean,
       default: true,

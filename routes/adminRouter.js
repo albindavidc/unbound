@@ -54,7 +54,7 @@ router.route("/add-product").get(adminAuth, productController.getAddProducts);
 
 const upload = productUpload.fields([
   { name: "primaryImage", maxCount: 1 },
-  { name: "images", maxCount: 4 },
+  { name: "secondaryImage", maxCount: 4 },
 ]);
 
 router.post("/add-product", adminAuth, upload, productController.addProducts);

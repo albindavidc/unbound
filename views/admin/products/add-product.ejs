@@ -14,7 +14,7 @@
   />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-  <title>SheShop</title>
+  <title>Unbound</title>
   <style>
     .form-container {
       display: flex;
@@ -487,7 +487,7 @@
       for (let i = 0; i < secondaryImages.length; i++) {
         const blobUrl = secondaryImages[i].querySelector("img").dataset.blob;
         const blob = await fetch(blobUrl).then((r) => r.blob());
-        formData.append("images", blob, `secondaryImage${i}.png`);
+        formData.append("secondaryImage", blob, `secondaryImage${i}.png`);
       }
 
       try {

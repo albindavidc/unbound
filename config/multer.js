@@ -7,7 +7,10 @@ const productStorage = multer.diskStorage({
     cb(null, path.join(__dirname, "../public/uploads/images")); // Destination folder
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // File naming convention
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extension = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, extension);
+    cb(null, baseName + '-' + uniqueSuffix + extension); // File naming convention
   }
 });
 

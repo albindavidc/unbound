@@ -65,14 +65,29 @@ module.exports = {
 
 async addProducts(req, res) {
 
-  console.log("22222222222222222")
 
     console.log("add product req.files",req.files)
+
+      console.log("22222222222222222")
+
      console.log("add product",req.body)
 
      try {
         const {productName,productdescription,brandname,price,quantity,color,category}= req.body
       
+         // Create arrays for primary and secondary images
+    const primaryImages = req.files.primaryImage.map(file => ({
+      name: file.filename,
+      path: file.path,
+      type: "primary"
+    }));
+
+    const secondaryImages = req.files.secondaryImage.map(file => ({
+      name: file.filename,
+      path: file.path,
+      type: "secondary"
+    }));
+
         const productExists = await Product.findOne({ name:productName })
         if (!productExists) {
             const images = []
@@ -91,7 +106,8 @@ async addProducts(req, res) {
                 price:price,
                 quantity:quantity,
                 color:color,
-                image: images
+                primaryImages,
+      secondaryImages
             })
             await newProduct.save()
             res.json({isvalid:true});

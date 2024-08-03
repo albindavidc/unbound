@@ -49,7 +49,7 @@
               <td>
                 <img
                   class="img-fluid img-thumbnail"
-                  src="/uploads/images/<%= product.primaryImages.length > 0 ? product.primaryImages[0].path : 'default.jpg' %>"
+                  src="/uploads/images/<%= product.primaryImages.length > 0 ? product.primaryImages[0].name : 'default.jpg' %>"
                   width="70rem"
                   alt=""
                 />
@@ -93,7 +93,15 @@
                   <i class="material-icons"></i> List
                 </button>
                 <% } %>
+                <button
+                  class="btn btn-danger"
+                  onclick="confirmAction('<%= product._id %>', 'delete', '<%= product.name %>')"
+                >
+                  <i class="material-icons md-delete_forever"></i> Delete
+                </button>
               </td>
+
+              
             </tr>
             <% }) %> <% } else { %>
             <tr>
@@ -141,39 +149,49 @@
   </nav>
   <% } %>
 </section>
-
+<!-- content-main end// -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
     const confirmAction = (productId, action, productName) => {
     let actionText, confirmButtonText;
+
     switch (action) {
-      case "list":
-        actionText = "list";
-        confirmButtonText = "Yes, List it!";
-        break;
-      case "unlist":
-        actionText = "unlist";
-        confirmButtonText = "Yes, Unlist it!";
-        break;
-      default:
-        return;
+        case "list":
+            actionText = "list";
+            confirmButtonText = "Yes, List it!";
+            break;
+        case "unlist":
+            actionText = "unlist";
+            confirmButtonText = "Yes, Unlist it!";
+            break;
+        case "delete":
+            actionText = "delete";
+            confirmButtonText = "Yes, Delete it!";
+            break;
+        default:
+            return;
     }
 
     Swal.fire({
-      title: "Are you sure?",
-      text: `Do you want to ${actionText} the product: ${productName}?`,
-      icon: "warning",
-      showCancelButton: true,
-      cancelButtonText: "No, cancel!",
-      confirmButtonText: confirmButtonText,
-      showConfirmButton: true, // Hide the confirm button
-      reverseButtons: true,
-      timerProgressBar: true // Optional: Show a progress bar
+        title: "Are you sure?",
+        text: `Do you want to ${actionText} the product: ${productName}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: confirmButtonText,
+        cancelButtonText: "No, cancel!",
+        showConfirmButton: true, // Hide the confirm button
+        reverseButtons: true,
+        timer: 5000, // Auto-close after 3 seconds
+        timerProgressBar: true // Optional: Show a progress bar
     }).then((result) => {
-      if (result.isConfirmed) {
-        const shouldList = action === "list";
-        unlistOrListProduct(productId, shouldList);
-      }
+        if (result.isConfirmed) {
+            if (action === "delete") {
+                deleteProduct(productId);
+            } else {
+                const shouldList = action === "list";
+                unlistOrListProduct(productId, shouldList);
+            }
+        }
     });
 };
 
@@ -194,6 +212,48 @@
           text: shouldList
             ? "Product has been listed."
             : "Product has been unlisted.",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: "Something went wrong.",
+          icon: "error",
+          showConfirmButton: false,
+
+          timer: 1500,
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Something went wrong.",
+        icon: "error",
+        showConfirmButton: false,
+
+        timer: 1500,
+      });
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    try {
+      const response = await fetch("/admin/product/deleteProduct", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Product has been deleted.",
           icon: "success",
           showConfirmButton: false,
 
