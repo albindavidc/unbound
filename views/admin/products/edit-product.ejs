@@ -1,0 +1,791 @@
+<%- include("../../partials/admin/header") %>
+
+<link
+  href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="/css/admin_panel.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css "
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+<style>
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .form-wrapper {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .cropped-img-container {
+    display: inline-block;
+    position: relative;
+    margin: 10px;
+  }
+
+  .cropped-img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .imagemodal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .modal-content {
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  .padding {
+    padding: 40px 0 10px 0;
+  }
+</style>
+
+<body>
+  <div
+    class="imagemodal"
+    id="cropImageModal"
+    tabindex="-1"
+    aria-labelledby="cropImageModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
+          <button
+            id="closeImageButton"
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="img-container">
+            <img id="imageToCrop" src="/images/hero.jpg" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            id="closeImageButton"
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="cropButton">
+            Crop
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content-main">
+    <div class="row">
+      <div class="col-9">
+        <div class="content-header">
+          <h2 class="content-title">Edit Product - <%= product.name %></h2>
+        </div>
+      </div>
+    </div>
+
+    <form
+      id="addProductForm"
+      action="/admin/products/edit-product/<%= product._id %>"
+      method="POST"
+      enctype="multipart/form-data"
+      onsubmit="editProduct(event)"
+    >
+      <div class="container mt-4">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="mb-4">
+                  <label for="product_name" class="form-label"
+                    >Product Name</label
+                  >
+                  <input
+                    type="text"
+                    value="<%= product.name %>"
+                    placeholder="Type here"
+                    class="form-control"
+                    name="name"
+                    id="product_name"
+                  />
+                </div>
+                <div class="mb-4">
+                  <label for="status" class="form-label">Status</label>
+                  <select
+                    class="form-select"
+                    name="isActive"
+                    aria-label="Active or Inactive"
+                  >
+                    <% if (product.isActive) { %>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                    <% } else { %>
+                    <option value="false">Inactive</option>
+                    <option value="true">Active</option>
+                    <% } %>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label for="category" class="form-label">Categories</label>
+                  <select name="category" id="category" class="form-select">
+                    <option value="<%= product.category._id %>">
+                      <%= product.category.name %>
+                    </option>
+                    <% categories.forEach(category => { %> <% if (category.name
+                    !== product.category.name) { %>
+                    <option value="<%= category._id %>">
+                      <%= category.name %>
+                    </option>
+                    <% } %> <% }) %>
+                  </select>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Description</label>
+                  <textarea
+                    placeholder="Type here"
+                    class="form-control"
+                    name="description"
+                    rows="4"
+                  >
+<%= product.description %></textarea
+                  >
+                </div>
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Regular Price</label>
+                      <input
+                        placeholder="Enter regular price"
+                        name="regularprice"
+                        value="<%= product.regularprice %>"
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Price</label>
+                      <input
+                        placeholder="Enter price"
+                        value="<%= product.price %>"
+                        name="price"
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Volume</label>
+                      <input
+                        placeholder="Enter volume"
+                        value="<%= product.volume %>"
+                        name="volume"
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Quantity</label>
+                      <input
+                        placeholder="Enter quantity"
+                        value="<%= product.quantity %>"
+                        name="quantity"
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Color</label>
+                      <input
+                        placeholder="Enter color"
+                        value="<%= product.color.join(', ') %>"
+                        name="color"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Offer Percentage</label>
+                      <input
+                        placeholder="Enter offer percentage"
+                        value="<%= product.offerpercentage %>"
+                        name="offerpercentage"
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label">Brand</label>
+                      <input
+                        placeholder="Enter brand"
+                        value="<%= product.brand %>"
+                        name="brand"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Primary image upload with cropping -->
+              <div class="col-lg-4">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Primary Image</h4>
+                  </div>
+                  <div class="card-body text-center">
+                    <div class="input-upload">
+                      <label for="primaryImageInput" class="form-label">
+                        <% if (product.primaryImages[0]) { %>
+                        <img
+                          id="preview1"
+                          src="/uploads/images/<%- product.primaryImages[0].name %>"
+                          alt=""
+                          width="150px"
+                        />
+                        <% } else { %>
+                        <img
+                          id="preview1"
+                          src="../../assets/imgs/theme/upload.svg"
+                          alt=""
+                          width="150px"
+                        />
+                        <% } %>
+                      </label>
+                    </div>
+                    <div class="padding">
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="primaryImageInput"
+                        accept="image/*"
+                        style="display: none"
+                      />
+                      <button
+                        id="primaryInputButton"
+                        type="button"
+                        class="btn btn-md rounded font-sm"
+                      >
+                        Upload Image
+                      </button>
+                      <div
+                        id="croppedPrimaryImages"
+                        style="display: none"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Secondary images upload -->
+              <div class="col-lg-4">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Secondary Image 1</h4>
+                  </div>
+                  <div class="card-body text-center">
+                    <div class="input-upload">
+                      <label for="secondaryImageInput1" class="form-label">
+                        <img
+                          id="preview2"
+                          src="<%= product.secondaryImages[0] ? `/uploads/images/${product.secondaryImages[0].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          alt=""
+                          width="150px"
+                        />
+                      </label>
+                    </div>
+                    <div class="padding">
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="secondaryImageInput1"
+                        style="display: none"
+                      />
+                      <button
+                        id="secondaryImageButton1"
+                        type="button"
+                        class="btn btn-md rounded font-sm"
+                      >
+                        Upload Image
+                      </button>
+                      <div
+                        id="croppedSecondaryImage1"
+                        style="display: none"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Secondary Image 2</h4>
+                  </div>
+                  <div class="card-body text-center">
+                    <div class="input-upload">
+                      <label for="secondaryImageInput2" class="form-label">
+                        <img
+                          id="preview3"
+                          src="<%= product.secondaryImages[1] ? `/uploads/images/${product.secondaryImages[1].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          alt=""
+                          width="150px"
+                        />
+                      </label>
+                    </div>
+                    <div class="padding">
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="secondaryImageInput2"
+                        style="display: none"
+                      />
+                      <button
+                        id="secondaryImageButton2"
+                        type="button"
+                        class="btn btn-md rounded font-sm"
+                      >
+                        Upload Image
+                      </button>
+                      <div
+                        id="croppedSecondaryImage2"
+                        style="display: none"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Secondary Image 3</h4>
+                  </div>
+                  <div class="card-body text-center">
+                    <div class="input-upload">
+                      <label for="secondaryImageInput3" class="form-label">
+                        <img
+                          id="preview4"
+                          src="<%= product.secondaryImages[2] ? `/uploads/images/${product.secondaryImages[2].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          alt=""
+                          width="150px"
+                        />
+                      </label>
+                    </div>
+                    <div class="padding">
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="secondaryImageInput3"
+                        style="display: none"
+                      />
+                      <button
+                        id="secondaryImageButton3"
+                        type="button"
+                        class="btn btn-md rounded font-sm"
+                      >
+                        Upload Image
+                      </button>
+                      <div
+                        id="croppedSecondaryImage3"
+                        style="display: none"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Secondary Image 4</h4>
+                  </div>
+                  <div class="card-body text-center">
+                    <div class="input-upload">
+                      <label for="secondaryImageInput4" class="form-label">
+                        <img
+                          id="preview5"
+                          src="<%= product.secondaryImages[3] ? `/uploads/images/${product.secondaryImages[3].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          alt=""
+                          width="150px"
+                        />
+                      </label>
+                    </div>
+                    <div class="padding">
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="secondaryImageInput4"
+                        style="display: none"
+                      />
+                      <button
+                        id="secondaryImageButton4"
+                        type="button"
+                        class="btn btn-md rounded font-sm"
+                      >
+                        Upload Image
+                      </button>
+                      <div
+                        id="croppedSecondaryImage4"
+                        style="display: none"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-center padding">
+              <div class="row">
+                <div class="col text-center padding">
+                  <button class="btn btn-md rounded font-sm" type="submit">
+                    Update
+                  </button>
+                  <a
+                    href="/admin/products/products"
+                    class="btn btn-light rounded font-sm"
+                    >Cancel</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+  // content-main end
+
+  <!-- Cropper.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const cropImageModal = document.getElementById("cropImageModal");
+      const cropButton = document.getElementById("cropButton");
+      const closeImageButton = document.getElementById("closeImageButton");
+      const imageToCrop = document.getElementById("imageToCrop");
+
+      let cropper;
+      let currentImageInputId = "";
+
+      function setupImageCropping(
+        inputId,
+        previewId,
+        croppedImagesDivId,
+        buttonId
+      ) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const croppedImagesDiv = document.getElementById(croppedImagesDivId);
+        const button = document.getElementById(buttonId);
+
+        // Handle image button click
+        button.addEventListener("click", function () {
+          currentImageInputId = inputId;
+          input.click();
+        });
+
+        // Handle file input change event
+        input.addEventListener("change", function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              openCropModal(e.target.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        function openCropModal(imageSrc) {
+          imageToCrop.src = imageSrc;
+          cropImageModal.style.display = "block";
+
+          // Ensure Cropper is destroyed before re-initializing
+          if (cropper) {
+            cropper.destroy();
+          }
+
+          cropper = new Cropper(imageToCrop, {
+            aspectRatio: 1, // Square aspect ratio
+            viewMode: 3, // Restrict the crop box to not exceed the canvas
+          });
+        }
+
+        // Crop the image and add it to the appropriate container
+        cropButton.addEventListener("click", function () {
+          if (!cropper) return; // Ensure Cropper is initialized
+
+          const canvas = cropper.getCroppedCanvas();
+          canvas.toBlob(function (blob) {
+            const url = URL.createObjectURL(blob);
+
+            // Update the image preview
+            if (currentImageInputId === inputId) {
+              preview.src = url;
+
+              // Clear any existing cropped images
+              croppedImagesDiv.innerHTML = "";
+
+              // Create and append the new cropped image
+              const imgContainer = document.createElement("div");
+              imgContainer.classList.add("cropped-img-container");
+
+              const imgElement = document.createElement("img");
+              imgElement.src = url;
+              imgElement.classList.add("cropped-img");
+              imgElement.dataset.blob = url;
+
+              imgContainer.appendChild(imgElement);
+              croppedImagesDiv.appendChild(imgContainer);
+
+              // Hide the modal
+              cropImageModal.style.display = "none";
+            }
+          }, "image/png");
+        });
+      }
+
+      // Setup cropping for primary image
+      setupImageCropping(
+        "primaryImageInput",
+        "preview1",
+        "croppedPrimaryImages",
+        "primaryInputButton"
+      );
+
+      // Setup cropping for secondary images
+      setupImageCropping(
+        "secondaryImageInput1",
+        "preview2",
+        "croppedSecondaryImage1",
+        "secondaryImageButton1"
+      );
+      setupImageCropping(
+        "secondaryImageInput2",
+        "preview3",
+        "croppedSecondaryImage2",
+        "secondaryImageButton2"
+      );
+      setupImageCropping(
+        "secondaryImageInput3",
+        "preview4",
+        "croppedSecondaryImage3",
+        "secondaryImageButton3"
+      );
+      setupImageCropping(
+        "secondaryImageInput4",
+        "preview5",
+        "croppedSecondaryImage4",
+        "secondaryImageButton4"
+      );
+
+      // Close the cropping modal
+      closeImageButton.addEventListener("click", function () {
+        cropImageModal.style.display = "none";
+      });
+
+      // Close the cropping modal when clicking outside of it
+      window.addEventListener("click", function (event) {
+        if (event.target === cropImageModal) {
+          cropImageModal.style.display = "none";
+        }
+      });
+
+      // Handle form submission
+      document
+        .getElementById("addProductForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          if (!validateForm()) {
+            return;
+          }
+
+          if (croppedPrimaryImagesDiv.childElementCount === 0) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Please add a primary image before submitting.",
+            });
+            return;
+          }
+
+          if (croppedSecondaryImagesDiv.childElementCount === 0) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Please add at least one secondary image before submitting.",
+            });
+            return;
+          }
+
+          let form = document.getElementById("addProductForm");
+          var formData = new FormData(form);
+
+          // Add primary image to formData
+          const primaryImage =
+            croppedPrimaryImagesDiv.children[0].querySelector("img");
+          const primaryBlobUrl = primaryImage.dataset.blob;
+          const primaryBlob = await fetch(primaryBlobUrl).then((r) => r.blob());
+          formData.append("primaryImage", primaryBlob, "primaryImage.png");
+
+          // Add secondary images to formData
+          const secondaryImages = croppedSecondaryImagesDiv.children;
+          for (let i = 0; i < secondaryImages.length; i++) {
+            const blobUrl =
+              secondaryImages[i].querySelector("img").dataset.blob;
+            const blob = await fetch(blobUrl).then((r) => r.blob());
+            formData.append("secondaryImage", blob, `secondaryImage${i}.png`);
+          }
+
+          try {
+            const response = await fetch(form.action, {
+              method: "POST",
+              body: formData,
+            });
+            const data = await response.json();
+
+            if (data.isvalid) {
+              const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+              window.location.href = `${API_BASE_URL}/admin/products`;
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Product updating failed...!",
+              });
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "An error occurred while updating the product.",
+            });
+          }
+        });
+
+      function validateForm() {
+        let isValid = true;
+
+        // Validate price
+        const price = document.querySelector('input[name="price"]').value;
+        if (isNaN(price) || price < 0) {
+          document.getElementById("price-error").innerText =
+            "Price must be a number greater than or equal to 0.";
+          isValid = false;
+        } else {
+          document.getElementById("price-error").innerText = "";
+        }
+
+        // Validate quantity
+        const quantity = document.querySelector('input[name="quantity"]').value;
+        if (isNaN(quantity) || quantity <= 0) {
+          document.getElementById("quantity-error").innerText =
+            "Quantity must be a number greater than 0.";
+          isValid = false;
+        } else {
+          document.getElementById("quantity-error").innerText = "";
+        }
+
+        // Validate product name
+        const productName = document.querySelector('input[name="name"]').value;
+        if (productName.trim() === "") {
+          document.getElementById("productNameError").innerText =
+            "Product name is required.";
+          isValid = false;
+        } else {
+          document.getElementById("productNameError").innerText = "";
+        }
+
+        // Validate product description
+        const productDescription = document.querySelector(
+          'textarea[name="description"]'
+        ).value;
+        if (productDescription.trim() === "") {
+          document.getElementById("productdescriptionError").innerText =
+            "Product description is required.";
+          isValid = false;
+        } else {
+          document.getElementById("productdescriptionError").innerText = "";
+        }
+
+        // Validate file inputs
+        const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach((fileInput, index) => {
+          const filePath = fileInput.value;
+          const fileExtension = filePath.split(".").pop().toLowerCase();
+
+          if (filePath && !allowedExtensions.includes(fileExtension)) {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid File Type",
+              text: `File ${
+                index + 1
+              } is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(
+                ", "
+              )}.`,
+            });
+            isValid = false;
+          }
+        });
+
+        return isValid;
+      }
+    });
+  </script>
+</body>
+<%- include("../../partials/admin/footer") %>

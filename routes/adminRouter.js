@@ -5,7 +5,7 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
-const { productUpload } = require("../config/multer"); // Adjust path accordingly
+const { productUpload } = require("../middlewares/multer"); // Adjust path accordingly
 
 // Error page
 router.get("/pageerror", adminController.pageerror);
@@ -34,59 +34,55 @@ router.get(
   categoryController.categoryUnlisted
 );
 
+//
+//
 // Product Management Routes
-
-router.get("/products", adminAuth, productController.getProducts);
-router.get(
-  "/products/editProducts",
-  adminAuth,
-  productController.getEditProducts
-);
-router.get(
-  "/products/deleteProduct/:id",
-  adminAuth,
-  productController.deleteProduct
-);
-router.get("/products/stocks", adminAuth, productController.getStocks);
-
-router.route("/add-product").get(adminAuth, productController.getAddProducts);
-
 
 const upload = productUpload.fields([
   { name: "primaryImage", maxCount: 1 },
   { name: "secondaryImage", maxCount: 4 },
 ]);
 
-router.post("/add-product", adminAuth, upload, productController.addProducts);
+router
+  .get("/products", adminAuth, productController.getProducts)
+  .route("/add-product")
+  .get(adminAuth, productController.getAddProducts)
+  .post(adminAuth, upload, productController.addProducts);
+
+router.post("/product/action", productController.listOrUnlistProduct);
+router.delete("/product/deleteProduct", productController.deleteProduct);
+router.get(
+  "/products/deleteProduct/:id",
+  adminAuth,
+  productController.deleteProduct
+);
 
 
-
-
-
-
+const editUpload = productUpload.fields([
+  {name: "primaryImage", maxCount: 1},
+  {name: "image2", maxCount:1}
+])
 
 
 router
   .route("/edit-product/:id")
   .get(adminAuth, productController.getEditProducts)
   .post(
-    adminAuth,
-    productUpload.fields([
-      { name: "primaryImage", maxCount: 1 },
-      { name: "image2", maxCount: 1 },
-      { name: "image3", maxCount: 1 },
-      { name: "image4", maxCount: 1 },
-    ]),
-    (req, res, next) => {
-      console.log(req.files); // Log the files being uploaded
-      console.log(req.body); // Log the body of the request
-      next();
-    },
+    adminAuth,editUpload,
     productController.editProduct
   );
 
-router.post("/product/action", productController.listOrUnlistProduct);
-router.delete("/product/deleteProduct", productController.deleteProduct);
+router.get("/products/stocks", adminAuth, productController.getStocks);
+
 router.post("/product/updateStock", productController.updateStocks);
+
+
+
+// router.get(
+//   "/products/edit-product",
+//   adminAuth,
+//   productController.getEditProducts
+// );
+
 
 module.exports = router;

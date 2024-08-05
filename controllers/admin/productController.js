@@ -132,28 +132,28 @@ async addProducts(req, res) {
     };
 
     const product = await Product.findById(req.params.id).populate(
-      "categoryid"
+      "category"
     );
     const categories = await Category.find({ isListed: true });
-    const brands = await Brand.find({ isListed: true }); // Assuming you have a `Brand` model
+    // const brands = await Brand.find({ isListed: true }); // Assuming you have a `Brand` model
     const breadcrumbs = [
       { name: "Home", url: "/admin" },
       { name: "Products", url: "/admin/products" },
-      { name: "Edit Product", url: `/admin/products/edit/${req.params.id}` },
+      { name: "Edit Product", url: `/admin/products/edit/${req.params._id}` },
     ];
 
     res.render("admin/products/edit-product", {
       locals,
       product,
       categories,
-      brands,
+      // brands,
       breadcrumbs,
     });
   },
 
   editProduct: async (req, res) => {
     try {
-      const productId = req.params.id;
+      const productId = req.params._id;
       const product = await Product.findById(productId);
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -174,7 +174,7 @@ async addProducts(req, res) {
           .toFile(
             path.join(
               __dirname,
-              "../../public/uploads/products-images/crp/",
+              "../public/uploads/images/",
               primaryImage.name
             )
           );
@@ -193,7 +193,7 @@ async addProducts(req, res) {
             .toFile(
               path.join(
                 __dirname,
-                "../../public/uploads/products-images/crp/",
+                "../public/uploads/images/",
                 file.filename
               )
             );
