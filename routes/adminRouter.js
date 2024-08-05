@@ -38,13 +38,13 @@ router.get(
 //
 // Product Management Routes
 
+router.get("/products", adminAuth, productController.getProducts)
+
 const upload = productUpload.fields([
   { name: "primaryImage", maxCount: 1 },
   { name: "secondaryImage", maxCount: 4 },
 ]);
-
 router
-  .get("/products", adminAuth, productController.getProducts)
   .route("/add-product")
   .get(adminAuth, productController.getAddProducts)
   .post(adminAuth, upload, productController.addProducts);
@@ -58,22 +58,15 @@ router.get(
 );
 
 
-const editUpload = productUpload.fields([
-  {name: "primaryImage", maxCount: 1},
-  {name: "image2", maxCount:1}
-])
-
-
 router
   .route("/edit-product/:id")
   .get(adminAuth, productController.getEditProducts)
-  .post(
-    adminAuth,editUpload,
-    productController.editProduct
-  );
+  .post(adminAuth, upload, productController.editProduct);
 
+
+
+  
 router.get("/products/stocks", adminAuth, productController.getStocks);
-
 router.post("/product/updateStock", productController.updateStocks);
 
 
