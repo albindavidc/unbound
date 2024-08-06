@@ -266,19 +266,20 @@ const logout = async (req, res) => {
 
 
 
-// Load product list
-const loadProductList = async (req, res) => {
-  try {
+// // Load product list
+// const loadProductList = async (req, res) => {
+//   try {
 
-    res.render("user/product-list",{
-      user:req.session.user,
-    });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('An error occurred while loading the product list.');
-  }
-};
+//     res.render("user/product-list",{
+//       user:req.session.user,
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('An error occurred while loading the product list.');
+//   }
+// };
 
 // Load product details
 const loadProductDetails = async (req, res) => {
@@ -313,7 +314,7 @@ module.exports = {
   login,
   logout,
 
-  loadProductList,
+  // loadProductList,
   loadProductDetails,
 
 };

@@ -104,7 +104,7 @@
         display: none;
         position: absolute;
         background-color: white;
-        width: 100%;
+        width: 120%;
         min-width: 50px;
         box-shadow: 0px 8px 16px 0px black;
         z-index: 1;
@@ -196,14 +196,20 @@
           </div>
           <div class="col-lg-3 col-md-3">
             <div class="header__nav__option">
+
+
+              
               <% if (locals.user) { %>
               <div class="dropdown">
+
                 <a href="#" class="sign-in-link">More</a>
-                <div class="dropdown-content">
+                
+              <div class="dropdown-content">
+
                   <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
                     <div>
                       <img
-                        src="../../../public/img/heart.png"
+                        src="/img/heart.svg"
                         alt="Favorites"
                         style="width: 24px; height: 24px; margin-right: 8px;"
                       />
@@ -213,7 +219,7 @@
                   <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
                     <div>
                       <img
-                        src="../../../public/img/shopping-cart1.png"
+                        src="/img/shopping-cart.svg"
                         alt="Favorites"
                         style="width: 24px; height: 24px; margin-right: 8px;"
                       />
@@ -223,7 +229,7 @@
                   <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
                     <div>
                       <img
-                        src="../../../public/img/profile-user.png"
+                        src="/img/profile-user.png"
                         alt="Favorites"
                         style="width: 24px; height: 24px; margin-right: 8px;"
                       />

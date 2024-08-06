@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const userController = require("../controllers/user/userController");
+const {userAuth} = require("../middlewares/auth");
+const productController = require("../controllers/user/productController");
 
 //Home page - Page not found
 router.get("/", userController.loadHomepage);
@@ -32,11 +34,10 @@ router.post("/login", userController.login);
 
 
 
-router.get("/user/product-list", userController.loadProductList);
+// router.get("/user/product-list", userController.loadProductList);
 router.get("/user/product-details", userController.loadProductDetails);
 
-
-
+router.get("/user/product-list", productController.loadProductList);
 
 
 
