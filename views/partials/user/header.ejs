@@ -6,23 +6,54 @@
     <meta name="keywords" content="Male_Fashion, unica, creative, html" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Unbound | Home</title>
+    <title>Unbound</title>
 
     <!-- Google Font -->
     <link
       href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-
     <!-- Css Styles -->
-    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css" />
-    <link rel="stylesheet" href="css/magnific-popup.css" type="text/css" />
-    <link rel="stylesheet" href="css/nice-select.css" type="text/css" />
-    <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css" />
-    <link rel="stylesheet" href="css/style.css" type="text/css" />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/bootstrap.min.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/font-awesome.min.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/elegant-icons.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/magnific-popup.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/nice-select.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/owl.carousel.min.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/slicknav.min.css"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="../../../public/css/style.css"
+      type="text/css"
+    />
 
     <style>
       .sign-in-link {
@@ -30,11 +61,10 @@
         padding: 12px 25px;
         margin: 0 10px;
         border: none;
-        border-radius: 30px; /* Rounded corners */
         background: linear-gradient(
           45deg,
-          #001F32,
-          #001F32
+          #001f32,
+          #001f32
         ); /* Gradient background */
         color: #fff;
         text-align: center;
@@ -48,8 +78,8 @@
       .sign-in-link:hover {
         background: linear-gradient(
           45deg,
-          #001F32,
-          #001F32
+          #001f32,
+          #001f32
         ); /* Reverse gradient on hover */
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Darker shadow on hover */
         transform: translateY(-2px); /* Slight lift effect */
@@ -58,8 +88,8 @@
       .sign-in-link:active {
         background: linear-gradient(
           45deg,
-          #001F32,
-          #001F32
+          #001f32,
+          #001f32
         ); /* Same as hover on click */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Less shadow on click */
         transform: translateY(0); /* Reset lift effect */
@@ -74,26 +104,22 @@
         display: none;
         position: absolute;
         background-color: white;
-        min-width: 160px;
+        width: 100%;
+        min-width: 50px;
         box-shadow: 0px 8px 16px 0px black;
-        z-index: 1000;
-        border-radius: 22px;
-
-        right: 0;
+        z-index: 1;
       }
 
       .dropdown-content a {
         color: black;
         padding: 12px 16px;
         text-decoration: none;
-        border-radius: 22px;
-
         display: block;
         width: 100%;
       }
 
       .dropdown-content a:hover {
-        background-color: #EBF3F8;
+        background-color: #ebf3f8;
       }
 
       .dropdown:hover .dropdown-content {
@@ -140,19 +166,19 @@
         <div class="row align-items-center">
           <div class="col-lg-3 col-md-3">
             <div class="header__logo">
-              <a href="#"><img src="img/logo.png" alt="Logo" /></a>
+              <a href="#"><img src="../../../public/img/logo.png" alt="Logo" /></a>
             </div>
           </div>
           <div class="col-lg-6 col-md-6">
             <nav class="header__menu mobile-menu">
               <ul>
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="./shop.html">Shop</a></li>
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/user/product-list">Shop</a></li>
                 <li>
                   <a href="#">Pages</a>
                   <ul class="dropdown">
                     <li><a href="./about.html">About Us</a></li>
-                    <li><a href="./shop-details.html">Shop Details</a></li>
+                    <li><a href="/user/product-details">Shop Details</a></li>
                     <li><a href="./shopping-cart.html">Shopping Cart</a></li>
                     <li><a href="./checkout.html">Check Out</a></li>
                     <li><a href="./blog.html">Blog</a></li>
@@ -162,7 +188,7 @@
                 <li><a href="./contact.html">Contacts</a></li>
                 <li>
                   <a href="#" class="search-switch"
-                    ><img src="img/icon/search.png" alt="Search"
+                    ><img src="../../../public/img/icon/search.png" alt="Search"
                   /></a>
                 </li>
               </ul>
@@ -174,32 +200,46 @@
               <div class="dropdown">
                 <a href="#" class="sign-in-link">More</a>
                 <div class="dropdown-content">
-                  <a href="#">
-                    <div style="margin: -18px 0px; padding-top: 20px">
-                      <img src="img/heart.png" alt="Favorites" style="width: 24px;height: 24px;"/>
+                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
+                    <div>
+                      <img
+                        src="../../../public/img/heart.png"
+                        alt="Favorites"
+                        style="width: 24px; height: 24px; margin-right: 8px;"
+                      />
                     </div>
-                    Favorites</a
-                  >
-                  <a href="#"
-                    ><div style="margin: -18px 0px; padding-top: 20px">
-                      <img src="img/shopping-cart1.png" alt="Cart" style="width: 24px;height: 24px;"/>
+                    Favorites
+                  </a>
+                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
+                    <div>
+                      <img
+                        src="../../../public/img/shopping-cart1.png"
+                        alt="Favorites"
+                        style="width: 24px; height: 24px; margin-right: 8px;"
+                      />
                     </div>
-                    Cart</a
-                  >
-
-                  <a href="/userprofile"
-                  ><div style="margin: -18px 0px; padding-top: 20px">
-                    <img src="img/profile-user.png" alt="logout" style="width: 24px;height: 24px;"/>
-                  </div>
-                  Profile</a
-                >
-
-                  <a href="/logout"
-                    ><div style="margin: -15px 0px; padding-top: 20px">
-                      <img src="img/logout.png" alt="logout" style="width: 24px;height: 24px;"/>
+                    Cart
+                  </a>
+                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
+                    <div>
+                      <img
+                        src="../../../public/img/profile-user.png"
+                        alt="Favorites"
+                        style="width: 24px; height: 24px; margin-right: 8px;"
+                      />
                     </div>
-                    Logout</a
-                  >
+                    Profile
+                  </a>
+                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
+                    <div>
+                      <img
+                        src="../../../public/img/logout.png"
+                        alt="Favorites"
+                        style="width: 24px; height: 24px; margin-right: 8px;"
+                      />
+                    </div>
+                    Logout
+                  </a>
 
                 </div>
               </div>

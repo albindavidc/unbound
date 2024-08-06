@@ -71,11 +71,4 @@ router.post("/product/updateStock", productController.updateStocks);
 
 
 
-// router.get(
-//   "/products/edit-product",
-//   adminAuth,
-//   productController.getEditProducts
-// );
-
-
 module.exports = router;

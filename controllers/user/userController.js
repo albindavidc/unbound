@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const User = require("../../models/userSchema");
+const Product = require("../../models/productSchema");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
@@ -268,7 +269,11 @@ const logout = async (req, res) => {
 // Load product list
 const loadProductList = async (req, res) => {
   try {
-    res.render('user/product-list'); // Render the product list view with the fetched products
+
+    res.render("user/product-list",{
+      user:req.session.user,
+    });
+
   } catch (error) {
     console.error(error);
     res.status(500).send('An error occurred while loading the product list.');
@@ -278,12 +283,18 @@ const loadProductList = async (req, res) => {
 // Load product details
 const loadProductDetails = async (req, res) => {
   try {
-    const productId = req.query.id; // Assuming the product ID is passed as a query parameter
-    const product = await Product.findById(productId); // Fetch the product details from the database
-    if (!product) {
-      return res.status(404).send('Product not found.');
-    }
-    res.render('user/product-details', { product }); // Render the product details view with the fetched product
+    // const productId = req.query.id; // Assuming the product ID is passed as a query parameter
+    // const product = await Product.findById(productId); // Fetch the product details from the database
+    // if (!product) {
+    //   return res.status(404).send('Product not found.');
+    // }
+    // res.render('user/product-details', { product }); // Render the product details view with the fetched product
+
+    res.render("user/product-details",{
+      user:req.session.user,
+    });
+
+
   } catch (error) {
     console.error(error);
     res.status(500).send('An error occurred while loading the product details.');
@@ -302,7 +313,7 @@ module.exports = {
   login,
   logout,
 
-  loadProductDetails,
   loadProductList,
+  loadProductDetails,
 
 };
