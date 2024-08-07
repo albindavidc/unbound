@@ -35,8 +35,37 @@ const adminAuth = (req, res, next) => {
 };
 
 
+const checkUserStatus = async (req, res, next) => {
+  try {
+      if (req.isAuthenticated()) { // Check if the user is authenticated
+          const userId = req.user._id; // Assuming req.user contains the authenticated user's information
+
+          // Find the user and check if they are blocked
+          const user = await User.findOne({ _id: userId, isBlocked: true });
+
+          if (user) { // If the user is found and is blocked
+              req.session.destroy((err) => {
+                  if (err) {
+                      return next(err);
+                  }
+                  return res.redirect('/login');
+              });
+          } else {
+              return next(); // User is not blocked, proceed to the next middleware
+          }
+      } else {
+          return next(); // User is not authenticated, proceed to the next middleware
+      }
+  } catch (error) {
+      console.log("Error in the checkUserStatus middleware", error);
+      res.status(500).send("Internal Server Error");
+  }
+};
+
 
 module.exports = {
   userAuth,
   adminAuth,
+  checkUserStatus,
+
 };

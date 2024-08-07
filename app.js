@@ -14,6 +14,7 @@ const passport = require("./config/passport");
 const userRouter = require("./routes/userRouter");
 const adminRouter = require("./routes/adminRouter");
 
+
 const port = process.env.PORT || 8080;
 const app = express();
 db();
@@ -37,6 +38,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 app.use(flash());
 app.use(nocache());

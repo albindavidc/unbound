@@ -1,264 +1,262 @@
-<!DOCTYPE html>
-<html lang="zxx">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Male_Fashion Template" />
-    <meta name="keywords" content="Male_Fashion, unica, creative, html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Unbound</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="Male_Fashion Template" />
+  <meta name="keywords" content="Male_Fashion, unica, creative, html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Unbound</title>
 
-    <!-- Google Font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Css Styles -->
-    <link
-      rel="stylesheet"
-      href="../../../public/css/bootstrap.min.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/font-awesome.min.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/elegant-icons.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/magnific-popup.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/nice-select.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/owl.carousel.min.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/slicknav.min.css"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
-      href="../../../public/css/style.css"
-      type="text/css"
-    />
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Css Styles -->
+  <link
+    rel="stylesheet"
+    href="../../../public/css/bootstrap.min.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="../../../public/css/font-awesome.min.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="../../../public/css/elegant-icons.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="../../../public/css/magnific-popup.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="../../../public/css/nice-select.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="../../../public/css/owl.carousel.min.css"
+    type="text/css"
+  />
+  <link
+    rel="stylesheet"
+    href="../../../public/css/slicknav.min.css"
+    type="text/css"
+  />
+  <link rel="stylesheet" href="../../../public/css/style.css" type="text/css" />
 
-    <style>
-      .sign-in-link {
-        display: inline-block;
-        padding: 12px 25px;
-        margin: 0 10px;
-        border: none;
-        background: linear-gradient(
-          45deg,
-          #001f32,
-          #001f32
-        ); /* Gradient background */
-        color: #fff;
-        text-align: center;
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: 700;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-      }
+  <style>
+    .sign-in-link {
+      display: inline-block;
+      padding: 12px 25px;
+      margin: 0 10px;
+      border: none;
+      background: linear-gradient(
+        45deg,
+        #001f32,
+        #001f32
+      ); /* Gradient background */
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    }
 
-      .sign-in-link:hover {
-        background: linear-gradient(
-          45deg,
-          #001f32,
-          #001f32
-        ); /* Reverse gradient on hover */
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Darker shadow on hover */
-        transform: translateY(-2px); /* Slight lift effect */
-      }
+    .sign-in-link:hover {
+      background: linear-gradient(
+        45deg,
+        #001f32,
+        #001f32
+      ); /* Reverse gradient on hover */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Darker shadow on hover */
+      transform: translateY(-2px); /* Slight lift effect */
+    }
 
-      .sign-in-link:active {
-        background: linear-gradient(
-          45deg,
-          #001f32,
-          #001f32
-        ); /* Same as hover on click */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Less shadow on click */
-        transform: translateY(0); /* Reset lift effect */
-      }
+    .sign-in-link:active {
+      background: linear-gradient(
+        45deg,
+        #001f32,
+        #001f32
+      ); /* Same as hover on click */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Less shadow on click */
+      transform: translateY(0); /* Reset lift effect */
+    }
 
-      .dropdown {
-        position: relative;
-        display: inline-block;
-      }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
 
-      .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: white;
-        width: 120%;
-        min-width: 50px;
-        box-shadow: 0px 8px 16px 0px black;
-        z-index: 1;
-      }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: white;
+      width: 120%;
+      min-width: 50px;
+      box-shadow: 0px 8px 16px 0px black;
+      z-index: 1;
+    }
 
-      .dropdown-content a {
-        color: black;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        width: 100%;
-      }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+    }
 
-      .dropdown-content a:hover {
-        background-color: #ebf3f8;
-      }
+    .dropdown-content a:hover {
+      background-color: #ebf3f8;
+    }
 
-      .dropdown:hover .dropdown-content {
-        display: block;
-      }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
 
-      .header {
-        position: relative;
-        z-index: 500;
-      }
-    </style>
-  </head>
+    .header {
+      position: relative;
+      z-index: 500;
+    }
+  </style>
+</head>
 
-  <body>
-    <!-- Header Section Begin -->
-    <header class="header">
-      <div class="header__top">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-6 col-md-7">
-              <div class="header__top__left">
-                <p>Free shipping, 30-day return or refund guarantee.</p>
-              </div>
-            </div>
-            <div class="col-lg-6 col-md-5">
-              <div class="header__top__right">
-                <div class="header__top__links">
-                  <a href="#">FAQs</a>
-                </div>
-                <div class="header__top__hover">
-                  <span>Usd <i class="arrow_carrot-down"></i></span>
-                  <ul>
-                    <li>USD</li>
-                    <li>EUR</li>
-                    <li>USD</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+<!-- Header Section Begin -->
+<header class="header">
+  <div class="header__top">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 col-md-7">
+          <div class="header__top__left">
+            <p>Free shipping, 30-day return or refund guarantee.</p>
           </div>
         </div>
-      </div>
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-lg-3 col-md-3">
-            <div class="header__logo">
-              <a href="#"><img src="../../../public/img/logo.png" alt="Logo" /></a>
+        <div class="col-lg-6 col-md-5">
+          <div class="header__top__right">
+            <div class="header__top__links">
+              <a href="#">FAQs</a>
             </div>
-          </div>
-          <div class="col-lg-6 col-md-6">
-            <nav class="header__menu mobile-menu">
+            <div class="header__top__hover">
+              <span>Usd <i class="arrow_carrot-down"></i></span>
               <ul>
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="/user/product-list">Shop</a></li>
-                <li>
-                  <a href="#">Pages</a>
-                  <ul class="dropdown">
-                    <li><a href="./about.html">About Us</a></li>
-                    <li><a href="/user/product-details">Shop Details</a></li>
-                    <li><a href="./shopping-cart.html">Shopping Cart</a></li>
-                    <li><a href="./checkout.html">Check Out</a></li>
-                    <li><a href="./blog.html">Blog</a></li>
-                    <li><a href="./blog-details.html">Blog Details</a></li>
-                  </ul>
-                </li>
-                <li><a href="./contact.html">Contacts</a></li>
-                <li>
-                  <a href="#" class="search-switch"
-                    ><img src="../../../public/img/icon/search.png" alt="Search"
-                  /></a>
-                </li>
+                <li>USD</li>
+                <li>EUR</li>
+                <li>USD</li>
               </ul>
-            </nav>
-          </div>
-          <div class="col-lg-3 col-md-3">
-            <div class="header__nav__option">
-
-
-              
-              <% if (locals.user) { %>
-              <div class="dropdown">
-
-                <a href="#" class="sign-in-link">More</a>
-                
-              <div class="dropdown-content">
-
-                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
-                    <div>
-                      <img
-                        src="/img/heart.svg"
-                        alt="Favorites"
-                        style="width: 24px; height: 24px; margin-right: 8px;"
-                      />
-                    </div>
-                    Favorites
-                  </a>
-                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
-                    <div>
-                      <img
-                        src="/img/shopping-cart.svg"
-                        alt="Favorites"
-                        style="width: 24px; height: 24px; margin-right: 8px;"
-                      />
-                    </div>
-                    Cart
-                  </a>
-                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
-                    <div>
-                      <img
-                        src="/img/profile-user.png"
-                        alt="Favorites"
-                        style="width: 24px; height: 24px; margin-right: 8px;"
-                      />
-                    </div>
-                    Profile
-                  </a>
-                  <a href="#" style="display: flex; align-items: center; padding-top: 15px;">
-                    <div>
-                      <img
-                        src="../../../public/img/logout.png"
-                        alt="Favorites"
-                        style="width: 24px; height: 24px; margin-right: 8px;"
-                      />
-                    </div>
-                    Logout
-                  </a>
-
-                </div>
-              </div>
-              <% }else { %>
-              <a href="/user/signup" class="sign-in-link">Sign Up</a>
-              <a href="/login" class="sign-in-link">Sign In</a>
-              <% } %>
             </div>
           </div>
         </div>
-        <div class="canvas__open"><i class="fa fa-bars"></i></div>
       </div>
-    </header>
-    <!-- Header Section End -->
-  </body>
-</html>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-3 col-md-3">
+        <div class="header__logo">
+          <a href="#"><img src="../../../public/img/logo.png" alt="Logo" /></a>
+        </div>
+      </div>
+      <div class="col-lg-6 col-md-6">
+        <nav class="header__menu mobile-menu">
+          <ul>
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/user/product-list">Shop</a></li>
+            <li>
+              <a href="#">Pages</a>
+              <ul class="dropdown">
+                <li><a href="./about.html">About Us</a></li>
+                <li><a href="/user/product-details">Shop Details</a></li>
+                <li><a href="./shopping-cart.html">Shopping Cart</a></li>
+                <li><a href="./checkout.html">Check Out</a></li>
+                <li><a href="./blog.html">Blog</a></li>
+                <li><a href="./blog-details.html">Blog Details</a></li>
+              </ul>
+            </li>
+            <li><a href="./contact.html">Contacts</a></li>
+            <li>
+              <a href="#" class="search-switch"
+                ><img src="../../../public/img/icon/search.png" alt="Search"
+              /></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="col-lg-3 col-md-3">
+        <div class="header__nav__option">
+          <% if (locals.user) { %>
+          <div class="dropdown">
+            <a href="#" class="sign-in-link">More</a>
+
+            <div class="dropdown-content">
+              <a
+                href="#"
+                style="display: flex; align-items: center; padding-top: 15px"
+              >
+                <div>
+                  <img
+                    src="/img/heart.svg"
+                    alt="Favorites"
+                    style="width: 24px; height: 24px; margin-right: 8px"
+                  />
+                </div>
+                Favorites
+              </a>
+              <a
+                href="#"
+                style="display: flex; align-items: center; padding-top: 15px"
+              >
+                <div>
+                  <img
+                    src="/img/shopping-cart.svg"
+                    alt="Cart"
+                    style="width: 24px; height: 24px; margin-right: 8px"
+                  />
+                </div>
+                Cart
+              </a>
+              <a
+                href="#"
+                style="display: flex; align-items: center; padding-top: 15px"
+              >
+                <div>
+                  <img
+                    src="/img/profile-user.png"
+                    alt="Profile"
+                    style="width: 24px; height: 24px; margin-right: 8px"
+                  />
+                </div>
+                Profile
+              </a>
+              <a
+                href="/logout"
+                style="display: flex; align-items: center; padding-top: 15px"
+              >
+                <div>
+                  <img
+                    src="../../../public/img/logout.png"
+                    alt="Logout"
+                    style="width: 24px; height: 24px; margin-right: 8px"
+                  />
+                </div>
+                Logout
+              </a>
+            </div>
+          </div>
+          <% }else { %>
+          <!-- <a href="/user/signup" class="sign-in-link">Sign Up</a> -->
+          <a href="/login" class="sign-in-link">Sign In</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <div class="canvas__open"><i class="fa fa-bars"></i></div>
+  </div>
+</header>
+<!-- Header Section End -->
+

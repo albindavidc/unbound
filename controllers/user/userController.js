@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 
 const pageNotFound = async (req, res) => {
   try {
-    return res.render("page-404");
+    return res.render("user/page-404");
   } catch (error) {
     res.redirect("/pageNotFound");
   }
@@ -15,18 +15,10 @@ const pageNotFound = async (req, res) => {
 
 const loadHomepage = async (req, res) => {
   try {
-    res.render("user/home",{
-      user:req.session.user,
+    
+    res.render("user/home", {
+      user: req.session.user,
     });
-
-
-
-    // if (user) {
-    //   res.render("user/home", { user: req.session.user });
-    // } else {
-      
-    //   return res.render("user/home");
-    // }
   } catch (error) {
     console.log(`Home page is not available`);
     res.status(500).send(`Server error`);
@@ -35,7 +27,11 @@ const loadHomepage = async (req, res) => {
 
 const loadSignup = async (req, res) => {
   try {
-    return res.render("user/signup");
+    if (user) {
+      res.render("user/home", { user: req.session.user });
+    } else {
+      return res.render("user/signup");
+    }
   } catch (error) {
     console.log("Home page is not loading:", error);
     res.status(500).send("Server Error");
@@ -203,11 +199,8 @@ const resendOtp = async (req, res) => {
 //Load Login - Redirect Login
 const loadLogin = async (req, res) => {
   try {
-    if (!req.session.user) {
       return res.render("user/signup");
-    } else {
-      res.render("/");
-    }
+    
   } catch (error) {
     res.redirect("/pageNotFound");
   }
@@ -256,7 +249,7 @@ const logout = async (req, res) => {
         console.log("Session destruction error", err.message);
         return res.redirect("/pageNotFound");
       }
-      return res.redirect("/signup");
+      return res.redirect("/login ");
     });
   } catch (error) {
     console.log("Logout error", error);
@@ -264,57 +257,18 @@ const logout = async (req, res) => {
   }
 };
 
-
-
-// // Load product list
-// const loadProductList = async (req, res) => {
-//   try {
-
-
-//     res.render("user/product-list",{
-//       user:req.session.user,
-//     });
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('An error occurred while loading the product list.');
-//   }
-// };
-
-// Load product details
-// const loadProductDetails = async (req, res) => {
-//   try {
-//     // const productId = req.query.id; // Assuming the product ID is passed as a query parameter
-//     // const product = await Product.findById(productId); // Fetch the product details from the database
-//     // if (!product) {
-//     //   return res.status(404).send('Product not found.');
-//     // }
-//     // res.render('user/product-details', { product }); // Render the product details view with the fetched product
-
-//     res.render("user/product-details",{
-//       user:req.session.user,
-//     });
-
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('An error occurred while loading the product details.');
-//   }
-// };
-
-
 module.exports = {
-  loadHomepage,
   pageNotFound,
+
+  loadHomepage,
+
   loadSignup,
   signup,
   verifyOtp,
   resendOtp,
+
   loadLogin,
   login,
+
   logout,
-
-  // loadProductList,
-  // loadProductDetails,
-
 };
