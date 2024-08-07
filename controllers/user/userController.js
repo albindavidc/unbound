@@ -282,25 +282,25 @@ const logout = async (req, res) => {
 // };
 
 // Load product details
-const loadProductDetails = async (req, res) => {
-  try {
-    // const productId = req.query.id; // Assuming the product ID is passed as a query parameter
-    // const product = await Product.findById(productId); // Fetch the product details from the database
-    // if (!product) {
-    //   return res.status(404).send('Product not found.');
-    // }
-    // res.render('user/product-details', { product }); // Render the product details view with the fetched product
+// const loadProductDetails = async (req, res) => {
+//   try {
+//     // const productId = req.query.id; // Assuming the product ID is passed as a query parameter
+//     // const product = await Product.findById(productId); // Fetch the product details from the database
+//     // if (!product) {
+//     //   return res.status(404).send('Product not found.');
+//     // }
+//     // res.render('user/product-details', { product }); // Render the product details view with the fetched product
 
-    res.render("user/product-details",{
-      user:req.session.user,
-    });
+//     res.render("user/product-details",{
+//       user:req.session.user,
+//     });
 
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('An error occurred while loading the product details.');
-  }
-};
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('An error occurred while loading the product details.');
+//   }
+// };
 
 
 module.exports = {
@@ -315,6 +315,6 @@ module.exports = {
   logout,
 
   // loadProductList,
-  loadProductDetails,
+  // loadProductDetails,
 
 };

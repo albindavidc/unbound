@@ -334,7 +334,7 @@
       async function fetchProducts() {
         try {
           console.log("Fetching products...");
-          const response = await fetch("/products");
+          const response = await fetch("/user/product-details/:id");
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
@@ -371,37 +371,37 @@
         });
       }
 
-      // Function to render star ratings
-      function renderRating(ratings) {
-        const averageRating = ratings.length
-          ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
-            ratings.length
-          : 0;
-        let stars = "";
-        for (let i = 0; i < 5; i++) {
-          stars +=
-            i < averageRating
-              ? '<span class="rating-star">★</span>'
-              : '<span class="rating-star">☆</span>';
-        }
-        return stars;
-      }
+      // // Function to render star ratings
+      // function renderRating(ratings) {
+      //   const averageRating = ratings.length
+      //     ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
+      //       ratings.length
+      //     : 0;
+      //   let stars = "";
+      //   for (let i = 0; i < 5; i++) {
+      //     stars +=
+      //       i < averageRating
+      //         ? '<span class="rating-star">★</span>'
+      //         : '<span class="rating-star">☆</span>';
+      //   }
+      //   return stars;
+      // }
 
-      // Function to sort products by price
-      function sortProducts(products) {
-        const sortValue = document.getElementById("sort").value;
-        products.sort((a, b) => {
-          if (sortValue === "low-high") {
-            return a.price - b.price;
-          } else {
-            return b.price - a.price;
-          }
-        });
-        renderProducts(products);
-      }
+      // // Function to sort products by price
+      // function sortProducts(products) {
+      //   const sortValue = document.getElementById("sort").value;
+      //   products.sort((a, b) => {
+      //     if (sortValue === "low-high") {
+      //       return a.price - b.price;
+      //     } else {
+      //       return b.price - a.price;
+      //     }
+      //   });
+      //   renderProducts(products);
+      // }
 
-      // Fetch products on page load
-      fetchProducts();
+      // // Fetch products on page load
+      // fetchProducts();
     });
   </script>
 </body>
