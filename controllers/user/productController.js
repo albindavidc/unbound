@@ -18,23 +18,46 @@ module.exports = {
   },
 
   loadProductDetails: async (req, res) => {
+    // Function to fetch related products based on the category
+    const getRelatedProducts = async (category, excludeProductId) => {
+      try {
+        // Find products that belong to the same category but exclude the current product
+        return await Product.find({
+          category: category,
+          _id: { $ne: excludeProductId }, // Exclude the current product
+        }).limit(4); // Limit to 4 related products
+      } catch (error) {
+        console.error("Error fetching related products:", error);
+        return []; // Return an empty array if there's an error
+      }
+    };
+
     try {
       const productId = req.params.id;
 
       // Fetch the product data asynchronously from the database
       const product = await Product.findById(productId);
 
+      // Fetch related products based on category
+      const relatedProducts = await getRelatedProducts(
+        product.category,
+        productId
+      );
+
       if (!product) {
         // Product not found, respond with 404
-        return res.status(404).send('Product not found');
+        return res.status(404).send("Product not found");
       }
 
       // Render the product details page with the fetched product data
-      res.render('user/product-details', {        user: req.session.user,
-        product });
+      res.render("user/product-details", {
+        user: req.session.user,
+        product,
+        relatedProducts,
+      });
     } catch (error) {
-      console.error('Error fetching product details:', error);
-      res.status(500).send('Internal Server Error');
+      console.error("Error fetching product details:", error);
+      res.status(500).send("Internal Server Error");
     }
   },
 };
