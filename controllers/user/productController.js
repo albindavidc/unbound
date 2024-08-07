@@ -30,7 +30,8 @@ module.exports = {
       }
 
       // Render the product details page with the fetched product data
-      res.render('user/product-details', { product });
+      res.render('user/product-details', {        user: req.session.user,
+        product });
     } catch (error) {
       console.error('Error fetching product details:', error);
       res.status(500).send('Internal Server Error');
