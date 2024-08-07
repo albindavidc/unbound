@@ -21,11 +21,14 @@ db();
 
 
 
+
+
+//session
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
     cookie: {
       secure: false,
@@ -40,11 +43,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+
+
+
 app.use(flash());
 app.use(nocache());
 
 app.use((req, res, next) => {
   res.set("cache-control", "no-store");
+
+
+
   next();
 });
 

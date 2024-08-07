@@ -5,7 +5,6 @@
     href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="/css/admin_panel.css" />
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css "
@@ -101,7 +100,7 @@
         </div>
         <div class="modal-body">
           <div class="img-container">
-            <img id="imageToCrop" src="/images/hero.jpg" />
+            <img id="imageToCrop" src="" />
           </div>
         </div>
         <div class="modal-footer">
@@ -303,14 +302,8 @@
                           alt=""
                           width="150px"
                         />
-                        <% } else { %>
-                        <img
-                          id="preview1"
-                          src="../../assets/imgs/theme/upload.svg"
-                          alt=""
-                          width="150px"
-                        />
-                        <% } %>
+                        <% }  %>
+                        
                       </label>
                     </div>
                     <div class="padding">
@@ -656,40 +649,23 @@
           return;
         }
 
-        if (
-          document.getElementById("croppedPrimaryImages").childElementCount ===
-          0
-        ) {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Please add a primary image before submitting.",
-          });
-          return;
-        }
-
-        if (
-          document.getElementById("croppedSecondaryImage1")
-            .childElementCount === 0
-        ) {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Please add at least one secondary image before submitting.",
-          });
-          return;
-        }
+       
 
         let form = document.getElementById("addProductForm");
         let formData = new FormData(form);
 
         // Add primary image to formData
         const primaryImage = document
-          .getElementById("croppedPrimaryImages")
-          .children[0].querySelector("img");
-        const primaryBlobUrl = primaryImage.dataset.blob;
-        const primaryBlob = await fetch(primaryBlobUrl).then((r) => r.blob());
-        formData.append("primaryImage", primaryBlob, "primaryImage.png");
+          ?.getElementById("croppedPrimaryImages")
+          ?.children[0]?.querySelector("img");
+        const primaryBlobUrl = primaryImage?.dataset?.blob;
+        
+        if(primaryBlobUrl) {
+          const primaryBlob = await fetch(primaryBlobUrl).then((r) => r?.blob());
+          formData.append("primaryImage", primaryBlob, "primaryImage.png");
+
+        }
+
 
         // Add secondary images to formData
         const secondaryImages = [
@@ -700,15 +676,18 @@
         ];
 
         for (let i = 0; i < secondaryImages.length; i++) {
-          if (secondaryImages[i].childElementCount > 0) {
+          if (secondaryImages[i]?.childElementCount > 0) {
             const blobUrl =
-              secondaryImages[i].querySelector("img").dataset.blob;
-            const blob = await fetch(blobUrl).then((r) => r.blob());
-            formData.append(
-              `secondaryImage`,
-              blob,
-              `secondaryImage${i + 1}.png`
-            );
+              secondaryImages[i]?.querySelector("img")?.dataset?.blob;
+              if(blobUrl) {
+                const blob = fetch(blobUrl).then((r) => r?.blob());
+                
+              formData.append(
+                `secondaryImage`,
+                blob,
+                `secondaryImage${i + 1}.png`
+              );
+            }
           }
         }
 

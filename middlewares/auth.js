@@ -1,7 +1,7 @@
 const User = require("../models/userSchema");
 
 const userAuth = (req, res, next) => {
-  if (req.session.user) {
+  if (req.session.user ) {
     User.findById(req.session.user)
       .then((data) => {
         if (data && !data.isBlocked) {
@@ -63,9 +63,21 @@ const checkUserStatus = async (req, res, next) => {
 };
 
 
+const isLogedOut = (req, res, next) => {
+  if(req.isAuthenticated()){
+    return res.redirect("/");
+  }
+
+  if(req.session.user) {
+    return res.redirect("/")
+  }
+  next();
+};
+
 module.exports = {
   userAuth,
   adminAuth,
   checkUserStatus,
+  isLogedOut,
 
 };

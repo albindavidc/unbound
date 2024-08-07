@@ -14,6 +14,10 @@ const pageNotFound = async (req, res) => {
 };
 
 const loadHomepage = async (req, res) => {
+
+
+  console.log(req.session.user )
+
   try {
     
     res.render("user/home", {
@@ -25,9 +29,12 @@ const loadHomepage = async (req, res) => {
   }
 };
 
+
+
 const loadSignup = async (req, res) => {
   try {
-    if (user) {
+    const user = req.session.userData;
+    if (user = req.session.user) {
       res.render("user/home", { user: req.session.user });
     } else {
       return res.render("user/signup");
@@ -240,6 +247,14 @@ const login = async (req, res) => {
     });
   }
 };
+
+// const forgotPassword = async (req, res) => {
+//   try {
+    
+//   } catch (error) {
+    
+//   }
+// }
 
 //Logout
 const logout = async (req, res) => {
