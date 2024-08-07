@@ -6,6 +6,12 @@ const categorySchema = new Schema({
         type: String,
         required: true,
         unique: true,
+        validate: {
+            validator: function(v) {
+                return /^[A-Z][a-z]*$/.test(v); // Ensures first letter is capital and the rest are lowercase
+            },
+            message: props => `${props.value} is not a valid name!`
+        }
     },
     description: {
         type: String,
