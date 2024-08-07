@@ -33,9 +33,20 @@ router.get(
 //Signin Managment
 router.get("/login",isLogedOut, userController.loadLogin);
 router.post("/login", userController.login);
-// router.get("/forgot-password", userController.forgotPassword);
+
+router
+  .route("/forgot-password")
+  .get(userController.getFrogotPass)
+  .post(userController.forgotPassword);
+
+  router.post("/forgotPassVerifyOtp", userController.forgotPassVerifyOtp);
+
+  router.get("/forgot-password-cpassword", userController.passwordReset)
+  router.post("/forgot-password-cpassword", userController.passwordChange);
 
 
+
+  
 router.get("/user/product-list/:id",userAuth, productController.loadProductDetails);
 router.get("/user/product-list",userAuth, productController.loadProductList);
 

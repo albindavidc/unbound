@@ -1,13 +1,11 @@
 const path = require("path");
 const sharp = require("sharp");
-const Jimp = require('jimp');
+const Jimp = require("jimp");
 
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const fs = require("fs");
 const { configDotenv } = require("dotenv");
-
-
 
 module.exports = {
   getProducts: async (req, res) => {
@@ -148,7 +146,7 @@ module.exports = {
       breadcrumbs,
     });
   },
-  
+
   editProduct: async (req, res) => {
     console.log("Request body:", req.body);
     console.log("Uploaded files: ", req.files);
@@ -161,39 +159,53 @@ module.exports = {
       }
 
       // Handle primary image
-let primaryImages = product.primaryImages || []; // Ensure primaryImages is an array
-if (req.files.primaryImage) {
-  const inputPath = req.files.primaryImage[0].path;
-  const outputPath = path.join(__dirname, '../../public/uploads/images/', req.files.primaryImage[0].filename);
+      let primaryImages = product.primaryImages || []; // Ensure primaryImages is an array
+      if (req.files.primaryImage) {
+        const inputPath = req.files.primaryImage[0].path;
+        const outputPath = path.join(
+          __dirname,
+          "../../public/uploads/images/",
+          req.files.primaryImage[0].filename
+        );
 
-  console.log("Processing primary image:", inputPath);
+        console.log("Processing primary image:", inputPath);
 
-  // Delete the old primary image if it exists
-  if (primaryImages.length > 0) {
-    const oldPrimaryImage = primaryImages[0];
-    const oldPath = path.join(__dirname, '../../public/uploads/images/', oldPrimaryImage.name);
-    if (fs.existsSync(oldPath)) {
-      fs.unlinkSync(oldPath);
-      console.log("Deleted old primary image:", oldPrimaryImage.name);
-    }
-  }
+        // Delete the old primary image if it exists
+        if (primaryImages.length > 0) {
+          const oldPrimaryImage = primaryImages[0];
+          const oldPath = path.join(
+            __dirname,
+            "../../public/uploads/images/",
+            oldPrimaryImage.name
+          );
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
+            console.log("Deleted old primary image:", oldPrimaryImage.name);
+          }
+        }
 
-  const image = await Jimp.read(inputPath);
-  await image.resize(500, 500).writeAsync(outputPath);
-  console.log("Resized and saved new primary image:", outputPath);
+        const image = await Jimp.read(inputPath);
+        await image.resize(500, 500).writeAsync(outputPath);
+        console.log("Resized and saved new primary image:", outputPath);
 
-  // Update the primaryImages array
-  primaryImages = [{
-    name: req.files.primaryImage[0].filename,
-    path: outputPath,
-  }];
-}
+        // Update the primaryImages array
+        primaryImages = [
+          {
+            name: req.files.primaryImage[0].filename,
+            path: outputPath,
+          },
+        ];
+      }
       // Handle secondary images
       let secondaryImages = product.secondaryImages || []; // Maintain existing secondary images
       if (req.files.secondaryImage) {
         // Reset secondaryImages if new images are uploaded
         for (const file of secondaryImages) {
-          const oldPath = path.join(__dirname, '../../public/uploads/images/', file.name);
+          const oldPath = path.join(
+            __dirname,
+            "../../public/uploads/images/",
+            file.name
+          );
           if (fs.existsSync(oldPath)) {
             fs.unlinkSync(oldPath);
           }
@@ -202,7 +214,11 @@ if (req.files.primaryImage) {
         secondaryImages = [];
         for (const file of req.files.secondaryImage) {
           const inputPath = file.path;
-          const outputPath = path.join(__dirname, '../../public/uploads/images/', file.filename);
+          const outputPath = path.join(
+            __dirname,
+            "../../public/uploads/images/",
+            file.filename
+          );
 
           const image = await Jimp.read(inputPath);
           await image.resize(500, 500).writeAsync(outputPath);
@@ -220,7 +236,7 @@ if (req.files.primaryImage) {
         price: req.body.price,
         regularprice: req.body.regularprice,
         offerpercentage: req.body.offerpercentage || 0,
-        color: req.body.color.split(','), // Assuming color is a comma-separated string
+        color: req.body.color.split(","), // Assuming color is a comma-separated string
         primaryImages,
         secondaryImages,
       };
@@ -240,9 +256,6 @@ if (req.files.primaryImage) {
       }
     }
   },
-  
-  
-
 
   listOrUnlistProduct: async (req, res) => {
     const productId = req.body.productId;
@@ -270,44 +283,52 @@ if (req.files.primaryImage) {
     }
   },
 
-   deleteProduct : async (req, res) => {
+  deleteProduct: async (req, res) => {
     try {
       const productId = req.body.productId;
-  
+
       const product = await Product.findById(productId);
       if (!product) {
         return res
           .status(404)
           .json({ success: false, message: "Product not found" });
       }
-  
-// Delete primary images if they exist
-if (product.primaryImages && product.primaryImages.length > 0) {
-  for (const image of product.primaryImages) {
-    const imagePath = path.join(__dirname, '../../public/uploads/images/', image.name);
-    if (fs.existsSync(imagePath)) {
-      try {
-        fs.unlinkSync(imagePath);
-        console.log("Deleted primary image:", image.name);
-      } catch (error) {
-        console.error("Error deleting primary image:", error);
+
+      // Delete primary images if they exist
+      if (product.primaryImages && product.primaryImages.length > 0) {
+        for (const image of product.primaryImages) {
+          const imagePath = path.join(
+            __dirname,
+            "../../public/uploads/images/",
+            image.name
+          );
+          if (fs.existsSync(imagePath)) {
+            try {
+              fs.unlinkSync(imagePath);
+              console.log("Deleted primary image:", image.name);
+            } catch (error) {
+              console.error("Error deleting primary image:", error);
+            }
+          } else {
+            console.log("Primary image not found at path:", imagePath);
+          }
+        }
       }
-    } else {
-      console.log("Primary image not found at path:", imagePath);
-    }
-  }
-}
       // Delete secondary images if they exist
       if (product.secondaryImages && product.secondaryImages.length > 0) {
         for (const secondaryImage of product.secondaryImages) {
-          const secondaryImagePath = path.join(__dirname, '../../public/uploads/images/', secondaryImage.name);
+          const secondaryImagePath = path.join(
+            __dirname,
+            "../../public/uploads/images/",
+            secondaryImage.name
+          );
           if (fs.existsSync(secondaryImagePath)) {
             fs.unlinkSync(secondaryImagePath);
             console.log("Deleted secondary image:", secondaryImage.name);
           }
         }
       }
-  
+
       await Product.findByIdAndDelete(productId);
       return res
         .status(200)
