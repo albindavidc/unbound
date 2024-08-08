@@ -6,5 +6,33 @@
         </div>
        
     </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light"> <i class="icon material-icons md-people"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Total Users</h6>
+                        <span><%- userCount  %></span>
+                        
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light" > <i class="icon material-icons md-shopping_bag"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Total Products</h6>
+                        <span><%- productCount  %></span>
+                        
+                    </div>
+                </article>
+            </div>
+        </div>
+    
+        
 </section>
 <%- include("../../views/partials/admin/footer") %>

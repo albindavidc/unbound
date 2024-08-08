@@ -64,13 +64,13 @@ const checkUserStatus = async (req, res, next) => {
 
 
 const isLogedOut = (req, res, next) => {
-  if(req.isAuthenticated()){
+  if(req.isAuthenticated() || req.session.user){
     return res.redirect("/");
   }
 
-  if(req.session.user) {
-    return res.redirect("/")
-  }
+  // if(req.session.user) {
+  //   return res.redirect("/")
+  // }
   next();
 };
 

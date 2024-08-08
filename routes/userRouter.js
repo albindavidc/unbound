@@ -6,13 +6,13 @@ const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
 
 //Home page - Page not found
-router.get("/",userAuth, userController.loadHomepage);
+router.get("/", userController.loadHomepage);
 router.get("/pageNotFound", userController.pageNotFound);
-router.get("/logout", userController.login);
+router.get("/logout", userController.logout);
 
 //Signup Managment
-router.get("/user/signup", isLogedOut, userController.loadSignup);
-router.post("/signup", userController.signup);
+router.get("/signup", isLogedOut, userController.loadSignup);
+router.post("/signup",isLogedOut, userController.signup);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 

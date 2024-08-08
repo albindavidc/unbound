@@ -1,4 +1,5 @@
 const User = require("../../models/userSchema");
+const Product = require("../../models/productSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -47,7 +48,9 @@ const login = async (req, res) => {
 const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
-      res.render("admin/dashboard");
+      const userCount = await User.find().countDocuments();
+      const productCount = await Product.find().countDocuments();
+      res.render("admin/dashboard", {userCount, productCount});
     } catch (error) {
       console.log("Dashboard error", error);
 

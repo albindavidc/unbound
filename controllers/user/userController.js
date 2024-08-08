@@ -17,9 +17,17 @@ const loadHomepage = async (req, res) => {
   console.log(req.session.user);
 
   try {
+
+    // if(req.session.user){
+    //   return res.render("user/home")
+    // }else{
+
     res.render("user/home", {
       user: req.session.user,
     });
+  // }
+
+
   } catch (error) {
     console.log(`Home page is not available`);
     res.status(500).send(`Server error`);
@@ -28,7 +36,8 @@ const loadHomepage = async (req, res) => {
 
 const loadSignup = async (req, res) => {
   try {
-    const user = req.session.userData;
+
+    const user = req.session.user;
     if ((user = req.session.user)) {
       res.render("user/home", { user: req.session.user });
     } else {
@@ -392,66 +401,26 @@ const passwordChange = async (req,res) => {
 
 
 
-
-// const forgotPassword = async (req, res) => {
-//   const securePassword = async (password) => {
-//     try {
-//       const passwordHash = await bcrypt.hash(password, 10);
-//       return passwordHash;
-//     } catch (error) {
-//       console.error("Error hashing password: ", error);
-//       throw error;
-//     }
-//   };
-//   try {
-//     const { otp } = req.body;
-//     console.log(otp);
-
-//     if (otp === req.session.userOtp) {
-//       const user = req.session.userData;
-//       const passwordHash = await securePassword(user.password);
-
-//       const saveUserData = new User({
-//         name: user.name,
-//         email: user.email,
-//         phone: user.phone,
-//         password: passwordHash,
-//       });
-
-//       if (!req.session.userOtp || !req.session.userData) {
-//         return res.status(400).json({
-//           success: false,
-//           message: "Session expired, please try again.",
-//         });
-//       }
-
-//       await saveUserData.save();
-//       req.session.user = saveUserData._id;
-//       res.json({ success: true, redirectUrl: "/login" });
-//     } else {
-//       res.status(400).json({
-//         success: false,
-//         message: "Invalid OTP, Please try again with recent OTP",
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Error Verifying OTP", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "An unexpected error occurred. Please try again later.",
-//     });
-//   }
-// };
-
 //Logout
 const logout = async (req, res) => {
   try {
+    
+    if(req.user) {
+      return req.logOut((err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.clearCookie("connect.sid");
+          res.redirect("/");
+        }
+      });
+    }
     req.session.destroy((err) => {
       if (err) {
         console.log("Session destruction error", err.message);
         return res.redirect("/pageNotFound");
       }
-      return res.redirect("/login ");
+      return res.redirect("/login");
     });
   } catch (error) {
     console.log("Logout error", error);

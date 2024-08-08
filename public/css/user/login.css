@@ -50,9 +50,9 @@ a {
 }
 
 button {
-  border-radius: 20px;
-  border: 1px solid #001f32;
-  background-color: #001f32;
+  border-radius: 0;
+  border: 1px solid #000000;
+  background-color: #000000;
   color: #ffffff;
   font-size: 12px;
   font-weight: bold;
@@ -100,7 +100,7 @@ input {
 
 .container {
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: 0;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   position: relative;
   overflow: hidden;
@@ -170,9 +170,9 @@ input {
 }
 
 .overlay {
-  background: #001f32;
-  background: -webkit-linear-gradient(to right, #001f32, #001f32);
-  background: linear-gradient(to right, #001f32, #001f32);
+  background: #000000;
+  background: -webkit-linear-gradient(to right, #000000, #000000);
+  background: linear-gradient(to right, #000000, #000000);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -227,7 +227,7 @@ input {
 
 .social-container a {
   border: 1px solid #dddddd;
-  border-radius: 50%;
+  border-radius: 0;
   display: inline-flex;
   justify-content: center;
   align-items: center;
