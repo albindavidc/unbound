@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const {userAuth, isLogedOut} = require("../middlewares/auth");
+const {userAuth, isLogedOut, checkUserStatus} = require("../middlewares/auth");
 const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
 
+
 //Home page - Page not found
-router.get("/", userController.loadHomepage);
+router.get("/",checkUserStatus, userController.loadHomepage);
 router.get("/pageNotFound", userController.pageNotFound);
 router.get("/logout", userController.logout);
 
@@ -47,8 +48,8 @@ router
 
 
   
-router.get("/user/product-list/:id",userAuth, productController.loadProductDetails);
-router.get("/user/product-list",userAuth, productController.loadProductList);
+router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
+router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
 
 
 

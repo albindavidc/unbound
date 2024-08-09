@@ -37,30 +37,38 @@ const adminAuth = (req, res, next) => {
 
 const checkUserStatus = async (req, res, next) => {
   try {
-      if (req.isAuthenticated()) { // Check if the user is authenticated
-          const userId = req.user._id; // Assuming req.user contains the authenticated user's information
+    if (req.isAuthenticated() || req.session.user) { 
+      const userId = req.session.user; 
 
-          // Find the user and check if they are blocked
-          const user = await User.findOne({ _id: userId, isBlocked: true });
+      // Find the user and check if they are blocked
+      const user = await User.findOne({ _id: userId, isBlocked: true });
 
-          if (user) { // If the user is found and is blocked
-              req.session.destroy((err) => {
-                  if (err) {
-                      return next(err);
-                  }
-                  return res.redirect('/login');
-              });
-          } else {
-              return next(); // User is not blocked, proceed to the next middleware
+      if (user) { // If the user is found and is blocked
+        req.logout((err) => { // Logs out the user
+          if (err) {
+            return next(err);
           }
+          req.session.destroy((err) => { // Destroys the session
+            if (err) {
+              return next(err);
+            }
+            return res.redirect('/login');
+          });
+        });
       } else {
-          return next(); // User is not authenticated, proceed to the next middleware
+        return next(); // User is not blocked, proceed to the next middleware
       }
+    } else {
+      return next(); // User is not authenticated, proceed to the next middleware
+    }
   } catch (error) {
-      console.log("Error in the checkUserStatus middleware", error);
-      res.status(500).send("Internal Server Error");
+    console.log("Error in the checkUserStatus middleware", error);
+    res.status(500).send("Internal Server Error");
   }
 };
+
+module.exports = checkUserStatus;
+
 
 
 const isLogedOut = (req, res, next) => {
