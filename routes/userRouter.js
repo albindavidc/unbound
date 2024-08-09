@@ -7,13 +7,13 @@ const productController = require("../controllers/user/productController");
 
 
 //Home page - Page not found
-router.get("/",checkUserStatus, userController.loadHomepage);
+router.get("/",checkUserStatus,userAuth, userController.loadHomepage);
 router.get("/pageNotFound", userController.pageNotFound);
 router.get("/logout", userController.logout);
 
 //Signup Managment
 router.get("/signup", isLogedOut, userController.loadSignup);
-router.post("/signup",isLogedOut, userController.signup);
+router.post("/signup", userController.signup);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 
