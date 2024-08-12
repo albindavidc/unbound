@@ -18,15 +18,11 @@ const loadHomepage = async (req, res) => {
 
   try {
 
-
     if(req.session.user){
       return res.render("user/home", {
         user: req.session.user,
       })
-    }else{
-
-    res.render("user/signup");
-  }
+    }
 
 
   } catch (error) {
