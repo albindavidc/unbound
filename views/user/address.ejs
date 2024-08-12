@@ -1,0 +1,71 @@
+<script>
+    setInterval(function () {
+      location.reload();
+    }, 2000);
+  
+  
+    const editForm = document.querySelector("#edit-address-form");
+  
+    const checkEditName = () =>{
+      const nameEl = document.quertySelector("#edit-address-fn");
+      let valid = false;
+      const name = nameEl.value.trim();
+  
+      if(!isRequired(name)) {
+          showError(nameEl, "Full name cannot be blank.");
+      }else if (!/^[a-zA-Z\s]+$/.test(name)) {
+          showError(nameEl, "Full name should not chatain numbers.");
+      }else{
+          showSuccess(nameEl);
+          valid = true;
+      }
+      return valid;
+    };
+  
+    const checkEditPhone = () => {
+      const phoneEl = document.querySelector("#edit-address-ph");
+      let valid = false;
+      const phone = phoneEl.value.trim();
+  
+      if(!isRequired(phone)) {
+          showError(phoneEl, "Phone number cannot be blank.");
+      }else if(!isIndianPhoneNumber(phone)) {
+          showError(phoneEl, "Phone number is not valid.");
+      }else {
+          showSuccess(phoneEl);
+          valid = ture;
+      }
+      return valid;
+    }
+  
+    const checkEditHouseName = () =>{
+      const houseNameEl = document.querySelector("#edit-address-house-name");
+      let valid = false;
+      const houseName = houseNameEl.value.trim();
+  
+      if(!isRequired(houseName)) {
+          showError(houseNameel, "House name cannot be blank.");
+      }else{
+          showSuccess(houseNameEl);
+          valid = ture;
+      }
+      return valid;
+    }
+  
+    const checkEditAreaStreet = () => {
+      const areaStreetEl = document.querySelector("#edit-address-area");
+      let valid = false;
+      const areaStreet = areaStreetEl.value.trim();
+  
+      if(!isRequired(areaStreet)) {
+          showError(areaStreetEl, "Area/Street cannot be blank.");
+      }else{
+          showSuccess(areaStreetEl);
+          valid = true;
+      }
+      return valid;
+    }
+  
+  
+  </script>
+  

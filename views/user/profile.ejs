@@ -1,1 +1,389 @@
-<%  %>
+<%- include('../../views/partials/user/header') %>
+<style>
+  .userProfileMain {
+    width: 80%;
+    height: 30%;
+    margin: 0 auto;
+    border-radius: 0px;
+    background-color: rgb(0, 0, 0);
+  }
+  .userProfileH1 {
+    width: 50%;
+    margin: auto auto;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 110px;
+  }
+  .breadcrumbCls {
+    border-radius: 0;
+    background-color: aliceblue;
+  }
+</style>
+
+<section>
+  <!-- Breadcrumbs -->
+  <div class="container">
+    <ol class="breadcrumb breadcrumbCls justify-content-right">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="home.ejs">Account</a></li>
+      <li class="breadcrumb-item active">Profile</li>
+    </ol>
+  </div>
+
+  <!-- Hero-Content -->
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain">
+      <h1 class="userProfileH1">Your Profile</h1>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container mb-5">
+    <div class="row">
+      <%- include('../partials/user/sidebar') %>
+
+      <div class="col-lg-8">
+        <!-- Profile form-->
+        <form id="update-form" action="/user/profile" method="POST">
+          <div class="bg-secondary-subtle rounded-3 p-4 mb-4">
+            <div class="d-flex align-items-center">
+              <img
+                class="rounded"
+                src="img/profile-user.png"
+                width="90"
+                alt="<%- user.username %>"
+              />
+              <h3 class="m-2 text-capitalize"><%- user.name %></h3>
+              <p class="lead m-2 text-uppercase">Update Profile</p>
+            </div>
+          </div>
+          <div class="row gx-4 gy-3">
+            <div class="col-sm-6">
+              <label class="form-label" for="account-fn">First Name</label>
+              <input
+                name="firstName"
+                class="form-control text-capitalize"
+                type="text"
+                id="account-fn"
+                value="<%- user.firstName %>"
+              />
+              <small></small>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="account-ln">Last Name</label>
+              <input
+                name="lastName"
+                class="form-control text-capitalize"
+                type="text"
+                id="account-ln"
+                value="<%- user.lastName %>"
+              />
+              <small></small>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="account-email"
+                >Email Address</label
+              >
+              <input
+                class="form-control text-uppercase"
+                type="email"
+                id="account-email"
+                value="<%- user.email %>"
+                disabled
+              />
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="account-phone">Phone Number</label>
+              <input
+                name="phone"
+                class="form-control text-capitalize"
+                type="text"
+                id="account-phone"
+                value="<%- user.phone %>"
+                placeholder="+91 80534 89572"
+                required
+              />
+              <small></small>
+            </div>
+            <div class="col-12">
+              <hr class="mt-2 mb-3" />
+              <div
+                class="d-flex flex-wrap justify-content-between align-items-center"
+              >
+                <button
+                  class="btn btn-outline-primary m-3 mt-sm-0"
+                  type="submit"
+                >
+                  Update profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!-- Change Password Form -->
+        <form
+          action="/user/reset-password"
+          method="POST"
+          id="reset-password-form"
+        >
+          <hr class="my-4" />
+          <div class="block-header bg-secondary-light rounded-3 p-4 pb-3 mb-4">
+            <h4>Change Password</h4>
+          </div>
+          <div class="col px-3">
+            <div class="col-md-12 mb-3 form-group">
+              <label class="form-label" for="oldPassword">Old Password</label>
+              <div class="d-flex align-items-center">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="oldPassword"
+                  name="oldPassword"
+                  placeholder="Old Password"
+                  onfocus="this.placeholder = ''"
+                  onblur="this.placeholder = 'Password'"
+                />
+                <i
+                  class="bi bi-eye-slash"
+                  id="toggleOldPassword"
+                  style="
+                    position: relative;
+                    z-index: 8;
+                    left: -30px;
+                    width: 0%;
+                    cursor: pointer;
+                  "
+                ></i>
+              </div>
+              <small></small>
+            </div>
+            <div class="row">
+              <div class="col px-3">
+                <div class="col-md-12 mb-3 form-group">
+                  <label class="form-label" for="newPassword"
+                    >New Password</label
+                  >
+                  <div class="col-md-6 mb-3 form-group">
+                    <div class="d-flex align-items-center">
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="newPassword"
+                        name="newPassword"
+                        placeholder="New Password"
+                        onfocus="this.placeholder = ''"
+                        onblur="this.placeholder = 'Password'"
+                      />
+                      <i
+                        class="bi bi-eye-slash"
+                        id="toggleNewPassword"
+                        style="
+                          position: relative;
+                          z-index: 8;
+                          left: -30px;
+                          width: 0%;
+                          cursor: pointer;
+                        "
+                      ></i>
+                    </div>
+                    <small></small>
+                  </div>
+                  <div class="col-md-6 mb-3 form-group">
+                    <div class="d-flex align-items-center">
+                      <input
+                        type="password"
+                        class="form-control password"
+                        id="confirmNewPassword"
+                        name="confirmNewPassword"
+                        placeholder="Confirm New Password"
+                        onfocus="this.placeholder = ''"
+                        onblur="this.placeholder = 'Confirm New Password'"
+                      />
+                      <i
+                        class="bi bi-eye-slash"
+                        id="toggleNewPasswordConfirm"
+                        style="
+                          position: relative;
+                          z-index: 8;
+                          left: -30px;
+                          width: 0%;
+                          cursor: pointer;
+                        "
+                      ></i>
+                    </div>
+                    <small></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <hr class="mt-2 mb-3" />
+            <div
+              class="d-flex flex-wrap justify-content-between align-items-center"
+            >
+              <!-- <button class="btn btn-outline-primary m-3 mt-sm-0" type="button">Update profile</button> -->
+              <button class="btn btn-outline-warning m-3 mt-sm-0" type="submit">
+                Change Password
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const updateForm = document.querySelector("#update-form");
+
+  const checkFirstName = () => {
+    const firstNameEl = document.querySelector("#account-fn");
+    let valid = false;
+    const firstName = firstNameEl.value.trim();
+
+    if (!isRequired(firstName)) {
+      showError(firstNameEl, "First name cannot be blank.");
+    } else if (!isAlpha(firstName)) {
+      showError(firstNameEl, "First name should only contain letters.");
+    } else {
+      showSuccess(firstNameEl);
+      valid = true;
+    }
+    return valid;
+  };
+
+  const checkLastName = () => {
+    const lastNameEl = document.querySelector("#account-ln");
+    let valid = false;
+    const lastName = lastNameEl.value.trim();
+
+    if (!isRequired(lastName)) {
+      showError(lastNameEl, "Last name cannot be blank.");
+    } else if (!isAlpha(lastName)) {
+      showError(lastNameEl, "Last name should only contain letters.");
+    } else {
+      showSuccess(lastNameEl);
+      valid = true;
+    }
+    return valid;
+  };
+
+  const checkPhone = () => {
+    const phoneEl = document.querySelector("#account-phone");
+    let valid = false;
+    const phone = phoneEl.value.trim();
+
+    if (!isRequired(phone)) {
+      showError(phoneEl, "Phone number cannot be blank.");
+    } else if (!isIndianPhoneNumber(phone)) {
+      showError(phoneEl, "Phone number is not valid.");
+    } else {
+      showSuccess(phoneEl);
+      valid = true;
+    }
+    return valid;
+  };
+
+  const isIndianPhoneNumber = (phone) => {
+    // Check if the phone number is a valid Indian number
+    // Indian phone numbers are  10 digits long
+    const re = /^\d{10}$/;
+    return re.test(phone);
+  };
+
+  const isAlpha = (value) => {
+    const regex = /^[a-zA-Z]+$/;
+    return regex.test(value);
+  };
+
+  const isRequired = (value) => (value === "" ? false : true);
+
+  const showError = (input, message) => {
+    const formField = input.parentElement;
+    formField.classList.remove("success", "is-valid");
+    input.classList.remove("success", "is-valid");
+    formField.classList.add("error", "is-invalid");
+    input.classList.add("error", "is-invalid");
+    const error = formField.querySelector("small");
+    error.textContent = message;
+  };
+
+  const showSuccess = (input) => {
+    const formField = input.parentElement;
+    formField.classList.remove("error", "is-invalid");
+    input.classList.remove("error", "is-invalid");
+    formField.classList.add("success", "is-valid");
+    input.classList.add("success", "is-valid");
+    const error = formField.querySelector("small");
+    error.textContent = "";
+  };
+
+  updateForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    let isFirstNameValid = checkFirstName(),
+      isLastNameValid = checkLastName(),
+      isPhoneValid = checkPhone();
+
+    let isFormValid = isFirstNameValid && isLastNameValid && isPhoneValid;
+
+    if (isFormValid) {
+      const formData = new FormData(updateForm);
+      const body = Object.fromEntries(formData.entries());
+      console.log(body);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You want to update your profile?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Update!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch("/user/profile", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(body),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              Swal.fire({
+                title: "Success!",
+                text: data.message,
+                icon: "success",
+                timer: 1500,
+              }).then(() => {
+                location.assign("/user/profile");
+              });
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: data.message || "Something went wrong.",
+                icon: "error",
+                timer: 1500,
+              });
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              title: "Error!",
+              text: "An error occurred while updating your profile.",
+              icon: "error",
+              timer: 1500,
+            });
+          }
+        }
+      });
+    }
+  });
+</script>
+
+<%- include('../../views/partials/user/footer') %>

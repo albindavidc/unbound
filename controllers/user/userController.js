@@ -2,6 +2,8 @@ require("dotenv").config();
 
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
+const Address = require("../../models/addressSchema");
+
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
@@ -429,6 +431,84 @@ const logout = async (req, res) => {
   }
 };
 
+
+
+
+/**
+  *
+  User-Profile
+ *
+***/
+
+const getUserProfile = async (req,res) => {
+
+  
+  const userId = req.session.user; 
+  
+  // Find the user and check if they are blocked
+  const user = await User.findOne({ _id: userId, isBlocked: false });
+  
+  console.log(req.user);
+  console.log(req.session.user);
+
+  console.log(req.session.user)
+  res.render("user/profile",{
+    user : user,
+  })
+
+};
+
+const editProfile = async (req, res) => {
+  try {
+
+
+    console.log("userdata",req.session.userData);
+    const users = req.session.userData;
+
+    const user = await User.findById(req.session.user);
+
+    const { firstName, lastName, phone } = req.body;
+
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.phone = phone || user.phone;
+
+    await user.save();
+
+    // Send a success response back to the client
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    // Handle errors and send an error response
+    console.error(error);
+    res.status(500).json({
+      message: "An error occurred while updating the profile",
+      error,
+    });
+  }
+};
+
+const getAddress = async (req, res) => {
+  const address = await Address.find({
+    customer_id: req.user.id,
+    delete: false,
+  });
+
+  // console.log(address);
+
+  const locals = {
+    title: "Unbound - Profile",
+  };
+
+  res.render("user/address", {
+    locals,
+    address,
+    user: req.user,
+  });
+};
+
+
+
+
 module.exports = {
   pageNotFound,
 
@@ -447,6 +527,10 @@ module.exports = {
   forgotPassVerifyOtp,
   passwordReset,
   passwordChange,
+
+  getUserProfile,
+  editProfile,
+  getAddress,
   
   logout,
 };
