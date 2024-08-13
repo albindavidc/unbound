@@ -26,6 +26,7 @@ const loadHomepage = async (req, res) => {
     } else {
       res.render("user/signup");
     }
+
   } catch (error) {
     console.log(`Home page is not available`);
     res.status(500).send(`Server error`);
