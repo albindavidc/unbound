@@ -45,17 +45,28 @@ router
   router.get("/forgot-password-cpassword", userController.passwordReset)
   router.post("/forgot-password-cpassword", userController.passwordChange);
 
-//User-Address
-router.get("/address", userController.getAddress);
   
-// Product-Managment  
-router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
-router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
-
-// User-Profile
-router
+  // Product-Managment  
+  router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
+  router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
+  
+  // User-Profile
+  router
   .route("/profile", userAuth, checkUserStatus)
   .get(userController.getUserProfile)
   .post(userController.editProfile);
+  
+  //User-Address
+  router.get("/address", userController.getAddress);
+  router.post("/address/add-address",userController.addAddress);
+
+router
+  .route("/address/edit-address/:id")
+  .get(userController.getEditAddress)
+  .post(userController.editAddress)
+
+router
+  .route("/address/delete-address/:id")
+  .delete(userController.deleteAddress);
 
 module.exports = router;
