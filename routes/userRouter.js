@@ -36,37 +36,42 @@ router.get("/login",isLogedOut, userController.loadLogin);
 router.post("/login", userController.login);
 
 router
-  .route("/forgot-password")
-  .get(userController.getFrogotPass)
-  .post(userController.forgotPassword);
+.route("/forgot-password")
+.get(userController.getFrogotPass)
+.post(userController.forgotPassword);
 
-  router.post("/forgotPassVerifyOtp", userController.forgotPassVerifyOtp);
+router.post("/forgotPassVerifyOtp", userController.forgotPassVerifyOtp);
 
-  router.get("/forgot-password-cpassword", userController.passwordReset)
-  router.post("/forgot-password-cpassword", userController.passwordChange);
+router.get("/forgot-password-cpassword", userController.passwordReset)
+router.post("/forgot-password-cpassword", userController.passwordChange);
 
-  
-  // Product-Managment  
-  router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
-  router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
-  
-  // User-Profile
-  router
-  .route("/profile", userAuth, checkUserStatus)
-  .get(userController.getUserProfile)
-  .post(userController.editProfile);
-  
-  //User-Address
-  router.get("/address", userController.getAddress);
-  router.post("/address/add-address", userController.addAddress);
-  
-  router
-    .route("/address/edit-address/:id")
-    .get(userController.getEditAddress)
-    .post(userController.editAddress)
-  
-  router
-    .route("/address/delete-address/:id")
-    .delete(userController.deleteAddress);
+
+// Product-Managment  
+router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
+router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
+
+// User-Profile
+router
+.route("/profile")
+.all(userAuth, checkUserStatus)  // Ensure authentication and user status check for both GET and POST
+.get(userController.getUserProfile)
+.post(userController.editProfile);
+
+router.post('/reset-password', userController.resetPassword);
+
+
+
+//User-Address
+router.get("/address", userController.getAddress);
+router.post("/address/add-address", userController.addAddress);
+
+router
+  .route("/address/edit-address/:id")
+  .get(userController.getEditAddress)
+  .post(userController.editAddress)
+
+router
+  .route("/address/delete-address/:id")
+  .delete(userController.deleteAddress);
 
 module.exports = router;

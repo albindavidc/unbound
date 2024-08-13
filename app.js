@@ -8,6 +8,8 @@ const flash = require("connect-flash");
 const MongoStore = require("connect-mongo");
 const nocache = require("nocache");
 const methodOverride = require("method-override");
+const bodyParser = require('body-parser');
+
 
 const db = require("./config/db");
 const passport = require("./config/passport");
@@ -55,6 +57,7 @@ app.use("/public", express.static("public")); // Static files for uploaded image
 //Middlewares
 app.use(logger("dev"));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // For URL-encoded data
 app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
