@@ -1,1 +1,261 @@
-<%  %>
+<%- include('../../views/partials/user/header') %>
+<style>
+  .userProfileMain {
+    width: 80%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 50%;
+    margin: auto;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 7vw;
+  }
+
+  .breadcrumbCls {
+    background-color: aliceblue;
+  }
+</style>
+
+<section>
+  <div class="container">
+    <ol class="breadcrumb breadcrumbCls justify-content-right">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active">Profile</li>
+    </ol>
+  </div>
+
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain">
+      <h1 class="userProfileH1">Your Profile</h1>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container mb-5">
+    <div class="row">
+      <%- include('../partials/user/sidebar') %>
+
+      <div class="col-lg-8">
+        <form id="update-form" action="/profile" method="POST">
+          <div class="bg-secondary-subtle rounded-3 p-4 mb-4">
+            <div class="d-flex align-items-center">
+              <img class="rounded" src="img/profile-user.png" width="90" alt="<%- user.username %>" />
+              <h3 class="m-2 text-capitalize"><%- user.name %></h3>
+              <p class="lead m-2 text-uppercase">Update Profile</p>
+            </div>
+          </div>
+          <div class="row gx-4 gy-3">
+            <div class="col-sm-6">
+              <label class="form-label" for="account-fn">Name</label>
+              <input name="fullName" class="form-control text-capitalize" type="text" id="account-fn" value="<%- user.name %>" />
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="account-email">Email Address</label>
+              <input class="form-control text-uppercase" type="email" id="account-email" value="<%- user.email %>" disabled />
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label" for="account-phone">Phone Number</label>
+              <input
+                name="phone"
+                class="form-control text-capitalize"
+                type="text"
+                id="account-phone"
+                value="<%- user.phone %>"
+                placeholder="+91 80534 89572"
+                required
+              />
+            </div>
+            <div class="col-12">
+              <hr class="mt-2 mb-3" />
+              <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <button class="btn btn-outline-primary m-3 mt-sm-0" type="submit">Update profile</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <form id="reset-password-form" action="/reset-password" method="POST">
+          <hr class="my-4" />
+          <div class="row block-header bg-secondary-light rounded-3 p-4 pb-3 mb-4 text-center">
+            <div class="col-4">
+              <h4 class="mb-3">Change Password</h4>
+            </div>
+            <div class="col-6">
+              <a href="/forgot-password" class="btn btn-outline-warning m-3 mt-sm-0 text-decoration-none text-reset">Forgot your password?</a>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="oldPassword">Old Password</label>
+            <input type="password" id="oldPassword" name="oldPassword" class="form-control" />
+            <i class="bi bi-eye-slash" id="toggleOldPassword" style="cursor: pointer"></i>
+            <small class="error-msg"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" name="newPassword" class="form-control" />
+            <i class="bi bi-eye-slash" id="toggleNewPassword" style="cursor: pointer"></i>
+            <small class="error-msg"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" />
+            <i class="bi bi-eye-slash" id="toggleNewPasswordConfirm" style="cursor: pointer"></i>
+
+            <small class="error-msg"></small>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Reset Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../../views/partials/user/footer') %>
+<script>
+  const updateForm = document.querySelector("#update-form");
+
+  const checkFullName = () => {
+    const fullNameEl = document.querySelector("#account-fn");
+    const fullName = fullNameEl.value.trim();
+    return (
+      fullName
+        .split(" ")
+        .filter((part) => part.trim() !== "")
+        .every(isAlpha) && fullName.split(" ").length >= 2
+    );
+  };
+
+  const checkPhone = () => {
+    const phoneEl = document.querySelector("#account-phone");
+    const phone = phoneEl.value.trim();
+    return isRequired(phone) && /^\d{10}$/.test(phone);
+  };
+
+  const isAlpha = (value) => /^[a-zA-Z]+$/.test(value);
+  const isRequired = (value) => value !== "";
+
+  updateForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    if (checkFullName() && checkPhone()) {
+      const formData = new FormData(updateForm);
+      const body = Object.fromEntries(formData.entries());
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You want to update your profile?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Update!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch("/profile", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await response.json();
+            const alertType = response.ok ? "success" : "error";
+            Swal.fire({
+              title: response.ok ? "Success!" : "Error!",
+              text: data.message || "Something went wrong.",
+              icon: alertType,
+              timer: 1500,
+            }).then(() => response.ok && location.assign("/profile"));
+          } catch (error) {
+            Swal.fire({
+              title: "Error!",
+              text: "An error occurred while updating your profile.",
+              icon: "error",
+              timer: 1500,
+            });
+          }
+        }
+      });
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const resetPass = document.getElementById("reset-password-form");
+    const oldPasswordEl = document.getElementById("oldPassword");
+    const newPasswordEl = document.getElementById("newPassword");
+    const confirmPasswordEl = document.getElementById("confirmPassword");
+
+    const isRequireded = (value) => (value === "" ? false : true);
+
+    const isPasswordSecure = (password) => {
+      const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+      return re.test(password);
+    };
+
+    const checkOldPassword = () => {
+      const password = oldPasswordEl.value.trim();
+      return isRequireded(password); // Check if old password is valid
+    };
+
+    const checkPassword = () => {
+      const password = newPasswordEl.value.trim();
+      return isRequireded(password) && isPasswordSecure(password) && password !== oldPasswordEl.value.trim();
+    };
+
+    const checkConfirmPassword = () => {
+      const confirmPassword = confirmPasswordEl.value.trim();
+      const password = newPasswordEl.value.trim();
+      return isRequireded(confirmPassword) && password === confirmPassword;
+    };
+
+    resetPass.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const isOldPasswordValid = checkOldPassword();
+      const isPasswordValid = checkPassword();
+      const isConfirmPasswordValid = checkConfirmPassword();
+
+      if (isOldPasswordValid && isPasswordValid && isConfirmPasswordValid) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You want to reset your password?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, reset!",
+          cancelButtonText: "No, cancel!",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData(resetPass);
+            console.log("Form Data:", Object.fromEntries(formData.entries())); // Log form data
+
+            const response = await fetch("/reset-password", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(Object.fromEntries(formData.entries())),
+            });
+
+            if (response.ok) {
+              Swal.fire("Success!", "Password has been reset.", "success").then(() => {
+                window.location.href = "/profile";
+              });
+            } else {
+              const errorData = await response.json(); // Capture error response
+              Swal.fire("Error!", errorData.message || "Failed to reset password.", "error");
+            }
+          }
+        });
+      } else {
+        Swal.fire("Error!", "Please ensure all fields are valid.", "error");
+      }
+    });
+  });
+</script>
