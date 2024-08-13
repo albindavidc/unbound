@@ -463,16 +463,18 @@ const editProfile = async (req, res) => {
 
     const user = await User.findById(req.session.user);
 
-    const { firstName, lastName, phone } = req.body;
+    const { firstName, phone } = req.body;
 
-    user.firstName = firstName || user.firstName;
-    user.lastName = lastName || user.lastName;
+    user.name = firstName || user.name;
+    // user.lastName = lastName || user.lastName;
     user.phone = phone || user.phone;
 
     await user.save();
 
     // Send a success response back to the client
     res.status(200).json({ message: "Profile updated successfully", user });
+    console.log("the profile added succcessfully")
+
   } catch (error) {
     // Handle errors and send an error response
     console.error(error);
@@ -488,8 +490,9 @@ const getAddress = async (req, res) => {
     customer_id: req.session.user,
     delete: false,
   });
-
-  // console.log(address);
+  
+  console.log(req.session.user)
+  console.log(address);
 
   res.render("user/address", {
     address,

@@ -58,15 +58,15 @@ router
   
   //User-Address
   router.get("/address", userController.getAddress);
-  router.post("/address/add-address",userController.addAddress);
-
-router
-  .route("/address/edit-address/:id")
-  .get(userController.getEditAddress)
-  .post(userController.editAddress)
-
-router
-  .route("/address/delete-address/:id")
-  .delete(userController.deleteAddress);
+  router.post("/address/add-address", userController.addAddress);
+  
+  router
+    .route("/address/edit-address/:id")
+    .get(userController.getEditAddress)
+    .post(userController.editAddress)
+  
+  router
+    .route("/address/delete-address/:id")
+    .delete(userController.deleteAddress);
 
 module.exports = router;

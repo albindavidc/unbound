@@ -25,7 +25,6 @@
   <div class="container">
     <ol class="breadcrumb breadcrumbCls justify-content-right">
       <li class="breadcrumb-item"><a href="/">Home</a></li>
-      <li class="breadcrumb-item"><a href="home.ejs">Account</a></li>
       <li class="breadcrumb-item active">Profile</li>
     </ol>
   </div>
@@ -66,7 +65,7 @@
                 class="form-control text-capitalize"
                 type="text"
                 id="account-ln"
-                value="<%- user.lastName %>"
+                value="  "
               />
               <small></small>
             </div> -->
@@ -188,37 +187,53 @@
 <script>
   const updateForm = document.querySelector("#update-form");
 
-  const checkFirstName = () => {
-    const firstNameEl = document.querySelector("#account-fn");
-    let valid = false;
-    const firstName = firstNameEl.value.trim();
-
-    if (!isRequired(firstName)) {
-      showError(firstNameEl, "First name cannot be blank.");
-    } else if (!isAlpha(firstName)) {
-      showError(firstNameEl, "First name should only contain letters.");
+  const checkFullName = () => {
+  const fullNameEl = document.querySelector("#account-fn");
+  let valid = false;
+  const fullName = fullNameEl.value.trim();
+  
+  // Split the full name into an array by spaces
+  const nameParts = fullName.split(" ").filter(part => part.trim() !== "");
+  
+  if (nameParts.length < 2) {
+    showError(fullNameEl, "Please enter both first and last names.");
+  } else {
+    let allValid = true;
+    
+    // Validate each part of the name
+    nameParts.forEach(name => {
+      if (!isAlpha(name)) {
+        allValid = false;
+      }
+    });
+    
+    if (!allValid) {
+      showError(fullNameEl, "Names should only contain letters.");
     } else {
-      showSuccess(firstNameEl);
+      showSuccess(fullNameEl);
       valid = true;
     }
-    return valid;
-  };
+  }
 
-  const checkLastName = () => {
-    const lastNameEl = document.querySelector("#account-ln");
-    let valid = false;
-    const lastName = lastNameEl.value.trim();
+  return valid;
+};
 
-    if (!isRequired(lastName)) {
-      showError(lastNameEl, "Last name cannot be blank.");
-    } else if (!isAlpha(lastName)) {
-      showError(lastNameEl, "Last name should only contain letters.");
-    } else {
-      showSuccess(lastNameEl);
-      valid = true;
-    }
-    return valid;
-  };
+
+  // const checkLastName = () => {
+  //   const lastNameEl = document.querySelector("#account-ln");
+  //   let valid = false;
+  //   const lastName = lastNameEl.value.trim();
+
+  //   if (!isRequired(lastName)) {
+  //     showError(lastNameEl, "Last name cannot be blank.");
+  //   } else if (!isAlpha(lastName)) {
+  //     showError(lastNameEl, "Last name should only contain letters.");
+  //   } else {
+  //     showSuccess(lastNameEl);
+  //     valid = true;
+  //   }
+  //   return valid;
+  // };
 
   const checkPhone = () => {
     const phoneEl = document.querySelector("#account-phone");
@@ -273,11 +288,11 @@
   updateForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    let isFirstNameValid = checkFirstName(),
-      isLastNameValid = checkLastName(),
+    let isFullNameValid = checkFullName(),
+      // isLastNameValid = checkLastName(),
       isPhoneValid = checkPhone();
 
-    let isFormValid = isFirstNameValid && isLastNameValid && isPhoneValid;
+    let isFormValid = isFullNameValid && isPhoneValid;
 
     if (isFormValid) {
       const formData = new FormData(updateForm);
@@ -294,7 +309,7 @@
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const response = await fetch("/user/profile", {
+            const response = await fetch("/profile", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -311,7 +326,7 @@
                 icon: "success",
                 timer: 1500,
               }).then(() => {
-                location.assign("/user/profile");
+                location.assign("/profile");
               });
             } else {
               Swal.fire({
