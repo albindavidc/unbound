@@ -12,7 +12,7 @@
     margin: auto auto;
     font-family: "Baloo", cursive;
     color: white;
-    font-size: 110px;
+    font-size: 7vw;
   }
   .breadcrumbCls {
     border-radius: 0;
@@ -60,17 +60,17 @@
           </div>
           <div class="row gx-4 gy-3">
             <div class="col-sm-6">
-              <label class="form-label" for="account-fn">First Name</label>
+              <label class="form-label" for="account-fn">Name</label>
               <input
                 name="firstName"
                 class="form-control text-capitalize"
                 type="text"
                 id="account-fn"
-                value="<%- user.firstName %>"
+                value="<%- user.name %>"
               />
               <small></small>
             </div>
-            <div class="col-sm-6">
+            <!-- <div class="col-sm-6">
               <label class="form-label" for="account-ln">Last Name</label>
               <input
                 name="lastName"
@@ -80,7 +80,7 @@
                 value="<%- user.lastName %>"
               />
               <small></small>
-            </div>
+            </div> -->
             <div class="col-sm-6">
               <label class="form-label" for="account-email"
                 >Email Address</label

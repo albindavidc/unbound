@@ -45,7 +45,8 @@ router
   router.get("/forgot-password-cpassword", userController.passwordReset)
   router.post("/forgot-password-cpassword", userController.passwordChange);
 
-
+//User-Address
+router.get("/address", userController.getAddress);
   
 // Product-Managment  
 router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);

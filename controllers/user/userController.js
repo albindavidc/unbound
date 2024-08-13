@@ -447,11 +447,7 @@ const getUserProfile = async (req,res) => {
   
   // Find the user and check if they are blocked
   const user = await User.findOne({ _id: userId, isBlocked: false });
-  
-  console.log(req.user);
-  console.log(req.session.user);
 
-  console.log(req.session.user)
   res.render("user/profile",{
     user : user,
   })
@@ -489,20 +485,15 @@ const editProfile = async (req, res) => {
 
 const getAddress = async (req, res) => {
   const address = await Address.find({
-    customer_id: req.user.id,
+    customer_id: req.session.user,
     delete: false,
   });
 
   // console.log(address);
 
-  const locals = {
-    title: "Unbound - Profile",
-  };
-
   res.render("user/address", {
-    locals,
     address,
-    user: req.user,
+    user: req.session.user,
   });
 };
 

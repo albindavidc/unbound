@@ -1,71 +1,351 @@
+<%- include("../partials/user/header") %>
+
+<style>
+  .userProfileMain {
+    width: 80vw;
+    height: 30%;
+    margin: 0 auto;
+    border-radius: 0px;
+    background-color: rgb(0, 0, 0);
+  }
+  .userProfileH1 {
+    width: 50%;
+    margin: auto auto;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 7vw;
+  }
+  .breadcrumbCls {
+    border-radius: 0;
+    background-color: aliceblue;
+  }
+</style>
+
+<section>
+  <!-- Breadcrumbs -->
+  <div class="container">
+    <ol class="breadcrumb breadcrumbCls justify-content-right">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="profile.ejs">Profile</a></li>
+      <li class="breadcrumb-item active">Addressess</li>
+    </ol>
+  </div>
+
+  <!-- Hero-Content -->
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain">
+      <h1 class="userProfileH1">Addressess</h1>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container mb-5">
+    <div class="row">
+      <%- include ("../partials/user/sidebar.ejs") %>
+
+      <!-- Content -->
+      <section class="col-lg-8">
+        <!-- Toolbar -->
+        <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-4 pb-lg-5 mb-lg-3">
+          <h6 class="fs-base fs-5 mb-0">LIst of your registered addresses:</h6>
+        </div>
+
+        <!-- Add New Address Modal-->
+        <form class="needs-validation modal fade" action="/user/address/add-address" method="POST" id="add-address" tabindex="-1" novalidate>
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content p-4">
+              <div class="modal-header">
+                <h5 class="modal-title">Add a new address</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row gx-4 gy-3">
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-fn">Full name</label>
+                    <input name="name" class="form-control" type="text" id="address-fn" required />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-ph">Phone</label>
+                    <input name="phone" class="form-control" type="tel" id="address-ph" required />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-house-name">House Name</label>
+                    <input name="house_name" class="form-control" type="text" id="address-house-name" />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-area">Area/Street</label>
+                    <input name="area_street" class="form-control" type="text" id="address-area" />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-locality">locality</label>
+                    <input name="locality" class="form-control" type="text" id="address-locality" />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-town">Town</label>
+                    <input name="town" class="form-control" type="text" id="address-town" />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-state">State</label>
+                    <select class="form-select" name="state" id="address-state">
+                      <option value="india">Select State</option>
+                      <option value="Andhra Pradesh">Andhra Pradesh</option>
+                      <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                      <option value="Assam">Assam</option>
+                      <option value="Bihar">Bihar</option>
+                      <option value="Chhattisgarh">Chhattisgarh</option>
+                      <option value="Goa">Goa</option>
+                      <option value="Gujarat">Gujarat</option>
+                      <option value="Haryana">Haryana</option>
+                      <option value="Himachal Pradesh">Himachal Pradesh</option>
+                      <option value="Jharkhand">Jharkhand</option>
+                      <option value="Karnataka">Karnataka</option>
+                      <option value="Kerala">Kerala</option>
+                      <option value="Madhya Pradesh">Madhya Pradesh</option>
+                      <option value="Maharashtra">Maharashtra</option>
+                      <option value="Manipur">Manipur</option>
+                      <option value="Meghalaya">Meghalaya</option>
+                      <option value="Mizoram">Mizoram</option>
+                      <option value="Nagaland">Nagaland</option>
+                      <option value="Odisha">Odisha</option>
+                      <option value="Punjab">Punjab</option>
+                      <option value="Rajasthan">Rajasthan</option>
+                      <option value="Sikkim">Sikkim</option>
+                      <option value="Tamil Nadu">Tamil Nadu</option>
+                      <option value="Telangana">Telangana</option>
+                      <option value="Tripura">Tripura</option>
+                      <option value="Uttar Pradesh">Uttar Pradesh</option>
+                      <option value="Uttarakhand">Uttarakhand</option>
+                      <option value="West Bengal">West Bengal</option>
+                      <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                      <option value="Chandigarh">Chandigarh</option>
+                      <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                      <option value="Lakshadweep">Lakshadweep</option>
+                      <option value="Delhi">Delhi</option>
+                      <option value="Puducherry">Puducherry</option>
+                    </select>
+                    <small></small>
+                  </div>
+
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-zip">ZIP code</label>
+                    <input name="zipcode" class="form-control" type="number" id="address-zip" required />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="address-landmark">Landmark</label>
+                    <input name="landmark" class="form-control" type="text" id="address-landmark" required />
+                    <small></small>
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="alternate-phone">Alternate Phone</label>
+                    <input name="alternate_phone" class="form-control" type="tel" id="alternate-phone" required />
+                    <small></small>
+                    <input name="customer_id" type="hidden" value="<%- user._id %>" class="form-control" />
+                  </div>
+                  <div class="col-sm-6 form-group">
+                    <label class="form-label" for="form-check">Address Type</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" value="HOME" name="address_type" id="flexRadioDefault1" checked />
+                      <small></small>
+                      <label class="form-check-label" for="flexRadioDefault1"> HOME </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" value="WORK" type="radio" name="address_type" id="flexRadioDefault2" />
+                      <label class="form-check-label" for="flexRadioDefault2"> WORK </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-outline-success btn-shadow" type="submit">Add address</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <!-- Addresses list-->
+        <div class="table table-responsive table-striped fs-md">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr class="align-middle fs-5">
+                <th>Address</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% address.forEach(item => { %>
+              <tr>
+                <td class="py-3 align-middle text-capitalize fs-5">
+                  <%- item.name.toLowerCase() + ', ' + item.house_name + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + ', PH:' +
+                  item.phone %>
+                </td>
+                <td class="py-3 btn-group align-middle align-items-center">
+                  <div class="">
+                    <button
+                      class="btn btn-sm btn-outline-warning"
+                      id="edit-button"
+                      data-address-id="<%- item._id %>"
+                      href="#edit-address-modal"
+                      data-bs-toggle="modal"
+                    >
+                      <i class="bi bi-pencil fs-6"></i>
+                    </button>
+                  </div>
+                  <!-- <a class="btn btn-sm btn-info" href="/user/address/edit-address/<%- item._id %>" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil fs-6"></i></a> -->
+                  <button
+                    class="btn btn-sm btn-danger"
+                    onclick="deleteAddress('<%- item._id %>')"
+                    type="submit"
+                    data-bs-toggle="tooltip"
+                    title="Remove"
+                  >
+                    <i class="bi bi-trash fs-6"></i>
+                  </button>
+                  <!-- <form id="deleteAddress" action="/user/address/delete-address/<%- item._id %>?_method=DELETE" method="POST">
+                </form> -->
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-sm-start pt-4">
+          <a class="btn btn-outline-success" href="#add-address" data-bs-toggle="modal"> Add new address </a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Edit Address Modal -->
+  <div class="modal fade" id="edit-address-modal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content p-4">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" id="edit-address-form" novalidate>
+          <div class="modal-body">
+            <div class="row gx-4 gy-3">
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-fn">Full name</label>
+                <input name="name" class="form-control" type="text" id="edit-address-fn" required />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-ph">Phone</label>
+                <input name="phone" class="form-control" type="text" id="edit-address-ph" required />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-house-name">House Name</label>
+                <input name="house_name" class="form-control" type="text" id="edit-address-house-name" />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-area">Area/Street</label>
+                <input name="area_street" class="form-control" type="text" id="edit-address-area" />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-locality">Locality</label>
+                <input name="locality" class="form-control" type="text" id="edit-address-locality" />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-town">Town</label>
+                <input name="town" class="form-control" type="text" id="edit-address-town" />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-state">State</label>
+                <select class="form-select" name="state" id="edit-address-state">
+                  <option value="india">Select State</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                  <option value="Lakshadweep">Lakshadweep</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Puducherry">Puducherry</option>
+                </select>
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-zip">ZIP code</label>
+                <input name="zipcode" class="form-control" type="number" id="edit-address-zip" required />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-address-landmark">Landmark</label>
+                <input name="landmark" class="form-control" type="text" id="edit-address-landmark" required />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-alternate-phone">Alternate Phone</label>
+                <input name="alternate_phone" class="form-control" type="text" id="edit-alternate-phone" required />
+                <small></small>
+              </div>
+              <div class="col-sm-6 form-group">
+                <label class="form-label" for="edit-form-check">Address Type</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" value="HOME" name="address_type" id="edit-flexRadioDefault1" checked />
+                  <small></small>
+                  <label class="form-check-label" for="edit-flexRadioDefault1"> HOME </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" value="WORK" type="radio" name="address_type" id="edit-flexRadioDefault2" />
+                  <small></small>
+                  <label class="form-check-label" for="edit-flexRadioDefault2"> WORK </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
 <script>
-    setInterval(function () {
-      location.reload();
-    }, 2000);
-  
-  
-    const editForm = document.querySelector("#edit-address-form");
-  
-    const checkEditName = () =>{
-      const nameEl = document.quertySelector("#edit-address-fn");
-      let valid = false;
-      const name = nameEl.value.trim();
-  
-      if(!isRequired(name)) {
-          showError(nameEl, "Full name cannot be blank.");
-      }else if (!/^[a-zA-Z\s]+$/.test(name)) {
-          showError(nameEl, "Full name should not chatain numbers.");
-      }else{
-          showSuccess(nameEl);
-          valid = true;
-      }
-      return valid;
-    };
-  
-    const checkEditPhone = () => {
-      const phoneEl = document.querySelector("#edit-address-ph");
-      let valid = false;
-      const phone = phoneEl.value.trim();
-  
-      if(!isRequired(phone)) {
-          showError(phoneEl, "Phone number cannot be blank.");
-      }else if(!isIndianPhoneNumber(phone)) {
-          showError(phoneEl, "Phone number is not valid.");
-      }else {
-          showSuccess(phoneEl);
-          valid = ture;
-      }
-      return valid;
-    }
-  
-    const checkEditHouseName = () =>{
-      const houseNameEl = document.querySelector("#edit-address-house-name");
-      let valid = false;
-      const houseName = houseNameEl.value.trim();
-  
-      if(!isRequired(houseName)) {
-          showError(houseNameel, "House name cannot be blank.");
-      }else{
-          showSuccess(houseNameEl);
-          valid = ture;
-      }
-      return valid;
-    }
-  
-    const checkEditAreaStreet = () => {
-      const areaStreetEl = document.querySelector("#edit-address-area");
-      let valid = false;
-      const areaStreet = areaStreetEl.value.trim();
-  
-      if(!isRequired(areaStreet)) {
-          showError(areaStreetEl, "Area/Street cannot be blank.");
-      }else{
-          showSuccess(areaStreetEl);
-          valid = true;
-      }
-      return valid;
-    }
-  
-  
-  </script>
-  
+
+</script>

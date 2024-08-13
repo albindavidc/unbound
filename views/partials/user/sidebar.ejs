@@ -1,77 +1,83 @@
 <aside class="col-lg-4 pt-4 pt-lg-0 pe-xl-5">
-    <div class="bg-white rounded-3 shadow-lg pt-1 mb-5 mb-lg-0">
-        <div class="d-md-flex justify-content-between align-items-center text-center text-md-start p-4">
-            <div class="d-md-flex align-items-center">
-                <div class="img-thumbnail rounded-circle position-relative flex-shrink-0 bg-secondary-subtle mx-auto mb-2 mx-md-0 mb-md-0"
-                    style="width: 6.375rem; height: 6.375rem;"><img class="img-fluid rounded-circle" src="img/profile-user.png"
-                        style="height: 100%; width: 100%;" alt="User"></div>
-                <div class="ps-md-3">
-                    <h3 class="fs-base mb-0 text-capitalize h4"><%- user.username %></h3><span class="text-accent fs-sm"><%- user.email %></span>
-                </div>
-            </div><a class="btn btn-primary d-lg-none mb-2 mt-3 mt-md-0" href="#account-menu" data-bs-toggle="collapse"
-                aria-expanded="false"><i class="ci-menu me-2"></i>Account menu</a>
+  <div class="bg-white rounded-3 shadow-lg pt-1 mb-5 mb-lg-0">
+    <div class="d-md-flex justify-content-between align-items-center text-center text-md-start p-4">
+      <div class="d-md-flex align-items-center">
+        <div
+          class="img-thumbnail rounded-circle position-relative flex-shrink-0 bg-secondary-subtle mx-auto mb-2 mx-md-0 mb-md-0"
+          style="width: 6.375rem; height: 6.375rem"
+        >
+          <img class="img-fluid rounded-circle" src="img/profile-user.png" style="height: 100%; width: 100%" alt="User" />
         </div>
-        <div class="d-lg-block collapse" id="account-menu">
-            <div class="bg-body-secondary px-4 py-3">
-                <h3 class="fs-sm mb-0 text-muted">Account settings</h3>
-            </div>
-            <ul class="list-unstyled mb-0">
-                <li class="border-bottom mb-0"><a class="nav-link-style d-flex align-items-center px-4 py-3 active"
-                        href="/user/profile"><i class="ci-user opacity-60 me-2"></i>Profile info</a></li>
-                <li class="border-bottom mb-0"><a class="nav-link-style d-flex align-items-center px-4 py-3"
-                        href="/user/address"><i class="ci-location opacity-60 me-2"></i>Addresses</a></li>
-            </ul>
-            <div class="bg-body-secondary px-4 py-3">
-                <h3 class="fs-sm mb-0 text-muted">Wallet, Refferals </h3>
-            </div>
-            <ul class="list-unstyled mb-0">
-                <li class="border-bottom mb-0">
-                    <a class="nav-link-style d-flex align-items-center px-4 py-3 "
-                        href="/user/wallet">
-                        <i class="ci-bag opacity-60 me-2"></i>
-                        Wallet
-                    </a>
-                </li>
-                <li class="border-bottom mb-0">
-                    <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/referrals">
-                        <i class="ci-heart opacity-60 me-2"></i>
-                        Refferals
-                    </a>
-                </li>
-                <!-- <li class="border-bottom mb-0">
+        <div class="ps-md-3">
+          <h3 class="fs-base mb-0 text-capitalize h4"><%- user.username %></h3>
+          <span class="text-accent fs-sm"><%- user.email %></span>
+        </div>
+      </div>
+      <a class="btn btn-primary d-lg-none mb-2 mt-3 mt-md-0" href="#account-menu" data-bs-toggle="collapse" aria-expanded="false"
+        ><i class="ci-menu me-2"></i>Account menu</a
+      >
+    </div>
+    <div class="d-lg-block collapse" id="account-menu">
+      <div class="bg-body-secondary px-4 py-3">
+        <h3 class="fs-sm mb-0 text-muted">Account settings</h3>
+      </div>
+      <ul class="list-unstyled mb-0">
+        <li class="border-bottom mb-0">
+          <a class="nav-link-style d-flex align-items-center px-4 py-3 active" href="/profile"
+            ><i class="ci-user opacity-60 me-2"></i>Profile info</a
+          >
+        </li>
+        <li class="border-bottom mb-0">
+          <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/address"><i class="ci-location opacity-60 me-2"></i>Addresses</a>
+        </li>
+      </ul>
+      <div class="bg-body-secondary px-4 py-3">
+        <h3 class="fs-sm mb-0 text-muted">Wallet, Refferals</h3>
+      </div>
+      <ul class="list-unstyled mb-0">
+        <li class="border-bottom mb-0">
+          <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/wallet">
+            <i class="ci-bag opacity-60 me-2"></i>
+            Wallet
+          </a>
+        </li>
+        <li class="border-bottom mb-0">
+          <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/referrals">
+            <i class="ci-heart opacity-60 me-2"></i>
+            Refferals
+          </a>
+        </li>
+        <!-- <li class="border-bottom mb-0">
                     <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/reviews">
                         <i class="ci-heart opacity-60 me-2"></i>
                         Reviews
                     </a>
                 </li> -->
-            </ul>
-            <div class="bg-body-secondary px-4 py-3">
-                <h3 class="fs-sm mb-0 text-muted">Orders & Wishlist</h3>
-            </div>
-            <ul class="list-unstyled mb-0">
-                <li class="border-bottom mb-0">
-                    <a class="nav-link-style d-flex align-items-center px-4 py-3 "
-                        href="/user/orders">
-                        <i class="ci-bag opacity-60 me-2"></i>
-                        Orders
-
-                        <% if (typeof orderCount !== 'undefined') { %>
-                            <span class="fs-sm text-muted ms-auto"><%= orderCount %></span>
-                        <% } %>
-                    </a>
-                </li>
-                <li class="border-bottom mb-0">
-                    <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/wishlist">
-                        <i class="ci-heart opacity-60 me-2"></i>
-                        Wishlist
-                        <% if (typeof wishlistCount !== 'undefined') { %>
-                            <span class="fs-sm text-muted ms-auto"><%= wishlistCount %></span>
-                        <% } %>
-                    </a></li>
-            </ul>
-            <div class="d-flex justify-content-center my-3 pb-3">
-                <button class="btn btn-outline-danger" onclick="logOut()">Sign Out</button>
-            </div>
-        </div>
+      </ul>
+      <div class="bg-body-secondary px-4 py-3">
+        <h3 class="fs-sm mb-0 text-muted">Orders & Wishlist</h3>
+      </div>
+      <ul class="list-unstyled mb-0">
+        <li class="border-bottom mb-0">
+          <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/orders">
+            <i class="ci-bag opacity-60 me-2"></i>
+            Orders <% if (typeof orderCount !== 'undefined') { %>
+            <span class="fs-sm text-muted ms-auto"><%= orderCount %></span>
+            <% } %>
+          </a>
+        </li>
+        <li class="border-bottom mb-0">
+          <a class="nav-link-style d-flex align-items-center px-4 py-3" href="/user/wishlist">
+            <i class="ci-heart opacity-60 me-2"></i>
+            Wishlist <% if (typeof wishlistCount !== 'undefined') { %>
+            <span class="fs-sm text-muted ms-auto"><%= wishlistCount %></span>
+            <% } %>
+          </a>
+        </li>
+      </ul>
+      <div class="d-flex justify-content-center my-3 pb-3">
+        <button class="btn btn-outline-danger" onclick="logOut()">Sign Out</button>
+      </div>
     </div>
+  </div>
 </aside>
