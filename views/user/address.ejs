@@ -225,14 +225,14 @@
   </div>
 
   <!-- Edit Address Modal -->
-  <div class="modal fade" id="edit-address-modal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+  <div class="modal fade" id="edit-address-modal"  tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content p-4">
         <div class="modal-header">
           <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form method="POST" id="edit-address-form" novalidate>
+        <form method="POST" id="edit-address-form" action="/address"  novalidate>
           <div class="modal-body">
             <div class="row gx-4 gy-3">
               <div class="col-sm-6 form-group">
@@ -359,7 +359,7 @@ editAddress.addEventListener("show.bs.modal", async (e) => {
     const editButton = e.relatedTarget;
     const addressId = editButton.getAttribute("data-address-id");
 
-    const response = await fetch(`/user/address/edit-address/${addressId}`);
+    const response = await fetch(`/address/edit-address/${addressId}`);
     if (!response.ok) {
       // If the response is not okay, throw an error
       throw new Error("Network response was not ok");
@@ -393,7 +393,7 @@ editAddress.addEventListener("show.bs.modal", async (e) => {
       addressTypeWork.checked = true;
     }
 
-    editAddressForm.action = `/user/address/edit-address/${addressId}`;
+    editAddressForm.action = `/address/edit-address/${addressId}`;
     return;
   } catch (error) {
     // Use SweetAlert to display the error message
