@@ -467,16 +467,12 @@ const editProfile = async (req, res) => {
   }
 };
 
-
-
-
 const resetPassword = async (req, res) => {
   console.log(req.body); // For Express.js
-  
-  const { oldPassword, newPassword, confirmPassword } = req.body;
-  
-  console.log({ oldPassword, newPassword, confirmPassword });
 
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  console.log({ oldPassword, newPassword, confirmPassword });
 
   if (!oldPassword || !newPassword || !confirmPassword) {
     return res.status(400).json({ message: "All fields are required" });
@@ -489,7 +485,7 @@ const resetPassword = async (req, res) => {
   try {
     const user = await User.findById(req.session.user); // Adjust to get the logged-in user
 
-    const isMatch =  bcrypt.compare(oldPassword, user.password);
+    const isMatch = bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Old password is incorrect." });
     }
@@ -505,11 +501,6 @@ const resetPassword = async (req, res) => {
   }
 };
 
-
-
-
-
-
 const getAddress = async (req, res) => {
   const address = await Address.find({
     customer_id: req.session.user,
@@ -522,14 +513,25 @@ const getAddress = async (req, res) => {
   res.render("user/address", {
     address,
     user: req.session.user,
+    success: req.flash("success"),
+    error: req.flash("error"),
   });
 };
 
 const addAddress = async (req, res) => {
-  console.log(req.body);
-  await Address.create(req.body);
-  req.flash("success", "Address Addedd");
-  res.redirect("/user/address");
+  console.log("Request body:", req.body);
+
+  try {
+    const newAddress = await Address.create(req.body);
+    console.log("New Address:", newAddress);
+
+    req.flash("success", "Address Added");
+    res.redirect("/address");
+  } catch (error) {
+    console.error("Error adding address:", error);
+    req.flash("error", "Failed to add address. Please try again.");
+    res.redirect("/address");
+  }
 };
 
 const getEditAddress = async (req, res) => {
