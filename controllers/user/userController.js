@@ -567,11 +567,11 @@ const editAddress = async (req, res) => {
     }
 
     req.flash("success", "Address Edited");
-    res.redirect("/user/address");
+    res.redirect("/address");
   } catch (error) {
     console.error(error);
     req.flash("error", "Error editing address. Please try again.");
-    res.redirect("/user/address");
+    res.redirect("/address");
   }
 };
 
