@@ -50,6 +50,7 @@ router.post("/forgot-password-cpassword", userController.passwordChange);
 router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
 router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
 
+
 // User-Profile
 router
 .route("/profile")
@@ -58,7 +59,6 @@ router
 .post(userController.editProfile);
 
 router.post('/reset-password', userController.resetPassword);
-
 
 
 //User-Address

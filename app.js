@@ -8,7 +8,7 @@ const flash = require("connect-flash");
 const MongoStore = require("connect-mongo");
 const nocache = require("nocache");
 const methodOverride = require("method-override");
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 
 
 const db = require("./config/db");
@@ -56,12 +56,10 @@ app.use("/public", express.static("public")); // Static files for uploaded image
 
 //Middlewares
 app.use(logger("dev"));
-app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // For URL-encoded data
+app.use(express.json());
 app.use(methodOverride("_method"));
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", userRouter);
 app.use("/admin", adminRouter);

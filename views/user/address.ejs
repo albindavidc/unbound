@@ -1,4 +1,6 @@
 <%- include("../partials/user/header") %>
+<%- include("../partials/flashMessage") %>
+
 
 <style>
   .userProfileMain {
@@ -42,17 +44,15 @@
 <section>
   <div class="container mb-5">
     <div class="row">
-      <%- include ("../partials/user/sidebar.ejs") %>
-
-      <!-- Content -->
+      <%- include('../partials/user/sidebar.ejs') %>
+      <!-- Content  -->
       <section class="col-lg-8">
-        <!-- Toolbar -->
+        <!-- Toolbar-->
         <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-4 pb-lg-5 mb-lg-3">
           <h6 class="fs-base fs-5 mb-0">List of your registered addresses:</h6>
         </div>
-
         <!-- Add New Address Modal-->
-        <form class="needs-validation modal fade" action="/user/address/add-address" method="POST" id="add-address" tabindex="-1" novalidate>
+        <form class="needs-validation modal fade" action="/address/add-address" method="POST" id="add-address" tabindex="-1" novalidate>
           <div class="modal-dialog modal-lg">
             <div class="modal-content p-4">
               <div class="modal-header">
@@ -147,7 +147,7 @@
                     <label class="form-label" for="alternate-phone">Alternate Phone</label>
                     <input name="alternate_phone" class="form-control" type="tel" id="alternate-phone" required />
                     <small></small>
-                    <input name="customer_id" type="hidden" value="<%- user._id %>" class="form-control" />
+                    <input name="customer_id" type="hidden" value="<%- user%>" class="form-control" />
                   </div>
                   <div class="col-sm-6 form-group">
                     <label class="form-label" for="form-check">Address Type</label>
@@ -210,7 +210,7 @@
                     <i class="bi bi-trash fs-6"></i>
                   </button>
                   <!-- <form id="deleteAddress" action="/user/address/delete-address/<%- item._id %>?_method=DELETE" method="POST">
-                </form> -->
+                  </form> -->
                 </td>
               </tr>
               <% }) %>
@@ -346,8 +346,11 @@
   </div>
 </section>
 
+<%- include("../partials/user/footer") %>
+
+
 <script>
-const editAddress = document.querySelector("#edit-address-modal");
+  const editAddress = document.querySelector("#edit-address-modal");
 
 const editAddressForm = document.querySelector("#edit-address-form");
 
@@ -726,11 +729,8 @@ form.addEventListener(
 
 </script>
 
-
-
-
 <script>
-  const editForm = document.querySelector("#edit-address-form");
+ const editForm = document.querySelector("#edit-address-form");
 
 const checkEditName = () => {
   const nameEl = document.querySelector("#edit-address-fn");
@@ -980,4 +980,3 @@ editForm.addEventListener(
 
 </script>
 
-<%- include("../partials/user/footer") %>

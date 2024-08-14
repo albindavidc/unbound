@@ -1,0 +1,18 @@
+<div class="container">
+  <% if (success.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong class="text-capitalize"><%- success %>!</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <% } %> <% if (error.length > 0) { %>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong class="text-capitalize"><%- error %></strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <% } %> <% if (typeof errorMsg != 'undefined') { %> <% if (errorMsg.length > 0) { %> <% errorMsg.forEach(element => { %>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong class="text-capitalize"><%- element %></strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <% }) %> <% } %> <% } %>
+</div>
