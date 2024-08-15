@@ -418,7 +418,7 @@ async function deleteAddress(addressId) {
     if (result.isConfirmed) {
       try {
         const response = await fetch(
-          `/user/address/delete-address/${addressId}`,
+          `/address/delete-address/${addressId}`,
           {
             method: "DELETE",
           }

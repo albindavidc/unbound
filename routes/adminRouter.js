@@ -63,12 +63,8 @@ router
   .get(adminAuth, productController.getEditProducts)
   .post(adminAuth, upload, productController.editProduct);
 
-
-
   
-router.get("/products/stocks", adminAuth, productController.getStocks);
-router.post("/product/updateStock", productController.updateStocks);
-
-
+  router.get("/stocks", productController.getStocks);
+  router.patch("/update-stock", productController.updateStock);
 
 module.exports = router;
