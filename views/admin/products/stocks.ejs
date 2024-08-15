@@ -1,0 +1,125 @@
+<%- include("../../partials/admin/header") %>
+
+
+<section class="breadcrumb-option">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-2">
+          <li class="breadcrumb-item">
+            <a class="link-body-emphasis" href="/admin">
+              <svg class="bi" width="16" height="16">
+                <use xlink:href="#house-door-fill"></use>
+              </svg>
+              <span class="visually-hidden">Dashboard</span>
+            </a>
+          </li>
+  
+          <li class="breadcrumb-item " aria-current="page">
+            <a class="link-body-emphasis fw-semibold text-decoration-none" href="/admin/products">Products</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Manage Stocks
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+  
+  <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><%= locals.title ? locals.title : 'Stock Management' %></h1>
+  
+  </div>
+  
+  <section class="container text-capitalize">
+    <div class="container table-responsive">
+      <table class="table table-hover table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Variants</th>
+            <th>Update Stock</th> <!-- Added column for updating stock -->
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach((product, index) => { %>
+          <tr>
+            <td class="align-middle"><%- index + 1 %></td>
+            <td class="align-middle"><%- product.name %></td>
+            <td>
+              <% product?.variants.forEach((element, i) => { %>
+              <span class="form-control-plaintext">
+                  <span class="text-muted"><%- i+1 %></span>
+                <span class="fw-bold">Color:</span> <%- element.color?.name %>,
+                <span class="fw-bold">Size:</span> <%- element.size?.value %> <br>
+              </span>
+              <% }) %>
+            </td>
+            <td>
+              <!-- Added Update Stock column -->
+              <div class="row">
+                <div class="col-auto">
+                  <input type="number" class="form-control" name="newStock" min="0" id="stock-<%- product._id %>" value="<%- product.quantity %>">
+                </div>
+                <div class="col-auto">
+                  <button onclick="updateStock('<%- product._id %>')" class="btn btn-primary btn-sm">Update</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <%- include("../../partials/admin/footer") %>
+<!-- Include SweetAlert2 library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+  
+  <script defer>
+  
+      const updateStock = async (variantId) => {
+          const stock = document.getElementById(`stock-${variantId}`).value;
+  
+          // Use SweetAlert to ask for confirmation
+          Swal.fire({
+              title: 'Are you sure?',
+              text: "You are about to update the stock for this variant.!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, update it!'
+          }).then(async (result) => {
+              if (result.isConfirmed) {
+                  // If confirmed, proceed with the stock update
+                  const response = await fetch(`/admin/update-stock`, {
+                      method: 'PATCH',
+                      headers: {'Content-type': 'application/json'},
+                      body: JSON.stringify({
+                          variantId,
+                          stock
+                      })
+                  });
+                  // Handle the response as needed
+                  if (response.ok) {
+                      Swal.fire(
+                          'Updated!',
+                          'Stock has been updated.',
+                          'success'
+                      );
+                  } else {
+                      Swal.fire(
+                          'Error!',
+                          'Something went wrong.',
+                          'error'
+                      );
+                  }
+              }
+          });
+      }
+  
+  </script>
+  

@@ -67,6 +67,24 @@ const ProductSchema = new mongoose.Schema(
       default: 0,
     },
     ratings: [RatingSchema],
+     variants: [
+      {
+        color: {
+          type: mongoose.Schema.Types.ObjectId, // Reference to Color object ID
+          ref: "Color", // Reference to the 'Color' model
+          required: true,
+        },
+        size: {
+          type: mongoose.Schema.Types.ObjectId, // Reference to Size object ID
+          ref: "Size", // Reference to the 'Size' model
+          required: true,
+        },
+        stock: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

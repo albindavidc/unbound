@@ -1,11 +1,16 @@
 const path = require("path");
 const sharp = require("sharp");
 const Jimp = require("jimp");
+const { configDotenv } = require("dotenv");
+const fs = require("fs");
 
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
-const fs = require("fs");
-const { configDotenv } = require("dotenv");
+const Color = require("../../models/attributes/colorSchema");
+const Size = require("../../models/attributes/sizeSchema");
+
+// const Brands = require("../../models/attributes/brandSchema");
+// const Order = require("../../models/orderSchema");
 
 module.exports = {
   getProducts: async (req, res) => {
@@ -341,59 +346,72 @@ module.exports = {
     }
   },
 
+
+  //**Product-Stock-Managment */
+
   getStocks: async (req, res) => {
     try {
-      const perPage = 7;
-      const page = parseInt(req.query.page) || 1;
+      let perPage = 9;
+      let page = req.query.page || 1;
+
       const products = await Product.find()
         .sort({ createdAt: -1 })
-        .populate("categoryid")
-        .skip(perPage * (page - 1))
+        .populate("brand")
+        .populate("category")
+        .populate("variants.color")
+        .populate("variants.size")
+        .skip(perPage * page - perPage)
         .limit(perPage)
         .exec();
-      const count = await Product.countDocuments({});
-      const nextPage = page + 1;
+
+      const count = await Product.find().countDocuments();
+      const nextPage = parseInt(page) + 1;
       const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
-      const breadcrumbs = [
-        { name: "Home", url: "/admin" },
-        { name: "Products", url: "/admin/products" },
-        { name: "Stock", url: "/admin/products/stocks" },
-        { name: `Page ${page}`, url: `/admin/products/stocks?page=${page}` },
-      ];
-
-      res.render("admin/products/stock", {
+      // console.log(products);
+      console.log(products[0]);
+      res.render("admin/products/stocks", {
         products,
-        layout: adminLayout,
         current: page,
-        perPage: perPage,
         pages: Math.ceil(count / perPage),
         nextPage: hasNextPage ? nextPage : null,
-        breadcrumbs,
+        currentRoute: "/admin/products/",
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });
     }
   },
-
-  updateStocks: async (req, res) => {
-    const { productId, newStock } = req.body;
-
+  
+  updateStock: async (req, res) => {
     try {
-      if (newStock < 0) {
-        return res.json({
-          success: false,
-          error: "Stock value cannot be negative.",
-        });
+      console.log(req.body);
+      const { variantId, stock } = req.body;  // Assuming productId is passed instead of variantId
+
+      // First, check if the product exists
+      const product = await Product.findById(variantId);
+      if (!product) {
+          return res.status(404).json({ message: "Product not found." });
       }
 
-      await Product.findByIdAndUpdate(productId, { quantity: newStock });
-      res.json({ success: true });
+      // Attempt to update the stock
+      product.quantity = stock; // Directly updating the quantity field
+
+      // Save the updated product
+      await product.save();
+
+      // Send a response indicating success
+      res.json({
+          message: "Stock updated successfully.",
+          product: product,
+      });
+      
     } catch (error) {
       console.error(error);
-      res.redirect("/products");
-      res.json({ success: false });
+      res
+        .status(500)
+        .json({ message: "An error occurred while updating the stock." });
     }
   },
+
 };
