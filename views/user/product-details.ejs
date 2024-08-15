@@ -118,12 +118,12 @@
               </div>
 
               <% if (product.quantity>0) { %>
-               
-                <a href="#" class="primary-btn">add to cart</a>
-              <% }else { %>
-                <a href="#" class="btn btn-danger">Out of Stock</a>
 
-                <% } %>
+              <a href="#" class="primary-btn">add to cart</a>
+              <% } else { %>
+              <a href="#" class="btn btn-danger">Out of Stock</a>
+
+              <% } %>
             </div>
             <div class="product__details__btns__option">
               <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
@@ -207,17 +207,13 @@
           <div class="product__item__text">
             <h6><%= product.name %></h6>
 
-
-            
             <% if (product.quantity >0) { %>
-              
-              <a href="#" class="add-cart">+ Add To Cart</a>
+
+            <a href="#" class="add-cart">+ Add To Cart</a>
             <% }else{ %>
 
-              <a href="#" class="add-cart">Out of Stock</a>
-              <% } %>
-
-
+            <a href="#" class="add-cart">Out of Stock</a>
+            <% } %>
 
             <div class="rating">
               <% for (let i = 0; i < 5; i++) { %>
