@@ -41,10 +41,10 @@
   
   <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2"><%= locals.title ? locals.title : 'Attribute Management' %></h1>
-    <div class="btn-group btn-toolbar mb-2 mb-md-0">
-      <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#addBrandModal">Add Brand</button>
-      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addColorModal">Add Color</button>
-      <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#addSizeModal">Add Size</button>
+    <div class="btn-group btn-toolbar mb-2 mb-md-2 mx-4">
+      <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#addBrandModal">Add Brand</button>
+      <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addColorModal">Add Color</button>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addSizeModal">Add Size</button>
     </div>
   </div>
   
@@ -53,10 +53,10 @@
   <section id="attributeSection" class="text-capitalize container">
     <div class="container">
       <div class="row">
-        <div class="col">
+        <div class="col" style="background-color: rgb(255, 240, 240);">
           <div class="container table-responsive">
             <table class="table table-hover table-sm table-striped">
-              <legend>Color Attribute</legend>
+              <legend class="pt-4">Color Attribute</legend>
               <thead>
                 <tr class="text-center align-middle">
                   <th>Color</th>
@@ -107,10 +107,10 @@
             </table>
           </div>
         </div>
-        <div class="col">
-          <div class="container table-responsive">
-            <table class="table table-hover table-sm table-striped">
-              <legend>Size Attribute</legend>
+        <div class="col" style="background-color: rgb(240, 255, 240);">
+          <div class=" container table-responsive">
+            <table class=" table table-hover table-sm table-striped">
+              <legend class="pt-4">Size Attribute</legend>
               <thead>
                 <tr class="text-center align-middle">
                   <th>Size</th>
@@ -155,10 +155,10 @@
             </table>
           </div>
         </div>
-        <div class="col">
+        <div class="col" style="background-color: rgb(240, 240, 255);">
           <div class="container table-responsive">
             <table class="table table-hover table-sm table-striped">
-              <legend>Brands</legend>
+              <legend class="pt-4">Brands</legend>
               <thead>
                 <tr class="text-center align-middle">
                   <th>Brand</th>
