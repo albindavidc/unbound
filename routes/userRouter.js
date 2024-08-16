@@ -77,8 +77,8 @@ router
   .delete(userController.deleteAddress);
 
 
-// //Cart
-// router.get("/cart", cartController.getCart);
+//Cart
+router.get("/cart", cartController.getCart);
 // router.get("/shop/order-success", cartController.getOrderSuccess);
 
 // router.post("/user/add-to-cart/", cartController.addToCart);
