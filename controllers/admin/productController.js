@@ -8,8 +8,7 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Color = require("../../models/attributes/colorSchema");
 const Size = require("../../models/attributes/sizeSchema");
-
-// const Brands = require("../../models/attributes/brandSchema");
+const Brands = require("../../models/attributes/brandSchema");
 // const Order = require("../../models/orderSchema");
 
 module.exports = {
@@ -54,10 +53,13 @@ module.exports = {
   async getAddProducts(req, res) {
     try {
       const categories = await Category.find();
+      const brand = await Brands.find();
+      const color = await Color.find();
+      const size = await Size.find();
+    
 
-      console.log("add product", req.body);
-      // Render the form with categories data
-      res.render("admin/products/add-product", { categories });
+      res.render("admin/products/add-product", { categories,brand, color, size });
+
     } catch (error) {
       console.log(error.message);
     }
@@ -76,9 +78,11 @@ module.exports = {
         productdescription,
         brandname,
         price,
-        quantity,
+        stock,
         color,
+        size,
         category,
+        variants,
       } = req.body;
 
       // Create arrays for primary and secondary images
@@ -93,6 +97,19 @@ module.exports = {
         path: file.path,
         type: "secondary",
       }));
+
+
+
+      // Process variants (assuming you have Color and Size models)
+    const processedVariants = await Promise.all(variants.map(async (variant) => {
+      const { color, size, stock } = variant;
+      return {
+        color: await Color.findById(color),
+        size: await Size.findById(size),
+        stock: parseInt(stock, 10) // Ensure stock is a number
+      };
+    }));
+
 
       const productExists = await Product.findOne({ name: productName });
       if (!productExists) {
@@ -110,10 +127,9 @@ module.exports = {
           category,
           regularprice: price,
           price: price,
-          quantity: quantity,
-          color: color,
           primaryImages,
           secondaryImages,
+          variants: processedVariants,
         });
         await newProduct.save();
         res.json({ isvalid: true });
@@ -237,7 +253,7 @@ module.exports = {
         brand: req.body.brand,
         category: req.body.category,
         description: req.body.description,
-        quantity: req.body.quantity,
+        stock: req.body.stock,
         price: req.body.price,
         regularprice: req.body.regularprice,
         offerpercentage: req.body.offerpercentage || 0,
@@ -388,14 +404,18 @@ module.exports = {
       console.log(req.body);
       const { variantId, stock } = req.body;  // Assuming productId is passed instead of variantId
 
-      // First, check if the product exists
-      const product = await Product.findById(variantId);
+
+
+      // Attempt to update the stock
+      const product = await Product.findOneAndUpdate(
+        { 'variants._id': variantId },
+        { $set: { 'variants.$.stock': parseInt(stock, 10) } },
+        { new: true }
+      );
+      
       if (!product) {
           return res.status(404).json({ message: "Product not found." });
       }
-
-      // Attempt to update the stock
-      product.quantity = stock; // Directly updating the quantity field
 
       // Save the updated product
       await product.save();

@@ -57,7 +57,7 @@ module.exports = {
       // Render the product details page with the fetched product data
       res.render("user/product-details", {
         user: req.session.user,
-        product,
+        product,  
         products,
         relatedProducts,
       });

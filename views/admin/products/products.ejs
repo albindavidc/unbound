@@ -15,12 +15,8 @@
       <h2 class="content-title card-title">Products List</h2>
     </div>
     <div>
-      <a href="/admin/stocks" class="btn btn-primary btn-sm rounded"
-        >Manage Stocks</a
-      >
-      <a href="/admin/add-product" class="btn btn-primary btn-sm rounded"
-        >Add products</a
-      >
+      <a href="/admin/stocks" class="btn btn-primary btn-sm rounded">Manage Stocks</a>
+      <a href="/admin/add-product" class="btn btn-primary btn-sm rounded">Add products</a>
     </div>
   </div>
 
@@ -42,8 +38,7 @@
             </tr>
           </thead>
           <tbody>
-            <% if (product && product.length > 0) { %> <%
-            product.forEach((product, index) => { %>
+            <% if (product && product.length > 0) { %> <% product.forEach((product, index) => { %>
             <tr>
               <td><%= (current - 1) * perPage + index + 1 %></td>
               <td>
@@ -57,11 +52,24 @@
               <td><%= product.name %></td>
               <td><%= product.category.name %></td>
               <td><%= product.price %></td>
+
+
+
               <td>
-                <% if (product.quantity === 0 || product.quantity < 0) { %>
+                <% let totalStock = 0; // Initialize total stock to 0 %> 
+                
+                <% product.variants.forEach(variant => { %> 
+                <% totalStock += variant.stock;
+                // Add stock of each variant %> <% }); %> <% if (totalStock > 0) { %>
+                <span class="text text-success">In Stock (<%= totalStock %>)</span>
+                <% } else { %>
                 <span class="text text-danger">Out Of Stock</span>
-                <% } else { %> <%= product.quantity %> <% } %>
+                <% } %>
               </td>
+
+
+
+
               <td>
                 <% if (product.isActive) { %>
                 <span class="badge rounded-pill alert-success">Listed</span>
@@ -70,38 +78,24 @@
                 <% } %>
               </td>
               <td>
-                <a
-                  href="/admin/edit-product/<%= product._id %>"
-                  class="btn btn-sm font-sm rounded btn-brand"
-                >
+                <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
                   <i class="material-icons md-edit"></i> Edit
                 </a>
               </td>
               <td class="text-center">
                 <% if (product.isActive) { %>
-                <button
-                  class="btn btn-danger btn-sm rounded"
-                  onclick="confirmAction('<%= product._id %>', 'unlist', '<%= product.name %>')"
-                >
+                <button class="btn btn-danger btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'unlist', '<%= product.name %>')">
                   <i class="material-icons"></i> Unlist
                 </button>
                 <% } else { %>
-                <button
-                  class="btn btn-warning btn-sm rounded"
-                  onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')"
-                >
+                <button class="btn btn-warning btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')">
                   <i class="material-icons"></i> List
                 </button>
                 <% } %>
-                <button
-                  class="btn btn-danger"
-                  onclick="confirmAction('<%= product._id %>', 'delete', '<%= product.name %>')"
-                >
+                <button class="btn btn-danger" onclick="confirmAction('<%= product._id %>', 'delete', '<%= product.name %>')">
                   <i class="material-icons md-delete_forever"></i> Delete
                 </button>
               </td>
-
-              
             </tr>
             <% }) %> <% } else { %>
             <tr>
@@ -124,11 +118,9 @@
       <li class="page-item">
         <a href="/admin/products/?page=1" class="page-link">First</a>
       </li>
-      <% } %> <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %> <%
-      if (i !== 1) { %>
+      <% } %> <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %> <% if (i !== 1) { %>
       <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
-      <% } %> <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %> <%
-      if (i == current) { %>
+      <% } %> <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %> <% if (i == current) { %>
       <li class="page-item disabled">
         <a href="#" class="page-link"><%= i %></a>
       </li>
@@ -152,49 +144,48 @@
 <!-- content-main end// -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-    const confirmAction = (productId, action, productName) => {
+  const confirmAction = (productId, action, productName) => {
     let actionText, confirmButtonText;
 
     switch (action) {
-        case "list":
-            actionText = "list";
-            confirmButtonText = "Yes, List it!";
-            break;
-        case "unlist":
-            actionText = "unlist";
-            confirmButtonText = "Yes, Unlist it!";
-            break;
-        case "delete":
-            actionText = "delete";
-            confirmButtonText = "Yes, Delete it!";
-            break;
-        default:
-            return;
+      case "list":
+        actionText = "list";
+        confirmButtonText = "Yes, List it!";
+        break;
+      case "unlist":
+        actionText = "unlist";
+        confirmButtonText = "Yes, Unlist it!";
+        break;
+      case "delete":
+        actionText = "delete";
+        confirmButtonText = "Yes, Delete it!";
+        break;
+      default:
+        return;
     }
 
     Swal.fire({
-        title: "Are you sure?",
-        text: `Do you want to ${actionText} the product: ${productName}?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: confirmButtonText,
-        cancelButtonText: "No, cancel!",
-        showConfirmButton: true, // Hide the confirm button
-        reverseButtons: true,
-        timer: 5000, // Auto-close after 3 seconds
-        timerProgressBar: true // Optional: Show a progress bar
+      title: "Are you sure?",
+      text: `Do you want to ${actionText} the product: ${productName}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: confirmButtonText,
+      cancelButtonText: "No, cancel!",
+      showConfirmButton: true, // Hide the confirm button
+      reverseButtons: true,
+      timer: 5000, // Auto-close after 3 seconds
+      timerProgressBar: true, // Optional: Show a progress bar
     }).then((result) => {
-        if (result.isConfirmed) {
-            if (action === "delete") {
-                deleteProduct(productId);
-            } else {
-                const shouldList = action === "list";
-                unlistOrListProduct(productId, shouldList);
-            }
+      if (result.isConfirmed) {
+        if (action === "delete") {
+          deleteProduct(productId);
+        } else {
+          const shouldList = action === "list";
+          unlistOrListProduct(productId, shouldList);
         }
+      }
     });
-};
-
+  };
 
   const unlistOrListProduct = async (productId, shouldList) => {
     try {
@@ -209,9 +200,7 @@
       if (result.success) {
         Swal.fire({
           title: "Success!",
-          text: shouldList
-            ? "Product has been listed."
-            : "Product has been unlisted.",
+          text: shouldList ? "Product has been listed." : "Product has been unlisted.",
           icon: "success",
           showConfirmButton: false,
           timer: 1500,

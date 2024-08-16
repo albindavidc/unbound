@@ -58,13 +58,16 @@
             <td>
               <!-- Added Update Stock column -->
               <div class="row">
-                <div class="col-auto">
-                  <input type="number" class="form-control" name="newStock" min="0" id="stock-<%- product._id %>" value="<%- product.quantity %>">
-                </div>
-                <div class="col-auto">
-                  <button onclick="updateStock('<%- product._id %>')" class="btn btn-primary btn-sm">Update</button>
-                </div>
+                <% product.variants.forEach((variant, index) => { %>
+                  <div class="col-auto">
+                    <input type="number" class="form-control" name="variants[<%= index %>][stock]" min="0" id="stock-<%= variant._id %>" value="<%= variant.stock %>">
+                  </div>
+                  <div class="col-auto">
+                    <button onclick="updateStock('<%= variant._id %>')" class="btn btn-primary btn-sm">Update</button>
+                  </div>
+                <% }); %>
               </div>
+              
             </td>
           </tr>
           <% }) %>

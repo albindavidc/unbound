@@ -101,21 +101,21 @@ module.exports = {
         return res.status(404).json({ status: false, message: "Product not found" });
       }
 
-      //   const variant = product.variants.find(
-      //     (v) => v._id.toString() === variantId
-      //   );
-      //   if (!variant) {
-      //     return res
-      //       .status(404)
-      //       .json({ status: false, message: "Variant not found" });
-      //   }
+        const variant = product.variants.find(
+          (v) => v._id.toString() === variantId
+        );
+        if (!variant) {
+          return res
+            .status(404)
+            .json({ status: false, message: "Variant not found" });
+        }
 
-      //   const stock = variant.stock;
-      //   if (stock === 0) {
-      //     return res
-      //       .status(409)
-      //       .json({ status: false, message: "Product Out Of Stock" });
-      //   }
+        const stock = variant.stock;
+        if (stock === 0) {
+          return res
+            .status(409)
+            .json({ status: false, message: "Product Out Of Stock" });
+        }
 
       const cart = await Cart.findOne({ userId });
       if (!cart) {

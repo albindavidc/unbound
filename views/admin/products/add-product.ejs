@@ -3,15 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link
-    href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/css/admin_panel.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css "
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css " />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
   <title>Unbound</title>
@@ -82,23 +76,12 @@
 </head>
 
 <body>
-  <div
-    class="imagemodal"
-    id="cropImageModal"
-    tabindex="-1"
-    aria-labelledby="cropImageModalLabel"
-    aria-hidden="true"
-  >
+  <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="img-container">
@@ -106,17 +89,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            id="closeImageButton"
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" id="cropButton">
-            Crop
-          </button>
+          <button id="closeImageButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="cropButton">Crop</button>
         </div>
       </div>
     </div>
@@ -131,46 +105,18 @@
           </div>
           <div class="form-container">
             <div class="form-wrapper">
-              <form
-                id="addProductForm"
-                action="/admin/add-product"
-                method="POST"
-                enctype="multipart/form-data"
-                onsubmit="addproduct(event)"
-              >
+              <form id="addProductForm" action="/admin/add-product" method="POST" enctype="multipart/form-data" onsubmit="addproduct(event)">
                 <div>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    id="addPrimaryImageButton"
-                  >
-                    Add Primary Image
-                  </button>
-                  <input
-                    type="file"
-                    id="primaryInput"
-                    accept="image/*"
-                    style="display: none"
-                  />
+                  <button type="button" class="btn btn-primary" id="addPrimaryImageButton">Add Primary Image</button>
+                  <input type="file" id="primaryInput" accept="image/*" style="display: none" />
                   <div id="croppedPrimaryImages"></div>
                 </div>
 
                 <hr />
 
                 <div>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    id="addSecondaryImageButton"
-                  >
-                    Add Secondary Image
-                  </button>
-                  <input
-                    type="file"
-                    id="imageInput"
-                    accept="image/*"
-                    style="display: none"
-                  />
+                  <button type="button" class="btn btn-primary" id="addSecondaryImageButton">Add Secondary Image</button>
+                  <input type="file" id="imageInput" accept="image/*" style="display: none" />
                   <div id="croppedImages"></div>
                   <div id="secondaryImageError" class="error-div"></div>
                 </div>
@@ -178,24 +124,12 @@
                 <hr />
                 <div class="margin-custom">
                   <label for="productName" class="form-label">Name</label>
-                  <input
-                    type="text"
-                    name="productName"
-                    id="productName"
-                    placeholder="Product name"
-                    class="form-control border"
-                    required
-                  />
+                  <input type="text" name="productName" id="productName" placeholder="Product name" class="form-control border" required />
                   <div id="productNameError" class="error-div"></div>
                 </div>
                 <div class="mb-4 mt-5">
                   <label class="form-label">Description of Product</label>
-                  <textarea
-                    name="productdescription"
-                    id="productdescription"
-                    class="form-control border"
-                    required
-                  ></textarea>
+                  <textarea name="productdescription" id="productdescription" class="form-control border" required></textarea>
                   <div id="productdescriptionError" class="error-div"></div>
                 </div>
                 <div class="mb-4 mt-5">
@@ -203,81 +137,61 @@
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label">Price of Product</label>
-                        <input
-                          placeholder="$"
-                          name="price"
-                          type="text"
-                          class="form-control border"
-                        />
-                        <div
-                          id="price-error"
-                          class="error-message error-div"
-                        ></div>
+                        <input placeholder="$" name="price" type="number" class="form-control border" />
+                        <div id="price-error" class="error-message error-div"></div>
                       </div>
                     </div>
                     <div class="col-lg-4">
                       <div class="mb-4">
-                        <label class="form-label">Quantity of Product</label>
-                        <input
-                          placeholder="Quantity"
-                          name="quantity"
-                          type="text"
-                          class="form-control border"
-                        />
-                        <div
-                          id="quantity-error"
-                          class="error-message error-div"
-                        ></div>
+                        <label for="variant-stock" class="form-label">Stock of Product</label>
+                        <input placeholder="Stock" name="variants[0][stock]" type="number" class="form-control border" />
+                        <div id="stock-error" class="error-message error-div"></div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="mb-4">
+                        <label for="variant-size" class="form-label">Size</label>
+                        <select class="form-control border" name="variants[0][size]" id="size" required>
+                          <option value="">Select Size</option>
+                          <% size.forEach((size) => { %>
+                          <option value="<%= size._id %>"><%= size.value %></option>
+                          <% }); %>
+                        </select>
+                        <div id="sizeError" class="error-div"></div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="mb-4 mt-5">
                   <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                       <div class="mb-4">
                         <label class="form-label">Max Product/Person</label>
-                        <input
-                          placeholder="Volume"
-                          name="volume"
-                          type="text"
-                          class="form-control border"
-                        />
+                        <input placeholder="Quantity" name="quantity" type="number" class="form-control border" />
                       </div>
                     </div>
-                    <div class="col-lg-4">
+
+                    <div class="col-lg-6">
                       <div class="mb-4">
-                        <label class="form-label">Color of Product</label>
-                        <input
-                          placeholder="Color"
-                          name="color"
-                          type="text"
-                          class="form-control border"
-                        />
+                        <label for="variant-color" class="form-label">Color</label>
+                        <select class="form-control border" name="variants[0][color]" id="color" required>
+                          <option value="">Select Color</option>
+                          <% color.forEach((color) => { %>
+                          <option value="<%= color._id %>"><%= color.name %></option>
+                          <% }); %>
+                        </select>
+                        <div id="colorError" class="error-div"></div>
                       </div>
                     </div>
                   </div>
                 </div>
+
                 <div class="form-group mb-3">
                   <label for="brand" class="form-label">Brand Name</label>
-                  <% const customBrands = [ { _id: "custom1", name: "Nike" }, {
-                  _id: "custom2", name: "Puma" }, { _id: "custom3", name:
-                  "Woodland" }, { _id: "custom4", name: "American Tourister" },
-                  { _id: "custom5", name: "Adidas" }, { _id: "custom6", name:
-                  "Reebok" }, { _id: "custom7", name: "Louis Vuitton" }, { _id:
-                  "custom8", name: "Prada" }, { _id: "custom9", name: "Gucci" },
-                  { _id: "custom10", name: "Saint Laurent" }, { _id: "custom11",
-                  name: "Marc Jacobs" }, { _id: "custom12", name: "Versace" }, {
-                  _id: "custom13", name: "Ralph Lauren" }, { _id: "custom14",
-                  name: "Hermes" }, { _id: "custom15", name: "Chanel" } ]; %>
-                  <select
-                    class="form-control border"
-                    name="brand"
-                    id="brand"
-                    required
-                  >
+
+                  <select class="form-control border" name="brand" id="brand" required>
                     <option value="">Select Brand</option>
-                    <% customBrands.forEach((brand) => { %>
+                    <% brand.forEach((brand) => { %>
                     <option value="<%= brand._id %>"><%= brand.name %></option>
                     <% }); %>
                   </select>
@@ -285,29 +199,17 @@
                 </div>
                 <div class="form-group mb-3">
                   <label for="category" class="form-label">Category Name</label>
-                  <select
-                    class="form-control border"
-                    name="category"
-                    id="category"
-                    required
-                  >
+                  <select class="form-control border" name="category" id="category" required>
                     <option value="">Select Category</option>
                     <% categories.forEach((category) => { %>
-                    <option value="<%= category._id %>">
-                      <%= category.name %>
-                    </option>
+                    <option value="<%= category._id %>"><%= category.name %></option>
                     <% }); %>
                   </select>
                   <div id="categoryError" class="error-div"></div>
                 </div>
-                <div
-                  class="d-flex justify-content-center mt-5"
-                  style="padding: 40px"
-                >
+                <div class="d-flex justify-content-center mt-5" style="padding: 40px">
                   <div class="d-grid col-md-5">
-                    <button class="btn btn-primary" type="submit">
-                      Add Product
-                    </button>
+                    <button class="btn btn-primary" type="submit">Add Product</button>
                   </div>
                 </div>
               </form>
@@ -328,18 +230,12 @@
     const cropImageModal = document.getElementById("cropImageModal");
     const primaryInput = document.getElementById("primaryInput");
     const secondaryInput = document.getElementById("imageInput");
-    const addPrimaryImageButton = document.getElementById(
-      "addPrimaryImageButton"
-    );
-    const addSecondaryImageButton = document.getElementById(
-      "addSecondaryImageButton"
-    );
+    const addPrimaryImageButton = document.getElementById("addPrimaryImageButton");
+    const addSecondaryImageButton = document.getElementById("addSecondaryImageButton");
     const cropButton = document.getElementById("cropButton");
     const closeImageButton = document.getElementById("closeImageButton");
     const imageToCrop = document.getElementById("imageToCrop");
-    const croppedPrimaryImagesDiv = document.getElementById(
-      "croppedPrimaryImages"
-    );
+    const croppedPrimaryImagesDiv = document.getElementById("croppedPrimaryImages");
     const croppedSecondaryImagesDiv = document.getElementById("croppedImages");
     let cropper;
     let croppingPrimary = false;
@@ -445,13 +341,19 @@
       }
     });
 
+
+
+
+
+    
+
     // Add product function
     async function addproduct(event) {
       event.preventDefault();
 
-      if (!validateForm()) {
-        return;
-      }
+      // if (!validateForm()) {
+      //   return;
+      // }
 
       if (croppedPrimaryImagesDiv.childElementCount === 0) {
         Swal.fire({
@@ -476,8 +378,7 @@
       var formData = new FormData(form);
 
       // Add primary image to formData
-      const primaryImage =
-        croppedPrimaryImagesDiv.children[0].querySelector("img");
+      const primaryImage = croppedPrimaryImagesDiv.children[0].querySelector("img");
       const primaryBlobUrl = primaryImage.dataset.blob;
       const primaryBlob = await fetch(primaryBlobUrl).then((r) => r.blob());
       formData.append("primaryImage", primaryBlob, "primaryImage.png");
@@ -489,6 +390,25 @@
         const blob = await fetch(blobUrl).then((r) => r.blob());
         formData.append("secondaryImage", blob, `secondaryImage${i}.png`);
       }
+
+
+
+
+    //   // Collect variants
+    //   const variants = [];
+    //   document.querySelectorAll(".variant").forEach((variant) => {
+    //     const color = variant.querySelector(".variant-color").value;
+    //     const size = variant.querySelector(".variant-size").value;
+    //     const stock = variant.querySelector(".variant-stock").value;
+    // variants.push({ color, size, stock: parseInt(stock, 10) }); // Ensure stock is a number
+    //   });
+    //   formData.append("variants", JSON.stringify(variants));
+
+
+
+
+
+
 
       try {
         console.log(formData.entries());
@@ -519,76 +439,55 @@
       }
     }
 
-    function validateForm() {
-      let isValid = true;
+    // function validateForm() {
+    //   let isValid = true;
 
-      // Validate price
-      const price = document.querySelector('input[name="price"]').value;
-      if (isNaN(price) || price < 0) {
-        document.getElementById("price-error").innerText =
-          "Price must be a number greater than or equal to 0.";
-        isValid = false;
-      } else {
-        document.getElementById("price-error").innerText = "";
-      }
+    //   // Validate price
+    //   const price = document.querySelector('input[name="price"]').value;
+    //   if (isNaN(price) || price < 0) {
+    //     document.getElementById("price-error").innerText = "Price must be a number greater than or equal to 0.";
+    //     isValid = false;
+    //   } else {
+    //     document.getElementById("price-error").innerText = "";
+    //   }
 
-      // Validate quantity
-      const quantity = document.querySelector('input[name="quantity"]').value;
-      if (isNaN(quantity) || quantity <= 0) {
-        document.getElementById("quantity-error").innerText =
-          "Quantity must be a number greater than 0.";
-        isValid = false;
-      } else {
-        document.getElementById("quantity-error").innerText = "";
-      }
+    //   // Validate product name
+    //   const productName = document.querySelector('input[name="productName"]').value;
+    //   if (productName.trim() === "") {
+    //     document.getElementById("productNameError").innerText = "Product name is required.";
+    //     isValid = false;
+    //   } else {
+    //     document.getElementById("productNameError").innerText = "";
+    //   }
 
-      // Validate product name
-      const productName = document.querySelector(
-        'input[name="productName"]'
-      ).value;
-      if (productName.trim() === "") {
-        document.getElementById("productNameError").innerText =
-          "Product name is required.";
-        isValid = false;
-      } else {
-        document.getElementById("productNameError").innerText = "";
-      }
+    //   // Validate product description
+    //   const productDescription = document.querySelector('textarea[name="productdescription"]').value;
+    //   if (productDescription.trim() === "") {
+    //     document.getElementById("productdescriptionError").innerText = "Product description is required.";
+    //     isValid = false;
+    //   } else {
+    //     document.getElementById("productdescriptionError").innerText = "";
+    //   }
 
-      // Validate product description
-      const productDescription = document.querySelector(
-        'textarea[name="productdescription"]'
-      ).value;
-      if (productDescription.trim() === "") {
-        document.getElementById("productdescriptionError").innerText =
-          "Product description is required.";
-        isValid = false;
-      } else {
-        document.getElementById("productdescriptionError").innerText = "";
-      }
+    //   // Validate file inputs
+    //   const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
+    //   const fileInputs = document.querySelectorAll('input[type="file"]');
+    //   fileInputs.forEach((fileInput, index) => {
+    //     const filePath = fileInput.value;
+    //     const fileExtension = filePath.split(".").pop().toLowerCase();
 
-      // Validate file inputs
-      const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-      const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach((fileInput, index) => {
-        const filePath = fileInput.value;
-        const fileExtension = filePath.split(".").pop().toLowerCase();
+    //     if (filePath && !allowedExtensions.includes(fileExtension)) {
+    //       Swal.fire({
+    //         icon: "error",
+    //         title: "Invalid File Type",
+    //         text: `File ${index + 1} is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(", ")}.`,
+    //       });
+    //       isValid = false;
+    //     }
+    //   });
 
-        if (filePath && !allowedExtensions.includes(fileExtension)) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid File Type",
-            text: `File ${
-              index + 1
-            } is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(
-              ", "
-            )}.`,
-          });
-          isValid = false;
-        }
-      });
-
-      return isValid;
-    }
+    //   return isValid;
+    // }
   </script>
 </body>
 
