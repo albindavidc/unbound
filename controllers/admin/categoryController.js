@@ -8,13 +8,9 @@ const categoryInfo = async (req, res) => {
       search = req.query.search;
     }
 
-    let page = 1;
-    if (req.query.page) {
-      page = req.query.page;
-    }
-
+    let page = parseInt(req.query.page) || 1;  // Ensure page is an integer
     const limit = 4;
-
+    
     // Fetch category data
     const categoryData = await Category.find({
       $or: [
@@ -25,7 +21,7 @@ const categoryInfo = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
-
+    
     // Count documents
     const count = await Category.find({
       $or: [
@@ -33,12 +29,17 @@ const categoryInfo = async (req, res) => {
         { description: { $regex: ".*" + search + ".*", $options: "i" } },
       ],
     }).countDocuments();
-
+    
     // Calculate total pages
     const totalPages = Math.ceil(count / limit);
-
+    
     // Render the EJS template with data
-    res.render("admin/category", { cat: categoryData, totalPages, currentPage: page });
+    res.render("admin/category", {
+      cat: categoryData,
+      totalPages,
+      currentPage: page,
+    });
+    
   } catch (error) {
     console.error('Error fetching category data:', error);
     res.redirect("/pageerror");
