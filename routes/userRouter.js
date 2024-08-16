@@ -78,10 +78,14 @@ router
 
 
 //Cart
-router.get("/cart", cartController.getCart);
+router.get("/cart", userAuth, cartController.getCart);
+router.post("/add-to-cart", cartController.addToCart);
+
+
 // router.get("/shop/order-success", cartController.getOrderSuccess);
 
-// router.post("/user/add-to-cart/", cartController.addToCart);
+
+
 
 // router.get(
 //   "/cart/remove-from-cart/:id/:variant",

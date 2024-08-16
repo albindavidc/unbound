@@ -35,6 +35,7 @@ module.exports = {
     try {
       const productId = req.params.id;
 
+      
       // Fetch the product data asynchronously from the database
       const product = await Product.findById(productId);
 
@@ -43,6 +44,10 @@ module.exports = {
         product.category,
         productId
       );
+
+      const products = await Product.findById(productId).populate('category');
+
+      console.log("this is a sample product:", products.category.name)
 
       if (!product) {
         // Product not found, respond with 404
@@ -53,6 +58,7 @@ module.exports = {
       res.render("user/product-details", {
         user: req.session.user,
         product,
+        products,
         relatedProducts,
       });
     } catch (error) {

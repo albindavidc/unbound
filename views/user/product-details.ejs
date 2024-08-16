@@ -118,12 +118,18 @@
               </div>
 
               <% if (product.quantity>0) { %>
-               
-                <a href="#" class="primary-btn">add to cart</a>
-              <% }else { %>
-                <a href="#" class="btn btn-danger">Out of Stock</a>
 
-                <% } %>
+              <!-- <a href="/add-to-cart" class="primary-btn">add to cart</a> -->
+
+              <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%- product._id %>')">
+                <i class="bi bi-cart me-2"></i>
+                Add to Cart
+              </button>
+
+              <% }else { %>
+              <a href="#" class="btn btn-danger">Out of Stock</a>
+
+              <% } %>
             </div>
             <div class="product__details__btns__option">
               <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
@@ -133,12 +139,34 @@
               <h5><span>Guaranteed Safe Checkout</span></h5>
               <img src="../../public/img/shop-details/details-payment.png" alt="" />
               <ul>
-                <li><span>SKU:</span> <%= product.sku %></li>
+
+
+                <div class="col-12 detail-option mb-3">
+                  <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
+                  <ul class="list-inline mb-0 colours-wrapper">
+                    <% let renderedColors = {}; %> <% let index = 0; %> <% product.variants.forEach((variant) => { %> <% if
+                    (!renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
+                    <li class="list-inline-item">
+                      <label
+                        onclick="selectColor('<%= variant.color.hex %>', '<%= index %>')"
+                        class="btn-colour <%= index === 0 ? 'active' : '' %>"
+                        for="colour_<%- variant.color.name %>"
+                        style="background-color:'<%- variant.color.hex %>'"
+                        data-color-id="<%- variant.color._id %>"
+                      >
+                      </label>
+                      <input class="input-invisible" type="radio" name="colour" value="<%- variant.color.name %>" id="colour_<%- variant.color.name %>" required />
+                    </li>
+                    <% index++; %> <% } %> <% }) %>
+                  </ul>
+                </div>
+
                 <li>
                   <span>Categories:</span>
-                  <% if (product.categories && Array.isArray(product.categories)) { %> <%= product.categories.join(', ') %> <% } else { %> No
-                  categories available <% } %>
+                  <%= products.category.name %>
                 </li>
+
+                
               </ul>
             </div>
           </div>
@@ -207,17 +235,13 @@
           <div class="product__item__text">
             <h6><%= product.name %></h6>
 
-
-            
             <% if (product.quantity >0) { %>
-              
-              <a href="#" class="add-cart">+ Add To Cart</a>
+
+            <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
             <% }else{ %>
 
-              <a href="#" class="add-cart">Out of Stock</a>
-              <% } %>
-
-
+            <a href="#" class="add-cart">Out of Stock</a>
+            <% } %>
 
             <div class="rating">
               <% for (let i = 0; i < 5; i++) { %>
@@ -233,6 +257,8 @@
   </div>
 </section>
 <!-- Related Section End -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -275,5 +301,71 @@
       });
     });
   });
+
+  const addToCart = async (productId) => {
+    // const variantId = document.querySelector('.size-option.active').getAttribute('data-variant-id');
+    // const color = document.querySelector('.size-option.active').getAttribute('data-color');
+    // const size = document.querySelector('.size-option.active').getAttribute('data-size');
+
+    try {
+      const response = await fetch(`/add-to-cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          // variantId,
+          // color,
+          // size,
+        }),
+      });
+
+      console.log(response);
+
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
+
+      if (response.status === 401) {
+        Swal.fire({
+          title: "Warning!",
+          text: "Please log in to add items to your cart.",
+          icon: "warning",
+          confirmButtonText: "Log In",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/login"; // Redirect to login page
+          }
+        });
+        return; // Exit the function after handling the unauthenticated case
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Network response was not ok.");
+      }
+
+      const data = await response.json();
+      let cartCount = document.getElementById("cartCount");
+      if (cartCount) {
+        cartCount.innerText = data.count;
+      }
+      Swal.fire({
+        icon: "success",
+        title: "Added to Cart",
+        text: "Your product has been added to the cart.",
+        confirmButtonText: "Continue Shopping",
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message, // Display the actual error message
+      });
+    }
+  };
 </script>
 <%- include('../../views/partials/user/footer') %>
