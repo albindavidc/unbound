@@ -1,0 +1,672 @@
+<%- include('../../partials/admin/header') %>
+
+
+<style>
+
+.btn {
+    display: flex;
+    align-items: center; /* Vertically centers the content */
+    justify-content: center; /* Horizontally centers the content */
+}
+
+.btn i {
+    margin-right: 0.5rem; /* Adds space between the icon and text */
+}
+
+
+</style>
+<!-- Add Bootstrap Icons CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Add Bootstrap CSS (for overall styling) -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
+<section class="breadcrumb-option">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-2">
+          <li class="breadcrumb-item">
+            <a class="link-body-emphasis" href="/admin">
+              <svg class="bi" width="16" height="16">
+                <use xlink:href="#house-door-fill"></use>
+              </svg>
+              <span class="visually-hidden">Dashboard</span>
+            </a>
+          </li>
+  
+          <li class="breadcrumb-item active" aria-current="page">Attributes</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+  
+  <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><%= locals.title ? locals.title : 'Attribute Management' %></h1>
+    <div class="btn-group btn-toolbar mb-2 mb-md-0">
+      <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#addBrandModal">Add Brand</button>
+      <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addColorModal">Add Color</button>
+      <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#addSizeModal">Add Size</button>
+    </div>
+  </div>
+  
+  <!-- Atribute List -->
+  
+  <section id="attributeSection" class="text-capitalize container">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="container table-responsive">
+            <table class="table table-hover table-sm table-striped">
+              <legend>Color Attribute</legend>
+              <thead>
+                <tr class="text-center align-middle">
+                  <th>Color</th>
+                  <th>Hex</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% colors.forEach((color,index) => { %>
+                <tr class="text-center align-middle">
+                  <td><%- color.name %></td>
+                  <td><%- color.hex %></td>
+                  <td class="<%- color.isDeleted ? 'text-danger' : 'text-success' %>"><%- color.isDeleted ? 'Unlisted' : 'Listed' %></td>
+                  <td>
+                    <div class="btn-group">
+                      <button
+                        data-color-id="<%- color._id %>"
+                        data-bs-target="#editColorModal"
+                        data-bs-toggle="modal"
+                        type="button"
+                        class="btn btn-sm btn-warning"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <% if (color.isDeleted) { %>
+                      <button id="toggleListColor" onclick="toggleListing('<%- color._id %>', 'color')" type="button" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-bookmark-plus"></i> List
+                      </button>
+                      <% } else { %>
+                      <button id="toggleListColor" onclick="toggleListing('<%- color._id %>', 'color')" type="button" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-bookmark-dash"></i> Unlist
+                      </button>
+                      <% } %>
+                      <button
+                        type="button"
+                        onclick="deleteAttribute('<%- color._id%>','color','<%- color.name%>')"
+                        class="btn btn-sm btn-danger"
+                        data-color-id="<%- color._id %>"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col">
+          <div class="container table-responsive">
+            <table class="table table-hover table-sm table-striped">
+              <legend>Size Attribute</legend>
+              <thead>
+                <tr class="text-center align-middle">
+                  <th>Size</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% sizes.forEach((size,index) => { %>
+                <tr class="text-center align-middle">
+                  <td><%- size.value %></td>
+                  <td class="<%- size.isDeleted ? 'text-danger' : 'text-success' %>"><%- size.isDeleted ? 'Unlisted' : 'Listed' %></td>
+                  <td>
+                    <div class="btn-group">
+                      <button
+                        id="editSizeButton"
+                        type="button"
+                        class="btn btn-sm btn-warning"
+                        data-size-id="<%- size._id %>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editSizeModal"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <% if (size.isDeleted) { %>
+                      <button id="toggleListSize" onclick="toggleListing('<%- size._id %>', 'size')" type="button" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-bookmark-plus"></i> List
+                      </button>
+                      <% } else { %>
+                      <button id="toggleListSize" onclick="toggleListing('<%- size._id %>', 'size')" type="button" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-bookmark-dash"></i> Unlist
+                      </button>
+                      <% } %>
+                      <button type="button" onclick="deleteAttribute('<%- size._id%>','size','<%- size.value%>')" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col">
+          <div class="container table-responsive">
+            <table class="table table-hover table-sm table-striped">
+              <legend>Brands</legend>
+              <thead>
+                <tr class="text-center align-middle">
+                  <th>Brand</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% brands?.forEach((brand,index) => { %>
+                <tr class="text-center align-middle">
+                  <td><%- brand.name %></td>
+                  <td class="<%- brand.isActive ? 'text-danger' : 'text-success' %>"><%- brand.isActive ? 'Unlisted' : 'Listed' %></td>
+                  <td>
+                    <div class="btn-group">
+                      <button
+                        id="editBrandButton"
+                        type="button"
+                        class="btn btn-sm btn-warning"
+                        data-brand-id="<%- brand._id %>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editBrandModal"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <% if (brand.isActive) { %>
+                      <button id="toggleListBrand" onclick="toggleListing('<%- brand._id %>', 'brand')" type="button" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-bookmark-plus"></i> List
+                      </button>
+                      <% } else { %>
+                      <button id="toggleListBrand" onclick="toggleListing('<%- brand._id %>', 'brand')" type="button" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-bookmark-dash"></i> Unlist
+                      </button>
+                      <% } %>
+                      <button type="button" onclick="deleteAttribute('<%- brand._id%>','brand','<%- brand.name%>')" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- End Attribute List -->
+  
+  <!-- Add Atrribute Modal -->
+  <!-- Color -->
+  <div class="modal fade" id="addColorModal" tabindex="-1" aria-labelledby="addColorModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addColorModalLabel">Add Color</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <form id="addColorForm" class="card-body">
+              <div class="row">
+                <fieldset class="col card mx-2">
+                  <legend>Color</legend>
+                  <div class="mb-3">
+                    <label for="colorName" class="form-label">Color</label>
+                    <input name="colorName" type="text" class="form-control text-capitalize" id="colorName" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="colorHex" class="form-label">Color Hex</label>
+                    <input name="colorHex" type="color" class="form-control" id="colorHex" />
+                  </div>
+                </fieldset>
+              </div>
+              <!-- Add more form fields as needed -->
+              <button type="submit" onclick="addAttribute('addColorForm', 'color')" class="btn btn-primary m-2 w-100">Add Color</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Size -->
+  <div class="modal fade" id="addSizeModal" tabindex="-1" aria-labelledby="addSizeModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addSizeModalLabel">Add New Size</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <form id="addSizeForm" class="card-body">
+              <div class="row">
+                <fieldset class="col card mx-2">
+                  <legend>Size</legend>
+                  <div class="mb-3">
+                    <label for="size" class="form-label">Size</label>
+                    <input name="size" type="number" min="6" class="form-control" id="size" />
+                  </div>
+                </fieldset>
+              </div>
+              <!-- Add more form fields as needed -->
+              <button type="submit" onclick="addAttribute('addSizeForm', 'size')" class="btn btn-primary m-2 w-100">Add Size</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Brand -->
+  <div class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="addBrandModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addBrandModalLabel">Add Color</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <form id="addBrandForm" class="card-body">
+              <div class="row">
+                <fieldset class="col card mx-2">
+                  <legend>Brand</legend>
+                  <div class="mb-3">
+                    <label for="brand" class="form-label">Brand</label>
+                    <input name="brand" type="text" class="form-control text-capitalize" id="brand" />
+                  </div>
+                </fieldset>
+              </div>
+              <!-- Add more form fields as needed -->
+              <button type="submit" onclick="addAttribute('addBrandForm', 'brand')" class="btn btn-primary m-2 w-100">Add Brand</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Add Atribute Modal -->
+  
+  <!-- Edit Color Modal -->
+  <div class="modal fade" id="editColorModal" tabindex="-1" aria-labelledby="editColorModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editColorModalLabel">Edit Color Attribute</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <form id="editColorForm" class="card-body" method="POST">
+              <div class="row">
+                <fieldset class="col card mx-2">
+                  <legend>Color</legend>
+                  <div class="mb-3">
+                    <label for="colorName" class="form-label">Color</label>
+                    <input name="colorName" type="text" class="form-control text-capitalize" id="colorNameEdit" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="colorHex" class="form-label">Color Hex</label>
+                    <input name="colorHex" type="color" class="form-control" id="colorHexEdit" required />
+                  </div>
+                </fieldset>
+              </div>
+              <!-- Add more form fields as needed -->
+              <button type="submit" class="btn btn-primary m-2 w-100">Add Attribute</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Edit Color Modal -->
+  
+  <!-- Edit Size -->
+  <div class="modal fade" id="editSizeModal" tabindex="-1" aria-labelledby="editSizeModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editSizeModal2Label">Edit Size Attribute</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <form id="editSizeForm" class="card-body" method="POST">
+              <div class="row">
+                <fieldset class="col card mx-2">
+                  <legend>Size</legend>
+                  <div class="mb-3">
+                    <label for="size" class="form-label">Size</label>
+                    <input name="size" type="number" min="6" class="form-control" id="sizeEdit" required />
+                  </div>
+                </fieldset>
+              </div>
+              <!-- Add more form fields as needed -->
+              <button type="submit" class="btn btn-primary m-2 w-100">Add Attribute</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Edit Size -->
+  
+  <!-- Edit Brand -->
+  <div class="modal fade" id="editBrandModal" tabindex="-1" aria-labelledby="editBrandModalLabel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editBrandModalLabel">Edit Size Attribute</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <form id="editBrandForm" class="card-body" method="POST">
+              <div class="row">
+                <fieldset class="col card mx-2">
+                  <legend>Brand</legend>
+                  <div class="mb-3">
+                    <label for="brand" class="form-label">Brand</label>
+                    <input name="brand" type="text" class="form-control text-capitalize" id="brandEdit" required />
+                  </div>
+                </fieldset>
+              </div>
+              <!-- Add more form fields as needed -->
+              <button type="submit" class="btn btn-primary m-2 w-100">Edit Brand</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Brand Size -->
+  
+
+  <%- include('../../partials/admin/footer') %>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Add Bootstrap JavaScript (for interactive components) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+
+  <script defer>
+    function addAttribute(formId, type) {
+      const form = document.getElementById(formId);
+  
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+  
+        // Collect form data
+        let data;
+        let modal;
+  
+        switch (type) {
+          case "size":
+            const size = document.getElementById("size").value;
+            data = {
+              size: parseInt(size),
+            };
+            modal = document.getElementById("addSizeModal");
+            break;
+          case "color":
+            const color = document.getElementById("colorName").value;
+            const colorHex = document.getElementById("colorHex").value;
+            data = {
+              color,
+              colorHex,
+            };
+            modal = document.getElementById("addColorModal");
+            break;
+          case "brand":
+            const brand = document.getElementById("brand").value; // Assuming 'brand' is an input element
+            console.log(brand);
+            data = {
+              brand,
+            };
+            modal = document.getElementById("addBrandModal");
+            break;
+          default:
+            // Optional: Handle the case where 'type' is not 'size', 'color', or 'brand'
+            console.log("Invalid type");
+        }
+  
+        // Confirmation dialog
+        Swal.fire({
+          title: "Are you sure?",
+          text: `You want to add this ${type}!`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, add it!",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const response = await fetch(`/admin/attributes/add-${type}`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+              });
+  
+              if (!response.ok) {
+                // Handle non-2xx responses
+                const errorData = await response.json();
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: errorData.message || "Something went wrong!",
+                });
+                return;
+              }
+  
+              const responseData = await response.json();
+              Swal.fire({
+                icon: responseData.success ? "success" : "error",
+                title: responseData.success ? "Success" : "Oops...",
+                text: responseData.message,
+              }).then(() => {
+                if (responseData.success) {
+                  // Optionally, close the modal and refresh the page or update the UI
+                  // modal.hide();
+                  location.reload();
+                }
+              });
+            } catch (error) {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            }
+          }
+        });
+      });
+    }
+  
+    function toggleListing(id, type) {
+      console.log(type);
+      Swal.fire({
+        title: "Are you sure?",
+        text: `"You want to list/unlist ${type}!"`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, toggle it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // show loading using swal
+          Swal.fire({
+            title: "Please wait...",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+  
+          fetch(`/admin/attributes/toggleListing/${type}/${id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              Swal.close();
+  
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: data.message.toUpperCase(),
+              }).then(() => {
+                location.reload();
+              });
+            })
+            .catch((error) => {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            });
+        }
+      });
+    }
+  
+    const editColorModal = document.getElementById("editColorModal");
+  
+    editColorModal.addEventListener("show.bs.modal", async (e) => {
+      const editColorButton = e.relatedTarget;
+  
+      const colorId = editColorButton.getAttribute("data-color-id");
+      try {
+        // show loading using swal
+        const response = await fetch(`/admin/attributes/color/${colorId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch color");
+        }
+        const color = await response.json();
+        document.getElementById("colorNameEdit").value = color.name;
+        document.getElementById("colorHexEdit").value = color.hex;
+        document.getElementById("editColorForm").action = `/admin/attributes/color/${colorId}?_method=PUT`;
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.message,
+        });
+      }
+    });
+    editSizeModal.addEventListener("show.bs.modal", async (e) => {
+      const editSizeButton = e.relatedTarget;
+  
+      const sizeId = editSizeButton.getAttribute("data-size-id");
+      try {
+        const response = await fetch(`/admin/attributes/size/${sizeId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch size");
+        }
+        const size = await response.json();
+        document.getElementById("sizeEdit").value = size.value;
+        document.getElementById("editSizeForm").action = `/admin/attributes/size/${sizeId}?_method=PUT`;
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.message,
+        });
+      }
+    });
+    editBrandModal.addEventListener("show.bs.modal", async (e) => {
+      const editBrandButton = e.relatedTarget;
+  
+      const brandId = editBrandButton.getAttribute("data-brand-id");
+      try {
+        const response = await fetch(`/admin/attributes/brand/${brandId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch brand");
+        }
+        const brand = await response.json();
+        document.getElementById("brandEdit").value = brand.name;
+        document.getElementById("editBrandForm").action = `/admin/attributes/brand/${brandId}?_method=PUT`;
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.message,
+        });
+      }
+    });
+  
+    function deleteAttribute(id, type, attribute) {
+      console.log(type);
+      Swal.fire({
+        title: "Are you sure?",
+        text: `You want to delete this ${type}: ${attribute}!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/admin/attributes/delete-${type}/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then(async (response) => {
+              if (!response.ok) {
+                // If the response is not OK, read the response body to get the error message
+                const text = await response.text();
+                throw new Error(text);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: data.message.toUpperCase(),
+              }).then(() => {
+                location.reload(); // Reload the current window
+              });
+            })
+            .catch((error) => {
+              console.log(error);
+              // Display an error message based on the error caught
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: error.message,
+              });
+            });
+        }
+      });
+    }
+  </script>
+  

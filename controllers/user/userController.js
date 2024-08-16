@@ -619,5 +619,6 @@ module.exports = {
   deleteAddress,
   resetPassword,
 
+
   logout,
 };
