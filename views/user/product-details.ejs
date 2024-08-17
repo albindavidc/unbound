@@ -98,38 +98,108 @@
               <i class="fa fa-star-o"></i>
               <% } %>
             </div>
-            <h3>₹<%= product.price %>.00</h3>
+            <h3 >₹ 655<span id="productPrice" ><%= product.price %></span></h3>
             <p><%= product.description %></p>
             <div class="product__details__option">
-              <!-- <div class="product__details__option__size">
-                                    <span>Size:</span>
-                                   
-                                </div> -->
-              <!-- <div class="product__details__option__color">
-                                    <span>Color:</span>
-                                    
-                                </div> -->
             </div>
+
             <div class="product__details__cart__option">
               <div class="quantity">
                 <div class="pro-qty">
-                  <input type="text" value="1" />
+                  <input type="text"id="productQuantity" value="1" />
                 </div>
               </div>
 
-              <% if (product.quantity>0) { %>
+         
 
-              <!-- <a href="/add-to-cart" class="primary-btn">add to cart</a> -->
 
-              <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%- product._id %>')">
-                <i class="bi bi-cart me-2"></i>
-                Add to Cart
-              </button>
+              <% let totalStock = 0; // Initialize total stock to 0 %> 
+              <% product.variants.forEach(variant => { %> 
+                <% totalStock +=variant.stock; // Add stock of each variant %>
+                 <% }); %> 
 
-              <% }else { %>
-              <a href="#" class="btn btn-danger">Out of Stock</a>
+                 
+              <div class="mt-3">
+                <h4>Variants:</h4>
+                <div class="col-12 detail-option mb-3">
+                  <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
+                  <ul class="list-inline mb-0 colours-wrapper">
+                    <% let renderedColors = {}; %>
+                    <% product.variants.forEach((variant, index) => { %>
+                      <% if (variant.color && !renderedColors[variant.color.hex]) { %>
+                        <% renderedColors[variant.color.hex] = true; %>
+                        <li class="list-inline-item">
+                          <label
+                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
+                              class="btn-colour <%= index === 0 ? 'active' : '' %>"
+                              for="colour_<%= variant.color.name %>"
+                              data-color-hex="<%= variant.color.hex %>" 
+                              data-color-id="<%= variant.color._id %>"
+                              data-size-id="<%= variant.size._id %>"
+                            ></label>
+      
+                          <input
+                            class="input-invisible"
+                            type="radio"
+                            name="colour"
+                            value="<%= variant.color._id %>"
+                            id="colour_<%= variant.color.name %>"
+                            required
+                          />
+                        </li>
+                      <% } %>
+                    <% }); %>
+                  </ul>
+                </div>
+                <div class="col-12 detail-option mb-3">
+                  <h6 class="detail-option-heading">Size <span>(required)</span></h6>
+                  <ul class="list-inline mb-0 sizes-wrapper">
+                    <% let renderedSizes = {}; %>
+                    <% product.variants.forEach((variant, index) => { %>
+                      <% if (variant.size && !renderedSizes[variant.size.value]) { %>
+                        <% renderedSizes[variant.size.value] = true; %>
+                        <li class="list-inline-item">
+                          <label
+                              onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
+                              class="btn btn-sm btn-outline-secondary detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
+                              for="size_<%= variant.size.value %>"
+                              data-size-value="<%= variant.size.value %>"
+                              data-size-id="<%= variant.size._id %>"
+                              data-color-id="<%= variant.color._id %>"
+                            >
+                              <%= variant.size.value %>
+                              <input
+                                class="input-invisible"
+                                type="radio"
+                                name="size"
+                                value="<%= variant.size._id %>"
+                                id="size_<%= variant.size.value %>"
+                                required
+                              />
+                            </label>
+                        </li>
+                      <% } %>
+                    <% }); %>
+                  </ul>
+                </div>
+              </div>
 
-              <% } %>
+
+
+
+
+              <% if (totalStock > 0) { %>
+
+                <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%- product._id %>')">
+                  <i class="bi bi-cart me-2"></i>
+                  Add to Cart
+                </button>
+
+              <% } else { %>
+                <a href="#" class="btn btn-danger">Out of Stock</a>
+                <% } %>
+
+        
             </div>
             <div class="product__details__btns__option">
               <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
@@ -138,35 +208,12 @@
             <div class="product__details__last__option">
               <h5><span>Guaranteed Safe Checkout</span></h5>
               <img src="../../public/img/shop-details/details-payment.png" alt="" />
-              <ul>
-
-
-                <div class="col-12 detail-option mb-3">
-                  <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
-                  <ul class="list-inline mb-0 colours-wrapper">
-                    <% let renderedColors = {}; %> <% let index = 0; %> <% product.variants.forEach((variant) => { %> <% if
-                    (!renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
-                    <li class="list-inline-item">
-                      <label
-                        onclick="selectColor('<%= variant.color.hex %>', '<%= index %>')"
-                        class="btn-colour <%= index === 0 ? 'active' : '' %>"
-                        for="colour_<%- variant.color.name %>"
-                        style="background-color:'<%- variant.color.hex %>'"
-                        data-color-id="<%- variant.color._id %>"
-                      >
-                      </label>
-                      <input class="input-invisible" type="radio" name="colour" value="<%- variant.color.name %>" id="colour_<%- variant.color.name %>" required />
-                    </li>
-                    <% index++; %> <% } %> <% }) %>
-                  </ul>
-                </div>
 
                 <li>
                   <span>Categories:</span>
-                  <%= products.category.name %>
+                  <%= product.category.name %>
                 </li>
-
-                
+    
               </ul>
             </div>
           </div>
@@ -235,12 +282,14 @@
           <div class="product__item__text">
             <h6><%= product.name %></h6>
 
-            <% if (product.quantity >0) { %>
-
+            <% let totalStock = 0; // Initialize total stock to 0 %> 
+            <% product.variants.forEach(variant => { %> 
+              <% totalStock +=variant.stock; // Add stock of each variant %>
+               <% }); %> 
+            <% if (totalStock > 0) { %>
             <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
-            <% }else{ %>
-
-            <a href="#" class="add-cart">Out of Stock</a>
+            <% } else { %>
+            <a href="#" class="out-of-stock">Out of Stock</a>
             <% } %>
 
             <div class="rating">
@@ -258,114 +307,110 @@
 </section>
 <!-- Related Section End -->
 
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const product =
-      /* Extract product ID from URL or another source */
-      fetch(`/product/${productId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          // Populate product details
-          document.querySelector(".product__details__text h4").innerText = data.name;
-          document.querySelector(".product__details__text .rating").innerHTML = generateRatingHTML(data.rating);
-          document.querySelector(".product__details__text h3").innerHTML = `$${data.price} <span>${data.oldPrice}</span>`;
-          document.querySelector(".product__details__text p").innerText = data.description;
 
-          // Populate tabs
-          document.querySelector("#tabs-5 .product__details__tab__content__item h5").innerText = "Product Description";
-          document.querySelector("#tabs-5 .product__details__tab__content__item p").innerText = data.description;
-
-          document.querySelector("#tabs-6 .product__details__tab__content__item h5").innerText = "Customer Reviews";
-          document.querySelector("#tabs-6 .product__details__tab__content__item p").innerHTML = generateReviewsHTML(data.customerReviews);
-
-          document.querySelector("#tabs-7 .product__details__tab__content__item h5").innerText = "Additional Information";
-          document.querySelector("#tabs-7 .product__details__tab__content__item p").innerText = generateAdditionalInfoHTML(data.additionalInfo);
-
-          // Company information
-          document.querySelector("#tabs-5 .product__details__tab__content").innerHTML += `<h5>About the Company</h5><p>${data.companyInfo}</p>`;
-
-          // Additional fields can be filled in the same manner
-        })
-        .catch((error) => console.error("Error fetching product data:", error));
-
-    const mainImage = document.getElementById("main-product-image");
-
-    // Handle click events for primary images
-    document.querySelectorAll(".nav-link[data-image-url]").forEach((link) => {
-      link.addEventListener("click", (event) => {
-        event.preventDefault();
-        const imageUrl = link.getAttribute("data-image-url");
-        mainImage.src = imageUrl;
+<script defer>
+document.addEventListener('DOMContentLoaded', function () {
+      const buttons = document.querySelectorAll('.btn-colour');
+      buttons.forEach(btn => {
+        const hex = btn.getAttribute('data-color-hex');
+        btn.style.backgroundColor = hex;
       });
     });
-  });
 
-  const addToCart = async (productId) => {
-    // const variantId = document.querySelector('.size-option.active').getAttribute('data-variant-id');
-    // const color = document.querySelector('.size-option.active').getAttribute('data-color');
-    // const size = document.querySelector('.size-option.active').getAttribute('data-size');
+    let selectedColorId = null;
+    let selectedSizeId = null;
 
-    try {
-      const response = await fetch(`/add-to-cart`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId,
-          // variantId,
-          // color,
-          // size,
-        }),
-      });
+  const price = document.getElementById("productPrice").textContent;
+  const quantity = document.getElementById("productQuantity").value;
 
-      console.log(response);
-
-      if (response.redirected) {
-        window.location.href = response.url;
-        return;
-      }
-
-      if (response.status === 401) {
-        Swal.fire({
-          title: "Warning!",
-          text: "Please log in to add items to your cart.",
-          icon: "warning",
-          confirmButtonText: "Log In",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "/login"; // Redirect to login page
-          }
-        });
-        return; // Exit the function after handling the unauthenticated case
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Network response was not ok.");
-      }
-
-      const data = await response.json();
-      let cartCount = document.getElementById("cartCount");
-      if (cartCount) {
-        cartCount.innerText = data.count;
-      }
-      Swal.fire({
-        icon: "success",
-        title: "Added to Cart",
-        text: "Your product has been added to the cart.",
-        confirmButtonText: "Continue Shopping",
-      });
-    } catch (error) {
-      console.log(error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: error.message, // Display the actual error message
-      });
+    function selectColor(hex, colorId, sizeId) {
+      document.querySelectorAll('.btn-colour').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.btn-colour[data-color-hex="${hex}"]`).classList.add('active');
+      selectedColorId = colorId;
+      selectedSizeId = sizeId;
     }
-  };
+
+    function selectSize(sizeValue, sizeId, colorId) {
+      document.querySelectorAll('.size-option').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.size-option[data-size-value="${sizeValue}"]`).classList.add('active');
+      selectedSizeId = sizeId;
+      selectedColorId = colorId;
+    }
+
+    function addToCart(productId) {
+      if (selectedColorId && selectedSizeId) {
+        fetch('/user/add-to-cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            productId,
+            // variantId: variantId, 
+            colorId: selectedColorId,
+            sizeId : selectedSizeId,
+            quantity, // Send the quantity
+            price,
+
+          }),
+        })
+        .then(response => {
+          if (response.ok) {
+
+            console.log('Product added to cart!');
+
+          } else {
+            console.error('Error adding product to cart');
+          }
+        })
+        .then((data) => {
+            Swal.fire({
+              icon: "success",
+              title: "Added to Cart",
+              text: "The item has been successfully added to your cart!",
+              showCancelButton: true,
+              confirmButtonText: "Go to Cart",
+              cancelButtonText: "Continue Shopping",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Redirect to the cart page
+                window.location.href = "/cart";
+              }
+            });
+          })
+
+        .catch((error) => {
+          console.error("Error:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+        });
+      } else {
+        // Handle case where no variant is selected
+        alert('Please select a color and size.');
+      }
+    }
 </script>
+
+
+
+<!-- <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.btn-colour');
+    buttons.forEach(btn => {
+      const hex = btn.getAttribute('data-color-hex');
+      btn.style.backgroundColor = hex;
+    });
+  });
+</script> -->
+
+
 <%- include('../../views/partials/user/footer') %>

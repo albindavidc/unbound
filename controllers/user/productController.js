@@ -1,11 +1,12 @@
 const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema"); // Assuming you have a Category schema
+const Category = require("../../models/categorySchema"); 
+const Color = require("../../models/attributes/colorSchema");
 
 module.exports = {
   // Fetch all products
   loadProductList: async (req, res) => {
     try {
-      const products = await Product.find({ isActive: true }); // Assuming you have a Product model
+      const products = await Product.find({ isActive: true }); 
 
       res.render("user/product-list", {
         user: req.session.user,
@@ -18,52 +19,49 @@ module.exports = {
   },
 
   loadProductDetails: async (req, res) => {
-    // Function to fetch related products based on the category
-    const getRelatedProducts = async (category, excludeProductId) => {
+    
       try {
-        // Find products that belong to the same category but exclude the current product
-        return await Product.find({
-          category: category,
-          _id: { $ne: excludeProductId }, // Exclude the current product
-        }).limit(4); // Limit to 4 related products
+        const productId = req.params.id;
+    
+        const product = await Product.findById(productId)
+          .populate('category')
+          .populate('variants.color')
+          .populate('variants.size')
+          .populate('ratings.user')
+          .populate('brand');
+
+        if (!product) {
+          return res.status(404).json({ message: 'Product not found' });
+        }
+    
+        // Check variant stock and calculate offer price if applicable
+        product.variants.forEach(variant => {
+          variant.isOutOfStock = variant.stock <= 0;
+        });
+    
+        // Calculate the offer price if there's an offer
+        const offerPrice = product.offerpercentage > 0
+          ? product.price * (1 - product.offerpercentage / 100)
+          : product.price;
+    
+        // Fetch related products based on the category
+        const relatedProducts = await Product.find({
+          category: product.category._id,
+          _id: { $ne: productId }, // Exclude the current product
+          isActive: true,
+        }).limit(4);
+    
+
+        res.render('user/product-details', {
+          product,
+          relatedProducts,
+          user: req.session.user,
+          offerPrice, 
+          
+        });
       } catch (error) {
-        console.error("Error fetching related products:", error);
-        return []; // Return an empty array if there's an error
+        console.error('Error fetching product details:', error);
+        res.status(500).send('Internal Server Error');
       }
-    };
-
-    try {
-      const productId = req.params.id;
-
-      
-      // Fetch the product data asynchronously from the database
-      const product = await Product.findById(productId);
-
-      // Fetch related products based on category
-      const relatedProducts = await getRelatedProducts(
-        product.category,
-        productId
-      );
-
-      const products = await Product.findById(productId).populate('category');
-
-      console.log("this is a sample product:", products.category.name)
-
-      if (!product) {
-        // Product not found, respond with 404
-        return res.status(404).send("Product not found");
-      }
-
-      // Render the product details page with the fetched product data
-      res.render("user/product-details", {
-        user: req.session.user,
-        product,  
-        products,
-        relatedProducts,
-      });
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-      res.status(500).send("Internal Server Error");
-    }
   },
 };

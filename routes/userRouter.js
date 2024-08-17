@@ -79,26 +79,27 @@ router
 
 //Cart
 router.get("/cart", userAuth, cartController.getCart);
-router.post("/add-to-cart", cartController.addToCart);
+router.post("/user/add-to-cart", cartController.addToCart);
 
 
 // router.get("/shop/order-success", cartController.getOrderSuccess);
 
 
+router.get(
+  "/cart/remove",
+  cartController.removeCartItem
+);
+router.post('/remove-from-cart', cartController.removeCartItem);
 
 
-// router.get(
-//   "/cart/remove-from-cart/:id/:variant",
-//   cartController.removeCartItem
-// );
-// router.get(
-//   "/cart/increase-quantity/:id/:variant",
-//   cartController.incrementCartItem
-// );
-// router.get(
-//   "/cart/decrease-quantity/:id/:variant",
-//   cartController.decrementCartItem
-// );
+router.get(
+  "/cart/increase-quantity/:id/:variant",
+  cartController.incrementCartItem
+);
+router.get(
+  "/cart/decrease-quantity/:id/:variant",
+  cartController.decrementCartItem
+);
 
 // router.get("/checkout", userController.getCheckout);
 // router.post("/checkout/add-address", userController.addAddress);

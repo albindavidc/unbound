@@ -9,14 +9,7 @@
       <li class="breadcrumb-item active">Shopping cart</li>
     </ol>
     <!-- Hero Content-->
-    <div class="hero-content pb-5 text-center">
-      <h1 class="hero-heading">Shopping cart</h1>
-      <div class="row">
-        <div class="col-xl-8 offset-xl-2">
-          <p class="lead text-muted">Items added to your cart will appear here.</p>
-        </div>
-      </div>
-    </div>
+   
   </div>
 </section>
 
@@ -47,18 +40,18 @@
             <div class="cart-item">
               <div class="row d-flex align-items-center text-start text-md-center">
                 <div class="col-12 col-md-5">
-                  <button class="btn cart-remove close mt-3 d-md-none" onclick="removeFromCart('<%- item.product_id._id %>', '<%- item.variant %>')">
+                  <button class="btn cart-remove close mt-3 d-md-none" onclick="removeFromCart('<%- item.productId._id %>', '<%- item.variant %>')">
                     <i class="bi bi-x-lg text-danger"> </i>
                   </button>
                   <div class="d-flex align-items-center">
-                    <a href="/shop/product/<%- item.product_id._id %>"
-                      ><img class="cart-item-img" src="/uploads/product-images/<%= item.product_id.primary_image.name %>" alt="..."
+                    <a href="/shop/product/<%- item.productId._id %>"
+                      ><img class="cart-item-img" src="/uploads/images/<%= item.productId.primaryImages[0].name ? item.productId.primaryImages[0].name : item.productId.secondaryImages[0].name %>" alt="..."
                     /></a>
                     <div class="cart-title text-start">
-                      <a class="text-uppercase text-dark" href="/shop/product/<%- item.product_id._id %>"
-                        ><strong><%= item.product_id.product_name %></strong></a
-                      ><br /><span class="text-muted text-sm">Size: <%- item.size.value %></span><br /><span class="text-muted text-sm"
-                        >Colour: <span class="text-capitalize"><%- item.color.name %></span></span
+                      <a class="text-uppercase text-dark" href="/shop/product/<%- item.productId._id %>"
+                        ><strong><%= item.productId.name %></strong></a
+                      ><br /><span class="text-muted text-sm">Size: <%- item.sizeId.value %></span><br /><span class="text-muted text-sm"
+                        >Colour: <span class="text-capitalize"><%- item.colorId.name %></span></span
                       >
                     </div>
                   </div>
@@ -69,8 +62,10 @@
                       <div class="row">
                         <div class="col-6 d-md-none text-muted">Price per item</div>
                         <div class="col-6 col-md-12 text-end text-md-center">
-                          <% if (item.product_id.onOffer) { %> ₹<%= item.product_id.offerDiscountPrice %> <% } else { %> ₹<%=
-                          item.product_id.sellingPrice %> <% } %>
+                          <% if (item.productId.onOffer) { %> <%= item.productId.offerDiscountPrice %> <% } else { %> <%=
+                          item.productId.sellingPrice %> <% } %>
+                                                    <p>₹<%- item.price %></p>
+
                         </div>
                       </div>
                     </div>
@@ -80,13 +75,13 @@
                         <div class="col-5 col-sm-3 col-md-12">
                           <div class="d-flex align-items-center">
                             <button
-                              onclick="decreaseCartQuantity('<%- item.product_id._id %>','<%- item.variant %>')"
+                              onclick="decreaseCartQuantity('<%- item.productId._id %>','<%- item.variant %>')"
                               class="btn btn-outline-dark btn-items btn-items-decrease col-3"
                             >
                               -
                             </button>
                             <input
-                              id="quantityInput-<%- item.product_id._id %>-<%- item.variant %>"
+                              id="quantityInput-<%- item.productId._id %>-<%- item.variant %>"
                               readonly
                               min="1"
                               name="quantity"
@@ -95,7 +90,7 @@
                               value="<%= item.quantity %>"
                             />
                             <button
-                              onclick="increaseCartQuantity('<%- item.product_id._id %>' ,'<%- item.variant %>')"
+                              onclick="increaseCartQuantity('<%- item.productId._id %>' ,'<%- item.variant %>')"
                               class="btn btn-outline-dark btn-items btn-items-increase col-3"
                             >
                               +
@@ -107,14 +102,14 @@
                     <div class="col-md-3">
                       <div class="row">
                         <div class="col-6 d-md-none text-muted">Total price</div>
-                        <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.product_id._id %>-<%- item.variant %>">
+                        <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
                           ₹<%= item.itemTotal %>
                         </div>
                       </div>
                     </div>
                     <div class="col-2 d-none d-md-block text-center">
-                      <button onclick="removeFromCart('<%- item.product_id._id %>', '<%- item.variant %>')" class="btn btn-light cart-remove">
-                        <i class="delete bi bi-x-lg text-danger"></i>
+                      <button onclick="removeFromCart('<%- item.productId._id %>', '<%- item.sizeId.value %>')" class="btn btn-light cart-remove">
+                        <i class="delete bi bi-trash text-danger"></i>
                       </button>
                     </div>
                   </div>
@@ -177,5 +172,60 @@
 
 <% } %>
 
+
+<script>
+  function removeFromCart(productId, sizeId) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, remove it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch('/remove-from-cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId, sizeId })
+      })
+      .then(response => {
+        if (response.ok) {
+          // Update the cart display (e.g., remove the item from the table)
+          // You'll need to implement this logic based on your EJS template
+          location.reload(); // Reload the page to reflect the changes
+          Swal.fire(
+            'Removed!',
+            'The item has been removed from your cart.',
+            'success'
+          )
+        } else {
+          return response.json()
+            .then(data => {
+              console.error('Error removing item:', data.error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong!',
+              })
+            });
+        }
+      })
+      .catch(error => {
+        console.error('Error removing item:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Something went wrong!',
+        })
+      });
+    }
+  })
+}
+
+</script>
 
 <%- include("../partials/user/footer") %>

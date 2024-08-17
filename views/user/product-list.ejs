@@ -266,11 +266,17 @@
                         <input type="radio" id="pc-9" />
                       </label>
                     </div>
-                    <% if (product.quantity > 0) { %>
-                    <a href="#" class="add-cart">+ Add To Cart</a>
+
+                    <% let totalStock = 0; // Initialize total stock to 0 %> 
+                    <% product.variants.forEach(variant => { %> 
+                    <% totalStock +=variant.stock; // Add stock of each variant %> 
+                    
+                    <% }); %> <% if (totalStock > 0) { %>
+                    <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
                     <% } else { %>
                     <a href="#" class="out-of-stock">Out of Stock</a>
                     <% } %>
+
                   </div>
                 </div>
                 <div class="product-action-1 show"></div>

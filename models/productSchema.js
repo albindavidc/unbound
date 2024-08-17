@@ -44,7 +44,8 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     brand: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"Brand",
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -52,10 +53,6 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     regularprice: {
-      type: Number,
-      required: true,
-    },
-    price: {
       type: Number,
       required: true,
     },
@@ -68,12 +65,32 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    offerpercentage: {
+    price: {
       type: Number,
-      default: 0,
+      required: true,
+    },
+    actualPrice: {
+      type: Number,
+    },
+    sellingPrice: {
+      type: Number,
+    },
+    onOffer: {
+      type: Boolean,
+      default: false,
+    },
+    offerDiscountPrice: {
+      type: Number,
+      min: 0,
+      default: 0
+    },
+    offerDiscountRate: {
+      type: Number,
+      min: 0,
+      default: 0
     },
     ratings: [ratingSchema],
-    variants: {type: [variantSchema]},
+    variants: [variantSchema],
   },
   { timestamps: true }
 );
