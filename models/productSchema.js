@@ -47,6 +47,8 @@ const ProductSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref:"Brand",
     },
+    variants: [variantSchema],
+
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -86,7 +88,6 @@ const ProductSchema = new mongoose.Schema(
       default: 0
     },
     ratings: [ratingSchema],
-    variants: [variantSchema],
   },
   { timestamps: true }
 );
