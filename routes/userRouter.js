@@ -89,7 +89,7 @@ router.get(
   "/cart/remove",
   cartController.removeCartItem
 );
-router.post('/remove-from-cart', cartController.removeCartItem);
+router.delete('/remove-from-cart', cartController.removeCartItem);
 
 
 router.get(

@@ -227,35 +227,49 @@ module.exports = {
     try {
       const userId = req.session.user;
       const productId = req.body.productId;
-      const sizeId = req.body.sizeId;
-  
-      const cart = await Cart.findOne({ userId }).populate('items.productId items.variantId items.colorId items.sizeId');
-  
-      if (!cart) {
-        return res.status(404).json({ error: 'Cart not found' });
-      }
-  
-      // Find the item to remove
-      const itemIndex = cart.items.findIndex(
-        (item) => item.productId.toString() === productId && item.sizeId.toString() === sizeId
-      );
-  
-      if (itemIndex === -1) {
-        return res.status(404).json({ error: 'Item not found in cart' });
-      }
-  
-      // Remove the item from the cart
-      cart.items.splice(itemIndex, 1);
-  
-      // Update the cart in the database
+
+      const cart = await Cart.findOne({userId}).populate('items.productId');
+
+     
+      const itemIndex = cart.items.findIndex((item) =>{
+        item.productId.toString() === productId
+      });
+
+      cart.items.splice(itemIndex,1);
       await cart.save();
-  
-      res.status(200).json({ message: 'Item removed from cart successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred while removing the item from cart' });
+
+      res.status(200).json({message: "Item removed from the cart successfully"});
+    }catch(error){
+      res.status(500).json({error: "An error occured while deleting the product"});
     }
-  },
+    //   const sizeId = req.body.sizeId;
+  
+    //   const cart = await Cart.findOne({ userId }).populate('items.productId items.variantId items.colorId items.sizeId');
+  
+    //   if (!cart) {
+    //     return res.status(404).json({ error: 'Cart not found' });
+    //   }
+  
+    //   // Find the item to remove
+    //   const itemIndex = cart.items.findIndex(
+    //     (item) => item.productId.toString() === productId && item.sizeId.toString() === sizeId
+    //   );
+  
+    //   if (itemIndex === -1) {
+    //     return res.status(404).json({ error: 'Item not found in cart' });
+    //   }
+  
+    //   // Remove the item from the cart
+    //   cart.items.splice(itemIndex, 1);
+  
+    //   // Update the cart in the database
+    //   await cart.save();
+  
+    //   res.status(200).json({ message: 'Item removed from cart successfully' });
+    // } catch (error) {
+    //   console.error(error);
+    //   res.status(500).json({ error: 'An error occurred while removing the item from cart' });
+    },
 
   // Use the helper function in both incrementCartItem and decrementCartItem
   incrementCartItem: async (req, res) => {
