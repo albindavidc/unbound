@@ -65,6 +65,8 @@ module.exports = {
     }
   },
 
+
+
   async addProducts(req, res) {
     console.log("add product req.files", req.files);
 
@@ -77,10 +79,12 @@ module.exports = {
         productName,
         productdescription,
         brandname,
-        price,
-        stock,
-        color,
-        size,
+        actualPrice,
+        sellingPrice,
+        bundlePrice,
+        offer,
+        offerDiscountPrice,
+        offerDiscountRate,
         category,
         variants,
       } = req.body;
@@ -125,11 +129,15 @@ module.exports = {
           description: productdescription,
           brand: brandname,
           category,
-          regularprice: price,
-          price: price,
+          actualPrice,
           primaryImages,
           secondaryImages,
           variants: processedVariants,
+          sellingPrice,
+          bundlePrice,
+          offer,
+          offerDiscountPrice,
+          offerDiscountRate,
         });
         await newProduct.save();
         res.json({ isvalid: true });

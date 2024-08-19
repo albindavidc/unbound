@@ -129,26 +129,69 @@
                 </div>
                 <div class="mb-4 mt-5">
                   <label class="form-label">Description of Product</label>
-                  <textarea name="productdescription" id="productdescription" class="form-control border" required></textarea>
+                  <textarea placeholder="Add a small description about the product"  name="productdescription" id="productdescription" class="form-control border" required></textarea>
                   <div id="productdescriptionError" class="error-div"></div>
                 </div>
                 <div class="mb-4 mt-5">
                   <div class="row">
                     <div class="col-lg-4">
                       <div class="mb-4">
-                        <label class="form-label">Price of Product</label>
-                        <input placeholder="$" name="price" type="number" class="form-control border" />
+                        <label class="form-label">Actual Price</label>
+                        <input placeholder="₹" name="actualPrice" type="number" class="form-control border" />
                         <div id="price-error" class="error-message error-div"></div>
                       </div>
                     </div>
                     <div class="col-lg-4">
+                      <div class="mb-4">
+                        <label class="form-label">Selling Price</label>
+                        <input placeholder="₹" name="sellingPrice" type="number" class="form-control border" />
+                        <div id="selling-price-error" class="error-message error-div"></div>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="mb-4">
+                        <label class="form-label">Bundle Price </label>
+                        <input placeholder="(5/Bundle)" name="bundlePrice" type="number" class="form-control border" />
+                        <div id="selling-price-error" class="error-message error-div"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-4 mt-5">
+                  <div class="row">
+                    <div class="col-lg-6">
                       <div class="mb-4">
                         <label for="variant-stock" class="form-label">Stock of Product</label>
                         <input placeholder="Stock" name="variants[0][stock]" type="number" class="form-control border" />
                         <div id="stock-error" class="error-message error-div"></div>
                       </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
+                      <div class="mb-4">
+                        <label class="form-label">Max Product/Person</label>
+                        <input placeholder="Quantity" name="quantity" type="number" class="form-control border" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-4 mt-5">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="mb-4">
+                        <label for="variant-color" class="form-label">Color</label>
+                        <select class="form-control border" name="variants[0][color]" id="color" required>
+                          <option value="">Select Color</option>
+                          <% color.forEach((color) => { %>
+                          <option value="<%= color._id %>"><%= color.name %></option>
+                          <% }); %>
+                        </select>
+                        <div id="colorError" class="error-div"></div>
+                      </div>
+                    </div>
+
+                    <div class="col-lg-6">
                       <div class="mb-4">
                         <label for="variant-size" class="form-label">Size</label>
                         <select class="form-control border" name="variants[0][size]" id="size" required>
@@ -162,25 +205,33 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="mb-4 mt-5">
                   <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                       <div class="mb-4">
-                        <label class="form-label">Max Product/Person</label>
-                        <input placeholder="Quantity" name="quantity" type="number" class="form-control border" />
+                        <label class="form-label">On Offer</label>
+                        <select class="form-control border" name="offer" id="on-offer">
+                          <option value="">Select offer status</option>
+                          <option value="">Yes</option>
+                          <option value="">No</option>
+                        </select>
                       </div>
                     </div>
 
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                       <div class="mb-4">
-                        <label for="variant-color" class="form-label">Color</label>
-                        <select class="form-control border" name="variants[0][color]" id="color" required>
-                          <option value="">Select Color</option>
-                          <% color.forEach((color) => { %>
-                          <option value="<%= color._id %>"><%= color.name %></option>
-                          <% }); %>
-                        </select>
-                        <div id="colorError" class="error-div"></div>
+                        <label class="form-label">Offer Discount Price</label>
+                        <input placeholder="₹" name="offerDiscountPrice" type="number" class="form-control border" />
+                        <div id="offer-discount-price-error" class="error-message error-div"></div>
+                      </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                      <div class="mb-4">
+                        <label class="form-label">Offer Discount Rate</label>
+                        <input placeholder="%" name="offerDiscountRate" type="number" class="form-control border" />
+                        <div id="offer-discount-rate-error" class="error-message error-div"></div>
                       </div>
                     </div>
                   </div>
@@ -341,12 +392,6 @@
       }
     });
 
-
-
-
-
-    
-
     // Add product function
     async function addproduct(event) {
       event.preventDefault();
@@ -391,24 +436,15 @@
         formData.append("secondaryImage", blob, `secondaryImage${i}.png`);
       }
 
-
-
-
-    //   // Collect variants
-    //   const variants = [];
-    //   document.querySelectorAll(".variant").forEach((variant) => {
-    //     const color = variant.querySelector(".variant-color").value;
-    //     const size = variant.querySelector(".variant-size").value;
-    //     const stock = variant.querySelector(".variant-stock").value;
-    // variants.push({ color, size, stock: parseInt(stock, 10) }); // Ensure stock is a number
-    //   });
-    //   formData.append("variants", JSON.stringify(variants));
-
-
-
-
-
-
+      //   // Collect variants
+      //   const variants = [];
+      //   document.querySelectorAll(".variant").forEach((variant) => {
+      //     const color = variant.querySelector(".variant-color").value;
+      //     const size = variant.querySelector(".variant-size").value;
+      //     const stock = variant.querySelector(".variant-stock").value;
+      // variants.push({ color, size, stock: parseInt(stock, 10) }); // Ensure stock is a number
+      //   });
+      //   formData.append("variants", JSON.stringify(variants));
 
       try {
         console.log(formData.entries());
