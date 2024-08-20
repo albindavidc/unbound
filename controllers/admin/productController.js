@@ -173,7 +173,7 @@ module.exports = {
     const sizes = await Size.find();
     const brands = await Brand.find(); // Assuming you have a `Brand` model
 
-    console.log("this is our brands: ", brands)
+    // console.log("this is our brands: ", brands)
 
     const breadcrumbs = [
       { name: "Home", url: "/admin" },
@@ -184,13 +184,12 @@ module.exports = {
       },
     ];
 
-
     res.render("admin/products/edit-product", {
       locals,
       product,
       categories,
       colors,
-      sizes,      
+      sizes,
       brands,
       breadcrumbs,
     });
@@ -237,28 +236,72 @@ module.exports = {
           },
         ];
       }
-      // Handle secondary images
+
       let secondaryImages = product.secondaryImages || []; // Maintain existing secondary images
-      if (req.files.secondaryImage) {
-        // Reset secondaryImages if new images are uploaded
-        for (const file of secondaryImages) {
-          const oldPath = path.join(__dirname, "../../public/uploads/images/", file.name);
-          if (fs.existsSync(oldPath)) {
-            fs.unlinkSync(oldPath);
+      const baseUploadPath = path.join(__dirname, "../../public/uploads/images/");
+
+      // Secondary Image Handling
+      const deleteAndUpdateSecondaryImage = async (imageIndex) => {
+        if (secondaryImages[imageIndex]) {
+          const oldSecondaryImage = secondaryImages[imageIndex];
+          const oldSecondaryPath = path.join(baseUploadPath, oldSecondaryImage.name);
+          if (fs.existsSync(oldSecondaryPath)) {
+            fs.unlinkSync(oldSecondaryPath);
+            console.log(`Deleted old secondary image ${imageIndex}:`, oldSecondaryImage.name);
           }
         }
 
-        secondaryImages = [];
-        for (const file of req.files.secondaryImage) {
-          const inputPath = file.path;
-          const outputPath = path.join(__dirname, "../../public/uploads/images/", file.filename);
+        const newImage = await Jimp.read(req.files[`secondaryImage${imageIndex}`][0].path);
+        const newImagePath = path.join(baseUploadPath, req.files[`secondaryImage${imageIndex}`][0].filename);
+        await newImage.resize(500, 500).writeAsync(newImagePath);
+        console.log(`Resized and saved new secondary image ${imageIndex}:`, req.files[`secondaryImage${imageIndex}`][0].filename);
 
-          const image = await Jimp.read(inputPath);
-          await image.resize(500, 500).writeAsync(outputPath);
+        // Update the corresponding index in the secondaryImages array
+        secondaryImages[imageIndex] = {
+          name: req.files[`secondaryImage${imageIndex}`][0].filename,
+          path: newImagePath,
+        };
+      };
 
-          secondaryImages.push({ name: file.filename, path: outputPath });
-        }
+      // Handle each secondary image separately
+      if (req.files.secondaryImage0) {
+        await deleteAndUpdateSecondaryImage(0);
       }
+
+      if(req.files.secondaryImage1){
+        await deleteAndUpdateSecondaryImage(1);
+      }
+
+      if(req.files.secondaryImage2){
+        await deleteAndUpdateSecondaryImage(2);
+      }
+
+      if(req.files.secondaryImage3){
+        await deleteAndUpdateSecondaryImage(3);
+      }
+
+      // // Handle secondary images
+      // let secondaryImages = product.secondaryImages || []; // Maintain existing secondary images
+      // if (req.files.secondaryImage) {
+      //   // Reset secondaryImages if new images are uploaded
+      //   for (const file of secondaryImages) {
+      //     const oldPath = path.join(__dirname, "../../public/uploads/images/", file.name);
+      //     if (fs.existsSync(oldPath)) {
+      //       fs.unlinkSync(oldPath);
+      //     }
+      //   }
+
+      //   secondaryImages = [];
+      //   for (const file of req.files.secondaryImage) {
+      //     const inputPath = file.path;
+      //     const outputPath = path.join(__dirname, "../../public/uploads/images/", file.filename);
+
+      //     const image = await Jimp.read(inputPath);
+      //     await image.resize(500, 500).writeAsync(outputPath);
+
+      //     secondaryImages.push({ name: file.filename, path: outputPath });
+      //   }
+      // }
 
       const updateProduct = {
         name: req.body.name.toLowerCase(),

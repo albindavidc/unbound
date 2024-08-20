@@ -59,10 +59,18 @@ router.get(
 );
 
 
+const editUpload = productUpload.fields([
+  {name: "primaryImage", maxCount: 1},
+  {name: "secondaryImage0", maxCount: 1},
+  {name: "secondaryImage1", maxCount: 1},
+  {name: "secondaryImage2", maxCount: 1},
+  {name: "secondaryImage3", maxCount: 1},
+])
+
 router
   .route("/edit-product/:id")
   .get(adminAuth, productController.getEditProducts)
-  .post(adminAuth, upload, productController.editProduct);
+  .post(adminAuth, editUpload, productController.editProduct);
 
   
   router.get("/stocks", productController.getStocks);

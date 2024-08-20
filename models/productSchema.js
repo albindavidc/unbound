@@ -9,11 +9,14 @@ const ratingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const imageSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  path: { type: String, required: true },
-  type: { type: String, enum: ["primary", "secondary"], required: true },
-});
+const imageSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    path: { type: String, required: true },
+    type: { type: String, enum: ["primary", "secondary"], required: true },
+  },
+  { timestamps: true }
+);
 
 const variantSchema = new mongoose.Schema({
   color: {
@@ -45,7 +48,7 @@ const ProductSchema = new mongoose.Schema(
     },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
-      ref:"Brand",
+      ref: "Brand",
     },
     variants: [variantSchema],
 
@@ -80,12 +83,12 @@ const ProductSchema = new mongoose.Schema(
     offerDiscountPrice: {
       type: Number,
       min: 0,
-      default: 0
+      default: 0,
     },
     offerDiscountRate: {
       type: Number,
       min: 0,
-      default: 0
+      default: 0,
     },
     ratings: [ratingSchema],
   },
