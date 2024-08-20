@@ -98,7 +98,7 @@
               <i class="fa fa-star-o"></i>
               <% } %>
             </div>
-            <h3 >₹ 655<span id="productPrice" ><%= product.price %></span></h3>
+            <h3 ><%= product.sellingPrice %><span id="productPrice" ><%= product.actualPrice %></span></h3>
             <p><%= product.description %></p>
             <div class="product__details__option">
             </div>
@@ -106,7 +106,7 @@
             <div class="product__details__cart__option">
               <div class="quantity">
                 <div class="pro-qty">
-                  <input type="text"id="productQuantity" value="1" />
+                  <input name="quantity" type="text"id="productQuantity" value="1" />
                 </div>
               </div>
 
@@ -265,8 +265,14 @@
       <% relatedProducts.forEach(product => { %>
       <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
         <div class="product__item">
-          <div class="product__item__pic set-bg" data-setbg="/uploads/images/<%= product.primaryImages[0].name %>">
+          <div class="product__item__pic set-bg" >
+            <a href="/user/product-list/<%= product._id %>">
+
+            <img src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                        alt="<%= product.productName %>"/>
+            </a>
             <span class="label"><%= product.sale ? 'Sale' : 'New' %></span>
+
             <ul class="product__hover">
               <li>
                 <a href="#"><img src="/img/icon/heart.png" alt="" /></a>
@@ -297,7 +303,7 @@
               <i class="fa fa-star<%= i < product.rating ? '' : '-o' %>"></i>
               <% } %>
             </div>
-            <h5>$<%= product.price.toFixed(2) %></h5>
+            <h5>$<%= product.actualPrice %></h5>
           </div>
         </div>
       </div>

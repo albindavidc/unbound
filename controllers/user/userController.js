@@ -6,6 +6,7 @@ const Address = require("../../models/addressSchema");
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const { checkout } = require("../../routes/userRouter");
 
 const pageNotFound = async (req, res) => {
   try {
@@ -591,6 +592,11 @@ const deleteAddress = async (req, res) => {
   }
 };
 
+const getCheckout= async(req,res) => {
+  console.log("Is this really working..  Yes it is")
+  res.render("user/checkout");
+};
+
 module.exports = {
   pageNotFound,
 
@@ -619,6 +625,7 @@ module.exports = {
   deleteAddress,
   resetPassword,
 
+  getCheckout,
 
   logout,
 };

@@ -9,7 +9,6 @@
       <li class="breadcrumb-item active">Shopping cart</li>
     </ol>
     <!-- Hero Content-->
-   
   </div>
 </section>
 
@@ -45,7 +44,10 @@
                   </button>
                   <div class="d-flex align-items-center">
                     <a href="/shop/product/<%- item.productId._id %>"
-                      ><img class="cart-item-img" src="/uploads/images/<%= item.productId.primaryImages[0].name ? item.productId.primaryImages[0].name : item.productId.secondaryImages[0].name %>" alt="..."
+                      ><img
+                        class="cart-item-img"
+                        src="/uploads/images/<%= item.productId.primaryImages[0].name ? item.productId.primaryImages[0].name : item.productId.secondaryImages[0].name %>"
+                        alt="..."
                     /></a>
                     <div class="cart-title text-start">
                       <a class="text-uppercase text-dark" href="/shop/product/<%- item.productId._id %>"
@@ -62,10 +64,9 @@
                       <div class="row">
                         <div class="col-6 d-md-none text-muted">Price per item</div>
                         <div class="col-6 col-md-12 text-end text-md-center">
-                          <% if (item.productId.onOffer) { %> <%= item.productId.offerDiscountPrice %> <% } else { %> <%=
-                          item.productId.sellingPrice %> <% } %>
-                                                    <p>₹<%- item.price %></p>
-
+                          <% if (item.productId.onOffer) { %> ₹ <%= item.productId.offerDiscountPrice %> <% } else { %> ₹ <%= item.productId.sellingPrice
+                          %> <% } %>
+                          <p style="text-decoration: line-through;">₹<%- item.price %></p>
                         </div>
                       </div>
                     </div>
@@ -103,12 +104,15 @@
                       <div class="row">
                         <div class="col-6 d-md-none text-muted">Total price</div>
                         <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
-                          ₹<%= item.itemTotal %>
+                          ₹<%= item.price %>
                         </div>
                       </div>
                     </div>
                     <div class="col-2 d-none d-md-block text-center">
-                      <button onclick="confirmAction('<%- item.productId._id %>','delete', '<%- item.productId.name %>')" class="btn btn-danger cart-remove">
+                      <button
+                        onclick="confirmAction('<%- item.productId._id %>','delete', '<%- item.productId.name %>')"
+                        class="btn btn-danger cart-remove"
+                      >
                         <i class="delete bi bi-trash"></i>
                       </button>
                     </div>
@@ -141,7 +145,7 @@
               <li class="order-summary-item"><span>Order Subtotal </span><span id="cartTotal">₹<%= totalPrice %></span></li>
               <li class="order-summary-item">
                 <span>Shipping and handling <span class="text-muted">(free)</span></span
-                ><span>₹0.00</span>
+                ><span>₹ <%= shipmentFee %></span>
               </li>
               <!-- <li class="order-summary-item"><span>Tax</span><span>₹0.00</span></li> -->
               <li class="order-summary-item border-0">
@@ -168,62 +172,54 @@
   </div>
 </div>
 
-
-
 <% } %>
 
-
 <script>
+  const confirmAction = (productId, action, productName) => {
+    let actionText, confirmButtonText;
 
-const confirmAction = (productId, action, productName) => {
-  let actionText, confirmButtonText;
-  
-  
-  switch (action){
-
-    case "delete":
-      actionText = "delete";
-      confirmButtonText = "Yes, Delete it!";
-      break;
-    default:
-      return;
-  }
-
-  Swal.fire({
-    title: "Are you sure ?",
-    text: `Do you want to ${actionText} the product: ${productName}`,
-    icon: "warning",
-    showCancelButton: true,
-    cancelButtonText: "No, cancel",
-    showConfirmButton: true,
-    confirmButtonText: confirmButtonText,
-    reverseButtons: true,
-    timer: 5000,
-    timerProgressBar: true,
-  }).then((result) => {
-    if(result.isConfirmed){
-      if(action === "delete"){
-        removeFromCart(productId);
-      }
+    switch (action) {
+      case "delete":
+        actionText = "delete";
+        confirmButtonText = "Yes, Delete it!";
+        break;
+      default:
+        return;
     }
-  })
-}
 
+    Swal.fire({
+      title: "Are you sure ?",
+      text: `Do you want to ${actionText} the product: ${productName}`,
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: "No, cancel",
+      showConfirmButton: true,
+      confirmButtonText: confirmButtonText,
+      reverseButtons: true,
+      timer: 5000,
+      timerProgressBar: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (action === "delete") {
+          removeFromCart(productId);
+        }
+      }
+    });
+  };
 
-  const removeFromCart = async(productId) => {
-
-    try{
-      const response = await fetch("/remove-from-cart",{
+  const removeFromCart = async (productId) => {
+    try {
+      const response = await fetch("/remove-from-cart", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-        }, 
-        body: JSON.stringify({productId})
+        },
+        body: JSON.stringify({ productId }),
       });
       const result = await response.json();
-      if(result.success){
+      if (result.success) {
         Swal.fire({
-          title:"Deleted!",
+          title: "Deleted!",
           text: "Product has been deleted.",
           icon: "success",
           showConfirmButton: false,
@@ -231,7 +227,7 @@ const confirmAction = (productId, action, productName) => {
         }).then(() => {
           location.reload();
         });
-      }else{
+      } else {
         Swal.fire({
           title: "Error",
           text: "Something went wrong",
@@ -251,9 +247,7 @@ const confirmAction = (productId, action, productName) => {
         location.reload();
       });
     }
-
-};
-
+  };
 </script>
 
 <%- include("../partials/user/footer") %>

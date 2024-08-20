@@ -53,8 +53,13 @@ const cartSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    shipmentFee:{
+      type: Number,
+      default: 0,
+    },
     payable: {
       type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

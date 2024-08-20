@@ -101,7 +101,7 @@ router.get(
   cartController.decrementCartItem
 );
 
-// router.get("/checkout", userController.getCheckout);
+router.get("/checkout", userController.getCheckout);
 // router.post("/checkout/add-address", userController.addAddress);
 
 // router
