@@ -1,12 +1,74 @@
+<style>
+  .pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.pagination-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 0 4px;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 600;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-btn:hover,
+.pagination-btn:focus {
+  background-color: #007bff;
+  color: white;
+  outline: none;
+}
+
+.pagination-btn.prev,
+.pagination-btn.next {
+  background-color: #f8f9fa;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.pagination-btn.prev:hover,
+.pagination-btn.next:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination-btn.current {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  pointer-events: none; /* Disable click for current page */
+}
+
+.pagination-btn.current:hover {
+  background-color: #007bff;
+  color: white;
+  cursor: default; /* Change cursor to default for current page */
+}
+
+</style>
+
+
+
 <div class="pagination-container">
-    <% if (currentPage > 1) { %>
-    <a href="?page=<%= currentPage - 1 %>">&laquo; Previous</a>
-    <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i ===
-    currentPage) { %>
-    <span class="current-page"><%= i %></span>
+  <% if (currentPage > 1) { %>
+  <a href="?page=<%= currentPage - 1 %>" class="pagination-btn prev">&laquo; Previous</a>
+  <% } %>
+  
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <% if (i === currentPage) { %>
+    <span class="pagination-btn current"><%= i %></span>
     <% } else { %>
-    <a href="?page=<%= i %>"><%= i %></a>
-    <% } %> <% } %> <% if (currentPage < totalPages) { %>
-    <a href="?page=<%= currentPage + 1 %>">Next &raquo;</a>
+    <a href="?page=<%= i %>" class="pagination-btn"><%= i %></a>
     <% } %>
-  </div>
+  <% } %>
+  
+  <% if (currentPage < totalPages) { %>
+  <a href="?page=<%= currentPage + 1 %>" class="pagination-btn next">Next &raquo;</a>
+  <% } %>
+</div>

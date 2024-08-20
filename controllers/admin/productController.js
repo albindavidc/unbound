@@ -8,8 +8,7 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Color = require("../../models/attributes/colorSchema");
 const Size = require("../../models/attributes/sizeSchema");
-
-// const Brands = require("../../models/attributes/brandSchema");
+const Brand = require("../../models/attributes/brandSchema");
 // const Order = require("../../models/orderSchema");
 
 module.exports = {
@@ -54,10 +53,11 @@ module.exports = {
   async getAddProducts(req, res) {
     try {
       const categories = await Category.find();
+      const brand = await Brand.find();
+      const color = await Color.find();
+      const size = await Size.find();
 
-      console.log("add product", req.body);
-      // Render the form with categories data
-      res.render("admin/products/add-product", { categories });
+      res.render("admin/products/add-product", { categories, brand, color, size });
     } catch (error) {
       console.log(error.message);
     }
@@ -65,20 +65,23 @@ module.exports = {
 
   async addProducts(req, res) {
     console.log("add product req.files", req.files);
-
     console.log("22222222222222222");
-
     console.log("add product", req.body);
 
     try {
       const {
         productName,
         productdescription,
-        brandname,
-        price,
-        quantity,
-        color,
+        brand,
+        actualPrice,
+        sellingPrice,
+        bundlePrice,
+        offer,
+        offerDiscountPrice,
+        offerDiscountRate,
         category,
+        quantity,
+        variants,
       } = req.body;
 
       // Create arrays for primary and secondary images
@@ -94,6 +97,18 @@ module.exports = {
         type: "secondary",
       }));
 
+      // Process variants (assuming you have Color and Size models)
+      const processedVariants = await Promise.all(
+        variants.map(async (variant) => {
+          const { color, size, stock } = variant;
+          return {
+            color: await Color.findById(color),
+            size: await Size.findById(size),
+            stock: parseInt(stock, 10), // Ensure stock is a number
+          };
+        })
+      );
+
       const productExists = await Product.findOne({ name: productName });
       if (!productExists) {
         const images = [];
@@ -106,16 +121,21 @@ module.exports = {
         const newProduct = new Product({
           name: productName,
           description: productdescription,
-          brand: brandname,
+          brand,
           category,
-          regularprice: price,
-          price: price,
-          quantity: quantity,
-          color: color,
+          actualPrice,
           primaryImages,
           secondaryImages,
+          variants: processedVariants,
+          sellingPrice,
+          bundlePrice,
+          quantity,
+          offer,
+          offerDiscountPrice,
+          offerDiscountRate,
         });
         await newProduct.save();
+
         res.json({ isvalid: true });
       } else {
         res.json({ isvalid: false });
@@ -131,9 +151,30 @@ module.exports = {
       title: "Edit Product",
     };
 
-    const product = await Product.findById(req.params.id).populate("category");
+    const product = await Product.findById(req.params.id)
+      .populate("category")
+      .populate({
+        path: "variants",
+        populate: [
+          {
+            path: "color",
+            model: "Color",
+          },
+          {
+            path: "size",
+            model: "Size",
+          },
+        ],
+      })
+      .populate("brand");
+
     const categories = await Category.find({ isListed: true });
-    // const brands = await Brand.find({ isListed: true }); // Assuming you have a `Brand` model
+    const colors = await Color.find();
+    const sizes = await Size.find();
+    const brands = await Brand.find(); // Assuming you have a `Brand` model
+
+    // console.log("this is our brands: ", brands)
+
     const breadcrumbs = [
       { name: "Home", url: "/admin" },
       { name: "Products", url: "/admin/products" },
@@ -147,7 +188,9 @@ module.exports = {
       locals,
       product,
       categories,
-      //brands,
+      colors,
+      sizes,
+      brands,
       breadcrumbs,
     });
   },
@@ -167,22 +210,14 @@ module.exports = {
       let primaryImages = product.primaryImages || []; // Ensure primaryImages is an array
       if (req.files.primaryImage) {
         const inputPath = req.files.primaryImage[0].path;
-        const outputPath = path.join(
-          __dirname,
-          "../../public/uploads/images/",
-          req.files.primaryImage[0].filename
-        );
+        const outputPath = path.join(__dirname, "../../public/uploads/images/", req.files.primaryImage[0].filename);
 
         console.log("Processing primary image:", inputPath);
 
         // Delete the old primary image if it exists
         if (primaryImages.length > 0) {
           const oldPrimaryImage = primaryImages[0];
-          const oldPath = path.join(
-            __dirname,
-            "../../public/uploads/images/",
-            oldPrimaryImage.name
-          );
+          const oldPath = path.join(__dirname, "../../public/uploads/images/", oldPrimaryImage.name);
           if (fs.existsSync(oldPath)) {
             fs.unlinkSync(oldPath);
             console.log("Deleted old primary image:", oldPrimaryImage.name);
@@ -201,43 +236,79 @@ module.exports = {
           },
         ];
       }
-      // Handle secondary images
+
       let secondaryImages = product.secondaryImages || []; // Maintain existing secondary images
-      if (req.files.secondaryImage) {
-        // Reset secondaryImages if new images are uploaded
-        for (const file of secondaryImages) {
-          const oldPath = path.join(
-            __dirname,
-            "../../public/uploads/images/",
-            file.name
-          );
-          if (fs.existsSync(oldPath)) {
-            fs.unlinkSync(oldPath);
+      const baseUploadPath = path.join(__dirname, "../../public/uploads/images/");
+
+      // Secondary Image Handling
+      const deleteAndUpdateSecondaryImage = async (imageIndex) => {
+        if (secondaryImages[imageIndex]) {
+          const oldSecondaryImage = secondaryImages[imageIndex];
+          const oldSecondaryPath = path.join(baseUploadPath, oldSecondaryImage.name);
+          if (fs.existsSync(oldSecondaryPath)) {
+            fs.unlinkSync(oldSecondaryPath);
+            console.log(`Deleted old secondary image ${imageIndex}:`, oldSecondaryImage.name);
           }
         }
 
-        secondaryImages = [];
-        for (const file of req.files.secondaryImage) {
-          const inputPath = file.path;
-          const outputPath = path.join(
-            __dirname,
-            "../../public/uploads/images/",
-            file.filename
-          );
+        const newImage = await Jimp.read(req.files[`secondaryImage${imageIndex}`][0].path);
+        const newImagePath = path.join(baseUploadPath, req.files[`secondaryImage${imageIndex}`][0].filename);
+        await newImage.resize(500, 500).writeAsync(newImagePath);
+        console.log(`Resized and saved new secondary image ${imageIndex}:`, req.files[`secondaryImage${imageIndex}`][0].filename);
 
-          const image = await Jimp.read(inputPath);
-          await image.resize(500, 500).writeAsync(outputPath);
+        // Update the corresponding index in the secondaryImages array
+        secondaryImages[imageIndex] = {
+          name: req.files[`secondaryImage${imageIndex}`][0].filename,
+          path: newImagePath,
+        };
+      };
 
-          secondaryImages.push({ name: file.filename, path: outputPath });
-        }
+      // Handle each secondary image separately
+      if (req.files.secondaryImage0) {
+        await deleteAndUpdateSecondaryImage(0);
       }
+
+      if(req.files.secondaryImage1){
+        await deleteAndUpdateSecondaryImage(1);
+      }
+
+      if(req.files.secondaryImage2){
+        await deleteAndUpdateSecondaryImage(2);
+      }
+
+      if(req.files.secondaryImage3){
+        await deleteAndUpdateSecondaryImage(3);
+      }
+
+      // // Handle secondary images
+      // let secondaryImages = product.secondaryImages || []; // Maintain existing secondary images
+      // if (req.files.secondaryImage) {
+      //   // Reset secondaryImages if new images are uploaded
+      //   for (const file of secondaryImages) {
+      //     const oldPath = path.join(__dirname, "../../public/uploads/images/", file.name);
+      //     if (fs.existsSync(oldPath)) {
+      //       fs.unlinkSync(oldPath);
+      //     }
+      //   }
+
+      //   secondaryImages = [];
+      //   for (const file of req.files.secondaryImage) {
+      //     const inputPath = file.path;
+      //     const outputPath = path.join(__dirname, "../../public/uploads/images/", file.filename);
+
+      //     const image = await Jimp.read(inputPath);
+      //     await image.resize(500, 500).writeAsync(outputPath);
+
+      //     secondaryImages.push({ name: file.filename, path: outputPath });
+      //   }
+      // }
 
       const updateProduct = {
         name: req.body.name.toLowerCase(),
         brand: req.body.brand,
         category: req.body.category,
         description: req.body.description,
-        quantity: req.body.quantity,
+        stock: req.body.stock,
         price: req.body.price,
         regularprice: req.body.regularprice,
         offerpercentage: req.body.offerpercentage || 0,
@@ -269,22 +340,16 @@ module.exports = {
     try {
       const product = await Product.findById(productId);
       if (!product) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Product not found" });
+        return res.status(404).json({ success: false, message: "Product not found" });
       }
 
       product.isActive = shouldList;
       await product.save();
 
-      return res
-        .status(200)
-        .json({ success: true, message: "Product status updated" });
+      return res.status(200).json({ success: true, message: "Product status updated" });
     } catch (error) {
       console.error("Error updating product status:", error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Server error", error });
+      return res.status(500).json({ success: false, message: "Server error", error });
     }
   },
 
@@ -294,19 +359,13 @@ module.exports = {
 
       const product = await Product.findById(productId);
       if (!product) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Product not found" });
+        return res.status(404).json({ success: false, message: "Product not found" });
       }
 
       // Delete primary images if they exist
       if (product.primaryImages && product.primaryImages.length > 0) {
         for (const image of product.primaryImages) {
-          const imagePath = path.join(
-            __dirname,
-            "../../public/uploads/images/",
-            image.name
-          );
+          const imagePath = path.join(__dirname, "../../public/uploads/images/", image.name);
           if (fs.existsSync(imagePath)) {
             try {
               fs.unlinkSync(imagePath);
@@ -322,11 +381,7 @@ module.exports = {
       // Delete secondary images if they exist
       if (product.secondaryImages && product.secondaryImages.length > 0) {
         for (const secondaryImage of product.secondaryImages) {
-          const secondaryImagePath = path.join(
-            __dirname,
-            "../../public/uploads/images/",
-            secondaryImage.name
-          );
+          const secondaryImagePath = path.join(__dirname, "../../public/uploads/images/", secondaryImage.name);
           if (fs.existsSync(secondaryImagePath)) {
             fs.unlinkSync(secondaryImagePath);
             console.log("Deleted secondary image:", secondaryImage.name);
@@ -335,17 +390,12 @@ module.exports = {
       }
 
       await Product.findByIdAndDelete(productId);
-      return res
-        .status(200)
-        .json({ success: true, message: "Product successfully deleted" });
+      return res.status(200).json({ success: true, message: "Product successfully deleted" });
     } catch (error) {
       console.error("Error deleting product:", error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Server error", error });
+      return res.status(500).json({ success: false, message: "Server error", error });
     }
   },
-
 
   //**Product-Stock-Managment */
 
@@ -382,36 +432,34 @@ module.exports = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
-  
+
   updateStock: async (req, res) => {
     try {
       console.log(req.body);
-      const { variantId, stock } = req.body;  // Assuming productId is passed instead of variantId
-
-      // First, check if the product exists
-      const product = await Product.findById(variantId);
-      if (!product) {
-          return res.status(404).json({ message: "Product not found." });
-      }
+      const { variantId, stock } = req.body; // Assuming productId is passed instead of variantId
 
       // Attempt to update the stock
-      product.quantity = stock; // Directly updating the quantity field
+      const product = await Product.findOneAndUpdate(
+        { "variants._id": variantId },
+        { $set: { "variants.$.stock": parseInt(stock, 10) } },
+        { new: true }
+      );
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found." });
+      }
 
       // Save the updated product
       await product.save();
 
       // Send a response indicating success
       res.json({
-          message: "Stock updated successfully.",
-          product: product,
+        message: "Stock updated successfully.",
+        product: product,
       });
-      
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ message: "An error occurred while updating the stock." });
+      res.status(500).json({ message: "An error occurred while updating the stock." });
     }
   },
-
 };

@@ -7,18 +7,16 @@
         <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-2">
           <li class="breadcrumb-item">
             <a class="link-body-emphasis" href="/admin">
-              <svg class="bi" width="16" height="16">
-                <use xlink:href="#house-door-fill"></use>
-              </svg>
-              <span class="visually-hidden">Dashboard</span>
+ 
+              <span>Dashboard / </span>
             </a>
           </li>
+          <li>
   
-          <li class="breadcrumb-item " aria-current="page">
-            <a class="link-body-emphasis fw-semibold text-decoration-none" href="/admin/products">Products</a>
+            <a class="link-body-emphasis fw-semibold text-decoration-none" href="/admin/products"> Products</a>
           </li>
           <li class="breadcrumb-item active" aria-current="page">
-            Manage Stocks
+           / Manage Stocks
           </li>
         </ol>
       </nav>
@@ -58,13 +56,16 @@
             <td>
               <!-- Added Update Stock column -->
               <div class="row">
-                <div class="col-auto">
-                  <input type="number" class="form-control" name="newStock" min="0" id="stock-<%- product._id %>" value="<%- product.quantity %>">
-                </div>
-                <div class="col-auto">
-                  <button onclick="updateStock('<%- product._id %>')" class="btn btn-primary btn-sm">Update</button>
-                </div>
+                <% product.variants.forEach((variant, index) => { %>
+                  <div class="col-auto">
+                    <input type="number" class="form-control" name="variants[<%= index %>][stock]" min="0" id="stock-<%= variant._id %>" value="<%= variant.stock %>">
+                  </div>
+                  <div class="col-auto">
+                    <button onclick="updateStock('<%= variant._id %>')" class="btn btn-primary btn-sm">Update</button>
+                  </div>
+                <% }); %>
               </div>
+              
             </td>
           </tr>
           <% }) %>

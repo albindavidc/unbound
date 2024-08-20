@@ -4,6 +4,7 @@ const passport = require("passport");
 const {userAuth, isLogedOut, checkUserStatus} = require("../middlewares/auth");
 const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
+const cartController = require('../controllers/user/cartController')
 
 
 //Home page - Page not found
@@ -74,5 +75,40 @@ router
 router
   .route("/address/delete-address/:id")
   .delete(userController.deleteAddress);
+
+
+//Cart
+router.get("/cart", userAuth, cartController.getCart);
+router.post("/user/add-to-cart", cartController.addToCart);
+
+
+// router.get("/shop/order-success", cartController.getOrderSuccess);
+
+
+router.get(
+  "/cart/remove",
+  cartController.removeCartItem
+);
+router.delete('/remove-from-cart', cartController.removeCartItem);
+
+
+router.get(
+  "/cart/increase-quantity/:id/:variant",
+  cartController.incrementCartItem
+);
+router.get(
+  "/cart/decrease-quantity/:id/:variant",
+  cartController.decrementCartItem
+);
+
+router.get("/checkout", userController.getCheckout);
+// router.post("/checkout/add-address", userController.addAddress);
+
+// router
+//   .route("/checkout/edit-address/:id")
+//   .get(userController.getEditAddress)
+//   .post(userController.editAddress)
+//   .delete(userController.deleteAddress);
+
 
 module.exports = router;

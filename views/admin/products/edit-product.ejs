@@ -1,15 +1,16 @@
 <%- include("../../partials/admin/header") %>
 
 <head>
-  <link
-    href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-    rel="stylesheet"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css "
-  />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css " />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
   <style>
     .form-container {
@@ -54,22 +55,41 @@
     .imagemodal {
       display: none;
       position: fixed;
-      z-index: 1;
-      padding-top: 100px;
-      left: 0;
-      top: 0;
+      z-index: 5;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); /* Center the modal horizontally and vertically */
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgb(0, 0, 0);
       background-color: rgba(0, 0, 0, 0.4);
     }
 
     .modal-content {
-      margin: auto;
+      margin: 10px auto; /* Center the modal horizontally */
       padding: 20px;
+      background-color: #fff;
       border: 1px solid #888;
-      width: 80%;
+      display: flex;
+      flex-direction: column; /* Ensure the content is stacked vertically */
+      justify-content: center; /* Center content vertically */
+      align-items: center; /* Center content horizontally */
+      width: 50%;
+      border-radius: 15px; /* Add rounded corners */
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
+    }
+
+    .img-container {
+      display: flex;
+      justify-content: center; /* Center the image horizontally */
+      align-items: center; /* Center the image vertically */
+      width: 100%;
+    }
+
+    .img-container img {
+      max-width: 100%; /* Make the image responsive */
+      height: auto;
+      border-radius: 10px; /* Add rounded corners to the image */
     }
 
     .padding {
@@ -79,24 +99,12 @@
 </head>
 
 <body>
-  <div
-    class="imagemodal"
-    id="cropImageModal"
-    tabindex="-1"
-    aria-labelledby="cropImageModalLabel"
-    aria-hidden="true"
-  >
+  <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
-          <button
-            id="closeImageButton"
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button id="closeImageButton" style="margin: 10px" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="img-container">
@@ -104,17 +112,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button
-            id="closeImageButton"
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" id="cropButton">
-            Crop
-          </button>
+          <button id="closeImageButton" style="margin: 10px" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" style="margin: 10px" class="btn btn-primary" id="cropButton">Crop</button>
         </div>
       </div>
     </div>
@@ -129,38 +128,20 @@
       </div>
     </div>
 
-    <form
-      id="addProductForm"
-      action="/admin/edit-product/<%= product._id %>"
-      method="POST"
-      enctype="multipart/form-data"
-    >
+    <form id="addProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data">
       <div class="container mt-4">
         <div class="row">
           <div class="col-lg-12">
             <div class="card mb-4">
               <div class="card-body">
                 <div class="mb-4">
-                  <label for="product_name" class="form-label"
-                    >Product Name</label
-                  >
-                  <input
-                    type="text"
-                    value="<%= product.name %>"
-                    placeholder="Type here"
-                    class="form-control"
-                    name="name"
-                    id="product_name"
-                  />
+                  <label for="product_name" class="form-label">Product Name</label>
+                  <input type="text" value="<%= product.name %>" placeholder="Type here" class="form-control" name="name" id="product_name" />
                   <div id="productNameError" class="text-danger"></div>
                 </div>
                 <div class="mb-4">
                   <label for="status" class="form-label">Status</label>
-                  <select
-                    class="form-select"
-                    name="isActive"
-                    aria-label="Active or Inactive"
-                  >
+                  <select class="form-select" name="isActive" aria-label="Active or Inactive">
                     <% if (product.isActive) { %>
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
@@ -171,114 +152,169 @@
                   </select>
                 </div>
                 <div class="mb-4">
-                  <label for="category" class="form-label">Categories</label>
-                  <select name="category" id="category" class="form-select">
-                    <option value="<%= product.category._id %>">
-                      <%= product.category.name %>
-                    </option>
-                    <% categories.forEach(category => { %> <% if (category.name
-                    !== product.category.name) { %>
-                    <option value="<%= category._id %>">
-                      <%= category.name %>
-                    </option>
-                    <% } %> <% }) %>
-                  </select>
-                </div>
-                <div class="mb-4">
                   <label class="form-label">Description</label>
-                  <textarea
-                    placeholder="Type here"
-                    class="form-control"
-                    name="description"
-                    rows="4"
-                  >
+                  <textarea placeholder="Type here" class="form-control" name="description" rows="4">
                 <%= product.description %></textarea
                   >
                   <div id="productDescriptionError" class="text-danger"></div>
                 </div>
+
                 <div class="row">
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label">Regular Price</label>
+                      <label class="form-label" for="actual-price">Actual Price</label>
                       <input
                         placeholder="Enter regular price"
-                        name="regularprice"
-                        value="<%= product.regularprice %>"
+                        name="actualPrice"
+                        value="<%= product.actualPrice %>"
                         type="number"
                         class="form-control"
+                        id="actual-price"
                       />
                     </div>
                   </div>
+
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label">Price</label>
+                      <label class="form-label" for="selling-price">Selling Price</label>
                       <input
-                        placeholder="Enter price"
-                        value="<%= product.price %>"
-                        name="price"
+                        placeholder="Enter selling price"
+                        name="sellingPrice"
+                        value="<%= product.sellingPrice %>"
                         type="number"
                         class="form-control"
-                      />
-                      <div id="priceError" class="text-danger"></div>
-                    </div>
-                  </div>
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label class="form-label">Volume</label>
-                      <input
-                        placeholder="Enter volume"
-                        value="<%= product.volume %>"
-                        name="volume"
-                        type="number"
-                        class="form-control"
+                        id="selling-price"
                       />
                     </div>
                   </div>
+
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label">Quantity</label>
+                      <label class="form-label" for="bundle-price">Bundle Price</label>
                       <input
-                        placeholder="Enter quantity"
+                        placeholder="Enter bundle price"
+                        name="bundlePrice"
+                        value="<%= product.bundlePrice %>"
+                        type="number"
+                        class="form-control"
+                        id="bundle-price"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label" for="maxProductPerPerson">Max Product per Person</label>
+                      <input
+                        placeholder="Enter bundle price"
+                        name="bundlePrice"
                         value="<%= product.quantity %>"
-                        name="quantity"
                         type="number"
                         class="form-control"
+                        id="bundle-price"
                       />
-                      <div id="quantityError" class="text-danger"></div>
                     </div>
                   </div>
+
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label">Color</label>
+                      <label for="color" class="form-label">Color</label>
+                      <select name="color" id="color" class="form-select">
+                        <option value="<%= product.variants[0].color._id %>"><%= product.variants[0].color.name %></option>
+
+                        <% colors.forEach(color => { %> <% if (color.name !== product.variants[0].color.name) { %>
+                        <option value="<%= color._id %>"><%= color.name %></option>
+                        <% } %> <% }) %>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label for="size" class="form-label">Size</label>
+                      <select name="size" id="size" class="form-select">
+                        <option value="<%= product.variants[0].size._id %>"><%= product.variants[0].size.value %></option>
+
+                        <% sizes.forEach(size => { %> <% if (size.value !== product.variants[0].size.value) { %>
+                        <option value="<%= size._id %>"><%= size.value %></option>
+                        <% } %> <% }) %>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label for="stock" class="form-label">Stock</label>
                       <input
-                        placeholder="Enter color"
-                        value="<%= product.color.join(', ') %>"
-                        name="color"
+                        type="number"
+                        placeholder="Enter the stock"
+                        name="stock"
+                        value="<%= product.variants[0].stock %>"
                         class="form-control"
+                        id="stock"
                       />
                     </div>
                   </div>
+
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label">Offer Percentage</label>
+                      <label for="on-offer" class="form-label">Offer</label>
+                      <select class="form-control border" name="onOffer" id="on-offer">
+                        <option value="true" <% if(product.onOffer){ %>selected <% } %>>Yes</option>
+                        <option value="false" <% if(!product.onOffer) { %>selected <% } %>>No</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label class="form-label" for="offer-discount-price">Offer Discount Price</label>
                       <input
-                        placeholder="Enter offer percentage"
-                        value="<%= product.offerpercentage %>"
-                        name="offerpercentage"
+                        placeholder="Enter discount price"
+                        name="offerDiscountPrice"
+                        value="<%= product.offerDiscountPrice %>"
                         type="number"
                         class="form-control"
+                        id="offer-discount-price"
                       />
                     </div>
                   </div>
+
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label">Brand</label>
+                      <label class="form-label" for="offer-discount-rate">Offer Discount Price</label>
                       <input
-                        placeholder="Enter brand"
-                        value="<%= product.brand %>"
-                        name="brand"
+                        placeholder="Enter discount Rate(%)"
+                        name="offerDiscountRate"
+                        value="<%= product.offerDiscountRate %>"
+                        type="number"
                         class="form-control"
+                        id="offer-discount-price"
                       />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label for="category" class="form-label">Categories</label>
+                      <select name="category" id="category" class="form-select">
+                        <option value="<%= product.category._id %>"><%= product.category.name %></option>
+                        <% categories.forEach(category => { %> <% if (category.name !== product.category.name) { %>
+                        <option value="<%= category._id %>"><%= category.name %></option>
+                        <% } %> <% }) %>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4">
+                    <div class="mb-4">
+                      <label for="brand" class="form-label">Brand</label>
+                      <select name="brand" id="brand" class="form-select">
+                        <option value="<%= product.brand._id %>"><%= product.brand.name %></option>
+                        <% brands.forEach(brand => { %> <% if (brand.name !== product.brand.name) { %>
+                        <option value="<%= brand._id %>"><%= brand.name %></option>
+                        <% } %> <% }) %>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -290,41 +326,20 @@
               <div class="col-lg-4">
                 <div class="card mb-4">
                   <div class="card-header">
-                    <h4>Primary Image</h4>
+                    <h4 style="font-size: 1rem">Primary Image</h4>
                   </div>
                   <div class="card-body text-center">
                     <div class="input-upload">
                       <label for="primaryImageInput" class="form-label">
                         <% if (product.primaryImages[0]) { %>
-                        <img
-                          id="preview1"
-                          src="/uploads/images/<%- product.primaryImages[0].name %>"
-                          alt=""
-                          width="150px"
-                        />
-                        <% }  %>
-                        
+                        <img id="preview1" src="/uploads/images/<%- product.primaryImages[0].name %>" alt="" width="150px" />
+                        <% } %>
                       </label>
                     </div>
                     <div class="padding">
-                      <input
-                        type="file"
-                        class="form-control"
-                        id="primaryImageInput"
-                        accept="image/*"
-                        style="display: none"
-                      />
-                      <button
-                        id="primaryInputButton"
-                        type="button"
-                        class="btn btn-md rounded font-sm"
-                      >
-                        Upload Image
-                      </button>
-                      <div
-                        id="croppedPrimaryImages"
-                        style="display: none"
-                      ></div>
+                      <input type="file" class="form-control" id="primaryImageInput" accept="image/*" style="display: none" />
+                      <button id="primaryInputButton" type="button" style="color: white" class="btn btn-md rounded font-sm">Upload Image</button>
+                      <div id="croppedPrimaryImages" style="display: none"></div>
                     </div>
                   </div>
                 </div>
@@ -333,37 +348,23 @@
               <div class="col-lg-4">
                 <div class="card mb-4">
                   <div class="card-header">
-                    <h4>Secondary Image 1</h4>
+                    <h4 style="font-size: 1rem">Secondary Image 1</h4>
                   </div>
                   <div class="card-body text-center">
                     <div class="input-upload">
                       <label for="secondaryImageInput1" class="form-label">
                         <img
                           id="preview2"
-                          src="<%= product.secondaryImages[0] ? `/uploads/images/${product.secondaryImages[0].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          src="<%= product.secondaryImages[0] ? `/uploads/images/${product.secondaryImages[0].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
                           alt=""
                           width="150px"
                         />
                       </label>
                     </div>
                     <div class="padding">
-                      <input
-                        type="file"
-                        class="form-control"
-                        id="secondaryImageInput1"
-                        style="display: none"
-                      />
-                      <button
-                        id="secondaryImageButton1"
-                        type="button"
-                        class="btn btn-md rounded font-sm"
-                      >
-                        Upload Image
-                      </button>
-                      <div
-                        id="croppedSecondaryImage1"
-                        style="display: none"
-                      ></div>
+                      <input type="file" class="form-control" id="secondaryImageInput1" style="display: none" />
+                      <button id="secondaryImageButton1" type="button" class="btn btn-md" style="color: white">Upload Image</button>
+                      <div id="croppedSecondaryImage1" style="display: none"></div>
                     </div>
                   </div>
                 </div>
@@ -371,37 +372,23 @@
               <div class="col-lg-4">
                 <div class="card mb-4">
                   <div class="card-header">
-                    <h4>Secondary Image 2</h4>
+                    <h4 style="font-size: 1rem">Secondary Image 2</h4>
                   </div>
                   <div class="card-body text-center">
                     <div class="input-upload">
                       <label for="secondaryImageInput2" class="form-label">
                         <img
                           id="preview3"
-                          src="<%= product.secondaryImages[1] ? `/uploads/images/${product.secondaryImages[1].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          src="<%= product.secondaryImages[1] ? `/uploads/images/${product.secondaryImages[1].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
                           alt=""
                           width="150px"
                         />
                       </label>
                     </div>
                     <div class="padding">
-                      <input
-                        type="file"
-                        class="form-control"
-                        id="secondaryImageInput2"
-                        style="display: none"
-                      />
-                      <button
-                        id="secondaryImageButton2"
-                        type="button"
-                        class="btn btn-md rounded font-sm"
-                      >
-                        Upload Image
-                      </button>
-                      <div
-                        id="croppedSecondaryImage2"
-                        style="display: none"
-                      ></div>
+                      <input type="file" class="form-control" id="secondaryImageInput2" style="display: none" />
+                      <button id="secondaryImageButton2" style="color: white" type="button" class="btn btn-md rounded font-sm">Upload Image</button>
+                      <div id="croppedSecondaryImage2" style="display: none"></div>
                     </div>
                   </div>
                 </div>
@@ -409,37 +396,23 @@
               <div class="col-lg-4">
                 <div class="card mb-4">
                   <div class="card-header">
-                    <h4>Secondary Image 3</h4>
+                    <h4 style="font-size: 1rem">Secondary Image 3</h4>
                   </div>
                   <div class="card-body text-center">
                     <div class="input-upload">
                       <label for="secondaryImageInput3" class="form-label">
                         <img
                           id="preview4"
-                          src="<%= product.secondaryImages[2] ? `/uploads/images/${product.secondaryImages[2].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          src="<%= product.secondaryImages[2] ? `/uploads/images/${product.secondaryImages[2].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
                           alt=""
                           width="150px"
                         />
                       </label>
                     </div>
                     <div class="padding">
-                      <input
-                        type="file"
-                        class="form-control"
-                        id="secondaryImageInput3"
-                        style="display: none"
-                      />
-                      <button
-                        id="secondaryImageButton3"
-                        type="button"
-                        class="btn btn-md rounded font-sm"
-                      >
-                        Upload Image
-                      </button>
-                      <div
-                        id="croppedSecondaryImage3"
-                        style="display: none"
-                      ></div>
+                      <input type="file" class="form-control" id="secondaryImageInput3" style="display: none" />
+                      <button id="secondaryImageButton3" style="color: white" type="button" class="btn btn-md rounded font-sm">Upload Image</button>
+                      <div id="croppedSecondaryImage3" style="display: none"></div>
                     </div>
                   </div>
                 </div>
@@ -447,38 +420,39 @@
               <div class="col-lg-4">
                 <div class="card mb-4">
                   <div class="card-header">
-                    <h4>Secondary Image 4</h4>
+                    <h4 style="font-size: 1rem">Secondary Image 4</h4>
                   </div>
                   <div class="card-body text-center">
                     <div class="input-upload">
                       <label for="secondaryImageInput4" class="form-label">
                         <img
                           id="preview5"
-                          src="<%= product.secondaryImages[3] ? `/uploads/images/${product.secondaryImages[3].name}` : '../../assets/imgs/theme/upload.svg' %>"
+                          src="<%= product.secondaryImages[3] ? `/uploads/images/${product.secondaryImages[3].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
                           alt=""
                           width="150px"
                         />
                       </label>
                     </div>
                     <div class="padding">
-                      <input
-                        type="file"
-                        class="form-control"
-                        id="secondaryImageInput4"
-                        style="display: none"
-                      />
-                      <button
-                        id="secondaryImageButton4"
-                        type="button"
-                        class="btn btn-md rounded font-sm"
-                      >
-                        Upload Image
-                      </button>
-                      <div
-                        id="croppedSecondaryImage4"
-                        style="display: none"
-                      ></div>
-                    </div>
+                      <!-- <div class="row">
+                        <div class="col-lg-6"> -->
+                          <input type="file" class="form-control" id="secondaryImageInput4" style="display: none" />
+                          <button id="secondaryImageButton4" style="color: white" type="button" class="btn btn-md">Upload Image</button>
+                        </div>
+                        <div class="col-lg-6">
+                          <!-- <button
+                            onclick="deleteImage('<%- product.secondaryImages[3] ? product.secondaryImages[3].name : `` %>', '<%- product._id %>')"
+                            type="button"
+                            class="btn btn-md btn-danger"
+                            style="background-color: red; color: white"
+                          >
+                            <i class="bi bi-trash"> </i>Delete
+                          </button> -->
+
+                          <div id="croppedSecondaryImage4" style="display: none"></div>
+                        </div>
+                      <!-- </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -487,14 +461,8 @@
             <div class="d-flex justify-content-center padding">
               <div class="row">
                 <div class="col text-center padding">
-                  <button class="btn btn-md rounded font-sm" type="submit">
-                    Update
-                  </button>
-                  <a
-                    href="/admin/products"
-                    class="btn btn-light rounded font-sm"
-                    >Cancel</a
-                  >
+                  <button class="btn btn-md rounded font-sm" type="submit">Update</button>
+                  <a href="/admin/products" class="btn btn-light rounded font-sm">Cancel</a>
                 </div>
               </div>
             </div>
@@ -507,7 +475,53 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script>
+    async function deleteImage(imageId, productId) {
+      try {
+        // Show a confirmation dialog
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+          // Send a request to the server to delete the image
+          const response = await fetch(`/admin/products/delete-image?productId=${productId}&imageId=${imageId}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            // If the image was deleted successfully, show a success message
+            Swal.fire("Deleted!", "The image has been deleted.", "success").then(() => {
+              location.reload();
+            });
+            // Optionally, remove the image from the UI here
+          } else {
+            // If there was an error, show an error message
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error deleting image:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+      }
+    }
+
     const cropImageModal = document.getElementById("cropImageModal");
     const cropButton = document.getElementById("cropButton");
     const closeImageButton = document.getElementById("closeImageButton");
@@ -516,12 +530,7 @@
     let cropper;
     let currentImageInputId = "";
 
-    function setupImageCropping(
-      inputId,
-      previewId,
-      croppedImagesDivId,
-      buttonId
-    ) {
+    function setupImageCropping(inputId, previewId, croppedImagesDivId, buttonId) {
       const input = document.getElementById(inputId);
       const preview = document.getElementById(previewId);
       const croppedImagesDiv = document.getElementById(croppedImagesDivId);
@@ -595,102 +604,113 @@
     }
 
     // Setup cropping for primary image
-    setupImageCropping(
-      "primaryImageInput",
-      "preview1",
-      "croppedPrimaryImages",
-      "primaryInputButton"
-    );
+    setupImageCropping("primaryImageInput", "preview1", "croppedPrimaryImages", "primaryInputButton");
 
     // Setup cropping for secondary images
-    setupImageCropping(
-      "secondaryImageInput1",
-      "preview2",
-      "croppedSecondaryImage1",
-      "secondaryImageButton1"
-    );
-    setupImageCropping(
-      "secondaryImageInput2",
-      "preview3",
-      "croppedSecondaryImage2",
-      "secondaryImageButton2"
-    );
-    setupImageCropping(
-      "secondaryImageInput3",
-      "preview4",
-      "croppedSecondaryImage3",
-      "secondaryImageButton3"
-    );
-    setupImageCropping(
-      "secondaryImageInput4",
-      "preview5",
-      "croppedSecondaryImage4",
-      "secondaryImageButton4"
-    );
+    setupImageCropping("secondaryImageInput1", "preview2", "croppedSecondaryImage1", "secondaryImageButton1");
+    setupImageCropping("secondaryImageInput2", "preview3", "croppedSecondaryImage2", "secondaryImageButton2");
+    setupImageCropping("secondaryImageInput3", "preview4", "croppedSecondaryImage3", "secondaryImageButton3");
+    setupImageCropping("secondaryImageInput4", "preview5", "croppedSecondaryImage4", "secondaryImageButton4");
 
     // Close the cropping modal
     closeImageButton.addEventListener("click", function () {
       cropImageModal.style.display = "none";
     });
 
-    // Close the cropping modal when clicking outside of it
-    window.addEventListener("click", function (event) {
-      if (event.target === cropImageModal) {
-        cropImageModal.style.display = "none";
+    // // Close the cropping modal when clicking outside of it
+    // window.addEventListener("click", function (event) {
+    //   if (event.target === cropImageModal) {
+    //     cropImageModal.style.display = "none";
+    //   }
+    // });
+
+    document.getElementById("addProductForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      // if (!validateForm()) {
+      //   return;
+      // }
+
+      let form = document.getElementById("addProductForm");
+      let formData = new FormData(form);
+
+      // Add primary image to formData
+      const primaryImage = document?.getElementById("croppedPrimaryImages")?.children[0]?.querySelector("img");
+      const primaryBlobUrl = primaryImage?.dataset?.blob;
+
+      if (primaryBlobUrl) {
+        const primaryBlob = await fetch(primaryBlobUrl).then((r) => r?.blob());
+        formData.append("primaryImage", primaryBlob, "primaryImage.png");
       }
-    });
 
-    document
-      .getElementById("addProductForm")
-      .addEventListener("submit", async function (event) {
-        event.preventDefault();
+      // //Add secodnary image to formData
+      // const secondaryImage0 = document?.getElementById("croppedSecondaryImage1")?.children[0]?.querySelector("img");
+      // const secondary0BlobUrl = secondaryImage0?.dataset?.blob;
 
-        if (!validateForm()) {
-          return;
+      // if(secondary0BlobUrl) {
+      //   const secondaryBlob0 = await fetch(secondary0BlobUrl).then((r) => r?.blob());
+      //   formData.append("secondaryImage0", secondaryBlob0, "secondaryImage0.png");
+      // }
+
+      // const secondaryImage1 = document?.getElementById("croppedSecondaryImage2")?.children[0]?.querySelector("img");
+      // const secondary1BlobUrl = secondaryImage1?.dataset?.blob;
+
+      // if(secondary1BlobUrl) {
+      //   const secondaryBlob1 = await fetch(secondary1BlobUrl).then((r) => r?.blob());
+      //   formData.append("secondaryImage1", secondaryBlob1, "secondaryImage1.png");
+      // }
+
+      // const secodnaryImage2 = document?.getElementById("croppedSecondaryImage3")?.children[2]?.querySelector("img");
+      // const secondary
+
+      async function appendSecondaryImageToFormData(formData, index) {
+        const secondaryImage = document?.getElementById(`croppedSecondaryImage${index + 1}`)?.children[0]?.querySelector("img");
+        const secondaryBlobUrl = secondaryImage?.dataset?.blob;
+
+        if (secondaryBlobUrl) {
+          const secondaryBlob = await fetch(secondaryBlobUrl).then((r) => r?.blob());
+          formData.append(`secondaryImage${index}`, secondaryBlob, `secondaryImage${index}.png`);
         }
+      }
 
-       
-
-        let form = document.getElementById("addProductForm");
-        let formData = new FormData(form);
-
-        // Add primary image to formData
-        const primaryImage = document
-          ?.getElementById("croppedPrimaryImages")
-          ?.children[0]?.querySelector("img");
-        const primaryBlobUrl = primaryImage?.dataset?.blob;
-        
-        if(primaryBlobUrl) {
-          const primaryBlob = await fetch(primaryBlobUrl).then((r) => r?.blob());
-          formData.append("primaryImage", primaryBlob, "primaryImage.png");
-
-        }
+      await appendSecondaryImageToFormData(formData, 0); // For secondaryImage0
+      await appendSecondaryImageToFormData(formData, 1); // For secondaryImage1
+      await appendSecondaryImageToFormData(formData, 2); // For secondaryImage2
+      await appendSecondaryImageToFormData(formData, 3); // For secondaryImage3
 
 
-        // Add secondary images to formData
-        const secondaryImages = [
-          document.getElementById("croppedSecondaryImage1"),
-          document.getElementById("croppedSecondaryImage2"),
-          document.getElementById("croppedSecondaryImage3"),
-          document.getElementById("croppedSecondaryImage4"),
-        ];
 
-        for (let i = 0; i < secondaryImages.length; i++) {
-          if (secondaryImages[i]?.childElementCount > 0) {
-            const blobUrl =
-              secondaryImages[i]?.querySelector("img")?.dataset?.blob;
-              if(blobUrl) {
-                const blob = fetch(blobUrl).then((r) => r?.blob());
-                
-              formData.append(
-                `secondaryImage`,
-                blob,
-                `secondaryImage${i + 1}.png`
-              );
-            }
-          }
-        }
 
+      // // Add secondary images to formData
+      // const secondaryImages = [
+      //   document.getElementById("croppedSecondaryImage2"),
+      //   document.getElementById("croppedSecondaryImage3"),
+      //   document.getElementById("croppedSecondaryImage4"),
+      // ];
+
+      // for (let i = 0; i < secondaryImages.length; i++) {
+      //   if (secondaryImages[i]?.childElementCount > 0) {
+      //     const blobUrl = secondaryImages[i]?.querySelector("img")?.dataset?.blob;
+      //     if (blobUrl) {
+      //       const blob = await fetch(blobUrl).then((r) => r?.blob());
+
+      //       formData.append(`secondaryImage`, blob, `secondaryImage${i + 1}.png`);
+      //     }
+      //   }
+      // }
+
+      const result = await Swal.fire({
+        title: "Are you sure ? ",
+        text: "Do you want to update the product ?",
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Yes, update it!",
+      });
+
+      if (result.isConfirmed) {
         try {
           const response = await fetch(form.action, {
             method: "POST",
@@ -699,8 +719,14 @@
           const data = await response.json();
 
           if (data.isvalid) {
-            const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
-            window.location.href = `${API_BASE_URL}/admin/products`;
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Product update successfully!",
+            }).then(() => {
+              const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+              window.location.href = `${API_BASE_URL}/admin/products`;
+            });
           } else {
             Swal.fire({
               icon: "error",
@@ -716,85 +742,71 @@
             text: "An error occurred while updating the product.",
           });
         }
-      });
-
-    function validateForm() {
-      let isValid = true;
-
-      // Validate price
-      const priceElement = document.getElementById("priceError");
-      const price = document.querySelector('input[name="price"]').value;
-      if (isNaN(price) || price < 0) {
-        if (priceElement)
-          priceElement.innerText =
-            "Price must be a number greater than or equal to 0.";
-        isValid = false;
-      } else {
-        if (priceElement) priceElement.innerText = "";
       }
+    });
 
-      // Validate quantity
-      const quantityElement = document.getElementById("quantityError");
-      const quantity = document.querySelector('input[name="quantity"]').value;
-      if (isNaN(quantity) || quantity <= 0) {
-        if (quantityElement)
-          quantityElement.innerText =
-            "Quantity must be a number greater than 0.";
-        isValid = false;
-      } else {
-        if (quantityElement) quantityElement.innerText = "";
-      }
+    // function validateForm() {
+    //   let isValid = true;
 
-      // Validate product name
-      const productNameElement = document.getElementById("productNameError");
-      const productName = document.querySelector('input[name="name"]').value;
-      if (productName.trim() === "") {
-        if (productNameElement)
-          productNameElement.innerText = "Product name is required.";
-        isValid = false;
-      } else {
-        if (productNameElement) productNameElement.innerText = "";
-      }
+    //   // Validate price
+    //   const priceElement = document.getElementById("priceError");
+    //   const price = document.querySelector('input[name="price"]').value;
+    //   if (isNaN(price) || price < 0) {
+    //     if (priceElement) priceElement.innerText = "Price must be a number greater than or equal to 0.";
+    //     isValid = false;
+    //   } else {
+    //     if (priceElement) priceElement.innerText = "";
+    //   }
 
-      // Validate product description
-      const productDescriptionElement = document.getElementById(
-        "productDescriptionError"
-      );
-      const productDescription = document.querySelector(
-        'textarea[name="description"]'
-      ).value;
-      if (productDescription.trim() === "") {
-        if (productDescriptionElement)
-          productDescriptionElement.innerText =
-            "Product description is required.";
-        isValid = false;
-      } else {
-        if (productDescriptionElement) productDescriptionElement.innerText = "";
-      }
+    //   // Validate quantity
+    //   const quantityElement = document.getElementById("quantityError");
+    //   const quantity = document.querySelector('input[name="quantity"]').value;
+    //   if (isNaN(quantity) || quantity <= 0) {
+    //     if (quantityElement) quantityElement.innerText = "Quantity must be a number greater than 0.";
+    //     isValid = false;
+    //   } else {
+    //     if (quantityElement) quantityElement.innerText = "";
+    //   }
 
-      // Validate file inputs
-      const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-      const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach((fileInput, index) => {
-        const filePath = fileInput.value;
-        const fileExtension = filePath.split(".").pop().toLowerCase();
+    //   // Validate product name
+    //   const productNameElement = document.getElementById("productNameError");
+    //   const productName = document.querySelector('input[name="name"]').value;
+    //   if (productName.trim() === "") {
+    //     if (productNameElement) productNameElement.innerText = "Product name is required.";
+    //     isValid = false;
+    //   } else {
+    //     if (productNameElement) productNameElement.innerText = "";
+    //   }
 
-        if (filePath && !allowedExtensions.includes(fileExtension)) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid File Type",
-            text: `File ${
-              index + 1
-            } is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(
-              ", "
-            )}.`,
-          });
-          isValid = false;
-        }
-      });
+    //   // Validate product description
+    //   const productDescriptionElement = document.getElementById("productDescriptionError");
+    //   const productDescription = document.querySelector('textarea[name="description"]').value;
+    //   if (productDescription.trim() === "") {
+    //     if (productDescriptionElement) productDescriptionElement.innerText = "Product description is required.";
+    //     isValid = false;
+    //   } else {
+    //     if (productDescriptionElement) productDescriptionElement.innerText = "";
+    //   }
 
-      return isValid;
-    }
+    //   // Validate file inputs
+    //   const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
+    //   const fileInputs = document.querySelectorAll('input[type="file"]');
+    //   fileInputs.forEach((fileInput, index) => {
+    //     const filePath = fileInput.value;
+    //     const fileExtension = filePath.split(".").pop().toLowerCase();
+
+    //     if (filePath && !allowedExtensions.includes(fileExtension)) {
+    //       Swal.fire({
+    //         icon: "error",
+    //         title: "Invalid File Type",
+    //         text: `File ${index + 1} is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(", ")}.`,
+    //       });
+    //       isValid = false;
+    //     }
+    //   });
+
+    //   return isValid;
+    // }
   </script>
 </body>
 <%- include("../../partials/admin/footer") %>

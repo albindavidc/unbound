@@ -6,6 +6,7 @@ const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
 const { productUpload } = require("../middlewares/multer"); // Adjust path accordingly
+const attributeController = require("../controllers/admin/attributeController")
 
 // Error page
 router.get("/pageerror", adminController.pageerror);
@@ -58,13 +59,72 @@ router.get(
 );
 
 
+const editUpload = productUpload.fields([
+  {name: "primaryImage", maxCount: 1},
+  {name: "secondaryImage0", maxCount: 1},
+  {name: "secondaryImage1", maxCount: 1},
+  {name: "secondaryImage2", maxCount: 1},
+  {name: "secondaryImage3", maxCount: 1},
+])
+
 router
   .route("/edit-product/:id")
   .get(adminAuth, productController.getEditProducts)
-  .post(adminAuth, upload, productController.editProduct);
+  .post(adminAuth, editUpload, productController.editProduct);
 
   
   router.get("/stocks", productController.getStocks);
   router.patch("/update-stock", productController.updateStock);
+
+
+
+//**Attribute-Management */
+
+
+router.get("/attributes", attributeController.getAttributes);
+
+router
+  .route("/attributes/color/:id")
+  .get(attributeController.getColor)
+  .put(attributeController.editColor);
+
+router
+  .route("/attributes/size/:id")
+  .get(attributeController.getSize)
+  .put(attributeController.editSize);
+
+router
+  .route("/attributes/brand/:id")
+  .get(attributeController.getBrand)
+  .put(attributeController.editBrand);
+
+router
+  .route("/attributes/toggleListing/color/:id")
+  .patch(attributeController.toggleListingColor);
+
+router
+  .route("/attributes/toggleListing/size/:id")
+  .patch(attributeController.toggleListingSize);
+
+router
+  .route("/attributes/toggleListing/brand/:id")
+  .patch(attributeController.toggleListingBrand);
+
+router
+  .route("/attributes/delete-color/:id")
+  .delete(attributeController.deleteColor);
+
+router
+  .route("/attributes/delete-size/:id")
+  .delete(attributeController.deleteSize);
+
+router
+  .route("/attributes/delete-brand/:id")
+  .delete(attributeController.deleteBrand);
+
+router.post("/attributes/add-color", attributeController.addColor);
+router.post("/attributes/add-size", attributeController.addSize);
+router.post("/attributes/add-brand", attributeController.addBrand);
+
 
 module.exports = router;
