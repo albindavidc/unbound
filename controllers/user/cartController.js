@@ -278,7 +278,7 @@ module.exports = {
         user: req.session.user,
       });
     } catch (error) {
-      console.error(error);
+      console.error("this is a fantastic error", error);
       res.status(500).json({ error: "An error occurred while fetching the cart." });
     }
   },
@@ -365,29 +365,30 @@ module.exports = {
     await handleCartUpdate(req, res, false);
   },
 
+  getOrderSuccess: async (req, res) => {
+    let userId = req.session.user;
+    let user = await User.findById(userId);
+    let order = await Order.aggregate([
+      {
+        $match: {
+          customerId: userId,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
+
+    res.render("user/orderConfirm", {
+      order: orderId,
+      user,
+    });
+  },
  
-
-  // getOrderSuccess: async (req, res) => {
-  //   let user = await User.findById(req.user.id);
-  //   let order = await Order.aggregate([
-  //     {
-  //       $match: {
-  //         customer_id: user._id,
-  //       },
-  //     },
-  //     {
-  //       $sort: {
-  //         createdAt: -1,
-  //       },
-  //     },
-  //     {
-  //       $limit: 1,
-  //     },
-  //   ]);
-  //   let order_id = order[0]._id.toString().slice(-7).toUpperCase();
-
-  //   res.render("shop/orderConfirm", {
-  //     order: order_id,
-  //   });
-  // },
 };

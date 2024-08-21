@@ -1,4 +1,3 @@
-
 const form = document.querySelector("#add-address");
 
 const editAddress = document.querySelector("#edit-address-modal");
@@ -20,15 +19,15 @@ editAddress.addEventListener("show.bs.modal", async (e) => {
 
     document.getElementById("edit-address-fn").value = address.name;
     document.getElementById("edit-address-ph").value = address.name;
-    document.getElementById("edit-address-house-name").value = address.house_name;
-    document.getElementById("edit-address-area").value = address.area_street;
+    document.getElementById("edit-address-house-name").value = address.houseName;
+    document.getElementById("edit-address-area").value = address.areaStreet;
     document.getElementById("edit-address-locality").value = address.locality;
     document.getElementById("edit-address-town").value = address.town;
     document.getElementById("edit-address-state").value = address.state;
     document.getElementById("edit-address-zip").value = address.zipcode;
     document.getElementById("edit-address-landmark").value = address.zipcode;
     document.getElementById("edit-alternative-phone").value = address.landmark;
-    document.getElementById("edit-alternative-phone").value = address.alternative_phone;
+    document.getElementById("edit-alternative-phone").value = address.alternatePhone;
 
     const addressTypeHome = document.getElementById("edit-addressType1");
     const addressTypeWork = document.getElementById("edit-addressType2");
@@ -43,20 +42,17 @@ editAddress.addEventListener("show.bs.modal", async (e) => {
       console.log("work");
     }
 
-    editAddressForm.action = `/checkout/edit-address/${addressId}`
+    editAddressForm.action = `/checkout/edit-address/${addressId}`;
     return;
-
   } catch (error) {}
   console.log(error);
 
   Swal.fire({
-    icon:"error",
-    title:"Oops...",
+    icon: "error",
+    title: "Oops...",
     text: error.message || "Something went wrong !",
-  })
+  });
 });
-
-
 
 /**
  * Add address validation
@@ -210,9 +206,7 @@ const checkAlternatePhone = () => {
 };
 
 const checkAddressType = () => {
-  const addressTypeEl = document.querySelector(
-    'input[name="address_type"]:checked'
-  );
+  const addressTypeEl = document.querySelector('input[name="address_type"]:checked');
   console.log(addressTypeEl);
   let valid = false;
 
@@ -290,9 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (submitOrder) {
     submitOrder.addEventListener("click", async function (e) {
       e.preventDefault();
-      const addressRadioButtons = document.querySelectorAll(
-        'input[name="address"]'
-      );
+      const addressRadioButtons = document.querySelectorAll('input[name="address"]');
       let isAddressSelected = false;
       for (let i = 0; i < addressRadioButtons.length; i++) {
         if (addressRadioButtons[i].checked) {
@@ -311,9 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // check if payment method is selected
-      const paymentMethod = document.querySelector(
-        'input[name="paymentMethod"]:checked'
-      );
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
       if (!paymentMethod) {
         Swal.fire({
           icon: "warning",
@@ -342,7 +332,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const paymentMethod = body.paymentMethod;
             console.log(body);
             try {
-
               // show loading using swal
               Swal.fire({
                 title: "Please wait...",
@@ -355,32 +344,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
               const response = await fetch("/place-order", {
                 method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
               });
 
               Swal.close();
-              
+
               console.log(response);
-              const data = await response.json();
-              console.log(data);
               if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
               }
-             
+              const data = await response.json();
+
+              console.log("Response data:", data);
+
               if (data.success) {
                 Swal.fire({
                   icon: "success",
                   title: "Order Successfull",
                   text: data.message,
                 }).then(() => {
-                  location.assign("/user/order-success");
+                  location.assign("/order-success");
                 });
               }
             } catch (error) {
-              console.error("Fetch error:", error);
+              // console.error("Fetch error:", error);
               Swal.fire({
                 icon: "error",
                 title: "Oops...",

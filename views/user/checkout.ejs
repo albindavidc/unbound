@@ -1,133 +1,201 @@
-<%- include('../../views/partials/user/header') %>
+<%- include('../partials/user/header') %>
 
-<!-- Hero Secion // Breadcrumb // Hero Content -->
-<section class="hero">
-  <div class="container">
-    <ol class="breadcrumb justify-content-center">
-      <li class="breackcrumb-itm"><a href="shop.ejs">Home</a></li>
-      <li class="breackcrumb-itm"><a href="">Cart</a></li>
-      <li class="breackcrumb-itm active">Checkout</li>
-    </ol>
-  </div>
-  <div class="hero-content pb-5 text-center">
-    <h1 class="hero-heading">Checkout</h1>
-  </div>
-</section>
-
-
-<!-- Checkout Section-->
-<section class="container mt-5">
-  <div class="row g-5">
-    <div class="col-md-5 col-lg-4 order-md-last">
-      <h4 class="bg-secondary-light text-white p-3 rounded d-flex justify-content-between align-items-center mb-3">
-        <span>Your Cart</span>
-        <span class="badge bg-secondary rounded-pill"><%- cartCount %></span>
-      </h4>
-      <ul class="list-group mb-4">
-        <% cartList.forEach(item => { %>
-        <li class="list-group-item d-flex justify-content-between lh-sm">
-          <div>
-            <h6 class="my-0 text-uppercase"><%- item.productId.name %></h6>
-            <small class="text-muted">Size: <%- item.sizeId.value %></small><br>
-            <small class="text-muted">Color: <%- item.colorId.name %></small><br>
-            <small class="text-muted">Quantity: <%- item.quantity %></small>
-          </div>
-          <div class="text-end">
-            <span class="text-muted">₹<%- item.price %> each</span><br>
-            <strong class="text-dark">₹<%- item.itemTotal %></strong>
-          </div>
-        </li>
-        <% }) %>
-        <li class="list-group-item d-flex justify-content-between">
-          <span>Grand Total (INR)</span>
-          <strong>₹<span id="grandTotal"><%- totalPrice %></span></strong>
-        </li>
-      </ul>
+<style>
+    .userProfileMain {
+      width: 80%;
+      height: 30%;
+      margin: 0 auto;
+      background-color: rgb(0, 0, 0);
+    }
+  
+    .userProfileH1 {
+      width: 50%;
+      margin: auto;
+      font-family: "Baloo", cursive;
+      color: white;
+      font-size: 7vw;
+    }
+  
+    .breadcrumbCls {
+      background-color: aliceblue;
+    }
+  </style>
+  
+  <section>
+    <div class="container">
+      <ol class="breadcrumb breadcrumbCls justify-content-right">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active">Checkout</li>
+      </ol>
     </div>
   
-    <div class="col-md-7 col-lg-8">
-      <h4 class="bg-secondary-light text-white p-3 rounded">Billing & Shipping Address</h4>
-      <form class="needs-validation" id="orderForm" novalidate>
-        <div class="my-4">
-          <% if (address.length > 0) { %>
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr class="text-muted">
-                  <th>Address</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% address.forEach((item, index) => { %>
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <input type="radio" class="form-check-input me-3" id="address-<%= index %>" name="address" value="<%= item._id %>" <% if (index === 0) { %> checked <% } %> required>
-                      <label for="address-<%= index %>" class="form-check-label">
-                        <%- item.name.toLowerCase() + ', ' + item.house_name + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + ', PH:' + item.phone %>
-                      </label>
-                    </div>
-                  </td>
-                  <td class="text-end">
-                    <button type="button" class="btn btn-sm btn-outline-warning me-2" id="edit-button" data-address-id="<%- item._id %>" href="#edit-address-modal" data-bs-toggle="modal">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAddress('<%- item._id %>')">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
-          <% } else { %>
-          <div class="alert alert-info">
-            No saved addresses. Please add a new address.
-          </div>
-          <% } %>
-          <div class="text-start mt-4">
-            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" href="#add-address">
-              Add New Address
-            </button>
-          </div>
-        </div>
-  
-        <hr class="my-4">
-  
-        <h4 class="bg-secondary-light text-white p-3 rounded">Payment</h4>
-  
-        <div class="accordion mb-5" id="paymentAccordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="headingCOD">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCOD" aria-expanded="false" aria-controls="collapseCOD">
-                Pay on Delivery
-              </button>
-            </h2>
-            <div id="collapseCOD" class="accordion-collapse collapse show" aria-labelledby="headingCOD" data-bs-parent="#paymentAccordion">
-              <div class="accordion-body">
-                <input type="radio" name="paymentMethod" id="payment-method-1" value="COD" class="form-check-input" <% if (isCOD) { %> checked <% } else { %> disabled <% } %> required>
-                <label for="payment-method-1" class="form-check-label ms-2">
-                  <strong>Pay on Delivery</strong><br>
-                  <% if (!isCOD) { %>
-                  <span class="text-danger">Pay on delivery is not available for orders above ₹1000.</span>
-                  <% } %>
-                </label>
+    <div class="pb-5 text-center">
+      <div class="card userProfileMain">
+        <h1 class="userProfileH1">Checkout</h1>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Checkout Section-->
+  <section>
+    <div class="container mb-7">
+      <div class="row g-5">
+        <div class="col-md-5 col-lg-4 order-md-last">
+          <h4 class="block-header bg-secondary-light d-flex justify-content-between align-items-center mb-3">
+            <span class="">Your cart</span>
+            <span class="badge bg-secondary rounded-pill"><%- cartCount %></span>
+          </h4>
+          <ul class="list-group mb-3 text-capitalize">
+            <% cartList.forEach(item => { %>
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+              <div class="fs-5">
+                <h6 class="my-0"><%- item.productId.name %></h6>
+                <small class="text-body-secondary">Size: <%- item.sizeId.value %></small> <br>
+                <small class="text-body-secondary">Color: <%- item.colorId.name %></small> <br>
+                <small class="text-body-secondary">Quantity: <%- item.quantity %></small>
               </div>
+              <div class="d-flex flex-column align-items-end lead fs-6">
+                <span class="fw-semibold text-body-secondary">Price per item: <span class="text-muted">₹<%- item.price %></span></span>
+                <span class="text-body-secondary fw-semibold">Total: ₹<%- item.itemTotal %></span>
+              </div>
+            </li>
+            <% }) %>
+            <li class="list-group-item d-flex justify-content-between bg-body-tertiary d-none" id="appliedCoupon">
+              <div class="text-success">
+                <h6 class="my-0">Coupon code</h6>
+                <small class="text-uppercase" id="coupon"></small>
+              </div>
+              <span class="text-success" id="discountAmount">−₹</span>
+            </li>
+            <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %>
+            <li class="list-group-item d-flex justify-content-between bg-body-tertiary" id="appliedCoupon">
+              <div class="text-success">
+                <h6 class="my-0">Coupon code</h6>
+                <small class="text-uppercase" id="coupon"><%- userCart.coupon.code %></small>
+              </div>
+              <span class="text-success" id="discountAmount">−₹<%- userCart.couponDiscount.toFixed(2) %></span>
+            </li>
+            <% } %>
+  
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Grand Total (INR)</span>
+              <strong>₹<span id="grandTotal"><%- totalPrice %></span></strong>
+            </li>
+          </ul>
+  
+        </div>
+        <div class="col-md-7 col-lg-8">
+  
+          <div class="row">
+            <div class="col-12">
+              <div class="block-header bg-secondary-light"><strong class="text-uppercase">Billing & Shipping Address</strong></div>
+              <br>
             </div>
           </div>
-        </div>
+          <form class="needs-validation" id="orderForm">
+            <div class="row g-3">
   
-        <div class="p-6">
+              <section class="col-lg-12">
+                <% if (address.length > 0) { %>
+                <!-- Toolbar-->
+                <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-3">
+                  <h6 class="fs-base fs-5  mb-0">Select Billing Address:</h6>
+                </div>
+  
+                <!-- Addresses list-->
+                <div class="table table-responsive table-striped mt-0">
+                  <table class="table table-hover mb-0">
+                    <thead>
+                      <tr class="align-middle fs-5">
+                        <th>Address</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% address.forEach((item,index) => { %>
+                      <tr class="align-middle fs-5">
+  
+                        <td class="py-3 align-middle text-capitalize">
+                          <div class="d-flex align-items-center">
+                            <input autocomplete="false" required class="mx-2" type="radio" <% if (index === 0) { %> checked <% } %> id="address-<%= index %>" name="address" value="<%= item._id %>">
+                            <label class="" for="address-<%= index %>">
+                              <%- item.name.toLowerCase() + ', ' + item.houseName + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + ', PH:' + item.phone %>
+                            </label>
+                          </div>
+                        </td>
+                        <td class="py-3 btn-group align-middle align-items-center">
+                          <div class="">
+                            <button type="button" class="btn btn-sm btn-outline-warning" id="edit-button" data-address-id="<%- item._id %>" href="#edit-address-modal" data-bs-toggle="modal">
+                              <i class="bi bi-pencil fs-6"></i>
+                            </button>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-danger" id="deleteAddressButton" data-bs-toggle="tooltip" title="Remove" onclick="deleteAddress('<%- item._id %>')">
+                            <i class="bi bi-trash fs-6"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+                <% } else { %>
+                <!-- Toolbar-->
+                <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-3">
+                  <h6 class="fs-base  mb-0">Add Address</h6>
+                </div>
+                <% } %>
+  
+                <div class="text-sm-start pt-4">
+                  <a class="btn btn-outline-success" href="#add-address" data-bs-toggle="modal">
+                    Add new address
+                  </a>
+                </div>
+              </section>
+            </div>
 
-            <button class="btn btn-primary btn-lg w-100" id="submitOrder" type="submit">Place Order</button>
+            <hr class="my-4">
+  
+            <div class="row">
+              <div class="col-12">
+                <div class="block-header bg-secondary-light"><strong class="text-uppercase">Payment</strong></div>
+                <br>
+              </div>
+            </div>
+  
+            <div class="mb-5">
+              <div id="accordion" role="tablist">
+  
+                <div class="block mb-3">
+                  <div class="block-header" id="headingThree" role="tab"><strong><a class="accordion-link collapsed" data-bs-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Pay on delivery</a></strong></div>
+                  <div class="collapse show" id="collapseThree" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                    <div class="block-body py-5 d-flex align-items-center">
+                      <input type="radio" name="paymentMethod" id="payment-method-1" value="COD" <% if (isCOD) { %> checked <% } else { %> disabled <% } %>>
+                      <label class="ms-3" for="payment-method-1">
+                        <strong class="d-block text-uppercase mb-2"> Pay on delivery</strong>
+                        <!-- <span class="text-muted text-sm">Pay on delivery is available for orders above ₹1000 only.    </span>
+                        <br> -->
+                        <% if (!isCOD) { %>
+                        <span class="text-muted text-danger text-sm">Pay on delivery is not available for orders above ₹1000.</span>
+                        <% } %>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+               
+              </div>
+            </div>
+  
+            <button id="submitOrder" class=" btn btn-primary btn-lg" type="submit">Place Order</button>
+            <!-- <div class="row">
+            </div> -->
+          </form>
         </div>
-      </form>
+      </div>
     </div>
-  </div>
-</section>
-
+  </section>
   
   <!-- Add New Address Modal-->
   <form class="needs-validation modal fade" action="/checkout/add-address" method="POST" id="add-address" tabindex="-1" novalidate>
@@ -230,7 +298,7 @@
               <label class="form-label" for="alternate-phone">Alternate Phone</label>
               <input autocomplete="false" name="alternate_phone" class="form-control" type="tel" id="alternate-phone" required>
               <small></small>
-              <input autocomplete="false" name="customerId" type="hidden" value="<%- user._id %>" class="form-control">
+              <input autocomplete="false" name="customer_id" type="hidden" value="<%- user._id %>" class="form-control">
             </div>
             <div class="col-sm-6 form-group">
               <p class="form-label">
@@ -402,7 +470,7 @@
 
 <script>
     
-    const editForm = document.querySelector("#edit-address-form");
+const editForm = document.querySelector("#edit-address-form");
 
 const checkEditName = () => {
   const nameEl = document.querySelector("#edit-address-fn");

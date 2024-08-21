@@ -105,16 +105,16 @@ router.get(
 
 router.get("/checkout", checkoutController.getCheckout);
 
+
 router.post("/checkout/add-address", userController.addAddress);
-
 router
-  .route("/checkout/edit-address/:id")
-  .get(userController.getEditAddress)
-  .post(userController.editAddress)
-  .delete(userController.deleteAddress);
+.route("/checkout/edit-address/:id")
+.get(userController.getEditAddress)
+.post(userController.editAddress)
+.delete(userController.deleteAddress);
 
-  router.post("/place-order", checkoutController.placeOrder);
-  router.post("/order-success", checkoutController.getOrderSuccess);
+router.post("/place-order", checkoutController.placeOrder);
+router.get("/order-success", cartController.getOrderSuccess);
 
 
 module.exports = router;

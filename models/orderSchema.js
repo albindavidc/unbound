@@ -19,7 +19,7 @@ const orderSchema = new Schema(
         variant: {
           type: ObjectId,
           ref: "Product.variants", // Corrected ref path
-          required: true,
+          // required: true,
         },
         color: {
           type: ObjectId,
@@ -28,7 +28,7 @@ const orderSchema = new Schema(
         size: {
           type: ObjectId,
           ref: "Size",
-          required: true,
+          // required: true,
         },
         quantity: {
           type: Number,

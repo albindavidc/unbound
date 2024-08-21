@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 
 // Function to check if a product exists and is active
 const checkProductExistence = async (cartItem) => {
-  const product = await Product.findById(cartItem.product_id._id);
+  const product = await Product.findById(cartItem.productId._id);
   if (!product || !product.isActive) {
     throw new Error(`${product.product_name}`);
   }
@@ -18,10 +18,10 @@ const checkProductExistence = async (cartItem) => {
 
 // Function to check if the stock is sufficient for a productExistencePromisesproduct
 const checkStockAvailability = async (cartItem) => {
-  const product = await Product.findById(cartItem.product_id._id);
+  const product = await Product.findById(cartItem.productId._id);
   const variant = product.variants.find((variant) => variant._id.toString() === cartItem.variant.toString());
   if (variant.stock < cartItem.quantity) {
-    throw new Error(`${product.product_name}`);
+    throw new Error(`${product.name}`);
   }
   return product;
 };
@@ -147,27 +147,31 @@ module.exports = {
 
   placeOrder: async (req, res) => {
     try {
-      const { paymentMethod, address } = req.body;
+      const {  paymentMethod, address } = req.body;
 
       const userId = req.session.user;
-      console.log(req.body);
+      console.log("eeeeeeeeeeeeeeeee",req.body);
 
       let shippingAddress = await Address.findOne({
         _id: address,
       });
 
+
+
+
+
       shippingAddress = {
         name: shippingAddress.name,
-        house_name: shippingAddress.house_name,
+        houseName: shippingAddress.houseName,
         locality: shippingAddress.locality,
-        area_street: shippingAddress.area_street,
+        areaStreet: shippingAddress.areaStreet,
         phone: shippingAddress.phone,
         address: shippingAddress.address,
         landmark: shippingAddress.landmark,
         city: shippingAddress.city,
         state: shippingAddress.state,
         zipcode: shippingAddress.zipcode,
-        address: `${shippingAddress.name}, ${shippingAddress.house_name}(H),  ${shippingAddress.locality}, ${shippingAddress.town}, ${shippingAddress.state}, PIN: ${shippingAddress.zipcode}. PH: ${shippingAddress.phone}`,
+        address: `${shippingAddress.name}, ${shippingAddress.houseName}(H),  ${shippingAddress.locality}, ${shippingAddress.town}, ${shippingAddress.state}, PIN: ${shippingAddress.zipcode}. PH: ${shippingAddress.phone}`,
       };
 
       if (!req.body.address) {
@@ -183,7 +187,7 @@ module.exports = {
         return res.status(404).json({ error: "User not found" });
       }
 
-      let userCart = await Cart.findOne({ userId: user._id }).catch((error) => {
+      let userCart = await Cart.findOne({ userId: userId }).catch((error) => {
         console.error(error);
         return res.status(500).json({ error: "Failed to find user's cart" });
       });
@@ -194,12 +198,14 @@ module.exports = {
       const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
       const paymentStatus = paymentMethod == "COD"  ? "Paid" : "Pending";
 
-      console.log(userCart.items);
+      console.log("hhhhhhhhhhhhhhhhhhhh",userCart.items);
 
-      let order;
 
-      order = new Order({
-        customerId: user._id,
+      console.log("hjjjjjjjjjjjjjjjjjjjjjj",req.body.items);
+
+
+      let order = new Order({
+        customerId: userId,
         items: userCart.items,
         totalPrice: userCart.totalPrice,
         payable: userCart.payable,
@@ -208,6 +214,10 @@ module.exports = {
         status,
         shippingAddress,
       });
+
+
+      console.log("these are the orders:",order);
+
 
       order.items.forEach((item) => {
         item.status = status;
@@ -227,10 +237,13 @@ module.exports = {
           // Save the order
           const orderPlaced = await order.save();
 
+          req.session.orderDetails = orderPlaced; // Store order details in session
+
+
           if (orderPlaced) {
             // reduce stock of the variant
             for (const item of userCart.items) {
-              const product = await Product.findById(item.product_id).catch((error) => {
+              const product = await Product.findById(item.productId).catch((error) => {
                 console.error(error);
                 return res.status(500).json({ error: "Failed to find product" });
               });
@@ -239,13 +252,18 @@ module.exports = {
                 return res.status(404).json({ error: "Product not found" });
               }
 
-              const variantIndex = product.variants.findIndex((variant) => variant._id.toString() === item.variant.toString());
+              const variantIndex = product?.variants?.findIndex((variant) => variant?._id?.toString() === item?.variant?.toString());
 
               if (variantIndex === -1) {
                 return res.status(404).json({ error: "Variant not found" });
               }
 
               console.log(product.variants[variantIndex]);
+
+              console.log("22222222222222", product.variants.stock)
+
+
+
 
               product.variants[variantIndex].stock -= item.quantity;
 
@@ -255,7 +273,7 @@ module.exports = {
               });
             }
 
-            await Cart.clearCart(req.user.id).catch((error) => {
+            await Cart.clearCart(req.session.user).catch((error) => {
               console.error(error);
               return res.status(500).json({ error: "Failed to clear user's cart" });
             });
@@ -273,35 +291,43 @@ module.exports = {
       }
     } catch (error) {
       console.error(error);
+
+      res.status(400).json({ message: "Detailed error message" });
+
+      console.log("ddddddddddddddddddddddddddddddddddd")
+      console.log(error.status);
+      console.log(error.stack);
+      
+
       res.status(500).json({ error: "An error occured while placing the order" });
     }
   },
 
 
-  getOrderSuccess: async (req, res) => {
-    let userId = req.session.user;
-    let user = await User.findById(userId);
-    let order = await Order.aggregate([
-      {
-        $match: {
-          customerId: userId,
-        },
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
-      },
-      {
-        $limit: 1,
-      },
-    ]);
-    let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
+//   getOrderSuccess: async (req, res) => {
+//     let userId = req.session.user;
+//     let user = await User.findById(userId);
+//     let order = await Order.aggregate([
+//       {
+//         $match: {
+//           customerId: userId,
+//         },
+//       },
+//       {
+//         $sort: {
+//           createdAt: -1,
+//         },
+//       },
+//       {
+//         $limit: 1,
+//       },
+//     ]);
+//     let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
 
-    res.render("user/orderConfirm", {
-      order: orderId,
-      user,
-    });
-  },
+//     res.render("user/orderConfirm", {
+//       order: orderId,
+//       user,
+//     });
+//   },
 
 };
