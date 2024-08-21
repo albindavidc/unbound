@@ -592,10 +592,10 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-const getCheckout= async(req,res) => {
-  console.log("Is this really working..  Yes it is")
-  res.render("user/checkout");
-};
+// const getCheckout= async(req,res) => {
+//   console.log("Is this really working..  Yes it is")
+//   res.render("user/checkout");
+// };
 
 module.exports = {
   pageNotFound,
@@ -625,7 +625,7 @@ module.exports = {
   deleteAddress,
   resetPassword,
 
-  getCheckout,
+  // getCheckout,
 
   logout,
 };

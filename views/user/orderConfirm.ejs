@@ -1,0 +1,26 @@
+<!-- Hero Section-->
+<section class="hero">
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <ol class="breadcrumb justify-content-center">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+            <li class="breadcrumb-item active">Order confirmed </li>
+        </ol>
+        <!-- Hero Content-->
+        <div class="hero-content pb-5 text-center">
+            <h1 class="hero-heading">Order confirmed</h1>
+        </div>
+    </div>
+</section>
+<section class="pb-5">
+    <div class="container text-center">
+        <div class="icon-rounded bg-success-light mb-3 mx-auto text-success">
+            <i class="bi bi-check-circle h1"></i>
+        </div>
+        <h4 class="mb-3 ff-base">Thank you, <%- user.username %>. Your order is confirmed.</h4>
+        <h4 class="mb-3 ff-base">Order Id : <%- order %> </h4>
+        <p class="text-muted mb-5">Your order hasn't shipped yet but we will send you ane email when it does.</p>
+        <p> <a class="btn btn-outline-dark" href="/user/orders">View or manage your order</a></p>
+    </div>
+</section>

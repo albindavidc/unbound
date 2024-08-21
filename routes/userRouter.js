@@ -4,7 +4,8 @@ const passport = require("passport");
 const {userAuth, isLogedOut, checkUserStatus} = require("../middlewares/auth");
 const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
-const cartController = require('../controllers/user/cartController')
+const cartController = require('../controllers/user/cartController');
+const checkoutController = require("../controllers/user/checkoutController");
 
 
 //Home page - Page not found
@@ -101,14 +102,16 @@ router.get(
   cartController.decrementCartItem
 );
 
-router.get("/checkout", userController.getCheckout);
-// router.post("/checkout/add-address", userController.addAddress);
 
-// router
-//   .route("/checkout/edit-address/:id")
-//   .get(userController.getEditAddress)
-//   .post(userController.editAddress)
-//   .delete(userController.deleteAddress);
+router.get("/checkout", checkoutController.getCheckout);
+
+router.post("/checkout/add-address", userController.addAddress);
+
+router
+  .route("/checkout/edit-address/:id")
+  .get(userController.getEditAddress)
+  .post(userController.editAddress)
+  .delete(userController.deleteAddress);
 
 
 module.exports = router;

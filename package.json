@@ -33,7 +33,7 @@
     "passport-google-oauth20": "^2.0.0",
     "sharp": "^0.33.4",
     "sweetalert": "^2.1.2",
-    "sweetalert2": "^11.6.13",
+    "sweetalert2": "^11.12.4",
     "uuid": "^10.0.0"
   },
   "description": "",
