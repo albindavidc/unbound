@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
               });
 
-              const response = await fetch("/user/place-order", {
+              const response = await fetch("/place-order", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -369,16 +369,14 @@ document.addEventListener("DOMContentLoaded", function () {
               if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
               }
-              if (data.status) {
-                showRazorpay(data.order, data.user);
-              }
+             
               if (data.success) {
                 Swal.fire({
                   icon: "success",
                   title: "Order Successfull",
                   text: data.message,
                 }).then(() => {
-                  location.assign("/shop/order-success");
+                  location.assign("/user/order-success");
                 });
               }
             } catch (error) {
@@ -386,7 +384,7 @@ document.addEventListener("DOMContentLoaded", function () {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "Something went wrong!",
+                text: "Everything is wrong !",
               });
             }
           } else {

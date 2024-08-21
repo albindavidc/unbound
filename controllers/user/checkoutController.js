@@ -108,7 +108,7 @@ module.exports = {
     // }
 
     const address = await Address.find({
-      customer_id: userId,
+      customerId: userId,
       delete: false,
     });
 
@@ -123,13 +123,8 @@ module.exports = {
       totalPriceBeforeOffer += prod.price;
     }
 
-
-
-
     // Correctly calculate cartCount
     let cartCount = userCart.items.length;
-
-
 
     let isCOD = true;
 
@@ -137,9 +132,8 @@ module.exports = {
       isCOD = false;
     }
 
-
     res.render("user/checkout", {
-    //   locals,
+      //   locals,
       user,
       address,
       userCart,
@@ -150,10 +144,12 @@ module.exports = {
       checkout: true,
     });
   },
+
   placeOrder: async (req, res) => {
     try {
       const { paymentMethod, address } = req.body;
 
+      const userId = req.session.user;
       console.log(req.body);
 
       let shippingAddress = await Address.findOne({
@@ -177,11 +173,8 @@ module.exports = {
       if (!req.body.address) {
         return res.status(400).json({ status: false, message: "Please add the address" });
       }
-      if (!req.body.paymentMethod) {
-        return res.status(400).json({ status: false, message: "Please select a payment method" });
-      }
 
-      const user = await User.findById(req.user.id).catch((error) => {
+      const user = await User.findById(userId).catch((error) => {
         console.error(error);
         return res.status(500).json({ error: "Failed to find user" });
       });
@@ -198,40 +191,24 @@ module.exports = {
       if (!userCart) {
         return res.status(404).json({ error: "User's cart not found" });
       }
-      const status = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Confirmed" : "Pending";
-      const paymentStatus = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Paid" : "Pending";
+      const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
+      const paymentStatus = paymentMethod == "COD"  ? "Paid" : "Pending";
 
       console.log(userCart.items);
 
       let order;
 
-      if (userCart.coupon) {
-        order = new Order({
-          customer_id: user._id,
-          items: userCart.items,
-          totalPrice: userCart.totalPrice,
-          payable: userCart.payable,
-          paymentMethod,
-          paymentStatus,
-          status,
-          shippingAddress,
-        });
+      order = new Order({
+        customerId: user._id,
+        items: userCart.items,
+        totalPrice: userCart.totalPrice,
+        payable: userCart.payable,
+        paymentMethod,
+        paymentStatus,
+        status,
+        shippingAddress,
+      });
 
-        order.items.forEach((item) => {
-          item.status = status;
-        });
-      } else {
-        order = new Order({
-          customer_id: user._id,
-          items: userCart.items,
-          totalPrice: userCart.totalPrice,
-          payable: userCart.payable,
-          paymentMethod,
-          paymentStatus,
-          status,
-          shippingAddress,
-        });
-      }
       order.items.forEach((item) => {
         item.status = status;
       });
@@ -251,11 +228,6 @@ module.exports = {
           const orderPlaced = await order.save();
 
           if (orderPlaced) {
-            // if coupon is used
-            if (order.coupon) {
-              await Coupon.findOneAndUpdate({ _id: userCart.coupon }, { $push: { usedBy: { userId: req.user.id } } });
-            }
-
             // reduce stock of the variant
             for (const item of userCart.items) {
               const product = await Product.findById(item.product_id).catch((error) => {
@@ -288,11 +260,6 @@ module.exports = {
               return res.status(500).json({ error: "Failed to clear user's cart" });
             });
 
-            // coupon is used
-            if (order.coupon) {
-              await Coupon.findOneAndUpdate({ _id: userCart.coupon }, { $push: { usedBy: { userId: req.user.id } } });
-            }
-
             return res.status(200).json({
               success: true,
               message: "Order has been placed successfully.",
@@ -309,4 +276,32 @@ module.exports = {
       res.status(500).json({ error: "An error occured while placing the order" });
     }
   },
+
+
+  getOrderSuccess: async (req, res) => {
+    let userId = req.session.user;
+    let user = await User.findById(userId);
+    let order = await Order.aggregate([
+      {
+        $match: {
+          customerId: userId,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
+
+    res.render("user/orderConfirm", {
+      order: orderId,
+      user,
+    });
+  },
+
 };

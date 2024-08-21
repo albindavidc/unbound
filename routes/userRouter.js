@@ -113,5 +113,8 @@ router
   .post(userController.editAddress)
   .delete(userController.deleteAddress);
 
+  router.post("/place-order", checkoutController.placeOrder);
+  router.post("/order-success", checkoutController.getOrderSuccess);
+
 
 module.exports = router;

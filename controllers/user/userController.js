@@ -504,7 +504,7 @@ const resetPassword = async (req, res) => {
 
 const getAddress = async (req, res) => {
   const address = await Address.find({
-    customer_id: req.session.user,
+    customerId: req.session.user,
     delete: false,
   });
 

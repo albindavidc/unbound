@@ -230,7 +230,7 @@
               <label class="form-label" for="alternate-phone">Alternate Phone</label>
               <input autocomplete="false" name="alternate_phone" class="form-control" type="tel" id="alternate-phone" required>
               <small></small>
-              <input autocomplete="false" name="customer_id" type="hidden" value="<%- user._id %>" class="form-control">
+              <input autocomplete="false" name="customerId" type="hidden" value="<%- user._id %>" class="form-control">
             </div>
             <div class="col-sm-6 form-group">
               <p class="form-label">
@@ -605,6 +605,22 @@ editForm.addEventListener("submit", function (e) {
     editForm.submit();
   }
 });
+
+
+
+const debounce = (fn, delay = 50) => {
+  let timeoutId;
+  return (...args) => {
+    // cancel the previous timer
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    // setup a new timer
+    timeoutId = setTimeout(() => {
+      fn.apply(null, args);
+    }, delay);
+  };
+};
 
 
 
