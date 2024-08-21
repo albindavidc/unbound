@@ -1,3 +1,31 @@
-<div class="container">
-<h1>"this is a new world"</h1>
-</div>
+<%- include('../views/partials/user/header') %>
+
+<!-- Hero Secion // Breadcrumb // Hero Content -->
+<section class="hero">
+    <div class="container">
+        <ol class="breadcrumb justify-content-center">
+            <li class="breackcrumb-itm"><a href="shop.ejs">Home</a></li>
+            <li class="breackcrumb-itm"><a href="">Cart</a></li>
+            <li class="breackcrumb-itm active">Checkout</li>
+        </ol>
+    </div>
+    <div class="hero-content pb-5 text-center">
+        <h1 class="hero-heading">Checkout</h1>
+    </div>
+</section>
+
+<!-- Checkout-Section -->
+ <section>
+    <div class="container mb-7">
+        <div class="row g-5">
+            <div class="col-md-5 col-lg-4 order-md-last">
+                <h4 class="block-header bg-secondary-light d-flex justify-content-between align-items center mb-3">
+                    <span>Your Cart</span>
+                    <span class="badge bg-secondary rounded-pill"><%- cartCount %></span>
+                </h4>
+            </div>
+        </div>
+    </div>
+ </section>
+
+<%- include('../views/partials/user/footer') %>
