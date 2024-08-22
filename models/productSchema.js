@@ -68,9 +68,11 @@ const ProductSchema = new mongoose.Schema(
     },
     actualPrice: {
       type: Number,
+      required: true,
     },
     sellingPrice: {
       type: Number,
+      required: true,
     },
     bundlePrice: {
       type: Number,
