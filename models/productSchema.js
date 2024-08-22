@@ -79,8 +79,8 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     onOffer: {
-      type: Boolean,
-      default: false,
+      type: String,
+      required: true,
     },
     offerDiscountPrice: {
       type: Number,

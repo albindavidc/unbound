@@ -181,19 +181,16 @@ module.exports = {
         return res.status(400).json({ status: false, message: "Please select a payment method" });
       }
 
-      const user = await User.findById(req.user.id).catch((error) => {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to find user" });
-      });
+      // const user = await User.findById(req.user.id).catch((error) => {
+      //   console.error(error);
+      //   return res.status(500).json({ error: "Failed to find user" });
+      // });
 
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
+      // if (!user) {
+      //   return res.status(404).json({ error: "User not found" });
+      // }
 
-      let userCart = await Cart.findOne({ userId: user._id }).catch((error) => {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to find user's cart" });
-      });
+      let userCart = await Cart.findOne({ userId: req.session.user })
 
       if (!userCart) {
         return res.status(404).json({ error: "User's cart not found" });
@@ -207,7 +204,7 @@ module.exports = {
 
       if (userCart.coupon) {
         order = new Order({
-          customer_id: user._id,
+          customerId: req.session.user,
           items: userCart.items,
           totalPrice: userCart.totalPrice,
           payable: userCart.payable,

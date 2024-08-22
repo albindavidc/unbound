@@ -71,27 +71,27 @@ module.exports = {
     try {
       const {
         productName,
-        productdescription,
-        brand,
+        productDescription,
         actualPrice,
         sellingPrice,
         bundlePrice,
         offer,
         offerDiscountPrice,
         offerDiscountRate,
+        brand,
         category,
         quantity,
         variants,
       } = req.body;
 
       // Create arrays for primary and secondary images
-      const primaryImages = req.files.primaryImage.map((file) => ({
+      const primaryImages = req?.files?.primaryImage?.map((file) => ({
         name: file.filename,
         path: file.path,
         type: "primary",
       }));
 
-      const secondaryImages = req.files.secondaryImage.map((file) => ({
+      const secondaryImages = req?.files?.secondaryImage?.map((file) => ({
         name: file.filename,
         path: file.path,
         type: "secondary",
@@ -120,7 +120,7 @@ module.exports = {
 
         const newProduct = new Product({
           name: productName,
-          description: productdescription,
+          description: productDescription,
           brand,
           category,
           actualPrice,
@@ -130,7 +130,7 @@ module.exports = {
           sellingPrice,
           bundlePrice,
           quantity,
-          offer,
+          onOffer:offer,
           offerDiscountPrice,
           offerDiscountRate,
         });
