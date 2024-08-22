@@ -243,40 +243,27 @@ module.exports = {
           if (orderPlaced) {
             // reduce stock of the variant
             for (const item of userCart.items) {
-              const product = await Product.findById(item.productId).catch((error) => {
-                console.error(error);
-                return res.status(500).json({ error: "Failed to find product" });
-              });
+             const product = await Product.findById(item.productId)
 
               if (!product) {
                 return res.status(404).json({ error: "Product not found" });
               }
 
-              const variantIndex = product?.variants?.findIndex((variant) => variant?._id?.toString() === item?.variant?.toString());
+              console.log(product,item);
 
-              if (variantIndex === -1) {
-                return res.status(404).json({ error: "Variant not found" });
-              }
+              const variantIndex = product.variants.find((variant)=>   variant.size === item.sizeId &&  variant.color === item.colorId  );
 
-              console.log(product.variants[variantIndex]);
-
-              console.log("22222222222222", product.variants.stock)
-
-
-
-
+              console.log(variantIndex);
+              console.log("this is a variant",product.variants[variantIndex]);
               product.variants[variantIndex].stock -= item.quantity;
+              
 
-              await product.save().catch((error) => {
-                console.error(error);
-                return res.status(500).json({ error: "Failed to update product stock" });
-              });
+              await product.save();
+              
+
             }
 
-            await Cart.clearCart(req.session.user).catch((error) => {
-              console.error(error);
-              return res.status(500).json({ error: "Failed to clear user's cart" });
-            });
+            await Cart.clearCart(req.session.user)
 
             return res.status(200).json({
               success: true,

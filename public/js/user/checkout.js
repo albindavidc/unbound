@@ -351,12 +351,12 @@ document.addEventListener("DOMContentLoaded", function () {
               Swal.close();
 
               console.log(response);
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
               const data = await response.json();
 
               console.log("Response data:", data);
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
 
               if (data.success) {
                 Swal.fire({
@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
               }
             } catch (error) {
-              // console.error("Fetch error:", error);
+              console.error("Fetch error:", error);
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
