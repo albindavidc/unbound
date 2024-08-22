@@ -291,11 +291,31 @@ module.exports = {
     
       // Find the user's cart (or create a new one if it doesn't exist)
       let cart = await Cart.findOne({ userId: req.session.user }); 
+      
       if (!cart) {
         cart = new Cart({ userId: req.session.user });
       }
+
+      const product = await Product.findById(productId).populate('variants.color').populate('variants.size');
+
+      if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+
+      const selectedVariant = product.variants.find(variant => 
+          variant.color._id.toString() === colorId && variant.size._id.toString() === sizeId
+      );
+
+      if (!selectedVariant) {
+          return res.status(404).json({ success: false, message: 'Variant not found' });
+      }
+
+      const variantId = selectedVariant._id;
+
+      console.log("these is the variantid ", variantId);
+      console.log("this is the product", product);
   
-      cart.items.push({ productId, colorId,sizeId, quantity,price }); 
+      cart.items.push({ productId, colorId,sizeId,variantId, quantity,price }); 
       await cart.save();
   
 

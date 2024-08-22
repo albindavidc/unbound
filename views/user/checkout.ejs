@@ -171,7 +171,7 @@
                   <div class="block-header" id="headingThree" role="tab"><strong><a class="accordion-link collapsed" data-bs-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Pay on delivery</a></strong></div>
                   <div class="collapse show" id="collapseThree" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
                     <div class="block-body py-5 d-flex align-items-center">
-                      <input type="radio" name="paymentMethod" id="payment-method-1" value="COD" <% if (isCOD) { %> checked <% } else { %> disabled <% } %>>
+                      <input type="radio" name="paymentMethod" id="payment-method-1" value="COD" <% if (isCOD) { %> checked  <% } else { %> disabled <% } %>>
                       <label class="ms-3" for="payment-method-1">
                         <strong class="d-block text-uppercase mb-2"> Pay on delivery</strong>
                         <!-- <span class="text-muted text-sm">Pay on delivery is available for orders above ₹1000 only.    </span>
@@ -180,6 +180,7 @@
                         <span class="text-muted text-danger text-sm">Pay on delivery is not available for orders above ₹1000.</span>
                         <% } %>
                       </label>
+
                     </div>
                   </div>
                 </div>

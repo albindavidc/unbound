@@ -18,7 +18,7 @@ const cartSchema = new mongoose.Schema(
         },
         variantId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Product.variants",
+          ref: "Variant",
         },
         colorId: {
           type: mongoose.Schema.Types.ObjectId,
@@ -64,6 +64,22 @@ const cartSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+cartSchema.statics.clearCart = async function (userId) {
+  return await this.findOneAndUpdate(
+    { userId: userId },
+    {
+      $set: {
+        items: [],
+        totalPrice: 0,
+        coupon: null,
+        couponDiscount: 0,
+        payable: 0,
+      },
+    },
+    { new: true }
+  );
+};
 
 const Cart = mongoose.model("Cart", cartSchema);
 module.exports = Cart;

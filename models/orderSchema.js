@@ -18,7 +18,7 @@ const orderSchema = new Schema(
         },
         variant: {
           type: ObjectId,
-          ref: "Product.variants", // Corrected ref path
+          ref: "Variants", // Corrected ref path
           // required: true,
         },
         color: {

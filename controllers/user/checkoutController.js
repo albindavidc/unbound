@@ -59,14 +59,6 @@ function generateOrderID() {
 
 module.exports = {
   getCheckout: async (req, res) => {
-    // const locals = {
-    //   title: "Unbound - Checkout",
-    // };
-
-    // if (!req.isAuthenticated()) {
-    //   return res.redirect("/login");
-    // }
-
     const userId = req.session.user;
 
     const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId");
@@ -128,12 +120,7 @@ module.exports = {
 
     let isCOD = true;
 
-    if (totalPrice > 1000) {
-      isCOD = false;
-    }
-
     res.render("user/checkout", {
-      //   locals,
       user,
       address,
       userCart,
@@ -147,18 +134,14 @@ module.exports = {
 
   placeOrder: async (req, res) => {
     try {
-      const {  paymentMethod, address } = req.body;
+      const { paymentMethod, address } = req.body;
 
       const userId = req.session.user;
-      console.log("eeeeeeeeeeeeeeeee",req.body);
+      console.log("eeeeeeeeeeeeeeeee", req.body);
 
       let shippingAddress = await Address.findOne({
         _id: address,
       });
-
-
-
-
 
       shippingAddress = {
         name: shippingAddress.name,
@@ -196,13 +179,11 @@ module.exports = {
         return res.status(404).json({ error: "User's cart not found" });
       }
       const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
-      const paymentStatus = paymentMethod == "COD"  ? "Paid" : "Pending";
+      const paymentStatus = paymentMethod == "COD" ? "Paid" : "Pending";
 
-      console.log("hhhhhhhhhhhhhhhhhhhh",userCart.items);
+      console.log("hhhhhhhhhhhhhhhhhhhh", userCart.items);
 
-
-      console.log("hjjjjjjjjjjjjjjjjjjjjjj",req.body.items);
-
+      console.log("hjjjjjjjjjjjjjjjjjjjjjj", req.body.items);
 
       let order = new Order({
         customerId: userId,
@@ -215,9 +196,7 @@ module.exports = {
         shippingAddress,
       });
 
-
-      console.log("these are the orders:",order);
-
+      console.log("these are the orders:", order);
 
       order.items.forEach((item) => {
         item.status = status;
@@ -239,31 +218,54 @@ module.exports = {
 
           req.session.orderDetails = orderPlaced; // Store order details in session
 
-
           if (orderPlaced) {
-            // reduce stock of the variant
+
+
+
+            // // reduce stock of the variant
+            // Assuming this is part of your checkout process after an order is placed
             for (const item of userCart.items) {
-             const product = await Product.findById(item.productId)
+              // Find the product by ID
+              const product = await Product.findById(item.productId);
 
               if (!product) {
                 return res.status(404).json({ error: "Product not found" });
               }
 
-              console.log(product,item);
+              // Find the variant based on size and color (assuming these are stored in sizeId and colorId)
+              const variant = product.variants.find(
+                (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
+              );
 
-              const variantIndex = product.variants.find((variant)=>   variant.size === item.sizeId &&  variant.color === item.colorId  );
+              // If the variant is not found, return an error
+              if (!variant) {
+                return res.status(404).json({ error: "Variant not found" });
+              }
 
-              console.log(variantIndex);
-              console.log("this is a variant",product.variants[variantIndex]);
-              product.variants[variantIndex].stock -= item.quantity;
-              
+              // Check if there's enough stock
+              if (variant.stock < item.quantity) {
+                return res.status(400).json({ error: "Insufficient stock" });
+              }
 
+
+              console.log("this is product", product);
+              console.log("this is variant", variant);
+              console.log("this is stock", variant.stock);
+              console.log('this is the quantity', item.quantity);
+              // Reduce the stock by the quantity in the cart
+              variant.stock -= item.quantity;
+
+              // Save the updated product
               await product.save();
-              
-
             }
 
-            await Cart.clearCart(req.session.user)
+
+
+            // Proceed with the rest of the checkout process here
+
+            const userId = req.session.user;
+
+            await Cart.clearCart(userId);
 
             return res.status(200).json({
               success: true,
@@ -281,40 +283,37 @@ module.exports = {
 
       res.status(400).json({ message: "Detailed error message" });
 
-      console.log("ddddddddddddddddddddddddddddddddddd")
+      console.log("ddddddddddddddddddddddddddddddddddd");
       console.log(error.status);
       console.log(error.stack);
-      
 
       res.status(500).json({ error: "An error occured while placing the order" });
     }
   },
 
+  //   getOrderSuccess: async (req, res) => {
+  //     let userId = req.session.user;
+  //     let user = await User.findById(userId);
+  //     let order = await Order.aggregate([
+  //       {
+  //         $match: {
+  //           customerId: userId,
+  //         },
+  //       },
+  //       {
+  //         $sort: {
+  //           createdAt: -1,
+  //         },
+  //       },
+  //       {
+  //         $limit: 1,
+  //       },
+  //     ]);
+  //     let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
 
-//   getOrderSuccess: async (req, res) => {
-//     let userId = req.session.user;
-//     let user = await User.findById(userId);
-//     let order = await Order.aggregate([
-//       {
-//         $match: {
-//           customerId: userId,
-//         },
-//       },
-//       {
-//         $sort: {
-//           createdAt: -1,
-//         },
-//       },
-//       {
-//         $limit: 1,
-//       },
-//     ]);
-//     let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
-
-//     res.render("user/orderConfirm", {
-//       order: orderId,
-//       user,
-//     });
-//   },
-
+  //     res.render("user/orderConfirm", {
+  //       order: orderId,
+  //       user,
+  //     });
+  //   },
 };
