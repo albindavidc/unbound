@@ -457,13 +457,21 @@
     }
   });
 
+
+
+
+
+
+
+
+
   // Add product function
   async function addproduct(event) {
     event.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
 
     if (croppedPrimaryImagesDiv.childElementCount === 0) {
       Swal.fire({
@@ -503,6 +511,9 @@
       formData.append("secondaryImage", blob, `secondaryImage${i}.png`);
     }
 
+    console.log(formData.entries());
+
+
 
     //   // Collect variants
     //   const variants = [];
@@ -514,272 +525,8 @@
     //   });
     //   formData.append("variants", JSON.stringify(variants));
 
+
     try {
-      console.log(formData.entries());
-
-      const response = await fetch("/admin/add-product", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-
-      if (data.isvalid) {
-        const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
-        window.location.href = `${API_BASE_URL}/admin/products`;
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Product adding failed...!",
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "An error occurred while adding the product.",
-      });
-    }
-  }
-
-  function validateForm() {
-    const form = document.getElementById("addProductForm");
-    let isValid = false;
-
-    const checkName = () => {
-      const nameEl = document.querySelector("#product-name");
-
-      const name = nameEl.value.trim();
-
-      if (!isRequired(name)) {
-        showError(nameEl, "Full name cannot be blank.");
-      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-        showError(nameEl, "Full name should not contain numbers.");
-      } else {
-        showSuccess(nameEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkDescription = () => {
-      const descriptionEl = document.querySelector("#product-description");
-      const description = descriptionEl.value.trim();
-
-      if (!isRequired(description)) {
-        showError(descriptionEl, "Description cannot be blank.");
-      } else if (!/^[a-zA-Z\s]+$/.test(description)) {
-        showError(descriptionEl, "Description should not contain numbers.");
-      } else {
-        showSuccess(descriptionEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkActualPrice = () =>{
-      const acutalPriceEl = document.querySelector("#actual-price");
-      const acutalPrice = acutalPriceEl.value;
-
-      if(!isRequired(acutalPrice)){
-        showError(acutalPriceEl, "Actual price cannot be blank");
-      }else if(parseFloat(acutalPrice) <= 0){
-
-        showError(acutalPriceEl, "Actual price cannot be zero")
-      
-      }else{
-        showSuccess(acutalPriceEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkSellingPrice = () =>{
-      const sellingPriceEl = document.querySelector("#selling-price");
-      const sellingPrice = sellingPriceEl.value;
-
-      if(!isRequired(sellingPrice)){
-        showError(sellingPriceEl, "Selling price cannot be blank");
-      }else if(parseFloat(sellingPrice) <=0){
-        showError(sellingPriceEl, "Selling price cannot be zero");
-      }else {
-        showSuccess(sellingPriceEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkBundlePrice = () =>{
-      const bundlePriceEl = document.querySelector("#bundle-price");
-      const bundlePrice = bundlePriceEl.value;
-
-      if(!isRequired(bundlePrice)){
-        showError(bundlePriceEl, "Bundle price cannot be blank");
-      }else if(parseFloat(bundlePrice) <= 0){
-        showError(bundlePriceEl, "Bundle Price cannot be zero");
-      }else {
-        showSuccess(bundlePriceEl);
-        isValid= true;
-      }
-      return isValid;
-    }
-
-    const checkVariantStock = () => {
-      const variantStockEl = document.querySelector("#variant-stock");
-      const variantStock = variantStockEl.value;
-
-      if(!isRequired(variantStock)){
-        showError(variantStockEl,"Stock cannot be blank");
-      }else if(parseFloat(variantStock) <= 0){
-        showError(variantStockEl, "Stock cannot be zero");
-      }else{
-        showSuccess(variantStockEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkMaxProduct = () => {
-      const maxProductPerPersonEl = document.querySelector("#max-product");
-      const maxProductPerPerson = maxProductPerPersonEl.value;
-
-      if(!isRequired(maxProductPerPerson)){
-        showError(maxProductPerPersonEl, "Max product cannot be blank");
-      }else if(parseFloat(maxProductPerPerson) <=0){
-        showError(maxProductPerPersonEl, "Max product cannot be Zero");
-      }else{
-        showSuccess(maxProductPerPersonEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkColor = () =>{
-      const colorEl = document.querySelector("#color");
-      const color = colorEl.value;
-
-      if(color === "selectColor" ){
-        showError(colorEl, "Select a color");
-      }else {
-        showSuccess(colorEl);
-        isValid = true;
-
-      }
-      return isValid;
-    }
-
-    const checkSize = () => {
-      const sizeEl = document.querySelector("#size")
-      const size = sizeEl.value;
-
-      if(size === "selectSize"){
-        showError(sizeEl, "Select a size");
-      }else{
-        showSuccess(sizeEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkOnOffer = () =>{
-      const onOfferEl = document.querySelector("#on-offer");
-      const onOffer = onOfferEl.value;
-
-      if(onOffer === "selectOffer"){
-        showError(onOfferEl, "Select Yes or No");
-      }else{
-        showSuccess(onOfferEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkOfferDiscountPrice = () =>{
-      const offerDiscountPriceEl = document.querySelector("#offer-discount-price")
-      const offerDiscountPrice = offerDiscountPriceEl.value;
-
-      if(!isRequired(offerDiscountPrice) ){
-        showError(offerDiscountPriceEl, "Offer discount cannot be blank");
-      }else if(parseFloat(offerDiscountPrice) <= 0){
-        showError(offerDiscountPriceEl, "Offer discount cannot be zero or less")
-      }else {
-        showSuccess(offerDiscountPriceEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkOfferDiscountRate = () => {
-      const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
-      const offerDiscountRate = offerDiscountRateEl.value;
-
-      if(!isRequired(offerDiscountRate)){
-        showError(offerDiscountRateEl, "Offer discount rate cannot be blank"); 
-      }else if(parseFloat(offerDiscountRate) <= 0 ){
-        showError(offerDiscountRateEl, "Offer discount cannot be zero or less");
-      }else {
-        showSuccess(offerDiscountRateEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkBrand = () => {
-      const brandEl = document.querySelector("#brand");
-      const brand = brandEl.value;
-
-      if(brand === "selectBrand"){
-        showError(brandEl, "Select a brand")
-      }else{
-        showSuccess(brandEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-    const checkCategory = () =>{
-      const categoryEl = document.querySelector("#category");
-      const category = categoryEl.value;
-
-      if(category === "selectCategory"){
-        showError(categoryEl, "Select a category");
-      }else {
-        showSuccess(categoryEl);
-        isValid = true;
-      }
-      return isValid;
-    }
-
-
-
-    const isRequired = (value) => (value === "" ? false : true);
-
-    const showError = (input, message) => {
-      const formField = input.parentElement;
-      formField.classList.remove("success", "is-valid");
-      input.classList.remove("success", "is-valid");
-      formField.classList.add("error", "is-invalid");
-      input.classList.add("error", "is-invalid");
-      const error = formField.querySelector("small");
-      error.textContent = message;
-    };
-
-    const showSuccess = (input) => {
-      const formField = input.parentElement;
-      formField.classList.remove("error", "is-invalid");
-      input.classList.remove("error", "is-invalid");
-      formField.classList.add("success", "is-valid");
-      input.classList.add("success", "is-valid");
-      const error = formField.querySelector("small");
-      if (error) {
-        error.textContent = "";
-      }
-    };
-    
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
 
       let isNameValid = checkName(),
       isDesciptionValid = checkDescription(),
@@ -814,12 +561,275 @@
       isBrand &&
       isCategory;
 
-      if (isFormValid) {
-        form.submit();
+      if(!isFormValid){
+        throw new Error("Form is not valid");
       }
-    });
 
-    const debounce = (fn, delay = 500) => {
+      console.log(formData.entries());
+
+      const response = await fetch("/admin/add-product", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (data.isvalid) {
+        const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+        window.location.href = `${API_BASE_URL}/admin/products`;
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Product adding failed...!",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred while adding the product.",
+      });
+    }
+  }
+
+
+  const form = document.getElementById("addProductForm");
+
+  
+  const checkName = () => {
+    const nameEl = document.querySelector("#product-name");
+
+    const name = nameEl.value.trim();
+
+    if (!isRequired(name)) {
+      showError(nameEl, "Full name cannot be blank.");
+    } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+      showError(nameEl, "Full name should not contain numbers.");
+    } else {
+      showSuccess(nameEl);
+      isValid = true;
+    }
+    return isValid;
+  };
+
+  const checkDescription = () => {
+    const descriptionEl = document.querySelector("#product-description");
+    const description = descriptionEl.value.trim();
+
+    if (!isRequired(description)) {
+      showError(descriptionEl, "Description cannot be blank.");
+    } else if (!/^[a-zA-Z\s]+$/.test(description)) {
+      showError(descriptionEl, "Description should not contain numbers.");
+    } else {
+      showSuccess(descriptionEl);
+      isValid = true;
+    }
+    return isValid;
+  };
+
+  const checkActualPrice = () =>{
+    const acutalPriceEl = document.querySelector("#actual-price");
+    const acutalPrice = acutalPriceEl.value;
+
+    if(!isRequired(acutalPrice)){
+      showError(acutalPriceEl, "Actual price cannot be blank");
+    }else if(parseFloat(acutalPrice) <= 0){
+
+      showError(acutalPriceEl, "Actual price cannot be zero")
+    
+    }else{
+      showSuccess(acutalPriceEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkSellingPrice = () =>{
+    const sellingPriceEl = document.querySelector("#selling-price");
+    const sellingPrice = sellingPriceEl.value;
+
+    if(!isRequired(sellingPrice)){
+      showError(sellingPriceEl, "Selling price cannot be blank");
+    }else if(parseFloat(sellingPrice) <=0){
+      showError(sellingPriceEl, "Selling price cannot be zero");
+    }else {
+      showSuccess(sellingPriceEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkBundlePrice = () =>{
+    const bundlePriceEl = document.querySelector("#bundle-price");
+    const bundlePrice = bundlePriceEl.value;
+
+    if(!isRequired(bundlePrice)){
+      showError(bundlePriceEl, "Bundle price cannot be blank");
+    }else if(parseFloat(bundlePrice) <= 0){
+      showError(bundlePriceEl, "Bundle Price cannot be zero");
+    }else {
+      showSuccess(bundlePriceEl);
+      isValid= true;
+    }
+    return isValid;
+  }
+
+  const checkVariantStock = () => {
+    const variantStockEl = document.querySelector("#variant-stock");
+    const variantStock = variantStockEl.value;
+
+    if(!isRequired(variantStock)){
+      showError(variantStockEl,"Stock cannot be blank");
+    }else if(parseFloat(variantStock) <= 0){
+      showError(variantStockEl, "Stock cannot be zero");
+    }else{
+      showSuccess(variantStockEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkMaxProduct = () => {
+    const maxProductPerPersonEl = document.querySelector("#max-product");
+    const maxProductPerPerson = maxProductPerPersonEl.value;
+
+    if(!isRequired(maxProductPerPerson)){
+      showError(maxProductPerPersonEl, "Max product cannot be blank");
+    }else if(parseFloat(maxProductPerPerson) <=0){
+      showError(maxProductPerPersonEl, "Max product cannot be Zero");
+    }else{
+      showSuccess(maxProductPerPersonEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkColor = () =>{
+    const colorEl = document.querySelector("#color");
+    const color = colorEl.value;
+
+    if(color === "selectColor" ){
+      showError(colorEl, "Select a color");
+    }else {
+      showSuccess(colorEl);
+      isValid = true;
+
+    }
+    return isValid;
+  }
+
+  const checkSize = () => {
+    const sizeEl = document.querySelector("#size")
+    const size = sizeEl.value;
+
+    if(size === "selectSize"){
+      showError(sizeEl, "Select a size");
+    }else{
+      showSuccess(sizeEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkOnOffer = () =>{
+    const onOfferEl = document.querySelector("#on-offer");
+    const onOffer = onOfferEl.value;
+
+    if(onOffer === "selectOffer"){
+      showError(onOfferEl, "Select Yes or No");
+    }else{
+      showSuccess(onOfferEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkOfferDiscountPrice = () =>{
+    const offerDiscountPriceEl = document.querySelector("#offer-discount-price")
+    const offerDiscountPrice = offerDiscountPriceEl.value;
+
+    if(!isRequired(offerDiscountPrice) ){
+      showError(offerDiscountPriceEl, "Offer discount cannot be blank");
+    }else if(parseFloat(offerDiscountPrice) <= 0){
+      showError(offerDiscountPriceEl, "Offer discount cannot be zero or less")
+    }else {
+      showSuccess(offerDiscountPriceEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkOfferDiscountRate = () => {
+    const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
+    const offerDiscountRate = offerDiscountRateEl.value;
+
+    if(!isRequired(offerDiscountRate)){
+      showError(offerDiscountRateEl, "Offer discount rate cannot be blank"); 
+    }else if(parseFloat(offerDiscountRate) <= 0 ){
+      showError(offerDiscountRateEl, "Offer discount cannot be zero or less");
+    }else {
+      showSuccess(offerDiscountRateEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkBrand = () => {
+    const brandEl = document.querySelector("#brand");
+    const brand = brandEl.value;
+
+    if(brand === "selectBrand"){
+      showError(brandEl, "Select a brand")
+    }else{
+      showSuccess(brandEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+  const checkCategory = () =>{
+    const categoryEl = document.querySelector("#category");
+    const category = categoryEl.value;
+
+    if(category === "selectCategory"){
+      showError(categoryEl, "Select a category");
+    }else {
+      showSuccess(categoryEl);
+      isValid = true;
+    }
+    return isValid;
+  }
+
+
+
+  const isRequired = (value) => (value === "" ? false : true);
+
+  const showError = (input, message) => {
+    const formField = input.parentElement;
+    formField.classList.remove("success", "is-valid");
+    input.classList.remove("success", "is-valid");
+    formField.classList.add("error", "is-invalid");
+    input.classList.add("error", "is-invalid");
+    const error = formField.querySelector("small");
+    error.textContent = message;
+  };
+
+  const showSuccess = (input) => {
+    const formField = input.parentElement;
+    formField.classList.remove("error", "is-invalid");
+    input.classList.remove("error", "is-invalid");
+    formField.classList.add("success", "is-valid");
+    input.classList.add("success", "is-valid");
+    const error = formField.querySelector("small");
+    if (error) {
+      error.textContent = "";
+    }
+  };
+
+
+
+  const debounce = (fn, delay = 500) => {
       let timeoutId;
       return (...args) => {
         // cancel the previous timer
@@ -884,6 +894,107 @@
       })
     );
 
+    form.addEventListener(
+      "change",
+      debounce(function (e) {
+        switch (e.target.id) {
+          case "product-name": // Assuming this is the full name field
+            checkName();
+            break;
+          case "product-description":
+            checkDescription();
+            break;
+          case "actual-price":
+            checkActualPrice();
+            break;
+          case "selling-price":
+            checkSellingPrice();
+            break;
+          case "bundle-price":
+            checkBundlePrice();
+            break;
+          case "variant-stock":
+            checkVariantStock();
+            break;
+          case "max-product":
+            checkMaxProduct();
+            break;
+          case "color":
+            checkColor();
+            break;
+          case "size":
+            checkSize();
+            break;
+          case "on-offer":
+            checkOnOffer();
+            break;
+          case "offer-discount-price":
+            checkOfferDiscountPrice();
+            break;
+          case "offer-discount-rate":
+            checkOfferDiscountRate();
+            break;
+          case "brand":
+            checkBrand();
+            break;
+          case "category":
+            checkCategory();
+            break;
+
+        }
+      })
+    );
+
+
+  function validateForm() {
+    let isValid = false;
+
+    
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      let isNameValid = checkName(),
+      isDesciptionValid = checkDescription(),
+      isActualPriceValid = checkActualPrice(),
+      isSellingPriceValid = checkSellingPrice(),
+      isBundlePriceValid = checkBundlePrice(),
+      isStockValid = checkVariantStock(),
+      isMaxProduct = checkMaxProduct(),
+      isColor = checkColor(),
+      isSize = checkSize(),
+      isOffer = checkOnOffer(),
+      isDiscountPrice = checkOfferDiscountPrice(),
+      isDiscountRate = checkOfferDiscountRate(),
+      isBrand = checkBrand(),
+      isCategory = checkCategory();
+
+
+
+      let isFormValid = 
+      isNameValid &&
+      isDesciptionValid &&
+      isActualPriceValid &&
+      isSellingPriceValid &&
+      isBundlePriceValid && 
+      isStockValid &&
+      isMaxProduct &&
+      isColor &&
+      isSize &&
+      isOffer &&
+      isDiscountPrice &&
+      isDiscountRate &&
+      isBrand &&
+      isCategory;
+
+      // if (isFormValid) {
+      //   // form.submit();
+      // }
+      return isFormValid;
+    });
+
+    
+
     // // Validate price
     // const price = document.querySelector('input[name="price"]').value;
     // if (isNaN(price) || price < 0) {
@@ -930,4 +1041,8 @@
 
     return isValid;
   }
+
+
+  
+
 </script>

@@ -118,7 +118,7 @@ router
 .post(checkoutController.placeOrder);
 
 
-router.get("/order-success", cartController.getOrderSuccess);
+// router.get("/order-success", cartController.getOrderSuccess);
 
 
 module.exports = router;
