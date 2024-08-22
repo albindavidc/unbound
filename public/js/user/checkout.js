@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
               });
 
-              const response = await fetch("/user/place-order", {
+              const response = await fetch("/place-order", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
