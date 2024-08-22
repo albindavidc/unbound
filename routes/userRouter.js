@@ -113,7 +113,11 @@ router
 .post(userController.editAddress)
 .delete(userController.deleteAddress);
 
-router.post("/place-order", checkoutController.placeOrder);
+router
+.route("/place-order")
+.post(checkoutController.placeOrder);
+
+
 router.get("/order-success", cartController.getOrderSuccess);
 
 
