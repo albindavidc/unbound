@@ -13,7 +13,9 @@ const imageSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     path: { type: String, required: true },
-    type: { type: String, enum: ["primary", "secondary"], required: true },
+    type: { type: String, enum: ["primary", "secondary"],
+      //  required: true 
+      },
   },
   { timestamps: true }
 );
@@ -22,16 +24,16 @@ const variantSchema = new mongoose.Schema({
   color: {
     type: mongoose.Schema.Types.ObjectId, // Reference to Color object ID
     ref: "Color", // Reference to the 'Color' model
-    required: true,
+    // required: true,
   },
   size: {
     type: mongoose.Schema.Types.ObjectId, // Reference to Size object ID
     ref: "Size", // Reference to the 'Size' model
-    required: true,
+    // required: true,
   },
   stock: {
     type: Number,
-    required: true,
+    // required: true,
   },
 });
 

@@ -278,7 +278,7 @@ module.exports = {
         user: req.session.user,
       });
     } catch (error) {
-      console.error(error);
+      console.error("this is a fantastic error", error);
       res.status(500).json({ error: "An error occurred while fetching the cart." });
     }
   },
@@ -291,11 +291,31 @@ module.exports = {
     
       // Find the user's cart (or create a new one if it doesn't exist)
       let cart = await Cart.findOne({ userId: req.session.user }); 
+      
       if (!cart) {
         cart = new Cart({ userId: req.session.user });
       }
+
+      const product = await Product.findById(productId).populate('variants.color').populate('variants.size');
+
+      if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+      }
+
+      const selectedVariant = product.variants.find(variant => 
+          variant.color._id.toString() === colorId && variant.size._id.toString() === sizeId
+      );
+
+      if (!selectedVariant) {
+          return res.status(404).json({ success: false, message: 'Variant not found' });
+      }
+
+      const variantId = selectedVariant._id;
+
+      console.log("these is the variantid ", variantId);
+      console.log("this is the product", product);
   
-      cart.items.push({ productId, colorId,sizeId, quantity,price }); 
+      cart.items.push({ productId, colorId,sizeId,variantId, quantity,price }); 
       await cart.save();
   
 
@@ -365,29 +385,30 @@ module.exports = {
     await handleCartUpdate(req, res, false);
   },
 
+  getOrderSuccess: async (req, res) => {
+    let userId = req.session.user;
+    let user = await User.findById(userId);
+    let order = await Order.aggregate([
+      {
+        $match: {
+          customerId: userId,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ]);
+    let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
+
+    res.render("user/orderConfirm", {
+      order: orderId,
+      user,
+    });
+  },
  
-
-  // getOrderSuccess: async (req, res) => {
-  //   let user = await User.findById(req.user.id);
-  //   let order = await Order.aggregate([
-  //     {
-  //       $match: {
-  //         customer_id: user._id,
-  //       },
-  //     },
-  //     {
-  //       $sort: {
-  //         createdAt: -1,
-  //       },
-  //     },
-  //     {
-  //       $limit: 1,
-  //     },
-  //   ]);
-  //   let order_id = order[0]._id.toString().slice(-7).toUpperCase();
-
-  //   res.render("shop/orderConfirm", {
-  //     order: order_id,
-  //   });
-  // },
 };

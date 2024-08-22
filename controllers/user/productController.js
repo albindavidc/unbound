@@ -52,8 +52,11 @@ module.exports = {
         }).limit(4);
     
 
+        const productData = await Product.find({productId});
+
         res.render('user/product-details', {
           product,
+          productData,
           relatedProducts,
           user: req.session.user,
           offerPrice, 

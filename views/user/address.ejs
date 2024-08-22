@@ -73,12 +73,12 @@
                   </div>
                   <div class="col-sm-6 form-group">
                     <label class="form-label" for="address-house-name">House Name</label>
-                    <input name="house_name" class="form-control" type="text" id="address-house-name" />
+                    <input name="houseName" class="form-control" type="text" id="address-house-name" />
                     <small></small>
                   </div>
                   <div class="col-sm-6 form-group">
                     <label class="form-label" for="address-area">Area/Street</label>
-                    <input name="area_street" class="form-control" type="text" id="address-area" />
+                    <input name="areaStreet" class="form-control" type="text" id="address-area" />
                     <small></small>
                   </div>
                   <div class="col-sm-6 form-group">
@@ -145,19 +145,19 @@
                   </div>
                   <div class="col-sm-6 form-group">
                     <label class="form-label" for="alternate-phone">Alternate Phone</label>
-                    <input name="alternate_phone" class="form-control" type="tel" id="alternate-phone" required />
+                    <input name="alternativePhone" class="form-control" type="tel" id="alternate-phone" required />
                     <small></small>
-                    <input name="customer_id" type="hidden" value="<%- user%>" class="form-control" />
+                    <input name="customerId" type="hidden" value="<%- user%>" class="form-control" />
                   </div>
                   <div class="col-sm-6 form-group">
                     <label class="form-label" for="form-check">Address Type</label>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" value="HOME" name="address_type" id="flexRadioDefault1" checked />
+                      <input class="form-check-input" type="radio" value="HOME" name="addressType" id="flexRadioDefault1" checked />
                       <small></small>
                       <label class="form-check-label" for="flexRadioDefault1"> HOME </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" value="WORK" type="radio" name="address_type" id="flexRadioDefault2" />
+                      <input class="form-check-input" value="WORK" type="radio" name="addressType" id="flexRadioDefault2" />
                       <label class="form-check-label" for="flexRadioDefault2"> WORK </label>
                     </div>
                   </div>
@@ -184,7 +184,7 @@
               <% address.forEach(item => { %>
               <tr>
                 <td class="py-3 align-middle text-capitalize fs-5">
-                  <%- item.name.toLowerCase() + ', ' + item.house_name + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + ', PH:' +
+                  <%- item.name.toLowerCase() + ', ' + item.houseName + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + ', PH:' +
                   item.phone %>
                 </td>
                 <td class="py-3 btn-group align-middle align-items-center">
@@ -247,12 +247,12 @@
               </div>
               <div class="col-sm-6 form-group">
                 <label class="form-label" for="edit-address-house-name">House Name</label>
-                <input name="house_name" class="form-control" type="text" id="edit-address-house-name" />
+                <input name="houseName" class="form-control" type="text" id="edit-address-house-name" />
                 <small></small>
               </div>
               <div class="col-sm-6 form-group">
                 <label class="form-label" for="edit-address-area">Area/Street</label>
-                <input name="area_street" class="form-control" type="text" id="edit-address-area" />
+                <input name="areaStreet" class="form-control" type="text" id="edit-address-area" />
                 <small></small>
               </div>
               <div class="col-sm-6 form-group">
@@ -318,18 +318,18 @@
               </div>
               <div class="col-sm-6 form-group">
                 <label class="form-label" for="edit-alternate-phone">Alternate Phone</label>
-                <input name="alternate_phone" class="form-control" type="text" id="edit-alternate-phone" required />
+                <input name="alternativePhone" class="form-control" type="text" id="edit-alternate-phone" required />
                 <small></small>
               </div>
               <div class="col-sm-6 form-group">
                 <label class="form-label" for="edit-form-check">Address Type</label>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" value="HOME" name="address_type" id="edit-flexRadioDefault1" checked />
+                  <input class="form-check-input" type="radio" value="HOME" name="addressType" id="edit-flexRadioDefault1" checked />
                   <small></small>
                   <label class="form-check-label" for="edit-flexRadioDefault1"> HOME </label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" value="WORK" type="radio" name="address_type" id="edit-flexRadioDefault2" />
+                  <input class="form-check-input" value="WORK" type="radio" name="addressType" id="edit-flexRadioDefault2" />
                   <small></small>
                   <label class="form-check-label" for="edit-flexRadioDefault2"> WORK </label>
                 </div>
@@ -594,7 +594,7 @@ const checkAlternatePhone = () => {
 
 const checkAddressType = () => {
   const addressTypeEl = document.querySelector(
-    'input[name="address_type"]:checked'
+    'input[name="addressType"]:checked'
   );
   let valid = false;
 

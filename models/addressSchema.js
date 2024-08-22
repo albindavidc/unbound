@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const addressSchema = new Schema({
-    customer_id: {
+    customerId: {
         type: ObjectId,
         required: true
     },
@@ -11,7 +11,7 @@ const addressSchema = new Schema({
         type: String,
         required: true
     },
-    address_type: {
+    addressType: {
         type: String,
         required: true
     }
@@ -28,11 +28,11 @@ const addressSchema = new Schema({
         type: String,
         required: true
     },
-    house_name:{
+    houseName:{
         type:String,
         required:true
     },
-    area_street: {
+    areaStreet: {
         type: String,
         required: true
     },
@@ -44,7 +44,7 @@ const addressSchema = new Schema({
         type: String,
         required: true
     },
-    alternate_phone: {
+    alternativePhone: {
         type: String,
     },
     landmark: {

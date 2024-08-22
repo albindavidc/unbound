@@ -105,13 +105,20 @@ router.get(
 
 router.get("/checkout", checkoutController.getCheckout);
 
+
 router.post("/checkout/add-address", userController.addAddress);
+router
+.route("/checkout/edit-address/:id")
+.get(userController.getEditAddress)
+.post(userController.editAddress)
+.delete(userController.deleteAddress);
 
 router
-  .route("/checkout/edit-address/:id")
-  .get(userController.getEditAddress)
-  .post(userController.editAddress)
-  .delete(userController.deleteAddress);
+.route("/place-order")
+.post(checkoutController.placeOrder);
+
+
+router.get("/order-success", cartController.getOrderSuccess);
 
 
 module.exports = router;
