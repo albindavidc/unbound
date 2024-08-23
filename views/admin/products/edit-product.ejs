@@ -51,7 +51,6 @@
       border-radius: 50%;
       cursor: pointer;
     }
-    
 
     .imagemodal {
       display: none;
@@ -136,13 +135,13 @@
             <div class="card mb-4">
               <div class="card-body">
                 <div class="mb-4">
-                  <label for="product_name" class="form-label">Product Name</label>
-                  <input type="text" value="<%= product.name %>" placeholder="Type here" class="form-control" name="name" id="product_name" />
+                  <label for="product-name" class="form-label">Product Name</label>
+                  <input type="text" value="<%= product.name %>" placeholder="Type here" class="form-control" name="name" id="product-name" />
                   <div id="productNameError" class="text-danger"></div>
                 </div>
                 <div class="mb-4">
                   <label for="status" class="form-label">Status</label>
-                  <select class="form-select" name="isActive" aria-label="Active or Inactive">
+                  <select class="form-select" id="status"  name="isActive" aria-label="Active or Inactive">
                     <% if (product.isActive) { %>
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
@@ -153,8 +152,8 @@
                   </select>
                 </div>
                 <div class="mb-4">
-                  <label class="form-label">Description</label>
-                  <textarea placeholder="Type here" class="form-control" name="description" rows="4">
+                  <label for="product-description" class="form-label">Description</label>
+                  <textarea placeholder="Type here" id="product-description" class="form-control" name="description" rows="4">
                 <%= product.description %></textarea
                   >
                   <div id="productDescriptionError" class="text-danger"></div>
@@ -205,14 +204,14 @@
 
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label class="form-label" for="maxProductPerPerson">Max Product per Person</label>
+                      <label class="form-label" for="max-product">Max Product per Person</label>
                       <input
                         placeholder="Enter bundle price"
                         name="bundlePrice"
                         value="<%= product.quantity %>"
                         type="number"
                         class="form-control"
-                        id="bundle-price"
+                        id="max-product"
                       />
                     </div>
                   </div>
@@ -252,7 +251,7 @@
                         name="stock"
                         value="<%= product.variants[0].stock %>"
                         class="form-control"
-                        id="stock"
+                        id="variant-stock"
                       />
                     </div>
                   </div>
@@ -290,7 +289,7 @@
                         value="<%= product.offerDiscountRate %>"
                         type="number"
                         class="form-control"
-                        id="offer-discount-price"
+                        id="offer-discount-rate"
                       />
                     </div>
                   </div>
@@ -437,11 +436,11 @@
                     <div class="padding">
                       <!-- <div class="row">
                         <div class="col-lg-6"> -->
-                          <input type="file" class="form-control" id="secondaryImageInput4" style="display: none" />
-                          <button id="secondaryImageButton4" style="color: white" type="button" class="btn btn-md">Upload Image</button>
-                        </div>
-                        <div class="col-lg-6">
-                          <!-- <button
+                      <input type="file" class="form-control" id="secondaryImageInput4" style="display: none" />
+                      <button id="secondaryImageButton4" style="color: white" type="button" class="btn btn-md">Upload Image</button>
+                    </div>
+                    <div class="col-lg-6">
+                      <!-- <button
                             onclick="deleteImage('<%- product.secondaryImages[3] ? product.secondaryImages[3].name : `` %>', '<%- product._id %>')"
                             type="button"
                             class="btn btn-md btn-danger"
@@ -450,9 +449,9 @@
                             <i class="bi bi-trash"> </i>Delete
                           </button> -->
 
-                          <div id="croppedSecondaryImage4" style="display: none"></div>
-                        </div>
-                      <!-- </div>
+                      <div id="croppedSecondaryImage4" style="display: none"></div>
+                    </div>
+                    <!-- </div>
                     </div> -->
                   </div>
                 </div>
@@ -679,9 +678,6 @@
       await appendSecondaryImageToFormData(formData, 2); // For secondaryImage2
       await appendSecondaryImageToFormData(formData, 3); // For secondaryImage3
 
-
-
-
       // // Add secondary images to formData
       // const secondaryImages = [
       //   document.getElementById("croppedSecondaryImage2"),
@@ -746,68 +742,451 @@
       }
     });
 
-    // function validateForm() {
-    //   let isValid = true;
+    const form = document.getElementById("addProductForm");
 
-    //   // Validate price
-    //   const priceElement = document.getElementById("priceError");
-    //   const price = document.querySelector('input[name="price"]').value;
-    //   if (isNaN(price) || price < 0) {
-    //     if (priceElement) priceElement.innerText = "Price must be a number greater than or equal to 0.";
-    //     isValid = false;
-    //   } else {
-    //     if (priceElement) priceElement.innerText = "";
-    //   }
+    const checkName = () => {
+      const nameEl = document.querySelector("#product-name");
 
-    //   // Validate quantity
-    //   const quantityElement = document.getElementById("quantityError");
-    //   const quantity = document.querySelector('input[name="quantity"]').value;
-    //   if (isNaN(quantity) || quantity <= 0) {
-    //     if (quantityElement) quantityElement.innerText = "Quantity must be a number greater than 0.";
-    //     isValid = false;
-    //   } else {
-    //     if (quantityElement) quantityElement.innerText = "";
-    //   }
+      const name = nameEl.value.trim();
 
-    //   // Validate product name
-    //   const productNameElement = document.getElementById("productNameError");
-    //   const productName = document.querySelector('input[name="name"]').value;
-    //   if (productName.trim() === "") {
-    //     if (productNameElement) productNameElement.innerText = "Product name is required.";
-    //     isValid = false;
-    //   } else {
-    //     if (productNameElement) productNameElement.innerText = "";
-    //   }
+      if (!isRequired(name)) {
+        showError(nameEl, "Full name cannot be blank.");
+      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+        showError(nameEl, "Full name should not contain numbers.");
+      } else {
+        showSuccess(nameEl);
+        isValid = true;
+      }
+      return isValid;
+    };
 
-    //   // Validate product description
-    //   const productDescriptionElement = document.getElementById("productDescriptionError");
-    //   const productDescription = document.querySelector('textarea[name="description"]').value;
-    //   if (productDescription.trim() === "") {
-    //     if (productDescriptionElement) productDescriptionElement.innerText = "Product description is required.";
-    //     isValid = false;
-    //   } else {
-    //     if (productDescriptionElement) productDescriptionElement.innerText = "";
-    //   }
+    const checkDescription = () => {
+      const descriptionEl = document.querySelector("#product-description");
+      const description = descriptionEl.value.trim();
 
-    //   // Validate file inputs
-    //   const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-    //   const fileInputs = document.querySelectorAll('input[type="file"]');
-    //   fileInputs.forEach((fileInput, index) => {
-    //     const filePath = fileInput.value;
-    //     const fileExtension = filePath.split(".").pop().toLowerCase();
+      if (!isRequired(description)) {
+        showError(descriptionEl, "Description cannot be blank.");
+      } else if (!/^[a-zA-Z\s]+$/.test(description)) {
+        showError(descriptionEl, "Description should not contain numbers.");
+      } else {
+        showSuccess(descriptionEl);
+        isValid = true;
+      }
+      return isValid;
+    };
 
-    //     if (filePath && !allowedExtensions.includes(fileExtension)) {
-    //       Swal.fire({
-    //         icon: "error",
-    //         title: "Invalid File Type",
-    //         text: `File ${index + 1} is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(", ")}.`,
-    //       });
-    //       isValid = false;
-    //     }
-    //   });
+    const checkActualPrice = () => {
+      const acutalPriceEl = document.querySelector("#actual-price");
+      const acutalPrice = acutalPriceEl.value;
 
-    //   return isValid;
-    // }
+      if (!isRequired(acutalPrice)) {
+        showError(acutalPriceEl, "Actual price cannot be blank");
+      } else if (parseFloat(acutalPrice) <= 0) {
+        showError(acutalPriceEl, "Actual price cannot be zero");
+      } else {
+        showSuccess(acutalPriceEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkSellingPrice = () => {
+      const sellingPriceEl = document.querySelector("#selling-price");
+      const sellingPrice = sellingPriceEl.value;
+
+      if (!isRequired(sellingPrice)) {
+        showError(sellingPriceEl, "Selling price cannot be blank");
+      } else if (parseFloat(sellingPrice) <= 0) {
+        showError(sellingPriceEl, "Selling price cannot be zero");
+      } else {
+        showSuccess(sellingPriceEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkBundlePrice = () => {
+      const bundlePriceEl = document.querySelector("#bundle-price");
+      const bundlePrice = bundlePriceEl.value;
+
+      if (!isRequired(bundlePrice)) {
+        showError(bundlePriceEl, "Bundle price cannot be blank");
+      } else if (parseFloat(bundlePrice) <= 0) {
+        showError(bundlePriceEl, "Bundle Price cannot be zero");
+      } else {
+        showSuccess(bundlePriceEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkVariantStock = () => {
+      const variantStockEl = document.querySelector("#variant-stock");
+      const variantStock = variantStockEl.value;
+
+      if (!isRequired(variantStock)) {
+        showError(variantStockEl, "Stock cannot be blank");
+      } else if (parseFloat(variantStock) <= 0) {
+        showError(variantStockEl, "Stock cannot be zero");
+      } else {
+        showSuccess(variantStockEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkMaxProduct = () => {
+      const maxProductPerPersonEl = document.querySelector("#max-product");
+      const maxProductPerPerson = maxProductPerPersonEl.value;
+
+      if (!isRequired(maxProductPerPerson)) {
+        showError(maxProductPerPersonEl, "Max product cannot be blank");
+      } else if (parseFloat(maxProductPerPerson) <= 0) {
+        showError(maxProductPerPersonEl, "Max product cannot be Zero");
+      } else {
+        showSuccess(maxProductPerPersonEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkColor = () => {
+      const colorEl = document.querySelector("#color");
+      const color = colorEl.value;
+
+      if (color === "selectColor") {
+        showError(colorEl, "Select a color");
+      } else {
+        showSuccess(colorEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkSize = () => {
+      const sizeEl = document.querySelector("#size");
+      const size = sizeEl.value;
+
+      if (size === "selectSize") {
+        showError(sizeEl, "Select a size");
+      } else {
+        showSuccess(sizeEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkOnOffer = () => {
+      const onOfferEl = document.querySelector("#on-offer");
+      const onOffer = onOfferEl.value;
+
+      if (onOffer === "selectOffer") {
+        showError(onOfferEl, "Select Yes or No");
+      } else {
+        showSuccess(onOfferEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkOfferDiscountPrice = () => {
+      const offerDiscountPriceEl = document.querySelector("#offer-discount-price");
+      const offerDiscountPrice = offerDiscountPriceEl.value;
+
+      if (!isRequired(offerDiscountPrice)) {
+        showError(offerDiscountPriceEl, "Offer discount cannot be blank");
+      } else if (parseFloat(offerDiscountPrice) <= 0) {
+        showError(offerDiscountPriceEl, "Offer discount cannot be zero or less");
+      } else {
+        showSuccess(offerDiscountPriceEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkOfferDiscountRate = () => {
+      const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
+      const offerDiscountRate = offerDiscountRateEl.value;
+
+      if (!isRequired(offerDiscountRate)) {
+        showError(offerDiscountRateEl, "Offer discount rate cannot be blank");
+      } else if (parseFloat(offerDiscountRate) <= 0) {
+        showError(offerDiscountRateEl, "Offer discount cannot be zero or less");
+      } else {
+        showSuccess(offerDiscountRateEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkBrand = () => {
+      const brandEl = document.querySelector("#brand");
+      const brand = brandEl.value;
+
+      if (brand === "selectBrand") {
+        showError(brandEl, "Select a brand");
+      } else {
+        showSuccess(brandEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const checkCategory = () => {
+      const categoryEl = document.querySelector("#category");
+      const category = categoryEl.value;
+
+      if (category === "selectCategory") {
+        showError(categoryEl, "Select a category");
+      } else {
+        showSuccess(categoryEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
+    const isRequired = (value) => (value === "" ? false : true);
+
+    const showError = (input, message) => {
+      const formField = input.parentElement;
+      formField.classList.remove("success", "is-valid");
+      input.classList.remove("success", "is-valid");
+      formField.classList.add("error", "is-invalid");
+      input.classList.add("error", "is-invalid");
+      const error = formField.querySelector("small");
+      error.textContent = message;
+    };
+
+    const showSuccess = (input) => {
+      const formField = input.parentElement;
+      formField.classList.remove("error", "is-invalid");
+      input.classList.remove("error", "is-invalid");
+      formField.classList.add("success", "is-valid");
+      input.classList.add("success", "is-valid");
+      const error = formField.querySelector("small");
+      if (error) {
+        error.textContent = "";
+      }
+    };
+
+    const debounce = (fn, delay = 500) => {
+      let timeoutId;
+      return (...args) => {
+        // cancel the previous timer
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        // setup a new timer
+        timeoutId = setTimeout(() => {
+          fn.apply(null, args);
+        }, delay);
+      };
+    };
+
+    form.addEventListener(
+      "input",
+      debounce(function (e) {
+        switch (e.target.id) {
+          case "product-name": // Assuming this is the full name field
+            checkName();
+            break;
+          case "product-description":
+            checkDescription();
+            break;
+          case "actual-price":
+            checkActualPrice();
+            break;
+          case "selling-price":
+            checkSellingPrice();
+            break;
+          case "bundle-price":
+            checkBundlePrice();
+            break;
+          case "variant-stock":
+            checkVariantStock();
+            break;
+          case "max-product":
+            checkMaxProduct();
+            break;
+          case "color":
+            checkColor();
+            break;
+          case "size":
+            checkSize();
+            break;
+          case "on-offer":
+            checkOnOffer();
+            break;
+          case "offer-discount-price":
+            checkOfferDiscountPrice();
+            break;
+          case "offer-discount-rate":
+            checkOfferDiscountRate();
+            break;
+          case "brand":
+            checkBrand();
+            break;
+          case "category":
+            checkCategory();
+            break;
+        }
+      })
+    );
+
+    form.addEventListener(
+      "change",
+      debounce(function (e) {
+        switch (e.target.id) {
+          case "product-name": // Assuming this is the full name field
+            checkName();
+            break;
+          case "product-description":
+            checkDescription();
+            break;
+          case "actual-price":
+            checkActualPrice();
+            break;
+          case "selling-price":
+            checkSellingPrice();
+            break;
+          case "bundle-price":
+            checkBundlePrice();
+            break;
+          case "variant-stock":
+            checkVariantStock();
+            break;
+          case "max-product":
+            checkMaxProduct();
+            break;
+          case "color":
+            checkColor();
+            break;
+          case "size":
+            checkSize();
+            break;
+          case "on-offer":
+            checkOnOffer();
+            break;
+          case "offer-discount-price":
+            checkOfferDiscountPrice();
+            break;
+          case "offer-discount-rate":
+            checkOfferDiscountRate();
+            break;
+          case "brand":
+            checkBrand();
+            break;
+          case "category":
+            checkCategory();
+            break;
+        }
+      })
+    );
+
+    function validateForm() {
+      let isValid = false;
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let isNameValid = checkName(),
+          isDesciptionValid = checkDescription(),
+          isActualPriceValid = checkActualPrice(),
+          isSellingPriceValid = checkSellingPrice(),
+          isBundlePriceValid = checkBundlePrice(),
+          isStockValid = checkVariantStock(),
+          isMaxProduct = checkMaxProduct(),
+          isColor = checkColor(),
+          isSize = checkSize(),
+          isOffer = checkOnOffer(),
+          isDiscountPrice = checkOfferDiscountPrice(),
+          isDiscountRate = checkOfferDiscountRate(),
+          isBrand = checkBrand(),
+          isCategory = checkCategory();
+
+        let isFormValid =
+          isNameValid &&
+          isDesciptionValid &&
+          isActualPriceValid &&
+          isSellingPriceValid &&
+          isBundlePriceValid &&
+          isStockValid &&
+          isMaxProduct &&
+          isColor &&
+          isSize &&
+          isOffer &&
+          isDiscountPrice &&
+          isDiscountRate &&
+          isBrand &&
+          isCategory;
+
+        // if (isFormValid) {
+        //   // form.submit();
+        // }
+        return isFormValid;
+      });
+  
+
+
+      // // Validate price
+      // const priceElement = document.getElementById("priceError");
+      // const price = document.querySelector('input[name="price"]').value;
+      // if (isNaN(price) || price < 0) {
+      //   if (priceElement) priceElement.innerText = "Price must be a number greater than or equal to 0.";
+      //   isValid = false;
+      // } else {
+      //   if (priceElement) priceElement.innerText = "";
+      // }
+
+      // // Validate quantity
+      // const quantityElement = document.getElementById("quantityError");
+      // const quantity = document.querySelector('input[name="quantity"]').value;
+      // if (isNaN(quantity) || quantity <= 0) {
+      //   if (quantityElement) quantityElement.innerText = "Quantity must be a number greater than 0.";
+      //   isValid = false;
+      // } else {
+      //   if (quantityElement) quantityElement.innerText = "";
+      // }
+
+      // // Validate product name
+      // const productNameElement = document.getElementById("productNameError");
+      // const productName = document.querySelector('input[name="name"]').value;
+      // if (productName.trim() === "") {
+      //   if (productNameElement) productNameElement.innerText = "Product name is required.";
+      //   isValid = false;
+      // } else {
+      //   if (productNameElement) productNameElement.innerText = "";
+      // }
+
+      // // Validate product description
+      // const productDescriptionElement = document.getElementById("productDescriptionError");
+      // const productDescription = document.querySelector('textarea[name="description"]').value;
+      // if (productDescription.trim() === "") {
+      //   if (productDescriptionElement) productDescriptionElement.innerText = "Product description is required.";
+      //   isValid = false;
+      // } else {
+      //   if (productDescriptionElement) productDescriptionElement.innerText = "";
+      // }
+
+      // Validate file inputs
+      const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach((fileInput, index) => {
+        const filePath = fileInput.value;
+        const fileExtension = filePath.split(".").pop().toLowerCase();
+
+        if (filePath && !allowedExtensions.includes(fileExtension)) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Type",
+            text: `File ${index + 1} is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(", ")}.`,
+          });
+          isValid = false;
+        }
+      });
+
+      return isValid;
+    }
   </script>
 </body>
 <%- include("../../partials/admin/footer") %>

@@ -172,7 +172,7 @@
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label" for="actual-price">Actual Price</label>
-                        <input placeholder="₹" name="actualPrice" type="number" id="actual-price" class="form-control" required/>
+                        <input placeholder="₹" name="actualPrice" type="number" id="actual-price" class="form-control" required />
                         <small></small>
                         <!-- <div id="actual-price-error" class="error-message error-div"></div> -->
                       </div>
@@ -180,16 +180,15 @@
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label">Selling Price</label>
-                        <input placeholder="₹" id="selling-price" name="sellingPrice" type="number" class="form-control " required/>
+                        <input placeholder="₹" id="selling-price" name="sellingPrice" type="number" class="form-control" required />
                         <!-- <div id="selling-price-error" class="error-message error-div"></div> -->
-                      <small></small>
+                        <small></small>
                       </div>
-
                     </div>
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label">Bundle Price </label>
-                        <input placeholder="(5/Bundle)" id="bundle-price" name="bundlePrice" type="number" class="form-control " required />
+                        <input placeholder="(5/Bundle)" id="bundle-price" name="bundlePrice" type="number" class="form-control" required />
                         <!-- <div id="bundle-price-error" class="error-message error-div"></div> -->
                         <small></small>
                       </div>
@@ -202,17 +201,16 @@
                     <div class="col-lg-6">
                       <div class="mb-4">
                         <label for="variant-stock" class="form-label">Stock of Product</label>
-                        <input placeholder="Stock" id="variant-stock" name="variants[0][stock]" type="number" class="form-control "required />
+                        <input placeholder="Stock" id="variant-stock" name="variants[0][stock]" type="number" class="form-control" required />
                         <!-- <div id="stock-error" class="error-message error-div"></div> -->
-                      <small></small>
+                        <small></small>
                       </div>
-
                     </div>
                     <div class="col-lg-6">
                       <div class="mb-4">
                         <label class="form-label">Max Product/Person</label>
-                        <input placeholder="Quantity" id="max-product" name="quantity" type="number" class="form-control " required/>
-                      <small></small>
+                        <input placeholder="Quantity" id="max-product" name="quantity" type="number" class="form-control" required />
+                        <small></small>
                       </div>
 
                       <!-- <div id="quantity-error" class="error-div"></div> -->
@@ -232,22 +230,21 @@
                           <% }); %>
                         </select>
                         <!-- <div id="color-error" class="error-div"></div> -->
-                      <small></small>
+                        <small></small>
                       </div>
-
                     </div>
 
                     <div class="col-lg-6">
                       <div class="mb-4">
                         <label for="size" class="form-label">Size</label>
-                        <select class="form-control " name="variants[0][size]" id="size" required>
+                        <select class="form-control" name="variants[0][size]" id="size" required>
                           <option value="selectSize">Select Size</option>
                           <% size.forEach((size) => { %>
                           <option value="<%= size._id %>"><%= size.value %></option>
                           <% }); %>
                         </select>
                         <!-- <div id="size-error" class="error-div"></div> -->
-                         <small></small>
+                        <small></small>
                       </div>
                     </div>
                   </div>
@@ -258,7 +255,7 @@
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label" for="on-offer">On Offer</label>
-                        <select class="form-control " name="offer" id="on-offer" required>
+                        <select class="form-control" name="offer" id="on-offer" required>
                           <option value="selectOffer">Select offer status</option>
                           <option value="Yes">Yes</option>
                           <option value="No">No</option>
@@ -270,18 +267,18 @@
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label" for="offer-discount-price">Offer Discount Price</label>
-                        <input placeholder="₹" name="offerDiscountPrice" type="number" class="form-control " id="offer-discount-price" required/>
+                        <input placeholder="₹" name="offerDiscountPrice" type="number" class="form-control" id="offer-discount-price" required />
                         <!-- <div id="offer-discount-price-error" class="error-message error-div"></div> -->
-                         <small></small>
+                        <small></small>
                       </div>
                     </div>
 
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label" for="offer-discount-rate">Offer Discount Rate</label>
-                        <input placeholder="%" name="offerDiscountRate" type="number" class="form-control" id="offer-discount-rate"required />
+                        <input placeholder="%" name="offerDiscountRate" type="number" class="form-control" id="offer-discount-rate" required />
                         <!-- <div id="offer-discount-rate-error" class="error-message error-div"></div> -->
-                         <small></small>
+                        <small></small>
                       </div>
                     </div>
                   </div>
@@ -301,7 +298,7 @@
                 </div>
                 <div class="form-group mb-3">
                   <label for="category" class="form-label">Category Name</label>
-                  <select class="form-control " name="category" id="category" required>
+                  <select class="form-control" name="category" id="category" required>
                     <option value="selectCategory">Select Category</option>
                     <% categories.forEach((category) => { %>
                     <option value="<%= category._id %>"><%= category.name %></option>
@@ -312,7 +309,7 @@
                 </div>
                 <div class="d-flex justify-content-center mt-5" style="padding: 40px">
                   <div class="d-grid col-md-5">
-                    <button class="btn btn-primary"  type="submit">Add Product</button>
+                    <button class="btn btn-primary" type="submit">Add Product</button>
                   </div>
                 </div>
               </form>
@@ -457,14 +454,6 @@
     }
   });
 
-
-
-
-
-
-
-
-
   // Add product function
   async function addproduct(event) {
     event.preventDefault();
@@ -491,8 +480,6 @@
       return;
     }
 
-
-
     let form = document.getElementById("addProductForm");
 
     var formData = new FormData(form);
@@ -513,8 +500,6 @@
 
     console.log(formData.entries());
 
-
-
     //   // Collect variants
     //   const variants = [];
     //   document.querySelectorAll(".variant").forEach((variant) => {
@@ -525,43 +510,39 @@
     //   });
     //   formData.append("variants", JSON.stringify(variants));
 
-
     try {
-
       let isNameValid = checkName(),
-      isDesciptionValid = checkDescription(),
-      isActualPriceValid = checkActualPrice(),
-      isSellingPriceValid = checkSellingPrice(),
-      isBundlePriceValid = checkBundlePrice(),
-      isStockValid = checkVariantStock(),
-      isMaxProduct = checkMaxProduct(),
-      isColor = checkColor(),
-      isSize = checkSize(),
-      isOffer = checkOnOffer(),
-      isDiscountPrice = checkOfferDiscountPrice(),
-      isDiscountRate = checkOfferDiscountRate(),
-      isBrand = checkBrand(),
-      isCategory = checkCategory();
+        isDesciptionValid = checkDescription(),
+        isActualPriceValid = checkActualPrice(),
+        isSellingPriceValid = checkSellingPrice(),
+        isBundlePriceValid = checkBundlePrice(),
+        isStockValid = checkVariantStock(),
+        isMaxProduct = checkMaxProduct(),
+        isColor = checkColor(),
+        isSize = checkSize(),
+        isOffer = checkOnOffer(),
+        isDiscountPrice = checkOfferDiscountPrice(),
+        isDiscountRate = checkOfferDiscountRate(),
+        isBrand = checkBrand(),
+        isCategory = checkCategory();
 
+      let isFormValid =
+        isNameValid &&
+        isDesciptionValid &&
+        isActualPriceValid &&
+        isSellingPriceValid &&
+        isBundlePriceValid &&
+        isStockValid &&
+        isMaxProduct &&
+        isColor &&
+        isSize &&
+        isOffer &&
+        isDiscountPrice &&
+        isDiscountRate &&
+        isBrand &&
+        isCategory;
 
-
-      let isFormValid = 
-      isNameValid &&
-      isDesciptionValid &&
-      isActualPriceValid &&
-      isSellingPriceValid &&
-      isBundlePriceValid && 
-      isStockValid &&
-      isMaxProduct &&
-      isColor &&
-      isSize &&
-      isOffer &&
-      isDiscountPrice &&
-      isDiscountRate &&
-      isBrand &&
-      isCategory;
-
-      if(!isFormValid){
+      if (!isFormValid) {
         throw new Error("Form is not valid");
       }
 
@@ -593,10 +574,8 @@
     }
   }
 
-
   const form = document.getElementById("addProductForm");
 
-  
   const checkName = () => {
     const nameEl = document.querySelector("#product-name");
 
@@ -628,180 +607,175 @@
     return isValid;
   };
 
-  const checkActualPrice = () =>{
+  const checkActualPrice = () => {
     const acutalPriceEl = document.querySelector("#actual-price");
     const acutalPrice = acutalPriceEl.value;
 
-    if(!isRequired(acutalPrice)){
+    if (!isRequired(acutalPrice)) {
       showError(acutalPriceEl, "Actual price cannot be blank");
-    }else if(parseFloat(acutalPrice) <= 0){
-
-      showError(acutalPriceEl, "Actual price cannot be zero")
-    
-    }else{
+    } else if (parseFloat(acutalPrice) <= 0) {
+      showError(acutalPriceEl, "Actual price cannot be zero");
+    } else {
       showSuccess(acutalPriceEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
-  const checkSellingPrice = () =>{
+  const checkSellingPrice = () => {
     const sellingPriceEl = document.querySelector("#selling-price");
     const sellingPrice = sellingPriceEl.value;
 
-    if(!isRequired(sellingPrice)){
+    if (!isRequired(sellingPrice)) {
       showError(sellingPriceEl, "Selling price cannot be blank");
-    }else if(parseFloat(sellingPrice) <=0){
+    } else if (parseFloat(sellingPrice) <= 0) {
       showError(sellingPriceEl, "Selling price cannot be zero");
-    }else {
+    } else {
       showSuccess(sellingPriceEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
-  const checkBundlePrice = () =>{
+  const checkBundlePrice = () => {
     const bundlePriceEl = document.querySelector("#bundle-price");
     const bundlePrice = bundlePriceEl.value;
 
-    if(!isRequired(bundlePrice)){
+    if (!isRequired(bundlePrice)) {
       showError(bundlePriceEl, "Bundle price cannot be blank");
-    }else if(parseFloat(bundlePrice) <= 0){
+    } else if (parseFloat(bundlePrice) <= 0) {
       showError(bundlePriceEl, "Bundle Price cannot be zero");
-    }else {
+    } else {
       showSuccess(bundlePriceEl);
-      isValid= true;
+      isValid = true;
     }
     return isValid;
-  }
+  };
 
   const checkVariantStock = () => {
     const variantStockEl = document.querySelector("#variant-stock");
     const variantStock = variantStockEl.value;
 
-    if(!isRequired(variantStock)){
-      showError(variantStockEl,"Stock cannot be blank");
-    }else if(parseFloat(variantStock) <= 0){
+    if (!isRequired(variantStock)) {
+      showError(variantStockEl, "Stock cannot be blank");
+    } else if (parseFloat(variantStock) <= 0) {
       showError(variantStockEl, "Stock cannot be zero");
-    }else{
+    } else {
       showSuccess(variantStockEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
   const checkMaxProduct = () => {
     const maxProductPerPersonEl = document.querySelector("#max-product");
     const maxProductPerPerson = maxProductPerPersonEl.value;
 
-    if(!isRequired(maxProductPerPerson)){
+    if (!isRequired(maxProductPerPerson)) {
       showError(maxProductPerPersonEl, "Max product cannot be blank");
-    }else if(parseFloat(maxProductPerPerson) <=0){
+    } else if (parseFloat(maxProductPerPerson) <= 0) {
       showError(maxProductPerPersonEl, "Max product cannot be Zero");
-    }else{
+    } else {
       showSuccess(maxProductPerPersonEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
-  const checkColor = () =>{
+  const checkColor = () => {
     const colorEl = document.querySelector("#color");
     const color = colorEl.value;
 
-    if(color === "selectColor" ){
+    if (color === "selectColor") {
       showError(colorEl, "Select a color");
-    }else {
+    } else {
       showSuccess(colorEl);
       isValid = true;
-
     }
     return isValid;
-  }
+  };
 
   const checkSize = () => {
-    const sizeEl = document.querySelector("#size")
+    const sizeEl = document.querySelector("#size");
     const size = sizeEl.value;
 
-    if(size === "selectSize"){
+    if (size === "selectSize") {
       showError(sizeEl, "Select a size");
-    }else{
+    } else {
       showSuccess(sizeEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
-  const checkOnOffer = () =>{
+  const checkOnOffer = () => {
     const onOfferEl = document.querySelector("#on-offer");
     const onOffer = onOfferEl.value;
 
-    if(onOffer === "selectOffer"){
+    if (onOffer === "selectOffer") {
       showError(onOfferEl, "Select Yes or No");
-    }else{
+    } else {
       showSuccess(onOfferEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
-  const checkOfferDiscountPrice = () =>{
-    const offerDiscountPriceEl = document.querySelector("#offer-discount-price")
+  const checkOfferDiscountPrice = () => {
+    const offerDiscountPriceEl = document.querySelector("#offer-discount-price");
     const offerDiscountPrice = offerDiscountPriceEl.value;
 
-    if(!isRequired(offerDiscountPrice) ){
+    if (!isRequired(offerDiscountPrice)) {
       showError(offerDiscountPriceEl, "Offer discount cannot be blank");
-    }else if(parseFloat(offerDiscountPrice) <= 0){
-      showError(offerDiscountPriceEl, "Offer discount cannot be zero or less")
-    }else {
+    } else if (parseFloat(offerDiscountPrice) <= 0) {
+      showError(offerDiscountPriceEl, "Offer discount cannot be zero or less");
+    } else {
       showSuccess(offerDiscountPriceEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
   const checkOfferDiscountRate = () => {
     const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
     const offerDiscountRate = offerDiscountRateEl.value;
 
-    if(!isRequired(offerDiscountRate)){
-      showError(offerDiscountRateEl, "Offer discount rate cannot be blank"); 
-    }else if(parseFloat(offerDiscountRate) <= 0 ){
+    if (!isRequired(offerDiscountRate)) {
+      showError(offerDiscountRateEl, "Offer discount rate cannot be blank");
+    } else if (parseFloat(offerDiscountRate) <= 0) {
       showError(offerDiscountRateEl, "Offer discount cannot be zero or less");
-    }else {
+    } else {
       showSuccess(offerDiscountRateEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
   const checkBrand = () => {
     const brandEl = document.querySelector("#brand");
     const brand = brandEl.value;
 
-    if(brand === "selectBrand"){
-      showError(brandEl, "Select a brand")
-    }else{
+    if (brand === "selectBrand") {
+      showError(brandEl, "Select a brand");
+    } else {
       showSuccess(brandEl);
       isValid = true;
     }
     return isValid;
-  }
+  };
 
-  const checkCategory = () =>{
+  const checkCategory = () => {
     const categoryEl = document.querySelector("#category");
     const category = categoryEl.value;
 
-    if(category === "selectCategory"){
+    if (category === "selectCategory") {
       showError(categoryEl, "Select a category");
-    }else {
+    } else {
       showSuccess(categoryEl);
       isValid = true;
     }
     return isValid;
-  }
-
-
+  };
 
   const isRequired = (value) => (value === "" ? false : true);
 
@@ -827,173 +801,162 @@
     }
   };
 
-
-
   const debounce = (fn, delay = 500) => {
-      let timeoutId;
-      return (...args) => {
-        // cancel the previous timer
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        // setup a new timer
-        timeoutId = setTimeout(() => {
-          fn.apply(null, args);
-        }, delay);
-      };
+    let timeoutId;
+    return (...args) => {
+      // cancel the previous timer
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      // setup a new timer
+      timeoutId = setTimeout(() => {
+        fn.apply(null, args);
+      }, delay);
     };
+  };
 
-    form.addEventListener(
-      "input",
-      debounce(function (e) {
-        switch (e.target.id) {
-          case "product-name": // Assuming this is the full name field
-            checkName();
-            break;
-          case "product-description":
-            checkDescription();
-            break;
-          case "actual-price":
-            checkActualPrice();
-            break;
-          case "selling-price":
-            checkSellingPrice();
-            break;
-          case "bundle-price":
-            checkBundlePrice();
-            break;
-          case "variant-stock":
-            checkVariantStock();
-            break;
-          case "max-product":
-            checkMaxProduct();
-            break;
-          case "color":
-            checkColor();
-            break;
-          case "size":
-            checkSize();
-            break;
-          case "on-offer":
-            checkOnOffer();
-            break;
-          case "offer-discount-price":
-            checkOfferDiscountPrice();
-            break;
-          case "offer-discount-rate":
-            checkOfferDiscountRate();
-            break;
-          case "brand":
-            checkBrand();
-            break;
-          case "category":
-            checkCategory();
-            break;
+  form.addEventListener(
+    "input",
+    debounce(function (e) {
+      switch (e.target.id) {
+        case "product-name": // Assuming this is the full name field
+          checkName();
+          break;
+        case "product-description":
+          checkDescription();
+          break;
+        case "actual-price":
+          checkActualPrice();
+          break;
+        case "selling-price":
+          checkSellingPrice();
+          break;
+        case "bundle-price":
+          checkBundlePrice();
+          break;
+        case "variant-stock":
+          checkVariantStock();
+          break;
+        case "max-product":
+          checkMaxProduct();
+          break;
+        case "color":
+          checkColor();
+          break;
+        case "size":
+          checkSize();
+          break;
+        case "on-offer":
+          checkOnOffer();
+          break;
+        case "offer-discount-price":
+          checkOfferDiscountPrice();
+          break;
+        case "offer-discount-rate":
+          checkOfferDiscountRate();
+          break;
+        case "brand":
+          checkBrand();
+          break;
+        case "category":
+          checkCategory();
+          break;
+      }
+    })
+  );
 
-        }
-      })
-    );
-
-    form.addEventListener(
-      "change",
-      debounce(function (e) {
-        switch (e.target.id) {
-          case "product-name": // Assuming this is the full name field
-            checkName();
-            break;
-          case "product-description":
-            checkDescription();
-            break;
-          case "actual-price":
-            checkActualPrice();
-            break;
-          case "selling-price":
-            checkSellingPrice();
-            break;
-          case "bundle-price":
-            checkBundlePrice();
-            break;
-          case "variant-stock":
-            checkVariantStock();
-            break;
-          case "max-product":
-            checkMaxProduct();
-            break;
-          case "color":
-            checkColor();
-            break;
-          case "size":
-            checkSize();
-            break;
-          case "on-offer":
-            checkOnOffer();
-            break;
-          case "offer-discount-price":
-            checkOfferDiscountPrice();
-            break;
-          case "offer-discount-rate":
-            checkOfferDiscountRate();
-            break;
-          case "brand":
-            checkBrand();
-            break;
-          case "category":
-            checkCategory();
-            break;
-
-        }
-      })
-    );
-
+  form.addEventListener(
+    "change",
+    debounce(function (e) {
+      switch (e.target.id) {
+        case "product-name": // Assuming this is the full name field
+          checkName();
+          break;
+        case "product-description":
+          checkDescription();
+          break;
+        case "actual-price":
+          checkActualPrice();
+          break;
+        case "selling-price":
+          checkSellingPrice();
+          break;
+        case "bundle-price":
+          checkBundlePrice();
+          break;
+        case "variant-stock":
+          checkVariantStock();
+          break;
+        case "max-product":
+          checkMaxProduct();
+          break;
+        case "color":
+          checkColor();
+          break;
+        case "size":
+          checkSize();
+          break;
+        case "on-offer":
+          checkOnOffer();
+          break;
+        case "offer-discount-price":
+          checkOfferDiscountPrice();
+          break;
+        case "offer-discount-rate":
+          checkOfferDiscountRate();
+          break;
+        case "brand":
+          checkBrand();
+          break;
+        case "category":
+          checkCategory();
+          break;
+      }
+    })
+  );
 
   function validateForm() {
     let isValid = false;
-
-    
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
       let isNameValid = checkName(),
-      isDesciptionValid = checkDescription(),
-      isActualPriceValid = checkActualPrice(),
-      isSellingPriceValid = checkSellingPrice(),
-      isBundlePriceValid = checkBundlePrice(),
-      isStockValid = checkVariantStock(),
-      isMaxProduct = checkMaxProduct(),
-      isColor = checkColor(),
-      isSize = checkSize(),
-      isOffer = checkOnOffer(),
-      isDiscountPrice = checkOfferDiscountPrice(),
-      isDiscountRate = checkOfferDiscountRate(),
-      isBrand = checkBrand(),
-      isCategory = checkCategory();
+        isDesciptionValid = checkDescription(),
+        isActualPriceValid = checkActualPrice(),
+        isSellingPriceValid = checkSellingPrice(),
+        isBundlePriceValid = checkBundlePrice(),
+        isStockValid = checkVariantStock(),
+        isMaxProduct = checkMaxProduct(),
+        isColor = checkColor(),
+        isSize = checkSize(),
+        isOffer = checkOnOffer(),
+        isDiscountPrice = checkOfferDiscountPrice(),
+        isDiscountRate = checkOfferDiscountRate(),
+        isBrand = checkBrand(),
+        isCategory = checkCategory();
 
-
-
-      let isFormValid = 
-      isNameValid &&
-      isDesciptionValid &&
-      isActualPriceValid &&
-      isSellingPriceValid &&
-      isBundlePriceValid && 
-      isStockValid &&
-      isMaxProduct &&
-      isColor &&
-      isSize &&
-      isOffer &&
-      isDiscountPrice &&
-      isDiscountRate &&
-      isBrand &&
-      isCategory;
+      let isFormValid =
+        isNameValid &&
+        isDesciptionValid &&
+        isActualPriceValid &&
+        isSellingPriceValid &&
+        isBundlePriceValid &&
+        isStockValid &&
+        isMaxProduct &&
+        isColor &&
+        isSize &&
+        isOffer &&
+        isDiscountPrice &&
+        isDiscountRate &&
+        isBrand &&
+        isCategory;
 
       // if (isFormValid) {
       //   // form.submit();
       // }
       return isFormValid;
     });
-
-    
 
     // // Validate price
     // const price = document.querySelector('input[name="price"]').value;
@@ -1041,8 +1004,4 @@
 
     return isValid;
   }
-
-
-  
-
 </script>
