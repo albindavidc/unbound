@@ -2,12 +2,24 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
+<<<<<<< HEAD
 const orderSchema = new Schema(
   {
     customerId: {
       type: ObjectId,
       ref: "User",
       required: true,
+=======
+const orderSchema = new Schema({
+    customerId:{
+        type: String,
+        required: true,
+    },
+    orderId: {
+        type: String,
+        default: () => uuidv4(),
+        unique: true,
+>>>>>>> admin-product-validation
     },
     items: [
       {

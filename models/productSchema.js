@@ -70,17 +70,19 @@ const ProductSchema = new mongoose.Schema(
     },
     actualPrice: {
       type: Number,
+      required: true,
     },
     sellingPrice: {
       type: Number,
+      required: true,
     },
     bundlePrice: {
       type: Number,
       required: true,
     },
     onOffer: {
-      type: Boolean,
-      default: false,
+      type: String,
+      required: true,
     },
     offerDiscountPrice: {
       type: Number,

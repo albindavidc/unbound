@@ -166,9 +166,9 @@ module.exports = {
         return res.status(500).json({ error: "Failed to find user" });
       });
 
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
+      // if (!user) {
+      //   return res.status(404).json({ error: "User not found" });
+      // }
 
       let userCart = await Cart.findOne({ userId: userId }).catch((error) => {
         console.error(error);
