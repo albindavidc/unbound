@@ -118,11 +118,7 @@ router
 .post(checkoutController.placeOrder);
 
 
-<<<<<<< HEAD
 router.get("/order-success", cartController.getOrderSuccess);
-=======
-// router.get("/order-success", cartController.getOrderSuccess);
->>>>>>> admin-product-validation
 
 
 module.exports = router;
