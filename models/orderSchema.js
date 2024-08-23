@@ -2,11 +2,19 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
+const { v4: uuidv4 } = require("uuid");
+
 const orderSchema = new Schema(
   {
     customerId: {
       type: ObjectId,
       ref: "User",
+      required: true,
+    },
+    orderId: {
+      type: String,
+      default: () => uuidv4(), // Generates a unique ID each time a new order is created
+      unique: true, // Ensures the orderId is unique in the database
       required: true,
     },
     items: [
@@ -61,7 +69,9 @@ const orderSchema = new Schema(
         },
         orderID: {
           type: String,
-          unique: true,
+          default: () => uuidv4(), // Generates a unique ID each time a new order is created
+          unique: true, // Ensures the orderId is unique in the database
+          required: true,
         },
         status: {
           type: String,
@@ -159,6 +169,5 @@ const orderSchema = new Schema(
     timestamps: true,
   }
 );
-
 
 module.exports = mongoose.model("Order", orderSchema);

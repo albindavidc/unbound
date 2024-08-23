@@ -3,7 +3,8 @@ const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
-const Coupon = require("../../models/couponSchema");
+const crypto = require('crypto');
+
 
 const mongoose = require("mongoose");
 
@@ -26,36 +27,36 @@ const checkStockAvailability = async (cartItem) => {
   return product;
 };
 
-async function assignUniqueOrderIDs(items) {
-  for (const item of items) {
-    let isUnique = false;
-    while (!isUnique) {
-      const generatedOrderID = generateOrderID();
-      const existingOrder = await Order.findOne({
-        "items.orderID": generatedOrderID,
-      });
-      if (!existingOrder) {
-        item.orderID = generatedOrderID;
-        isUnique = true;
-      }
-    }
-  }
-}
+// async function assignUniqueOrderIDs(items) {
+//   for (const item of items) {
+//     let isUnique = false;
+//     while (!isUnique) {
+//       const generatedOrderID = generateOrderID();
+//       const existingOrder = await Order.findOne({
+//         "items.orderID": generatedOrderID,
+//       });
+//       if (!existingOrder) {
+//         item.orderID = generatedOrderID;
+//         isUnique = true;
+//       }
+//     }
+//   }
+// }
 
-let orderCounter = 0;
+// let orderCounter = 0;
 
-function generateOrderID() {
-  const date = new Date();
-  const year = date.getFullYear().toString().slice(-2); // Last two digits of the year
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month as two digits
-  const day = date.getDate().toString().padStart(2, "0"); // Day as two digits
+// function generateOrderID() {
+//   const date = new Date();
+//   const year = date.getFullYear().toString().slice(-2); // Last two digits of the year
+//   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month as two digits
+//   const day = date.getDate().toString().padStart(2, "0"); // Day as two digits
 
-  // Increment and format the counter part
-  orderCounter = (orderCounter + 1) % 1000; // Resets every 1000
-  const counterPart = orderCounter.toString().padStart(3, "0");
+//   // Increment and format the counter part
+//   orderCounter = (orderCounter + 1) % 1000; // Resets every 1000
+//   const counterPart = orderCounter.toString().padStart(3, "0");
 
-  return `ODR${year}${month}${day}${counterPart}`;
-}
+//   return `ODR${year}${month}${day}${counterPart}`;
+// }
 
 module.exports = {
   getCheckout: async (req, res) => {
@@ -131,9 +132,41 @@ module.exports = {
       checkout: true,
     });
   },
+  
+
 
   placeOrder: async (req, res) => {
     try {
+      // const generateOrderId = () => {
+      //   const timestamp = Date.now().toString(36); // Convert current time to a base-36 string
+      //   const randomString = Math.random().toString(36).substring(2, 10); // Generate a random base-36 string
+      //   return `${timestamp}-${randomString}`; // Combine both for a unique order ID
+      // };
+
+      // const assignUniqueOrderIDs = async (items) => {
+      //   items.forEach((item) => {
+      //     item.orderId = generateOrderId(); // Assign the generated order ID
+      //   });
+      // };
+
+      // const createOrder = async (order) => {
+      //   // const order = new Order(order);
+
+      //   if (!order.orderId) {
+      //     order.orderId = uuidv4();
+      //   }
+
+      //   await order.save();
+      //   return order;
+      // };
+
+      const generateUniqueId = () => {
+        const timestamp = Date.now().toString(36); // Convert current time to base 36
+        const randomStr = Math.random().toString(36).substr(2, 9); // Generate a random string
+        return `${timestamp}-${randomStr}`; // Combine both
+    };
+    
+
       const { paymentMethod, address } = req.body;
 
       const userId = req.session.user;
@@ -161,23 +194,13 @@ module.exports = {
         return res.status(400).json({ status: false, message: "Please add the address" });
       }
 
-      const user = await User.findById(userId).catch((error) => {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to find user" });
-      });
-
-      // if (!user) {
-      //   return res.status(404).json({ error: "User not found" });
-      // }
-
-      let userCart = await Cart.findOne({ userId: userId }).catch((error) => {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to find user's cart" });
-      });
+      const user = await User.findById(userId);
+      let userCart = await Cart.findOne({ userId: userId });
 
       if (!userCart) {
         return res.status(404).json({ error: "User's cart not found" });
       }
+
       const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
       const paymentStatus = paymentMethod == "COD" ? "Paid" : "Pending";
 
@@ -185,8 +208,12 @@ module.exports = {
 
       console.log("hjjjjjjjjjjjjjjjjjjjjjj", req.body.items);
 
+      // const uniqueId = await generateUniqueId();  // Generate the unique ID for the order
+
+
       let order = new Order({
         customerId: userId,
+        // orderId: uniqueId, // This should resolve to a string, not a promise
         items: userCart.items,
         totalPrice: userCart.totalPrice,
         payable: userCart.payable,
@@ -201,11 +228,17 @@ module.exports = {
       order.items.forEach((item) => {
         item.status = status;
       });
-      // order.status = paymentMethod == "COD" ? "Confirmed" : "Pending";
-      await assignUniqueOrderIDs(order.items).catch((error) => {
-        console.error(error);
-        return res.status(500).json({ error: "Failed to assign unique order IDs" });
-      });
+
+      
+
+      // await assignUniqueOrderIDs(order.items);
+
+      order.status = paymentMethod == "COD" ? "Confirmed" : "Pending";
+
+      // await assignUniqueOrderIDs(order.items).catch((error) => {
+      //   console.error(error);
+      //   return res.status(500).json({ error: "Failed to assign unique order IDs" });
+      // });
 
       switch (paymentMethod) {
         case "COD":
@@ -215,13 +248,9 @@ module.exports = {
 
           // Save the order
           const orderPlaced = await order.save();
-
           req.session.orderDetails = orderPlaced; // Store order details in session
 
           if (orderPlaced) {
-
-
-
             // // reduce stock of the variant
             // Assuming this is part of your checkout process after an order is placed
             for (const item of userCart.items) {
@@ -247,19 +276,16 @@ module.exports = {
                 return res.status(400).json({ error: "Insufficient stock" });
               }
 
-
               console.log("this is product", product);
               console.log("this is variant", variant);
               console.log("this is stock", variant.stock);
-              console.log('this is the quantity', item.quantity);
+              console.log("this is the quantity", item.quantity);
               // Reduce the stock by the quantity in the cart
               variant.stock -= item.quantity;
 
               // Save the updated product
               await product.save();
             }
-
-
 
             // Proceed with the rest of the checkout process here
 
@@ -290,30 +316,4 @@ module.exports = {
       res.status(500).json({ error: "An error occured while placing the order" });
     }
   },
-
-  //   getOrderSuccess: async (req, res) => {
-  //     let userId = req.session.user;
-  //     let user = await User.findById(userId);
-  //     let order = await Order.aggregate([
-  //       {
-  //         $match: {
-  //           customerId: userId,
-  //         },
-  //       },
-  //       {
-  //         $sort: {
-  //           createdAt: -1,
-  //         },
-  //       },
-  //       {
-  //         $limit: 1,
-  //       },
-  //     ]);
-  //     let orderId = order[0]?._id?.toString()?.slice(-7)?.toUpperCase();
-
-  //     res.render("user/orderConfirm", {
-  //       order: orderId,
-  //       user,
-  //     });
-  //   },
 };
