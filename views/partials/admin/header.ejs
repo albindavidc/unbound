@@ -17,35 +17,90 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <style>
 body {
-    background-color: #ffffff;
+    background-color: #ffffff; /* White */
 }
+
 .navbar {
-    background-color: #8da7ab;
+    background-color: #000000; /* Black */
 }
+
 .navbar-aside {
-    background-color: #b0d5de;
+    background-color: #000000; /* Black */
 }
+
 .menu-item a.menu-link {
-    color: #310505;
+    color: #ffffff; /* White */
 }
 
 .menu-item a.menu-link:hover,
 .menu-item a.menu-link.active {
-    background-color: #6e7e6e; 
-    color: #ffffff;
+    background-color: #ffffff; /* White */
+    color: #000000; /* Black */
+    border-radius: 8px;
 }
+
 .dropdown-menu {
-    background-color: #bb9aaf;
+    background-color: #000000; /* Black */
 }
 
 .dropdown-item:hover {
-    background-color: #33053d;
-    color: #ffffff;
+    background-color: #ffffff; /* White */
+    color: #000000; /* Black */
+    border-radius: 8px;
 }
+
+nav {
+    background-color: #000000; /* Black */
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    margin-bottom: 15px;
+}
+
+nav a {
+    color: #ffffff; /* White */
+    text-decoration: none;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+nav a:hover {
+    color: #000000; /* Black */
+    background-color: #ffffff; /* White */
+    border-radius: 8px;
+    padding: 10px;
+}
+
+nav img {
+    width: 22px;
+    height: 22px;
+    filter: invert(100%); /* White icons */
+}
+
+nav a:hover img {
+    filter: invert(0%); /* Black icons when hovering */
+}
+
+
+
+
+
+
 
 </style>
 </head>
 <body>
+
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">

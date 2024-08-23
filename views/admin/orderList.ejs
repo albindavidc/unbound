@@ -1,0 +1,127 @@
+<%- include('../partials/admin/header') %>
+
+
+<section class="breadcrumb-option">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-2">
+          <li class="breadcrumb-item">
+            <a class="link-body-emphasis" href="/admin">
+              <svg class="bi" width="16" height="16">
+                <use xlink:href="#house-door-fill"></use>
+              </svg>
+              <span class="visually-hidden">Dashboard</span>
+            </a>
+            <!-- </li>
+              <li class="breadcrumb-item">
+                <a class="link-body-emphasis fw-semibold text-decoration-none" href="/category">Banners</a>
+              </li> -->
+          </li>
+  
+          <li class="breadcrumb-item active" aria-current="page">Orders</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+  
+  <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><%= locals.title ? locals.title : 'Dashboard' %></h1>
+    <header class=" text-center mb-20">
+      <form action="/admin/orders/" method="get" class="d-inline">
+        <div class="input-group input-group-sm border bg-primary rounded-pill" style="width: 500px;">
+          <input type="text" class="form-control border-0 bg-white rounded-pill" placeholder="Search orders..." name="search">
+          <button class="btn border-0 btn-outline-primary text-white rounded-pill" type="submit">Search</button>
+        </div>
+      </form>
+    </header>
+    <!-- <div class="btn-toolbar mb-2 mb-md-0">
+      <a href="/admin/category/add-category">
+        <button type="button" class="btn btn-sm btn-outline-primary">
+          Add Category
+        </button>
+      </a>
+    </div> -->
+  </div>
+  
+  <section class="container my-5">
+      <div class="container table-responsive text-capitalize">
+          <table class="table table-striped table-hover ">
+              <thead>
+                  <tr class="text-center">
+                      <th scope="col">#</th>
+                      <th scope="col">Order Id</th>
+                      <th scope="col">Date</th>
+                      <th scope="col">Image</th>
+                      <th scope="col">Product</th>
+                      <th scope="col">User</th>
+                      <th scope="col">Payment</th>
+                      <th scope="col">Amount</th>
+                      <th scope="col">Order Status</th>
+                      <!-- <th>Payment Status</th> -->
+                      <th scope="col">Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <% if (orders && orders.length > 0) { %>
+                  <% orders?.forEach((order,index) => { %>
+                      <tr class="align-middle text-center">
+                          <td><%- index+1 %></td>
+                          <td>#<%- order.items.orderID %></td>
+                          <td><%- order.createdAt.toLocaleDateString('en-GB') %></td>
+                          <td><img src="/uploads/product-images/<%= order.items.productId.primaryImages %>" alt="<%- order.productDetails.name %>" class="img-fluid img-thumbnail" width="90rem" ></td>
+                          <td class="mx-0"><%- order.productDetails.name %> <br> <span class="text-muted"><span class="fw-bold">Color :</span> <%- order.productDetails.name %><br> <span class="text-muted"><span class="fw-bold">Size :</span> <%- order.productDetails.value %></span> </td>
+                          <td><%- order.user[0].firstName + ' ' + order.user[0].lastName %></td>
+                          <td><%- order.paymentMethod %></td>
+                          <td>$<%- order.payable %></td>
+                          <td <% if (order.items.status == 'Placed') { %>
+                              class="text-uppercase text-primary"
+                              <% } else if (order.items.status == 'Pending') { %>
+                                  class="text-uppercase text-secondary"
+                              <% } else if (order.items.status == 'Shipped') { %>
+                                  class="text-uppercase text-success"
+                              <% } else if (order.items.status == 'Delivered') { %>
+                                  class="text-uppercase text-success"
+                              <% } else if (order.items.status == 'Cancelled') { %>
+                                  class="text-uppercase text-danger"
+                              <% } else { %>
+                                  class="text-uppercase text-info"
+                              <% } %> 
+                          ><%- order.items.status %></td>
+                          <!-- <td <% if (order.paymentStatus == 'pending') { %>
+                              class="text-uppercase text-primary"
+                              <% } else if (order.paymentStatus == 'paid' ) { %>
+                                  class="text-uppercase text-success"
+                              <% } else if (order.paymentStatus == 'refund') { %>
+                                  class="text-uppercase text-danger"
+                              <% } else { %>
+                                  class="text-uppercase text-warning"
+                              <% } %> 
+                          ><%- order.paymentStatus %></td> -->
+                          <td>
+                            <div class="d-flex justify-content-center">
+                              <% if (order.orderStatus != 'Cancelled') { %>
+                                <a href="/admin/orders/manage-order/<%- order._id %>/?productId=<%- order.items.productId %>&variant=<%- order.items.variant %>">
+                                  <button type="button" class="btn btn-sm btn-danger">
+                                    Manage
+                                  </button>  
+                                </a>
+                                  <!-- <a href="/admin/orders/manage-order/<%- order._id %>">
+                                  </a> -->
+                                  <% } else { %>
+                                    <button type="button" class="btn btn-sm btn-info">
+                                      View
+                                    </button>
+                              <% } %>
+                            </div>
+                          </td>
+                      </tr>
+                  <% }) %>
+                  <% } else { %>
+                    <td colspan="8" class="text-danger">No Orders Available</td>
+                <% } %>
+              </tbody>
+          </table>
+      </div>
+
+
+      <%- include('../partials/admin/footer') %>
