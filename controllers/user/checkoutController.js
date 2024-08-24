@@ -3,8 +3,7 @@ const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
-const crypto = require('crypto');
-
+const crypto = require("crypto");
 
 const mongoose = require("mongoose");
 
@@ -132,45 +131,13 @@ module.exports = {
       checkout: true,
     });
   },
-  
-
 
   placeOrder: async (req, res) => {
     try {
-      // const generateOrderId = () => {
-      //   const timestamp = Date.now().toString(36); // Convert current time to a base-36 string
-      //   const randomString = Math.random().toString(36).substring(2, 10); // Generate a random base-36 string
-      //   return `${timestamp}-${randomString}`; // Combine both for a unique order ID
-      // };
-
-      // const assignUniqueOrderIDs = async (items) => {
-      //   items.forEach((item) => {
-      //     item.orderId = generateOrderId(); // Assign the generated order ID
-      //   });
-      // };
-
-      // const createOrder = async (order) => {
-      //   // const order = new Order(order);
-
-      //   if (!order.orderId) {
-      //     order.orderId = uuidv4();
-      //   }
-
-      //   await order.save();
-      //   return order;
-      // };
-
-      const generateUniqueId = () => {
-        const timestamp = Date.now().toString(36); // Convert current time to base 36
-        const randomStr = Math.random().toString(36).substr(2, 9); // Generate a random string
-        return `${timestamp}-${randomStr}`; // Combine both
-    };
-    
-
       const { paymentMethod, address } = req.body;
+      console.log("eeeeeeeeeeeeeeeee", req.body);
 
       const userId = req.session.user;
-      console.log("eeeeeeeeeeeeeeeee", req.body);
 
       let shippingAddress = await Address.findOne({
         _id: address,
@@ -202,22 +169,68 @@ module.exports = {
       }
 
       const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
-      const paymentStatus = paymentMethod == "COD" ? "Paid" : "Pending";
+      const paymentStatus = paymentMethod == "COD" ? "Pending" : "Paid";
 
       console.log("hhhhhhhhhhhhhhhhhhhh", userCart.items);
-
       console.log("hjjjjjjjjjjjjjjjjjjjjjj", req.body.items);
 
-      // const uniqueId = await generateUniqueId();  // Generate the unique ID for the order
+      // for (const item of userCart.items) {
+      //   // Find the product by ID
+      //   const product = await Product.findById(item.productId);
+      //   const orders = await Order.find();
 
+      //   for (let order of orders) {
+      //     const updatedItems = await Promise.all(order.items.map(async (item) => {
+      //       if (!item.productDetail || !item.productDetail.name) {
+      //         item.productDetail = {
+      //           name: product.name,
+      //           color: product.variants.color,
+      //           size: size.variants.size,
+      //           price: product.actualPrice,
+      //         };
+      //       }
+      //       return item;
+      //     }));
+
+      //     order.items = updatedItems;
+      //     await order.save();
+      //   }
+      //   console.log('productdetails  added successfully.');
+      // }
+      
+      // for (const item of userCart.items) {
+
+      // const product = await Product.findById(item.productId);
+
+      // const variant = product.variants.find(
+      //   (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
+      // );
+      //   const orders = await Order.find();
+
+
+      //   for (let order of orders) {
+      //     const updatedItems = await Promise.all(order.items.map(async (item) => {
+      //       if (!item.productDetail || !item.productDetail.name) {
+      //         item.productDetail = {
+      //           name: product.name,
+      //           color: product.variants.color,
+      //           size: size.variants.size,
+      //           price: product.actualPrice,
+      //         };
+      //       }
+      //       return item;
+      //     }));
+
+      //     order.items = updatedItems;
+      //   }
 
       let order = new Order({
         customerId: userId,
-        // orderId: uniqueId, // This should resolve to a string, not a promise
         items: userCart.items,
         totalPrice: userCart.totalPrice,
         payable: userCart.payable,
         paymentMethod,
+        // productDetail:item,
         paymentStatus,
         status,
         shippingAddress,
@@ -226,19 +239,10 @@ module.exports = {
       console.log("these are the orders:", order);
 
       order.items.forEach((item) => {
-        item.status = status;
+        item.status = "Pending";
       });
 
-      
-
-      // await assignUniqueOrderIDs(order.items);
-
       order.status = paymentMethod == "COD" ? "Confirmed" : "Pending";
-
-      // await assignUniqueOrderIDs(order.items).catch((error) => {
-      //   console.error(error);
-      //   return res.status(500).json({ error: "Failed to assign unique order IDs" });
-      // });
 
       switch (paymentMethod) {
         case "COD":
@@ -247,26 +251,22 @@ module.exports = {
           }
 
           // Save the order
-          const orderPlaced = await order.save();
-          req.session.orderDetails = orderPlaced; // Store order details in session
+          // const orderPlaced = await order.save();
+          // req.session.orderDetails = orderPlaced; // Store order details in session
 
-          if (orderPlaced) {
+          // if (orderPlaced) {
             // // reduce stock of the variant
-            // Assuming this is part of your checkout process after an order is placed
             for (const item of userCart.items) {
-              // Find the product by ID
               const product = await Product.findById(item.productId);
 
               if (!product) {
                 return res.status(404).json({ error: "Product not found" });
               }
 
-              // Find the variant based on size and color (assuming these are stored in sizeId and colorId)
               const variant = product.variants.find(
                 (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
               );
 
-              // If the variant is not found, return an error
               if (!variant) {
                 return res.status(404).json({ error: "Variant not found" });
               }
@@ -283,8 +283,24 @@ module.exports = {
               // Reduce the stock by the quantity in the cart
               variant.stock -= item.quantity;
 
-              // Save the updated product
+              // Attach product details to the order item
+              item.productDetail = {
+                name: product.name,
+                color: variant.color.name, // Assuming color is an object with a `name` property
+                size: variant.size.value, // Assuming size is an object with a `value` property
+                price: product.price,
+              };
+
+
               await product.save();
+            }
+
+            // Save the updated product and order
+            const orderPlaced = await order.save();
+            req.session.orderDetails = orderPlaced;
+
+            if (!orderPlaced) {
+              return res.status(500).json({ error: "Failed to create order" });
             }
 
             // Proceed with the rest of the checkout process here
@@ -297,7 +313,7 @@ module.exports = {
               success: true,
               message: "Order has been placed successfully.",
             });
-          }
+          // }
 
           break;
 

@@ -1,112 +1,50 @@
 const Order = require("../../models/orderSchema");
+const Product = require("../../models/productSchema");
+const Color = require("../../models/attributes/colorSchema");
+const Size = require("../../models/attributes/sizeSchema");
+
+const { prependListener } = require("../../models/userSchema");
+
+module.exports = {
+  getOrderList: async (req, res) => {
 
 
-module.exports= {
-    getOrderList: async (req, res, next) => {
 
-        // let perPage = 10;
-        // let page = req.query.page || 1;
-    
-        let orderDetails = await Order.aggregate([
-          {
-            $project: {
-              _id: 1,
-              customerId: 1,
-              items: 1,
-              shippingAddress: 1,
-              paymentMethod: 1,
-              totalPrice: 1,
-              
-              payable: 1,
-              categoryDiscount: 1,
-              paymentStatus: 1,
-              orderStatus: 1,
-              createdAt: 1,
-            },
-          },
-          {
-            $lookup: {
-              from: "users",
-              localField: "customerId",
-              foreignField: "_id",
-              as: "user",
-            },
-          },
-          { $unwind: { path: "$items" } },
-          {
-            $lookup: {
-              from: "products",
-              localField: "items.productId",
-              foreignField: "_id",
-              as: "productDetails",
-            },
-          },
-          {
-            $lookup: {
-              from: "colors",
-              localField: "items.color",
-              foreignField: "_id",
-              as: "product-color",
-            },
-          },
-          {
-            $lookup: {
-              from: "sizes",
-              localField: "items.size",
-              foreignField: "_id",
-              as: "product-size",
-            },
-          },
-          {
-            $addFields: {
-              productDetails: {
-                $mergeObjects: [
-                  {
-                    $arrayElemAt: ["$product_detail", 0],
-                  },
-                  {
-                    $arrayElemAt: ["$product-color", 0],
-                  },
-                  { $arrayElemAt: ["$product-size", 0] },
-                ],
-              },
-            },
-          },
-          {
-            $project: {
-              _id: 1,
-              user: 1,
-              items: 1,
-              paymentMethod: 1,
-              totalPrice: 1,
-             
-              payable: 1,
-              paymentStatus: 1,
-              orderStatus: 1,
-              createdAt: 1,
-              productDetails: 1,
-            },
-          },
-          { $sort: { createdAt: -1 } },
-        //   { $skip: perPage * page - perPage },
-        //   { $limit: perPage },
-        ]);
-    
-        // console.log(orderDetails, orderDetails.length);
-    
-        // console.log(orders);
-        const count = await Order.countDocuments();
-        // const nextPage = parseInt(page) + 1;
-        // const hasNextPage = nextPage <= Math.ceil(count / perPage);
-    
-        res.render("admin/orderList", {
-        //locals,
-          orders: orderDetails,
-        //   current: page,
-        //   pages: Math.ceil(count / perPage),
-        //   nextPage: hasNextPage ? nextPage : null,
-        //   currentRoute: "/admin/orders/",
-        //   layout,
-        });
+
+    try {
+      // Fetch all orders with related product and user details
+      let orderDetails = await Order.find()
+        .populate({
+          path: "customerId",
+          select: "name email", // Select the fields you want from the user
+        })
+        .populate({
+          path: "items.productId",
+          select: "name price", // Select the fields you want from the product
+        })
+        .populate({
+          path: "items.color",
+          select: "name", // Select the fields you want from the color
+        })
+        .populate({
+          path: "items.size",
+          select: "name", // Select the fields you want from the size
+        })
+        .sort({ createdAt: -1 }); // Sort by latest order
+
+        const newOrderDetails = await Order.find();
+        console.log(orderDetails.items)
+        // console.log("this is orderDetails",newOrderDetails[])
+
+
+
+      // Render the order list on the admin side
+      res.render("admin/orderList", {
+        orders: orderDetails,
+      });
+    } catch (error) {
+      console.error("Error loading order details:", error);
+      res.status(500).send("Server Error");
     }
-}
+  },
+};
