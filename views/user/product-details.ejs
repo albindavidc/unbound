@@ -1,99 +1,77 @@
 <%- include('../../views/partials/user/header') %>
 
 <style>
-  /* Fixed size for the main image container */
+  /* Container for the main product image */
   .product__details__pic__item {
-    width: 100%; /* Adjust width as needed */
-    max-width: 500px; /* Set a maximum width */
-    height: 400px; /* Set a fixed height */
-    overflow: hidden; /* Hide overflow */
+    max-width: 500px; /* Set maximum width for the image container */
+    height: auto; /* Fixed height for the container */
+    overflow: hidden; /* Hide any overflow */
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center; /* Center image vertically */
+    justify-content: center; /* Center image horizontally */
   }
 
+  /* Main product image styling */
   .product__details__pic__item img {
-    width: 100%;
-    height: auto; /* Maintain aspect ratio */
-    max-height: 100%;
-    object-fit: cover; /* Ensure image covers the container without stretching */
+    width: 100%; /* Image takes up full width of the container */
+    height: auto; /* Maintain the aspect ratio */
+    max-height: 100%; /* Ensure image does not exceed container height */
+    object-fit: cover; /* Cover the container without distorting the image */
   }
 
-  .imgSize{
-    width: 10%;
+  /* Thumbnail images styling */
+  .imgSize {
+    width: 10%; /* Set width for thumbnails */
   }
 
-/* Apply border-box sizing to all elements */
-* {
-  box-sizing: border-box;
-}
+  /* Apply border-box sizing to all elements */
+  * {
+    box-sizing: border-box;
+  }
 
-/* Container for the zoom functionality */
-.img-zoom-container {
-  position: relative;
-}
+  /* Container for the zoom functionality */
+  .img-zoom-container {
+    position: relative; /* Position relative for absolute children */
+  }
 
-/* Initially hide the zoom lens and result */
-.img-zoom-lens, .img-zoom-result {
-  display: none;
-  position: absolute;
-  border: 1px solid #d4d4d4;
-}
+  /* Styling for the zoom lens */
+  .img-zoom-lens {
+    display: none; /* Initially hide the zoom lens */
+    position: absolute; /* Position within the container */
+    border: 2px dotted rgba(0, 0, 0, 0.8); /* Dotted border for the lens */
+    width: 160px; /* Set lens width */
+    height: 160px; /* Set lens height */
+    pointer-events: none; /* Prevent the lens from interfering with mouse events */
+    background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.8) 0, rgba(0, 0, 0, 0.8) 1px, transparent 0, transparent 20px);
+    background-size: 10px 10px; /* Size of the dots */
+  }
 
-/* Define size and appearance for the zoom lens */
-.img-zoom-lens {
-  position: absolute;
-  border: 2px dotted rgba(0, 0, 0, 0.8); /* Small dotted border */
-  width: 160px;
-  height: 160px;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(0, 0, 0, 0.8) 0,
-    rgba(0, 0, 0, 0.8) 1px,
-    transparent 0,
-    transparent 20px
-  );
+  /* Change cursor to zoom-in when hovering over the image */
+  .img-zoom-container:hover img {
+    cursor: zoom-in; /* Display a plus sign cursor */
+  }
 
-  background-size: 10px 10px; /* Size of the dots */
-  pointer-events: none; /* Prevent the lens itself from interfering with mouse events */
-  /* display: none; Hide the lens initially */
-}
+  /* Show the zoom lens on hover */
+  .img-zoom-container:hover .img-zoom-lens {
+    display: block; /* Make the lens visible */
+  }
 
-/* Change cursor to a plus sign when hovering over the image */
-.img-zoom-container:hover img {
-  cursor: zoom-in; /* Change the cursor to a plus sign */
-}
+  /* Styling for the zoom result */
+  .img-zoom-result {
+    display: none; /* Initially hide the zoom result */
+    position: absolute; /* Position relative to the container */
+    top: 0; /* Align to the top of the container */
+    margin-left: -100px; /* Adjust horizontal positioning */
+    width: 700px; /* Set width of the zoomed area */
+    height: 500px; /* Set height of the zoomed area */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for better visibility */
+  }
 
-/* Optional: Make the lens visible when hovering */
-.img-zoom-container:hover .img-zoom-lens {
-  display: block; /* Show the lens on hover */
-}
-
-
-/* Define size and appearance for the zoom result */
-.img-zoom-result {
-  width: 700px;
-  height: 500px;
-  /* Ensure the result is positioned correctly */
-  top: 0; 
-
-  margin-left: -180px; 
-  /* Optional: Add a box shadow for better visibility */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Show the zoom lens and result when hovering over the image */
-.img-zoom-container:hover .img-zoom-lens,
-.img-zoom-container:hover .img-zoom-result {
-  display: block;
-}
-
-
+  /* Show the zoom result when hovering over the image */
+  .img-zoom-container:hover .img-zoom-result {
+    display: block; /* Display the zoom result */
+  }
 </style>
-
-
-
-
 
 <!-- Shop Details Section Begin -->
 <section class="shop-details">
@@ -109,100 +87,73 @@
         </div>
       </div>
 
-      <div class="d-flex flex-row ">
-
-      <div class="row">
-
-        
-
-        <!-- Tab Content for Secondary Images -->
-        <div class="col-lg-9 col-md-9">
-          <div class="tab-content    img-zoom-container">
-            <!-- Main Image Container -->
-            <div class="tab-pane active" id="tabs-primary" role="tabpanel">
-              <div class="product__details__pic__item p-0">
-                <img
-                  id="main-product-image"
-                  class="img-fluid"
-                  src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                  alt="<%= product.name %>"
-                />
+      <div class="d-flex flex-row">
+        <div class="row">
+          <!-- Main Image and Thumbnails Column -->
+          <div class="col-lg-9 col-md-9">
+            <div class="tab-content img-zoom-container">
+              <!-- Main Image Container -->
+              <div class="tab-pane active" id="tabs-primary" role="tabpanel">
+                <div class="product__details__pic__item p-0">
+                  <img
+                    id="main-product-image"
+                    class="img-fluid"
+                    src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                    alt="<%= product.name %>"
+                  />
+                </div>
               </div>
-            </div>
-            <% product.secondaryImages.forEach((image, index) => { %>
-            <div class="tab-pane" id="tabs-<%= index + 1 %>" role="tabpanel">
-              <div class="product__details__pic__item">
-                <img
-                  id="secondary-product-image-<%= index %>"
-                  class="img-fluid"
-                  src="/uploads/images/<%= image.name %>"
-                  alt="<%= product.name %>"
-                />
+              <% product.secondaryImages.forEach((image, index) => { %>
+              <div class="tab-pane" id="tabs-<%= index + 1 %>" role="tabpanel">
+                <div class="product__details__pic__item">
+                  <img
+                    id="secondary-product-image-<%= index %>"
+                    class="img-fluid"
+                    src="/uploads/images/<%= image.name %>"
+                    alt="<%= product.name %>"
+                  />
+                </div>
               </div>
+              <% }); %>
             </div>
-            <% }); %>
+
+            <ul class="nav nav-tabs justify-content-center flex-row mt-3" role="tablist">
+              <!-- Primary Images -->
+              <% product.primaryImages.forEach((image, index) => { %>
+              <li class="nav-item pt-2">
+                <a
+                  class="nav-link <%= index === 0 ? 'active' : '' %>"
+                  data-toggle="tab"
+                  href="#tabs-primary"
+                  role="tab"
+                  data-image-url="/uploads/images/<%= image.name %>"
+                >
+                  <img class="img-thumbnail" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" style="width: 60px; height: 60px" />
+                </a>
+              </li>
+              <% }); %>
+
+              <!-- Secondary Images -->
+              <% product.secondaryImages.forEach((image, index) => { %>
+              <li class="nav-item p-2">
+                <a class="nav-link" data-toggle="tab" href="#tabs-<%= index + 1 %>" role="tab" data-image-url="/uploads/images/<%= image.name %>">
+                  <img class="img-thumbnail" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" style="width: 60px; height: 60px" />
+                </a>
+              </li>
+              <% }); %>
+            </ul>
           </div>
         </div>
-        
 
-
-
-
-        <!-- Thumbnails Column -->
-        <div class="col-lg-9 col-md-9 mt-3 d-flex flex-wrap  ">
-          <ul class="nav nav-tabs justify-content-center flex-row"  role="tablist">
-            <!-- Primary Images -->
-            <% product.primaryImages.forEach((image, index) => { %>
-            <li class="nav-item pt-2">
-              <a
-                class="nav-link <%= index === 0 ? 'active' : '' %>"
-                data-toggle="tab"
-                href="#tabs-primary"
-                role="tab"
-                data-image-url="/uploads/images/<%= image.name %>"
-              >
-                <img
-                  class="img-thumbnail"
-                  src="/uploads/images/<%= image.name %>"
-                  alt="<%= product.name %>"
-                  style="width: 60px; height: 60px;"
-                />
-              </a>
-            </li>
-            <% }); %>
-      
-            <!-- Secondary Images -->
-            <% product.secondaryImages.forEach((image, index) => { %>
-            <li class="nav-item p-2">
-              <a class="nav-link" data-toggle="tab" href="#tabs-<%= index + 1 %>" role="tab" data-image-url="/uploads/images/<%= image.name %>">
-                <img
-                  class="img-thumbnail"
-                  src="/uploads/images/<%= image.name %>"
-                  alt="<%= product.name %>"
-                  style="width: 60px; height: 60px;"
-                />
-              </a>
-            </li>
-            <% }); %>
-          </ul>
+        <!-- Zoom Lens and Result Container -->
+        <div class="img-zoom-container">
+          <div class="img-zoom-lens"></div>
+          <div id="myresult" class="img-zoom-result"></div>
         </div>
-      
-      </div>
-      
-      <div class="img-zoom-container">
-       <div class="img-zoom-lens"></div>
-        <div id="myresult" class="img-zoom-result"></div>
-      </div>
-      
-    </div>
-
-
-       
-
-      
       </div>
     </div>
   </div>
+
   <div class="product__details__content">
     <div class="container">
       <div class="row d-flex justify-content-center">
@@ -216,128 +167,48 @@
               <i class="fa fa-star-o"></i>
               <% } %>
             </div>
-            <h3 ><%= product.sellingPrice %><span id="productPrice" ><%= product.actualPrice %></span></h3>
+            <h3><%= product.sellingPrice %><span id="productPrice"><%= product.actualPrice %></span></h3>
             <p><%= product.description %></p>
-            <div class="product__details__option">
-            </div>
+
+            <div class="product__details__option"></div>
 
             <div class="product__details__cart__option">
               <div class="quantity">
                 <div class="pro-qty">
-                  <input name="quantity" type="text"id="productQuantity" value="1" />
+                  <input name="quantity" type="text" id="productQuantity" value="1" />
                 </div>
               </div>
 
-         
-
-
-              <% let totalStock = 0; // Initialize total stock to 0 %> 
-              <% product.variants.forEach(variant => { %> 
-                <% totalStock +=variant.stock; // Add stock of each variant %>
-                 <% }); %> 
-
-                 
-              <div class="mt-3">
-                <h4>Variants:</h4>
-                <div class="col-12 detail-option mb-3">
-                  <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
-                  <ul class="list-inline mb-0 colours-wrapper">
-                    <% let renderedColors = {}; %>
-                    <% product.variants.forEach((variant, index) => { %>
-                      <% if (variant.color && !renderedColors[variant.color.hex]) { %>
-                        <% renderedColors[variant.color.hex] = true; %>
-                        <li class="list-inline-item">
-                          <label
-                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
-                              class="btn-colour <%= index === 0 ? 'active' : '' %>"
-                              for="colour_<%= variant.color.name %>"
-                              data-color-hex="<%= variant.color.hex %>" 
-                              data-color-id="<%= variant.color._id %>"
-                              data-size-id="<%= variant.size._id %>"
-                            ></label>
-      
-                          <input
-                            class="input-invisible"
-                            type="radio"
-                            name="colour"
-                            value="<%= variant.color._id %>"
-                            id="colour_<%= variant.color.name %>"
-                            required
-                          />
-                        </li>
-                      <% } %>
-                    <% }); %>
-                  </ul>
-                </div>
-                <div class="col-12 detail-option mb-3">
-                  <h6 class="detail-option-heading">Size <span>(required)</span></h6>
-                  <ul class="list-inline mb-0 sizes-wrapper">
-                    <% let renderedSizes = {}; %>
-                    <% product.variants.forEach((variant, index) => { %>
-                      <% if (variant.size && !renderedSizes[variant.size.value]) { %>
-                        <% renderedSizes[variant.size.value] = true; %>
-                        <li class="list-inline-item">
-                          <label
-                              onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
-                              class="btn btn-sm btn-outline-secondary detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
-                              for="size_<%= variant.size.value %>"
-                              data-size-value="<%= variant.size.value %>"
-                              data-size-id="<%= variant.size._id %>"
-                              data-color-id="<%= variant.color._id %>"
-                            >
-                              <%= variant.size.value %>
-                              <input
-                                class="input-invisible"
-                                type="radio"
-                                name="size"
-                                value="<%= variant.size._id %>"
-                                id="size_<%= variant.size.value %>"
-                                required
-                              />
-                            </label>
-                        </li>
-                      <% } %>
-                    <% }); %>
-                  </ul>
-                </div>
-              </div>
-
-
-
-
-
-              <% if (totalStock > 0) { %>
-
-                <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%- product._id %>')">
-                  <i class="bi bi-cart me-2"></i>
-                  Add to Cart
-                </button>
-
+              <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >
+              0) { %>
+              <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%= product._id %>')">
+                <i class="bi bi-cart me-2"></i>
+                Add to Cart
+              </button>
               <% } else { %>
-                <a href="#" class="btn btn-danger">Out of Stock</a>
-                <% } %>
-
-        
+              <a href="#" class="btn btn-danger">Out of Stock</a>
+              <% } %>
             </div>
+
             <div class="product__details__btns__option">
               <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
               <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
             </div>
+
             <div class="product__details__last__option">
               <h5><span>Guaranteed Safe Checkout</span></h5>
               <img src="../../public/img/shop-details/details-payment.png" alt="" />
-
+              <ul>
                 <li>
                   <span>Categories:</span>
                   <%= product.category.name %>
                 </li>
-    
               </ul>
             </div>
           </div>
         </div>
       </div>
-      <!-- Add tabs and other sections here -->
+
       <div class="tab-pane active" id="tabs-5" role="tabpanel">
         <div class="product__details__tab__content">
           <div class="product__details__tab__content__item">
@@ -350,6 +221,7 @@
           </div>
         </div>
       </div>
+
       <div class="tab-pane" id="tabs-6" role="tabpanel">
         <div class="product__details__tab__content">
           <div class="product__details__tab__content__item">
@@ -358,6 +230,7 @@
           </div>
         </div>
       </div>
+
       <div class="tab-pane" id="tabs-7" role="tabpanel">
         <div class="product__details__tab__content">
           <div class="product__details__tab__content__item">
@@ -369,8 +242,8 @@
     </div>
   </div>
 </section>
-
 <!-- Shop Details Section End -->
+
 <!-- Related Section Begin -->
 <section class="related spad">
   <div class="container">
@@ -383,14 +256,14 @@
       <% relatedProducts.forEach(product => { %>
       <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
         <div class="product__item">
-          <div class="product__item__pic set-bg" >
+          <div class="product__item__pic set-bg">
             <a href="/user/product-list/<%= product._id %>">
-
-            <img src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                        alt="<%= product.productName %>"/>
+              <img
+                src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                alt="<%= product.productName %>"
+              />
             </a>
             <span class="label"><%= product.sale ? 'Sale' : 'New' %></span>
-
             <ul class="product__hover">
               <li>
                 <a href="#"><img src="/img/icon/heart.png" alt="" /></a>
@@ -405,17 +278,12 @@
           </div>
           <div class="product__item__text">
             <h6><%= product.name %></h6>
-
-            <% let totalStock = 0; // Initialize total stock to 0 %> 
-            <% product.variants.forEach(variant => { %> 
-              <% totalStock +=variant.stock; // Add stock of each variant %>
-               <% }); %> 
-            <% if (totalStock > 0) { %>
+            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock > 0)
+            { %>
             <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
             <% } else { %>
             <a href="#" class="out-of-stock">Out of Stock</a>
             <% } %>
-
             <div class="rating">
               <% for (let i = 0; i < 5; i++) { %>
               <i class="fa fa-star<%= i < product.rating ? '' : '-o' %>"></i>
@@ -431,164 +299,149 @@
 </section>
 <!-- Related Section End -->
 
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <%- include('../../views/partials/user/footer') %>
 
+<script>
+  function imageZoom(imgID, resultID) {
+    const img = document.getElementById(imgID);
+    const result = document.getElementById(resultID);
+    const lens = document.createElement("DIV");
+    lens.setAttribute("class", "img-zoom-lens");
 
+    img.parentElement.insertBefore(lens, img);
 
-<script defer>
+    img.addEventListener("mouseenter", function () {
+      lens.style.display = "block";
+      result.style.display = "block";
+      const cx = result.offsetWidth / lens.offsetWidth;
+      const cy = result.offsetHeight / lens.offsetHeight;
+      result.style.backgroundImage = `url('${img.src}')`;
+      result.style.backgroundSize = `${img.width * cx}px ${img.height * cy}px`;
 
-function imageZoom(imgID, resultID) {
-  const img = document.getElementById(imgID);
-  const result = document.getElementById(resultID);
-  const lens = document.createElement("DIV");
-  lens.setAttribute("class", "img-zoom-lens");
+      function moveLens(e) {
+        e.preventDefault();
+        const pos = getCursorPos(e);
+        let x = pos.x - lens.offsetWidth / 2;
+        let y = pos.y - lens.offsetHeight / 2;
 
-  img.parentElement.insertBefore(lens, img);
+        if (x > img.width - lens.offsetWidth) x = img.width - lens.offsetWidth;
+        if (x < 0) x = 0;
+        if (y > img.height - lens.offsetHeight) y = img.height - lens.offsetHeight;
+        if (y < 0) y = 0;
 
-  img.addEventListener("mouseenter", function() {
-    lens.style.display = "block";
-    result.style.display = "block";
-    const cx = result.offsetWidth / lens.offsetWidth;
-    const cy = result.offsetHeight / lens.offsetHeight;
-    result.style.backgroundImage = `url('${img.src}')`;
-    result.style.backgroundSize = `${img.width * cx}px ${img.height * cy}px`;
-
-    function moveLens(e) {
-      e.preventDefault();
-      const pos = getCursorPos(e);
-      let x = pos.x - lens.offsetWidth / 2;
-      let y = pos.y - lens.offsetHeight / 2;
-
-      if (x > img.width - lens.offsetWidth) x = img.width - lens.offsetWidth;
-      if (x < 0) x = 0;
-      if (y > img.height - lens.offsetHeight) y = img.height - lens.offsetHeight;
-      if (y < 0) y = 0;
-
-      lens.style.left = x + "px";
-      lens.style.top = y + "px";
-      result.style.backgroundPosition = `-${x * cx}px -${y * cy}px`;
-    }
-
-    let animationFrame;
-    function onMouseMove(e) {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
+        lens.style.left = x + "px";
+        lens.style.top = y + "px";
+        result.style.backgroundPosition = `-${x * cx}px -${y * cy}px`;
       }
-      animationFrame = requestAnimationFrame(() => moveLens(e));
-    }
 
-    img.addEventListener("mousemove", onMouseMove);
-    img.addEventListener("touchmove", onMouseMove);
+      let animationFrame;
+      function onMouseMove(e) {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+        }
+        animationFrame = requestAnimationFrame(() => moveLens(e));
+      }
 
-    img.addEventListener("mouseleave", function() {
-      lens.style.display = "none";
-      result.style.display = "none";
-      img.removeEventListener("mousemove", onMouseMove);
-      img.removeEventListener("touchmove", onMouseMove);
-      cancelAnimationFrame(animationFrame);
-    });
-  });
+      img.addEventListener("mousemove", onMouseMove);
+      img.addEventListener("touchmove", onMouseMove);
 
-  function getCursorPos(e) {
-    const a = img.getBoundingClientRect();
-    const x = e.pageX - a.left - window.pageXOffset;
-    const y = e.pageY - a.top - window.pageYOffset;
-    return { x: x, y: y };
-  }
-}
-
-
-
-
-imageZoom("main-product-image", "myresult");
-imageZoom("secondary-product-image-0", "myresult");
-imageZoom("secondary-product-image-1", "myresult");
-imageZoom("secondary-product-image-2", "myresult");
-imageZoom("secondary-product-image-3", "myresult");
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function () {
-      const buttons = document.querySelectorAll('.btn-colour');
-      buttons.forEach(btn => {
-        const hex = btn.getAttribute('data-color-hex');
-        btn.style.backgroundColor = hex;
+      img.addEventListener("mouseleave", function () {
+        lens.style.display = "none";
+        result.style.display = "none";
+        img.removeEventListener("mousemove", onMouseMove);
+        img.removeEventListener("touchmove", onMouseMove);
+        cancelAnimationFrame(animationFrame);
       });
     });
 
-    let selectedColorId = null;
-    let selectedSizeId = null;
+    function getCursorPos(e) {
+      const a = img.getBoundingClientRect();
+      const x = e.pageX - a.left - window.pageXOffset;
+      const y = e.pageY - a.top - window.pageYOffset;
+      return { x: x, y: y };
+    }
+  }
+
+  imageZoom("main-product-image", "myresult");
+  imageZoom("secondary-product-image-0", "myresult");
+  imageZoom("secondary-product-image-1", "myresult");
+  imageZoom("secondary-product-image-2", "myresult");
+  imageZoom("secondary-product-image-3", "myresult");
+</script>
+
+<script defer>
+  document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".btn-colour");
+    buttons.forEach((btn) => {
+      const hex = btn.getAttribute("data-color-hex");
+      btn.style.backgroundColor = hex;
+    });
+  });
+
+  let selectedColorId = null;
+  let selectedSizeId = null;
 
   const price = document.getElementById("productPrice").textContent;
   const quantity = document.getElementById("productQuantity").value;
 
-    function selectColor(hex, colorId, sizeId) {
-      document.querySelectorAll('.btn-colour').forEach(el => el.classList.remove('active'));
-      document.querySelector(`.btn-colour[data-color-hex="${hex}"]`).classList.add('active');
-      selectedColorId = colorId;
-      selectedSizeId = sizeId;
-    }
+  function selectColor(hex, colorId, sizeId) {
+    document.querySelectorAll(".btn-colour").forEach((el) => el.classList.remove("active"));
+    document.querySelector(`.btn-colour[data-color-hex="${hex}"]`).classList.add("active");
+    selectedColorId = colorId;
+    selectedSizeId = sizeId;
+  }
 
+  function selectSize(sizeValue, sizeId, colorId) {
+    document.querySelectorAll(".size-option").forEach((el) => el.classList.remove("active"));
+    document.querySelector(`.size-option[data-size-value="${sizeValue}"]`).classList.add("active");
+    selectedSizeId = sizeId;
+    selectedColorId = colorId;
+  }
 
-    function selectSize(sizeValue, sizeId, colorId) {
-      document.querySelectorAll('.size-option').forEach(el => el.classList.remove('active'));
-      document.querySelector(`.size-option[data-size-value="${sizeValue}"]`).classList.add('active');
-      selectedSizeId = sizeId;
-      selectedColorId = colorId;
-    }
+  function addToCart(productId) {
+    const quantity = document.getElementById("productQuantity").value;
 
-
-
-    function addToCart(productId) {
-      const quantity = document.getElementById("productQuantity").value;
-
-      if (selectedColorId && selectedSizeId) {
-        fetch('/user/add-to-cart', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            productId,
-            // variantId: variantId, 
-            colorId: selectedColorId,
-            sizeId : selectedSizeId,
-            quantity, // Send the quantity
-            price,
-
-          }),
-        })
-        .then(response => {
+    if (selectedColorId && selectedSizeId) {
+      fetch("/user/add-to-cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          // variantId: variantId,
+          colorId: selectedColorId,
+          sizeId: selectedSizeId,
+          quantity, // Send the quantity
+          price,
+        }),
+      })
+        .then((response) => {
           if (response.ok) {
-
-            console.log('Product added to cart!');
-
+            console.log("Product added to cart!");
           } else {
-            console.error('Error adding product to cart');
+            console.error("Error adding product to cart");
           }
         })
         .then((data) => {
-            Swal.fire({
-              icon: "success",
-              title: "Added to Cart",
-              text: "The item has been successfully added to your cart!",
-              showCancelButton: true,
-              confirmButtonText: "Go to Cart",
-              cancelButtonText: "Continue Shopping",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // Redirect to the cart page
-                window.location.href = "/cart";
-              }
-            });
-          })
+          Swal.fire({
+            icon: "success",
+            title: "Added to Cart",
+            text: "The item has been successfully added to your cart!",
+            showCancelButton: true,
+            confirmButtonText: "Go to Cart",
+            cancelButtonText: "Continue Shopping",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the cart page
+              window.location.href = "/cart";
+            }
+          });
+        })
 
         .catch((error) => {
           console.error("Error:", error);
@@ -598,14 +451,12 @@ document.addEventListener('DOMContentLoaded', function () {
             text: "Something went wrong!",
           });
         });
-      } else {
-        // Handle case where no variant is selected
-        alert('Please select a color and size.');
-      }
+    } else {
+      // Handle case where no variant is selected
+      alert("Please select a color and size.");
     }
+  }
 </script>
-
-
 
 <!-- <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -616,5 +467,3 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 </script> -->
-
-
