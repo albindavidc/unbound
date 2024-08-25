@@ -18,6 +18,77 @@
     max-height: 100%;
     object-fit: cover; /* Ensure image covers the container without stretching */
   }
+
+  .imgSize{
+    width: 10%;
+  }
+
+/* Apply border-box sizing to all elements */
+* {
+  box-sizing: border-box;
+}
+
+/* Container for the zoom functionality */
+.img-zoom-container {
+  position: relative;
+}
+
+/* Initially hide the zoom lens and result */
+.img-zoom-lens, .img-zoom-result {
+  display: none;
+  position: absolute;
+  border: 1px solid #d4d4d4;
+}
+
+/* Define size and appearance for the zoom lens */
+.img-zoom-lens {
+  position: absolute;
+  border: 2px dotted rgba(0, 0, 0, 0.8); /* Small dotted border */
+  width: 160px;
+  height: 160px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.8) 0,
+    rgba(0, 0, 0, 0.8) 1px,
+    transparent 0,
+    transparent 20px
+  );
+
+  background-size: 10px 10px; /* Size of the dots */
+  pointer-events: none; /* Prevent the lens itself from interfering with mouse events */
+  /* display: none; Hide the lens initially */
+}
+
+/* Change cursor to a plus sign when hovering over the image */
+.img-zoom-container:hover img {
+  cursor: zoom-in; /* Change the cursor to a plus sign */
+}
+
+/* Optional: Make the lens visible when hovering */
+.img-zoom-container:hover .img-zoom-lens {
+  display: block; /* Show the lens on hover */
+}
+
+
+/* Define size and appearance for the zoom result */
+.img-zoom-result {
+  width: 700px;
+  height: 500px;
+  /* Ensure the result is positioned correctly */
+  top: 0; 
+
+  margin-left: -180px; 
+  /* Optional: Add a box shadow for better visibility */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Show the zoom lens and result when hovering over the image */
+.img-zoom-container:hover .img-zoom-lens,
+.img-zoom-container:hover .img-zoom-result {
+  display: block;
+}
+
+
 </style>
 
 
@@ -38,41 +109,21 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-lg-3 col-md-3">
-          <ul class="nav nav-tabs" role="tablist">
-            <!-- Primary Images -->
-            <% product.primaryImages.forEach((image, index) => { %>
-            <li class="nav-item">
-              <a
-                class="nav-link <%= index === 0 ? 'active' : '' %>"
-                data-toggle="tab"
-                href="#tabs-primary"
-                role="tab"
-                data-image-url="/uploads/images/<%= image.name %>"
-              >
-                <div class="product__thumb__pic set-bg" data-setbg="/uploads/images/<%= image.name %>"></div>
-              </a>
-            </li>
-            <% }); %>
+      <div class="d-flex flex-row ">
 
-            <!-- Secondary Images -->
-            <% product.secondaryImages.forEach((image, index) => { %>
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#tabs-<%= index + 1 %>" role="tab" data-image-url="/uploads/images/<%= image.name %>">
-                <div class="product__thumb__pic set-bg" data-setbg="/uploads/images/<%= image.name %>"></div>
-              </a>
-            </li>
-            <% }); %>
-          </ul>
-        </div>
+      <div class="row">
+
+        
+
+        <!-- Tab Content for Secondary Images -->
         <div class="col-lg-9 col-md-9">
-          <div class="tab-content">
+          <div class="tab-content    img-zoom-container">
             <!-- Main Image Container -->
             <div class="tab-pane active" id="tabs-primary" role="tabpanel">
-              <div class="product__details__pic__item">
+              <div class="product__details__pic__item p-0">
                 <img
                   id="main-product-image"
+                  class="img-fluid"
                   src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
                   alt="<%= product.name %>"
                 />
@@ -81,12 +132,74 @@
             <% product.secondaryImages.forEach((image, index) => { %>
             <div class="tab-pane" id="tabs-<%= index + 1 %>" role="tabpanel">
               <div class="product__details__pic__item">
-                <img id="secondary-product-image-<%= index %>" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" />
+                <img
+                  id="secondary-product-image-<%= index %>"
+                  class="img-fluid"
+                  src="/uploads/images/<%= image.name %>"
+                  alt="<%= product.name %>"
+                />
               </div>
             </div>
             <% }); %>
           </div>
         </div>
+        
+
+
+
+
+        <!-- Thumbnails Column -->
+        <div class="col-lg-9 col-md-9 mt-3 d-flex flex-wrap  ">
+          <ul class="nav nav-tabs justify-content-center flex-row"  role="tablist">
+            <!-- Primary Images -->
+            <% product.primaryImages.forEach((image, index) => { %>
+            <li class="nav-item pt-2">
+              <a
+                class="nav-link <%= index === 0 ? 'active' : '' %>"
+                data-toggle="tab"
+                href="#tabs-primary"
+                role="tab"
+                data-image-url="/uploads/images/<%= image.name %>"
+              >
+                <img
+                  class="img-thumbnail"
+                  src="/uploads/images/<%= image.name %>"
+                  alt="<%= product.name %>"
+                  style="width: 60px; height: 60px;"
+                />
+              </a>
+            </li>
+            <% }); %>
+      
+            <!-- Secondary Images -->
+            <% product.secondaryImages.forEach((image, index) => { %>
+            <li class="nav-item p-2">
+              <a class="nav-link" data-toggle="tab" href="#tabs-<%= index + 1 %>" role="tab" data-image-url="/uploads/images/<%= image.name %>">
+                <img
+                  class="img-thumbnail"
+                  src="/uploads/images/<%= image.name %>"
+                  alt="<%= product.name %>"
+                  style="width: 60px; height: 60px;"
+                />
+              </a>
+            </li>
+            <% }); %>
+          </ul>
+        </div>
+      
+      </div>
+      
+      <div class="img-zoom-container">
+       <div class="img-zoom-lens"></div>
+        <div id="myresult" class="img-zoom-result"></div>
+      </div>
+      
+    </div>
+
+
+       
+
+      
       </div>
     </div>
   </div>
@@ -326,7 +439,82 @@
 <%- include('../../views/partials/user/footer') %>
 
 
+
 <script defer>
+
+function imageZoom(imgID, resultID) {
+  const img = document.getElementById(imgID);
+  const result = document.getElementById(resultID);
+  const lens = document.createElement("DIV");
+  lens.setAttribute("class", "img-zoom-lens");
+
+  img.parentElement.insertBefore(lens, img);
+
+  img.addEventListener("mouseenter", function() {
+    lens.style.display = "block";
+    result.style.display = "block";
+    const cx = result.offsetWidth / lens.offsetWidth;
+    const cy = result.offsetHeight / lens.offsetHeight;
+    result.style.backgroundImage = `url('${img.src}')`;
+    result.style.backgroundSize = `${img.width * cx}px ${img.height * cy}px`;
+
+    function moveLens(e) {
+      e.preventDefault();
+      const pos = getCursorPos(e);
+      let x = pos.x - lens.offsetWidth / 2;
+      let y = pos.y - lens.offsetHeight / 2;
+
+      if (x > img.width - lens.offsetWidth) x = img.width - lens.offsetWidth;
+      if (x < 0) x = 0;
+      if (y > img.height - lens.offsetHeight) y = img.height - lens.offsetHeight;
+      if (y < 0) y = 0;
+
+      lens.style.left = x + "px";
+      lens.style.top = y + "px";
+      result.style.backgroundPosition = `-${x * cx}px -${y * cy}px`;
+    }
+
+    let animationFrame;
+    function onMouseMove(e) {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+      animationFrame = requestAnimationFrame(() => moveLens(e));
+    }
+
+    img.addEventListener("mousemove", onMouseMove);
+    img.addEventListener("touchmove", onMouseMove);
+
+    img.addEventListener("mouseleave", function() {
+      lens.style.display = "none";
+      result.style.display = "none";
+      img.removeEventListener("mousemove", onMouseMove);
+      img.removeEventListener("touchmove", onMouseMove);
+      cancelAnimationFrame(animationFrame);
+    });
+  });
+
+  function getCursorPos(e) {
+    const a = img.getBoundingClientRect();
+    const x = e.pageX - a.left - window.pageXOffset;
+    const y = e.pageY - a.top - window.pageYOffset;
+    return { x: x, y: y };
+  }
+}
+
+
+
+
+imageZoom("main-product-image", "myresult");
+imageZoom("secondary-product-image-0", "myresult");
+imageZoom("secondary-product-image-1", "myresult");
+imageZoom("secondary-product-image-2", "myresult");
+imageZoom("secondary-product-image-3", "myresult");
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
       const buttons = document.querySelectorAll('.btn-colour');
       buttons.forEach(btn => {

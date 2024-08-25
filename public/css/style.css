@@ -1510,7 +1510,7 @@ ol {
 
 .product__details__pic .nav-tabs {
 	border-bottom: none;
-	width: 105px;
+	/* width: 105px; */
 }
 
 .product__details__pic .nav-tabs .nav-item {

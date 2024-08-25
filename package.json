@@ -21,6 +21,7 @@
     "http-errors": "~1.6.3",
     "jade": "^0.29.0",
     "jimp": "^0.22.12",
+    "js-image-zoom": "^0.7.0",
     "loader": "^2.1.1",
     "method-override": "^3.0.0",
     "mongodb": "^6.8.0",
