@@ -37,19 +37,18 @@
                   <div class="card-heading">
                     <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
                   </div>
+
                   <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
                     <div class="card-body">
                       <div class="shop__sidebar__categories">
                         <ul class="nice-scroll">
-                          <li><a href="#">Men (20)</a></li>
-                          <li><a href="#">Women (20)</a></li>
-                          <li><a href="#">Bags (20)</a></li>
-                          <li><a href="#">Clothing (20)</a></li>
-                          <li><a href="#">Shoes (20)</a></li>
-                          <li><a href="#">Accessories (20)</a></li>
-                          <li><a href="#">Kids (20)</a></li>
-                          <li><a href="#">Kids (20)</a></li>
-                          <li><a href="#">Kids (20)</a></li>
+                          <% categories.forEach(category => { %>
+                          <li>
+                            <a href="#" data-category-id="<%= category._id %>" onclick="filterByCategory('<%= category._id %>')">
+                              <%= category.name %>
+                            </a>
+                          </li>
+                          <% }) %>
                         </ul>
                       </div>
                     </div>
@@ -61,12 +60,13 @@
                   </div>
                   <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
                     <div class="card-body">
-                      <div class="shop__sidebar__brand">
-                        <ul>
-                          <li><a href="#">Louis Vuitton</a></li>
-                          <li><a href="#">Chanel</a></li>
-                          <li><a href="#">Hermes</a></li>
-                          <li><a href="#">Gucci</a></li>
+                      <div class="shop__sidebar__categories">
+                        <ul class="nice-scroll">
+                          <% brand.forEach(brand => { %>
+                          <li>
+                            <a href="#" data-brand-id="<%= brand._id %>" onclick="filterByCategory('<%= brand._id %>')"> <%= brand.name %> </a>
+                          </li>
+                          <% }) %>
                         </ul>
                       </div>
                     </div>
@@ -80,12 +80,12 @@
                     <div class="card-body">
                       <div class="shop__sidebar__price">
                         <ul>
-                          <li><a href="#">$0.00 - $50.00</a></li>
-                          <li><a href="#">$50.00 - $100.00</a></li>
-                          <li><a href="#">$100.00 - $150.00</a></li>
-                          <li><a href="#">$150.00 - $200.00</a></li>
-                          <li><a href="#">$200.00 - $250.00</a></li>
-                          <li><a href="#">250.00+</a></li>
+                          <li><a href="#">₹0.00 - ₹500.00</a></li>
+                          <li><a href="#">₹500.00 - ₹1000.00</a></li>
+                          <li><a href="#">₹1000.00 - ₹2000.00</a></li>
+                          <li><a href="#">₹2000.00 - ₹3000.00</a></li>
+                          <li><a href="#">₹3000.00 - ₹4000.00</a></li>
+                          <li><a href="#">₹4000.00+</a></li>
                         </ul>
                       </div>
                     </div>
@@ -97,43 +97,19 @@
                   </div>
                   <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
                     <div class="card-body">
-                      <div class="shop__sidebar__size">
-                        <label for="xs"
-                          >xs
-                          <input type="radio" id="xs" />
-                        </label>
-                        <label for="sm"
-                          >s
-                          <input type="radio" id="sm" />
-                        </label>
-                        <label for="md"
-                          >m
-                          <input type="radio" id="md" />
-                        </label>
-                        <label for="xl"
-                          >xl
-                          <input type="radio" id="xl" />
-                        </label>
-                        <label for="2xl"
-                          >2xl
-                          <input type="radio" id="2xl" />
-                        </label>
-                        <label for="xxl"
-                          >xxl
-                          <input type="radio" id="xxl" />
-                        </label>
-                        <label for="3xl"
-                          >3xl
-                          <input type="radio" id="3xl" />
-                        </label>
-                        <label for="4xl"
-                          >4xl
-                          <input type="radio" id="4xl" />
-                        </label>
+                      <div class="shop__sidebar__categories">
+                        <ul class="nice-scroll">
+                          <% size.forEach(size => { %>
+                          <li>
+                            <a href="#" data-size-id="<%= size._id %>" onclick="filterByCategory('<%= size._id %>')"> <%= size.value %> </a>
+                          </li>
+                          <% }) %>
+                        </ul>
                       </div>
                     </div>
                   </div>
                 </div>
+
                 <div class="card">
                   <div class="card-heading">
                     <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
@@ -141,38 +117,23 @@
                   <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                     <div class="card-body">
                       <div class="shop__sidebar__color">
-                        <label class="c-1" for="sp-1">
-                          <input type="radio" id="sp-1" />
+                        <% colors.forEach(color => { %>
+                        <label class="c-<%= color._id %>" style="background-color: <%= color.hex %>" for="color_<%= color._id %>">
+                          <input
+                            type="radio"
+                            id="color_<%= color._id %>"
+                            name="color"
+                            value="<%= color._id %>"
+                            onclick="filterByColor('<%= color._id %>')"
+                          />
                         </label>
-                        <label class="c-2" for="sp-2">
-                          <input type="radio" id="sp-2" />
-                        </label>
-                        <label class="c-3" for="sp-3">
-                          <input type="radio" id="sp-3" />
-                        </label>
-                        <label class="c-4" for="sp-4">
-                          <input type="radio" id="sp-4" />
-                        </label>
-                        <label class="c-5" for="sp-5">
-                          <input type="radio" id="sp-5" />
-                        </label>
-                        <label class="c-6" for="sp-6">
-                          <input type="radio" id="sp-6" />
-                        </label>
-                        <label class="c-7" for="sp-7">
-                          <input type="radio" id="sp-7" />
-                        </label>
-                        <label class="c-8" for="sp-8">
-                          <input type="radio" id="sp-8" />
-                        </label>
-                        <label class="c-9" for="sp-9">
-                          <input type="radio" id="sp-9" />
-                        </label>
+                        <% }); %>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="card">
+
+                <!-- <div class="card">
                   <div class="card-heading">
                     <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
                   </div>
@@ -189,7 +150,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -199,33 +160,33 @@
             <div class="row">
               <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="shop__product__option__left">
-                  <p>Showing 1–12 of 126 results</p>
+                  <p>Showing 1–<%= products.length %> of <%= productCount %> results</p>
                 </div>
               </div>
               <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="shop__product__option__right">
-                  <p>Sort by Price:</p>
+                  <p>Sort :</p>
                   <select>
-                    <option value="">Low To High</option>
-                    <option value="">$0 - $55</option>
-                    <option value="">$55 - $100</option>
+                    <option value="">Price: Low To High</option>
+                    <option value="">Price: High To Low</option>
+                    <option value="">Popular</option>
                   </select>
                 </div>
               </div>
             </div>
           </div>
 
-
           <div class="container">
-          
             <div class="row" id="myUL">
               <% products.filter(product => product.isActive).forEach((product, index) => { %>
               <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-item">
                 <div class="product__item">
                   <div class="product__item__pic set-bg">
                     <a href="/user/product-list/<%= product._id %>">
-                      <img src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                        alt="<%= product.productName %>" />
+                      <img
+                        src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                        alt="<%= product.productName %>"
+                      />
                     </a>
                     <ul class="product__hover">
                       <li>
@@ -267,30 +228,22 @@
                         <input type="radio" id="pc-9" />
                       </label>
                     </div>
-          
-                    <% let totalStock = 0; %> 
-                    <% product.variants.forEach(variant => { %> 
-                    <% totalStock +=variant.stock; %> 
-                    <% }); %> 
-                    
-                    <% if (totalStock > 0) { %>
+
+                    <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock +=variant.stock; %> <% }); %> <% if
+                    (totalStock > 0) { %>
                     <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
                     <% } else { %>
                     <a href="#" class="out-of-stock">Out of Stock</a>
                     <% } %>
-          
                   </div>
                 </div>
                 <div class="product-action-1 show"></div>
               </div>
-          
+
               <% if ((index + 1) % 3 === 0 && index !== products.length - 1) { %>
             </div>
             <div class="row"><% } %> <% }); %></div>
           </div>
-          
-
-          
         </div>
       </div>
     </div>
@@ -298,30 +251,25 @@
 
   <!-- Shop Section End -->
 
-
-
   <script>
     function myFunction() {
-    var input, filter, ul, li, h6, i, txtValue;
-    input = document.getElementById('myInput');
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("myUL");
-    li = ul.getElementsByClassName('product-item');
+      var input, filter, ul, li, h6, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("myUL");
+      li = ul.getElementsByClassName("product-item");
 
-    for (i = 0; i < li.length; i++) {
+      for (i = 0; i < li.length; i++) {
         h6 = li[i].getElementsByTagName("h6")[0];
         txtValue = h6.textContent || h6.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
+          li[i].style.display = "";
         } else {
-            li[i].style.display = "none";
+          li[i].style.display = "none";
         }
+      }
     }
-}
-
-    </script>
-
-
+  </script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {

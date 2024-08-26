@@ -1238,7 +1238,7 @@ ol {
 .shop__sidebar__categories ul,
 .shop__sidebar__price ul,
 .shop__sidebar__brand ul {
-	height: 225px;
+	height: auto;
 }
 
 .shop__sidebar__categories ul li,
