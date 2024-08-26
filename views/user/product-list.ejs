@@ -42,13 +42,13 @@
                     <div class="card-body">
                       <div class="shop__sidebar__categories">
                         <ul class="nice-scroll">
-                          <% categories.forEach(category => { %>
                           <li>
-                            <a href="#" data-category-id="<%= category._id %>" onclick="filterByCategory('<%= category._id %>')">
-                              <%= category.name %>
-                            </a>
+                            <% categories.forEach(category => { %>
+                            <a href="?category=<%= category._id %>&sort=<%= req.sort || '' %>"><%= category.name %></a>
+
+
+                            <% }); %>
                           </li>
-                          <% }) %>
                         </ul>
                       </div>
                     </div>
@@ -80,12 +80,12 @@
                     <div class="card-body">
                       <div class="shop__sidebar__price">
                         <ul>
-                          <li><a href="#">₹0.00 - ₹500.00</a></li>
-                          <li><a href="#">₹500.00 - ₹1000.00</a></li>
-                          <li><a href="#">₹1000.00 - ₹2000.00</a></li>
-                          <li><a href="#">₹2000.00 - ₹3000.00</a></li>
-                          <li><a href="#">₹3000.00 - ₹4000.00</a></li>
-                          <li><a href="#">₹4000.00+</a></li>
+                          <li><a href="#">₹0.00 - ₹500</a></li>
+                          <li><a href="#">₹500 - ₹1000</a></li>
+                          <li><a href="#">₹1000 - ₹2000</a></li>
+                          <li><a href="#">₹2000 - ₹3000</a></li>
+                          <li><a href="#">₹3000 - ₹4000</a></li>
+                          <li><a href="#">₹4000 + </a></li>
                         </ul>
                       </div>
                     </div>
@@ -163,23 +163,40 @@
                   <p>Showing 1–<%= products.length %> of <%= productCount %> results</p>
                 </div>
               </div>
+
+
               <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="shop__product__option__right">
-                  <p>Sort :</p>
-                  <select>
-                    <option value="">Price: Low To High</option>
-                    <option value="">Price: High To Low</option>
-                    <option value="">Popular</option>
-                  </select>
+                <div class="shop__product__option__right d-flex flex-row justify-content-end">
+                  <p p-2>Sort :&nbsp;&nbsp;</p>
+
+
+                  <form action="" method="get" id="sortForm">
+                    <input type="hidden" name="category" value="<%= req.category || '' %>">
+                    <select name="sort" onchange="this.form.submit()">
+                      <option value="">Select Sort Order</option>
+                      <option value="low-to-high">Price: Low To High</option>
+                      <option value="high-to-low">Price: High To Low</option>
+                      <option value="a-z">A - Z</option>
+                      <option value="z-a">Z - A</option>
+                    </select>
+                  </form>
+                  
+
+
+
+
+
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- This is product -->
+
           <div class="container">
             <div class="row" id="myUL">
               <% products.filter(product => product.isActive).forEach((product, index) => { %>
-              <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-item">
+              <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-item" data-category-id="<%= product.category._id %>">
                 <div class="product__item">
                   <div class="product__item__pic set-bg">
                     <a href="/user/product-list/<%= product._id %>">
@@ -250,6 +267,46 @@
   </section>
 
   <!-- Shop Section End -->
+
+  <script>
+    document.getElementById("sortSelect").addEventListener("change", function () {
+      const sortValue = this.value; // Get the selected sort value
+      if (sortValue) {
+        // Check if a valid sort option is selected
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("sort", sortValue); // Set the sort parameter
+        window.location.href = currentUrl.toString(); // Redirect to the updated URL
+      }
+    });
+  </script>
+
+  //
+  <script>
+    //     document.addEventListener('DOMContentLoaded', function () {
+    //     const filterButtons = document.querySelectorAll('.filter-btn');
+    //     const sortSelect = document.getElementById('sortSelect');
+
+    //     filterButtons.forEach(button => {
+    //         button.addEventListener('click', function () {
+    //             const categoryId = this.getAttribute('data-category');
+    //             applyFilterSort(categoryId, sortSelect.value);
+    //         });
+    //     });
+
+    //     sortSelect.addEventListener('change', function () {
+    //         const activeCategoryButton = document.querySelector('.filter-btn.active');
+    //         const categoryId = activeCategoryButton ? activeCategoryButton.getAttribute('data-category') : 'all';
+    //         applyFilterSort(categoryId, this.value);
+    //     });
+
+    //     function applyFilterSort(categoryId, sort) {
+    //         const query = `?category=${categoryId}&sort=${sort}`;
+    //         window.location.href = `/products${query}`;
+    //     }
+    // });
+
+    //
+  </script>
 
   <script>
     function myFunction() {

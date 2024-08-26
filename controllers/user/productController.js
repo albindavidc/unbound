@@ -7,27 +7,71 @@ const Size = require("../../models/attributes/sizeSchema");
 module.exports = {
   // Fetch all products
   loadProductList: async (req, res) => {
-    try {
-      const products = await Product.find({ isActive: true })
-      .populate('variants.color'); // Ensure color data is populated
 
+
+       //----------------------------------//
+       const { category, sort } = req.query;
+
+       let query = {};
+
+       console.log(`Sort parameter received: ${sort}`); // Debugging log
+
+       
+       if (category && category !== "all") {
+         query.category = category;
+       }
+ 
+       let sortQuery = {};
+       switch (sort) {
+         case "low-to-high":
+           sortQuery.sellingPrice = 1; // Ascending order
+           break;
+         case "high-to-low":
+           sortQuery.sellingPrice = -1; // Descending order
+           break;
+         case "a-z":
+           sortQuery.name = 1; // Ascending order
+           break;
+         case "z-a":
+           sortQuery.name = -1; // Descending order
+           break;
+         default:
+           sortQuery = {}; // No sorting
+       }
+ 
+ 
+       //---------------------------------------//
+
+       
+
+    try {
+      const product = await Product.find({ isActive: true }).populate("variants.color"); // Ensure color data is populated
 
       const categories = await Category.find({});
       const brand = await Brand.find({});
       const size = await Size.find({});
-      const colors = await Color.find({isListed:true});
+      const colors = await Color.find({ isListed: true });
 
-      const productCount = await Product.countDocuments({ isActive: true });
+
+      //----------------------//
+      
+      const products = await Product.find(query).sort(sortQuery);
+      const productCount = await Product.countDocuments(query);
+   
+      //--------------------------//
 
 
       res.render("user/product-list", {
         user: req.session.user,
+        product,
         products,
         categories,
         brand,
         size,
         colors,
         productCount,
+        
+        req: req.query
       });
     } catch (error) {
       console.error(error);
@@ -79,4 +123,31 @@ module.exports = {
       res.status(500).send("Internal Server Error");
     }
   },
+
+  // Assuming you are using Express.js
+
+  // getCategory: async (req, res) => {
+  //   const { category, sort } = req.query;
+  //   let filter = {};
+
+  //   if (category && category !== "all") {
+  //     filter.category = category;
+  //   }
+
+  //   let sortOption = {};
+  //   if (sort === "low-to-high") {
+  //     sortOption.sellingPrice = 1;
+  //   } else if (sort === "high-to-low") {
+  //     sortOption.sellingPrice = -1;
+  //   } else if (sort === "a-to-z") {
+  //     sortOption.name = 1;
+  //   } else if (sort === "z-to-a") {
+  //     sortOption.name = -1;
+  //   }
+
+  //   const products = await Product.find(filter).sort(sortOption);
+  //   const productCount = products.length;
+
+  //   res.render("product-list", { products, productCount });
+  // },
 };

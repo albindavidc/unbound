@@ -61,6 +61,10 @@ router
 .get(userController.getUserProfile)
 .post(userController.editProfile);
 
+// router.get("/product", productController.getCategory);
+
+
+
 router.post('/reset-password', userController.resetPassword);
 
 
