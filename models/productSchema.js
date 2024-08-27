@@ -13,9 +13,11 @@ const imageSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     path: { type: String, required: true },
-    type: { type: String, enum: ["primary", "secondary"],
-      //  required: true 
-      },
+    type: {
+      type: String,
+      enum: ["primary", "secondary"],
+      //  required: true
+    },
   },
   { timestamps: true }
 );
@@ -95,6 +97,7 @@ const ProductSchema = new mongoose.Schema(
       default: 0,
     },
     ratings: [ratingSchema],
+    arrivalDate: { type: Date, default: Date.now }, // Field to track the arrival date
   },
   { timestamps: true }
 );

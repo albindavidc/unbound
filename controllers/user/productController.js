@@ -58,6 +58,9 @@ module.exports = {
       case "z-a":
         sortQuery.name = -1; // Descending order
         break;
+      case "new_arrival":
+        sortQuery.arrivalDate = -1;
+        break;
       default:
         sortQuery = {}; // No sorting
     }
