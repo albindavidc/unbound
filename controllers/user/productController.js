@@ -7,48 +7,48 @@ const Size = require("../../models/attributes/sizeSchema");
 module.exports = {
   // Fetch all products
   loadProductList: async (req, res) => {
+    //----------------------------------//
+    const { price, brand, category, sort } = req.query;
 
+    const currentCategoryId = req.query.categoryId;
+    const currentBrandId = req.query.brandId;
+    let query = {};
 
-       //----------------------------------//
-       const { brand, category, sort } = req.query;
+    console.log(`Sort parameter received: ${sort}`); // Debugging log
 
-       const currentCategoryId = req.query.categoryId; 
-      const  currentBrandId = req.query.brandId;
-       let query = {};
+    if (category && category !== "all") {
+      query.category = category;
+    }
 
-       console.log(`Sort parameter received: ${sort}`); // Debugging log
+    if (brand && brand !== "all") {
+      query.brand = brand;
+    }
 
-       
-       if (category && category !== "all") {
-         query.category = category;
-       }
+    // Add price filter
+    if (price) {
+      const [minPrice, maxPrice] = price.split("-").map(Number);
+      query.sellingPrice = { $gte: minPrice, $lte: maxPrice };
+    }
 
-       if (brand && brand !== "all") {
-        query.brand = brand;
-      }
- 
-       let sortQuery = {};
-       switch (sort) {
-         case "low-to-high":
-           sortQuery.sellingPrice = 1; // Ascending order
-           break;
-         case "high-to-low":
-           sortQuery.sellingPrice = -1; // Descending order
-           break;
-         case "a-z":
-           sortQuery.name = 1; // Ascending order
-           break;
-         case "z-a":
-           sortQuery.name = -1; // Descending order
-           break;
-         default:
-           sortQuery = {}; // No sorting
-       }
- 
- 
-       //---------------------------------------//
+    let sortQuery = {};
+    switch (sort) {
+      case "low-to-high":
+        sortQuery.sellingPrice = 1; // Ascending order
+        break;
+      case "high-to-low":
+        sortQuery.sellingPrice = -1; // Descending order
+        break;
+      case "a-z":
+        sortQuery.name = 1; // Ascending order
+        break;
+      case "z-a":
+        sortQuery.name = -1; // Descending order
+        break;
+      default:
+        sortQuery = {}; // No sorting
+    }
 
-       
+    //---------------------------------------//
 
     try {
       const product = await Product.find({ isActive: true }).populate("variants.color"); // Ensure color data is populated
@@ -58,14 +58,12 @@ module.exports = {
       const size = await Size.find({});
       const colors = await Color.find({ isListed: true });
 
-
       //----------------------//
-      
+
       const products = await Product.find(query).sort(sortQuery);
       const productCount = await Product.countDocuments(query);
-   
-      //--------------------------//
 
+      //--------------------------//
 
       res.render("user/product-list", {
         user: req.session.user,
@@ -79,7 +77,6 @@ module.exports = {
         req: req.query,
         currentCategoryId: currentCategoryId,
         currentBrandId,
-
       });
     } catch (error) {
       console.error(error);
