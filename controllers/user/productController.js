@@ -4,14 +4,18 @@ const Color = require("../../models/attributes/colorSchema");
 const Brand = require("../../models/attributes/brandSchema");
 const Size = require("../../models/attributes/sizeSchema");
 
+const mongoose = require("mongoose");
+
+
 module.exports = {
   // Fetch all products
   loadProductList: async (req, res) => {
     //----------------------------------//
-    const { price, brand, category, sort } = req.query;
+    const { color, size, price, brand, category, sort } = req.query;
 
     const currentCategoryId = req.query.categoryId;
     const currentBrandId = req.query.brandId;
+    const currentSizeId = req.query.sizeId;
     let query = {};
 
     console.log(`Sort parameter received: ${sort}`); // Debugging log
@@ -28,6 +32,16 @@ module.exports = {
     if (price) {
       const [minPrice, maxPrice] = price.split("-").map(Number);
       query.sellingPrice = { $gte: minPrice, $lte: maxPrice };
+    }
+
+    // Check if size is a valid ObjectId and set query accordingly
+    if (size && mongoose.Types.ObjectId.isValid(size) && size !== "all") {
+      query["variants.size"] = size; // Assuming size is in variant array
+    }
+
+    // Check if color is a valid ObjectId and set query accordingly
+    if (color && mongoose.Types.ObjectId.isValid(color) && color !== "all") {
+      query["variants.color"] = color; // Assuming color is in variant array
     }
 
     let sortQuery = {};
@@ -77,6 +91,7 @@ module.exports = {
         req: req.query,
         currentCategoryId: currentCategoryId,
         currentBrandId,
+        currentSizeId,
       });
     } catch (error) {
       console.error(error);

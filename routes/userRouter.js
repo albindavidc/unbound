@@ -52,6 +52,8 @@ router.post("/forgot-password-cpassword", userController.passwordChange);
 router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
 router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
 
+// router.get("/user/product-list/filter", productController.filterProducts); // For filtered products
+
 
 
 // User-Profile

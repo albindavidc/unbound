@@ -113,6 +113,9 @@
                     <div class="card-body">
                       <div class="shop__sidebar__price">
                         <ul>
+                          <li>
+                            <a href="#" class="price-filter" data-price="0-1000000">All</a>
+                          </li>
                           <li><a href="#" class="price-filter" data-price="0-500">₹0.00 - ₹500</a></li>
                           <li><a href="#" class="price-filter" data-price="500-1000">₹500 - ₹1000</a></li>
                           <li><a href="#" class="price-filter" data-price="1000-2000">₹1000 - ₹2000</a></li>
@@ -133,9 +136,12 @@
                     <div class="card-body">
                       <div class="shop__sidebar__categories">
                         <ul class="nice-scroll">
+                          <li>
+                            <a href="#" class="size-filter <%= !currentSizeId || currentSizeId === 'all' ? '' : 'active' %>" data-size="all">All</a>
+                          </li>
                           <% size.forEach(size => { %>
                           <li>
-                            <a href="#" data-size-id="<%= size._id %>" onclick="filterByCategory('<%= size._id %>')"> <%= size.value %> </a>
+                            <a href="#" class="size-filter" data-size="<%= size._id %>"> <%= size.value %> </a>
                           </li>
                           <% }) %>
                         </ul>
@@ -152,13 +158,13 @@
                     <div class="card-body">
                       <div class="shop__sidebar__color">
                         <% colors.forEach(color => { %>
-                        <label class="c-<%= color._id %>" style="background-color: <%= color.hex %>" for="color_<%= color._id %>">
+                        <label class="color-filter" data-color="<%= color._id %>" style="background-color: <%= color.hex %>" for="color_<%= color._id %>">
                           <input
+                          class="color-filter" data-color="<%= color._id %>"
                             type="radio"
                             id="color_<%= color._id %>"
                             name="color"
                             value="<%= color._id %>"
-                            onclick="filterByColor('<%= color._id %>')"
                           />
                         </label>
                         <% }); %>
@@ -166,7 +172,6 @@
                     </div>
                   </div>
                 </div>
-
                 <!-- <div class="card">
                   <div class="card-heading">
                     <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
@@ -296,69 +301,67 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".category-filter, .brand-filter").forEach(function (element) {
+      // Combine event listeners for category, brand, and price filters
+      document.querySelectorAll(".category-filter, .brand-filter, .price-filter, .size-filter,.color-filter").forEach(function (element) {
         element.addEventListener("click", function (e) {
           e.preventDefault();
 
           let currentUrl = new URL(window.location.href);
           let params = new URLSearchParams(currentUrl.search);
 
-          // Set category or brand based on clicked element
+          // Handle category filter
           if (this.classList.contains("category-filter")) {
-            this.classList.remove("active");
+            // Set the category parameter in the URL
             params.set("category", this.getAttribute("data-category"));
 
-            // this.classList.add("active");
-          } else {
+            // Add 'active' class to the clicked category
+            document.querySelectorAll(".category-filter").forEach((el) => el.classList.remove("active"));
+            this.classList.add("active");
+          }
+
+          // Handle brand filter
+          if (this.classList.contains("brand-filter")) {
+            // Set the brand parameter in the URL
             params.set("brand", this.getAttribute("data-brand"));
+
+            // Add 'active' class to the clicked brand
+            document.querySelectorAll(".brand-filter").forEach((el) => el.classList.remove("active"));
+            this.classList.add("active");
+          }
+
+          // Handle price filter
+          if (this.classList.contains("price-filter")) {
+            // Set the price parameter in the URL
+            params.set("price", this.getAttribute("data-price"));
+
+            // Add 'active' class to the clicked price range
+            document.querySelectorAll(".price-filter").forEach((el) => el.classList.remove("active"));
+            this.classList.add("active");
+          }
+
+          if (this.classList.contains("size-filter")) {
+            params.set("size", this.getAttribute("data-size"));
+
+            document.querySelectorAll(".size-filter").forEach((el) => el.classList.remove("active"));
+            this.classList.add("active");
+          }
+
+          if (this.classList.contains("color-filter")) {
+            // Set the brand parameter in the URL
+            params.set("color", this.getAttribute("data-color"));
+
+            // Add 'active' class to the clicked brand
+            document.querySelectorAll(".color-filter").forEach((el) => el.classList.remove("active"));
+            this.classList.add("active");
           }
 
           // Always keep the sort parameter
           let sortSelect = document.querySelector('#sortForm select[name="sort"]');
-          params.set("sort", sortSelect.value);
+          if (sortSelect) {
+            params.set("sort", sortSelect.value);
+          }
 
           // Construct the new URL and navigate
-          currentUrl.search = params.toString();
-          window.location.href = currentUrl.toString();
-        });
-      });
-
-      const categoryFilters = document.querySelectorAll(".category-filter");
-
-      categoryFilters.forEach((filter) => {
-        filter.addEventListener("click", function () {
-          // Temporarily removed class removal for testing
-          this.classList.add("active");
-        });
-      });
-
-      const brandFilters = document.querySelectorAll(".brand-filter");
-
-      brandFilters.forEach((filter) => {
-        filter.addEventListener("click", function () {
-          // Temporarily removed class removal for testing
-          this.classList.add("active");
-        });
-      });
-    });
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".price-filter").forEach(function (element) {
-        element.addEventListener("click", function (e) {
-          e.preventDefault();
-
-          let currentUrl = new URL(window.location.href);
-          let params = new URLSearchParams(currentUrl.search);
-
-          // Get the selected price range
-          const priceRange = this.getAttribute("data-price");
-
-          // Set the price parameter in the URL
-          params.set("price", priceRange);
-
-          // Update the URL and reload the page
           currentUrl.search = params.toString();
           window.location.href = currentUrl.toString();
         });
@@ -383,6 +386,12 @@
       if (params.has("brand")) {
         // Do nothing, keep the existing brand parameter
       }
+      if (params.has("price")) {
+        // Do nothing, keep the existing price parameter
+      }
+      if (params.has("size")) {
+        // Do nothing, keep the existing size parameter
+      }
 
       // Construct the new URL and navigate
       currentUrl.search = params.toString();
@@ -390,51 +399,26 @@
     });
   </script>
 
+  //
   <script>
-    //     document.addEventListener('DOMContentLoaded', function () {
-    //     const filterButtons = document.querySelectorAll('.filter-btn');
-    //     const sortSelect = document.getElementById('sortSelect');
+    //   function myFunction() {
+    //     var input, filter, ul, li, h6, i, txtValue;
+    //     input = document.getElementById("myInput");
+    //     filter = input.value.toUpperCase();
+    //     ul = document.getElementById("myUL");
+    //     li = ul.getElementsByClassName("product-item");
 
-    //     filterButtons.forEach(button => {
-    //         button.addEventListener('click', function () {
-    //             const categoryId = this.getAttribute('data-category');
-    //             applyFilterSort(categoryId, sortSelect.value);
-    //         });
-    //     });
-
-    //     sortSelect.addEventListener('change', function () {
-    //         const activeCategoryButton = document.querySelector('.filter-btn.active');
-    //         const categoryId = activeCategoryButton ? activeCategoryButton.getAttribute('data-category') : 'all';
-    //         applyFilterSort(categoryId, this.value);
-    //     });
-
-    //     function applyFilterSort(categoryId, sort) {
-    //         const query = `?category=${categoryId}&sort=${sort}`;
-    //         window.location.href = `/products${query}`;
+    //     for (i = 0; i < li.length; i++) {
+    //       h6 = li[i].getElementsByTagName("h6")[0];
+    //       txtValue = h6.textContent || h6.innerText;
+    //       if (txtValue.toUpperCase().indexOf(filter) > -1) {
+    //         li[i].style.display = "";
+    //       } else {
+    //         li[i].style.display = "none";
+    //       }
     //     }
-    // });
-
+    //   }
     //
-  </script>
-
-  <script>
-    function myFunction() {
-      var input, filter, ul, li, h6, i, txtValue;
-      input = document.getElementById("myInput");
-      filter = input.value.toUpperCase();
-      ul = document.getElementById("myUL");
-      li = ul.getElementsByClassName("product-item");
-
-      for (i = 0; i < li.length; i++) {
-        h6 = li[i].getElementsByTagName("h6")[0];
-        txtValue = h6.textContent || h6.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          li[i].style.display = "";
-        } else {
-          li[i].style.display = "none";
-        }
-      }
-    }
   </script>
 
   <script>
