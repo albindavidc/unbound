@@ -1,5 +1,19 @@
 <%- include('../../views/partials/user/header') %>
+<style>
+  /* Ensure these styles are applied */
+  .category-filter,
+  .brand-filter {
+    cursor: pointer;
+  }
+</style>
 
+<style>
+  .active {
+    color: rgb(255, 0, 0); /* Example: Change color to indicate active */
+    font-weight: bold;
+    font-size: 10px;
+  }
+</style>
 <body>
   <!-- Breadcrumb Section Begin -->
   <section class="breadcrumb-option">
@@ -43,9 +57,22 @@
                       <div class="shop__sidebar__categories">
                         <ul class="nice-scroll">
                           <li>
-                            <% categories.forEach(category => { %>
-                            <a href="?category=<%= category._id %>&sort=<%= req.sort || '' %>"><%= category.name %></a>
+                            <a
+                              href="#"
+                              class="category-filter <%= !currentCategoryId || currentCategoryId === 'all' ? '' : 'active' %>"
+                              data-category="all"
+                              >All</a
+                            >
+                          </li>
 
+                          <% categories.forEach(category => { %>
+                          <li>
+                            <a
+                              href="#"
+                              class="category-filter <%= category._id == currentCategoryId ? 'active' : '' %>"
+                              data-category="<%= category._id %>"
+                              ><%= category.name %></a
+                            >
 
                             <% }); %>
                           </li>
@@ -62,9 +89,15 @@
                     <div class="card-body">
                       <div class="shop__sidebar__categories">
                         <ul class="nice-scroll">
+                          <li>
+                            <a href="#" class="brand-filter <%= !currentBrandId || currentBrandId === 'all' ? '' : 'active' %>" data-brand="all"
+                              >All</a
+                            >
+                          </li>
+
                           <% brand.forEach(brand => { %>
                           <li>
-                            <a href="#" data-brand-id="<%= brand._id %>" onclick="filterByCategory('<%= brand._id %>')"> <%= brand.name %> </a>
+                            <a href="#" class="brand-filter" data-brand="<%= brand._id %>"><%= brand.name %></a>
                           </li>
                           <% }) %>
                         </ul>
@@ -164,14 +197,12 @@
                 </div>
               </div>
 
-
               <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="shop__product__option__right d-flex flex-row justify-content-end">
                   <p p-2>Sort :&nbsp;&nbsp;</p>
 
-
                   <form action="" method="get" id="sortForm">
-                    <input type="hidden" name="category" value="<%= req.category || '' %>">
+                    <input type="hidden" name="category" value="<%= req.category || '' %>" />
                     <select name="sort" onchange="this.form.submit()">
                       <option value="">Select Sort Order</option>
                       <option value="low-to-high">Price: Low To High</option>
@@ -180,7 +211,6 @@
                       <option value="z-a">Z - A</option>
                     </select>
                   </form>
-
                 </div>
               </div>
             </div>
@@ -264,18 +294,76 @@
   <!-- Shop Section End -->
 
   <script>
-    document.getElementById("sortSelect").addEventListener("change", function () {
-      const sortValue = this.value; // Get the selected sort value
-      if (sortValue) {
-        // Check if a valid sort option is selected
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("sort", sortValue); // Set the sort parameter
-        window.location.href = currentUrl.toString(); // Redirect to the updated URL
-      }
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".category-filter, .brand-filter").forEach(function (element) {
+        element.addEventListener("click", function (e) {
+          e.preventDefault();
+          console.log("Element clicked:", this);
+
+          let currentUrl = new URL(window.location.href);
+          let params = new URLSearchParams(currentUrl.search);
+
+          if (this.classList.contains("category-filter")) {
+            console.log("Category filter clicked");
+            document.querySelectorAll(".category-filter").forEach(function (el) {
+              el.classList.remove("active");
+            });
+
+            params.set("category", this.getAttribute("data-category"));
+            this.classList.add("active");
+          }
+
+          if (this.classList.contains("brand-filter")) {
+            console.log("Brand filter clicked");
+            document.querySelectorAll(".brand-filter").forEach(function (el) {
+              el.classList.remove("active");
+            });
+
+            params.set("brand", this.getAttribute("data-brand"));
+            this.classList.add("active");
+          }
+
+          let sortSelect = document.querySelector('#sortForm select[name="sort"]');
+          if (sortSelect) {
+            params.set("sort", sortSelect.value);
+          }
+
+          console.log("Navigating to:", currentUrl.toString());
+          currentUrl.search = params.toString();
+          window.location.href = currentUrl.toString();
+        });
+      });
     });
   </script>
 
-  //
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {});
+  </script>
+
+  <script>
+    document.getElementById("sortForm").addEventListener("change", function (e) {
+      e.preventDefault(); // Prevent form submission
+
+      let currentUrl = new URL(window.location.href);
+      let params = new URLSearchParams(currentUrl.search);
+
+      // Update sort parameter
+      params.set("sort", this.querySelector('select[name="sort"]').value);
+
+      // Keep category and brand parameters if they exist
+      if (params.has("category")) {
+        // Do nothing, keep the existing category parameter
+      }
+      if (params.has("brand")) {
+        // Do nothing, keep the existing brand parameter
+      }
+
+      // Construct the new URL and navigate
+      currentUrl.search = params.toString();
+      window.location.href = currentUrl.toString();
+    });
+  </script>
+
   <script>
     //     document.addEventListener('DOMContentLoaded', function () {
     //     const filterButtons = document.querySelectorAll('.filter-btn');

@@ -10,8 +10,10 @@ module.exports = {
 
 
        //----------------------------------//
-       const { category, sort } = req.query;
+       const { brand, category, sort } = req.query;
 
+       const currentCategoryId = req.query.categoryId; 
+      const  currentBrandId = req.query.brandId;
        let query = {};
 
        console.log(`Sort parameter received: ${sort}`); // Debugging log
@@ -20,6 +22,10 @@ module.exports = {
        if (category && category !== "all") {
          query.category = category;
        }
+
+       if (brand && brand !== "all") {
+        query.brand = brand;
+      }
  
        let sortQuery = {};
        switch (sort) {
@@ -70,8 +76,10 @@ module.exports = {
         size,
         colors,
         productCount,
-        
-        req: req.query
+        req: req.query,
+        currentCategoryId: currentCategoryId,
+        currentBrandId,
+
       });
     } catch (error) {
       console.error(error);
