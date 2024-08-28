@@ -132,7 +132,10 @@ router.post("/attributes/add-brand", attributeController.addBrand);
  * Order Managment
  */
 
-router.get("/orderList", orderController.getOrderList);
+router
+  .route("/orderList")
+  .get(orderController.getOrderList)
+  .post(orderController.updateDeliveryStatus);
 
 
 module.exports = router;
