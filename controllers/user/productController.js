@@ -147,30 +147,5 @@ module.exports = {
     }
   },
 
-  // Assuming you are using Express.js
-
-  // getCategory: async (req, res) => {
-  //   const { category, sort } = req.query;
-  //   let filter = {};
-
-  //   if (category && category !== "all") {
-  //     filter.category = category;
-  //   }
-
-  //   let sortOption = {};
-  //   if (sort === "low-to-high") {
-  //     sortOption.sellingPrice = 1;
-  //   } else if (sort === "high-to-low") {
-  //     sortOption.sellingPrice = -1;
-  //   } else if (sort === "a-to-z") {
-  //     sortOption.name = 1;
-  //   } else if (sort === "z-to-a") {
-  //     sortOption.name = -1;
-  //   }
-
-  //   const products = await Product.find(filter).sort(sortOption);
-  //   const productCount = products.length;
-
-  //   res.render("product-list", { products, productCount });
-  // },
+ 
 };

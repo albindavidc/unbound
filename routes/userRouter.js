@@ -6,6 +6,7 @@ const userController = require("../controllers/user/userController");
 const productController = require("../controllers/user/productController");
 const cartController = require('../controllers/user/cartController');
 const checkoutController = require("../controllers/user/checkoutController");
+const orderController = require("../controllers/user/orderController");
 
 
 //Home page - Page not found
@@ -64,10 +65,11 @@ router
 .post(userController.editProfile);
 
 // router.get("/product", productController.getCategory);
-
-
-
 router.post('/reset-password', userController.resetPassword);
+
+router
+  .route("/orders")
+  .get(orderController.getOrders);
 
 
 //User-Address

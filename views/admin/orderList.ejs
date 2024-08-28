@@ -24,7 +24,7 @@
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Order Confirm</h1>
+      <h1 class="userProfileH1">Order Managment</h1>
     </div>
   </div>
 </section>
@@ -64,32 +64,18 @@
           <td><%- order.paymentMethod %></td>
           <td>₹<%= order.totalPrice %></td>
           <td>
-            <% newOrderDetails.forEach(item => { %>
-              <select class="form-select" name="paymentStatus" id="deliveryStatus" data-order-id="<%= order._id %>">
-                <% 
-                  const statuses = ["Pending", "Shipped", "Delivered", "Cancelled"];
-                  statuses.forEach(status => { 
-                    // Check if the status should be included and if it's the current status
-                    if (status !== item.status) { %>
-                      <option value="<%= status %>"><%= status %></option>
-                    <% } else { %>
-                      <option value="<%= status %>" selected><%= status %></option>
-                    <% }
-                  }); 
-                %>
-              </select>
-              
-            <% }) %>
+            <select class="form-select" name="paymentStatus" id="deliveryStatus-<%= order._id %>" data-order-id="<%= order._id %>" aria-label="Select Delivery Status">
+              <% statuses.forEach(status => { %>
+                <option value="<%= status %>" <%= status === order.commonStatus ? 'selected' : '' %>><%= status %></option>
+              <% }); %>
+            </select>
           </td>
           <td>
             <div class="d-flex justify-content-center p-4">
-              <% if (order.status) { %>
-              <a href="/admin/orderList">
-                <button type="button" id="updateButton" class="btn btn-sm btn-dark">Update</button>
-              </a>
-              <% } %>
+              <button type="button" class="btn btn-sm btn-dark update-button" data-order-id="<%= order._id %>">Update</button>
             </div>
           </td>
+          
         </tr>
         <% }) %> <% } else { %>
         <td colspan="8" class="text-danger">No Orders Available</td>
@@ -101,45 +87,48 @@
 
 <%- include('../partials/admin/footer') %>
 
-<script>
-  document.querySelectorAll(".form-select").forEach((select) => {
-    select.addEventListener("change", function () {
-      const deliveryStatus = document.getElementById("deliveryStatus").value;
-      const id = document.getElementById("orderId").dataset.orderId;
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-      fetch("/admin/orderList", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ deliveryStatus, id }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            return response.json().then((err) => {
-              throw new Error(err.error);
-            });
-          }
-          return response.json();
-        })
-        .then(() => {
-          Swal.fire({
-            icond: "success",
-            title: "Success",
-            timer: 3000,
-            showConfirmation: false,
-            text: "Order updated successfully!",
-          }).then(() => location.reload());
-        })
-        .catch((err) => {
-          Swal.fire({
-            icon: "error",
-            title: "Oops",
-            timer: 3000,
-            showConfrimButton: false,
-            text: "Couldn't update the status of the delivery",
-          });
-        });
+<script>
+document.querySelectorAll('.update-button').forEach(button => {
+  button.addEventListener('click', async function(e) {
+    e.preventDefault(); // Prevent the default link behavior
+
+    const id = this.getAttribute('data-order-id');
+    console.log("this is id", id);
+    const selectedStatus = document.querySelector(`#deliveryStatus-${id}`).value;
+
+    fetch(`/admin/orderList/updateOrder/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({id, status: selectedStatus }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => { throw new Error(err.error); });
+      }
+      return response.json();
+    })
+    .then(() => {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        timer: 3000,
+        showConfirmButton: false,
+        text: "Order updated successfully!",
+      }).then(() => location.reload());
+    })
+    .catch(err => {
+      Swal.fire({
+        icon: "error",
+        title: "Oops",
+        timer: 3000,
+        showConfirmButton: false,
+        text: "Couldn't update the status of the delivery",
+      });
     });
   });
+});
 </script>

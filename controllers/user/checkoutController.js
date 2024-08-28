@@ -309,6 +309,8 @@ module.exports = {
 
             await Cart.clearCart(userId);
 
+
+            
             return res.status(200).json({
               success: true,
               message: "Order has been placed successfully.",

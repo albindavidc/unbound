@@ -88,9 +88,7 @@ const orderSchema = new Schema(
         outForDelivery: {
           type: Date,
         },
-        deliveredOn: {
-          type: Date,
-        },
+        
         cancelledOn: {
           type: Date,
         },
@@ -163,6 +161,9 @@ const orderSchema = new Schema(
     status: {
       type: String,
       required: true,
+    },
+    deliveredOn: {
+      type: Date,
     },
   },
   {

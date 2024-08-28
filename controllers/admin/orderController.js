@@ -3,8 +3,6 @@ const Product = require("../../models/productSchema");
 const Color = require("../../models/attributes/colorSchema");
 const Size = require("../../models/attributes/sizeSchema");
 
-const { prependListener } = require("../../models/userSchema");
-
 module.exports = {
   getOrderList: async (req, res) => {
     try {
@@ -28,14 +26,28 @@ module.exports = {
         })
         .sort({ createdAt: -1 }); // Sort by latest order
 
-      const newOrderDetails = await Order.find();
-      console.log(orderDetails.items);
-      // console.log("this is orderDetails",newOrderDetails[])
+      const statuses = ["Pending", "Shipped", "Delivered", "Cancelled"];
+
+      // Calculate the common status for each order
+      orderDetails.forEach((order) => {
+        let commonStatus = order.items[0].status;
+
+        // Determine if all items have the same status
+        const allSameStatus = order.items.every((item) => item.status === commonStatus);
+
+        // If not all items share the same status, use a fallback
+        if (!allSameStatus) {
+          commonStatus = "Pending"; // Or another fallback status
+        }
+
+        // Attach the commonStatus to the order object
+        order.commonStatus = commonStatus;
+      });
 
       // Render the order list on the admin side
       res.render("admin/orderList", {
         orders: orderDetails,
-        newOrderDetails,
+        statuses,
       });
     } catch (error) {
       console.error("Error loading order details:", error);
@@ -45,18 +57,20 @@ module.exports = {
 
   updateDeliveryStatus: async (req, res) => {
     try {
-      const { deliveryStatus, id } = req.body;
+      const { id } = req.params;
+      const { status } = req.body;
 
-      const order = await Order.findById(id).populate("paymentStatus", "status");
+      // Update the status of all items in the order
+      await Order.updateOne({ _id: id }, { $set: { "items.$[].status": status, status } });
 
-      console.log("this is body", req.body);
+      const order = await Order.findById(id);
 
       if (!order) {
-        res.status(400).json({ error: "Order not found" });
+        return res.status(400).json({ error: "Order not found" });
       }
 
       // Update status and paymentStatus based on deliveryStatus
-      switch (deliveryStatus) {
+      switch (status) {
         case "Shipped":
           order.status = "Shipped";
           order.paymentStatus = "Pending";
@@ -64,6 +78,7 @@ module.exports = {
         case "Delivered":
           order.status = "Delivered";
           order.paymentStatus = "Paid";
+          order.deliveredOn = new Date();
           break;
         case "Cancelled":
           order.status = "Cancelled";
@@ -79,9 +94,10 @@ module.exports = {
 
       await order.save();
       res.json({ message: "Order updated successfully" });
+
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal SErver Error" });
+      res.status(500).json({ error: "Internal Server Error" });
     }
   },
 };
