@@ -69,11 +69,16 @@ router.post('/reset-password', userController.resetPassword);
 
 router
   .route("/orders")
+  
   .get(orderController.getOrders);
 
 router 
   .route("/order/:orderId")
-  .get(orderController.getOrder);
+  .all(userAuth, checkUserStatus)
+  .get(orderController.getOrder)
+  .put(orderController.returnOrder)
+  // .delete(orderController.cancelOrder);
+
 
 
 //User-Address

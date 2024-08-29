@@ -69,6 +69,7 @@
                 <option value="<%= status %>" <%= status === order.commonStatus ? 'selected' : '' %>><%= status %></option>
               <% }); %>
             </select>
+            
           </td>
           <td>
             <div class="d-flex justify-content-center p-4">
@@ -127,7 +128,7 @@ document.querySelectorAll('.update-button').forEach(button => {
         timer: 3000,
         showConfirmButton: false,
         text: "Couldn't update the status of the delivery",
-      });
+      }).then(() => location.reload());
     });
   });
 });

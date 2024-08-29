@@ -68,10 +68,60 @@ module.exports = {
         console.log("No orders found.");
       }
 
-      res.render("user/order", { order,orderId });
+      // Calculate canReturn and canCancel for each order
+      order = order.map((order) => {
+        const isDelivered = order.status === "Delivered";
+        const isCancelled = order.status === "Cancelled";
+        const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+        const isWithinReturnPeriod = new Date() - new Date(order.deliveredOn) <= oneWeekInMilliseconds;
+
+        order.canReturn = isDelivered && isWithinReturnPeriod;
+        order.canCancel = !isDelivered && !isCancelled;
+        return order;
+      });
+
+      res.render("user/order", { order, orderId, user: req.session.user });
+
     } catch (error) {
       console.error("Error fetching order details:", error);
       res.status(500).send("Server Error");
     }
   },
+
+  returnOrder: async (req, res) => {
+    let orderId = req.params.orderId;
+
+    console.log("this is order id", orderId);
+    try {
+      const result = await Order.findByIdAndUpdate(
+        orderId, 
+        { 
+          $set: { 
+            "items.$[].status": "Return",
+            status: "Return",
+            paymentStatus: "Refund"        // Update the payment status to "Refund"
+          } 
+        },
+        { new: true } // This option ensures the updated document is returned
+      );
+
+      if (result) {
+        res.status(200).json({ success: true, message: "Order returned successfully" });
+      } else {
+        res.status(404).json({ success: false, message: "Order not found" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  },
+
+  // cancelOrder: async (req,res) =>{
+  //   let orderId = req.params.id;
+  //   try {
+  //     const result = await Order.findByIdAndUpdate(orderId, )
+  //   } catch (error) {
+
+  //   }
+  // }
 };

@@ -6,42 +6,37 @@ const Size = require("../../models/attributes/sizeSchema");
 module.exports = {
   getOrderList: async (req, res) => {
     try {
-      // Fetch all orders with related product and user details
+      const statuses = ["Pending", "Shipped", "Delivered", "Cancelled", "Return"];
+
+      // Fetch and populate order details
       let orderDetails = await Order.find()
-        .populate({
-          path: "customerId",
-          select: "name email", 
-        })
-        .populate({
-          path: "items.productId",
-          select: "name price", 
-        })
-        .populate({
-          path: "items.color",
-          select: "name", 
-        })
-        .populate({
-          path: "items.size",
-          select: "name",
-        })
+        .populate({ path: "customerId", select: "name email" })
+        .populate({ path: "items.productId", select: "name price" })
+        .populate({ path: "items.color", select: "name" })
+        .populate({ path: "items.size", select: "name" })
         .sort({ createdAt: -1 });
-
-      const statuses = ["Pending", "Shipped", "Delivered", "Cancelled"];
-
+      
       // Calculate the common status for each order
       orderDetails.forEach((order) => {
-        let commonStatus = order.items[0].status;
-
-        const allSameStatus = order.items.every((item) => item.status === commonStatus);
-
-        if (!allSameStatus) {
-          commonStatus = "Pending"; 
+        // Extract all statuses for the items in the order
+        let itemStatuses = order.items.map(item => item.status);
+        
+        // Determine the common status based on the item statuses
+        if (itemStatuses.includes("Return")) {
+          order.commonStatus = "Return";
+        } else if (itemStatuses.every(status => status === "Shipped")) {
+          order.commonStatus = "Shipped";
+        } else if (itemStatuses.every(status => status === "Delivered")) {
+          order.commonStatus = "Delivered";
+        } else if (itemStatuses.every(status => status === "Cancelled")) {
+          order.commonStatus = "Cancelled";
+        } else {
+          order.commonStatus = "Pending";
         }
-        order.commonStatus = commonStatus;
+        
+        console.log(`Order ID: ${order._id}, Common status: ${order.commonStatus}`);
       });
-
-
-     
+      
       res.render("admin/orderList", {
         orders: orderDetails,
         statuses,
@@ -85,12 +80,16 @@ module.exports = {
           order.status = "Pending";
           order.paymentStatus = "Pending";
           break;
+        case "Return":
+          order.status = "Return";
+          order.paymentStatus = "Refund";
+          break;
         default:
           return res.status(400).json({ error: "Invalid delivery status" });
       }
 
       await order.save();
-      res.json({ message: "Order updated successfully" });
+      res.json({success: true, message: "Order updated successfully" });
 
     } catch (error) {
       console.error(error);
