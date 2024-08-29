@@ -15,12 +15,13 @@ module.exports = {
     // Calculate canReturn and canCancel for each order
     order = order.map((order) => {
       const isDelivered = order.status === "Delivered";
+      const isCancelled = order.status === "Cancelled";
       const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
       const isWithinReturnPeriod = new Date() - new Date(order.deliveredOn) <= oneWeekInMilliseconds;
 
       order.canReturn = isDelivered && isWithinReturnPeriod;
       // Show the cancel button if the order is not delivered
-      order.canCancel = !isDelivered;
+      order.canCancel = !isDelivered && !isCancelled;
       return order;
     });
 

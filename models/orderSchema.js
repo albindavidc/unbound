@@ -89,9 +89,7 @@ const orderSchema = new Schema(
           type: Date,
         },
         
-        cancelledOn: {
-          type: Date,
-        },
+       
         returnedOn: {
           type: Date,
         },
@@ -163,6 +161,9 @@ const orderSchema = new Schema(
       required: true,
     },
     deliveredOn: {
+      type: Date,
+    },
+    cancelledOn: {
       type: Date,
     },
   },
