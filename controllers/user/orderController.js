@@ -81,47 +81,54 @@ module.exports = {
       });
 
       res.render("user/order", { order, orderId, user: req.session.user });
-
     } catch (error) {
       console.error("Error fetching order details:", error);
       res.status(500).send("Server Error");
     }
   },
 
-  returnOrder: async (req, res) => {
-    let orderId = req.params.orderId;
+  updateOrder: async (req, res) => {
+    const { orderId } = req.params;
+    const { action } = req.body;
 
-    console.log("this is order id", orderId);
+    console.log("this is orderId", orderId);
+    console.log("this is action", action);
     try {
-      const result = await Order.findByIdAndUpdate(
-        orderId, 
-        { 
-          $set: { 
-            "items.$[].status": "Return",
-            status: "Return",
-            paymentStatus: "Refund"        // Update the payment status to "Refund"
-          } 
-        },
-        { new: true } // This option ensures the updated document is returned
-      );
+      let result;
+      if (action === "return") {
+        result = await Order.findByIdAndUpdate(
+          orderId,
+          {
+            $set: {
+              "items.$[].status": "Return",
+              status: "Return",
+              paymentStatus: "Refund",
+            },
+          },
+          { new: true }
+        );
+      } else if (action === "cancel") {
+        result = await Order.findByIdAndUpdate(
+          orderId,
+          {
+            $set: {
+              "items.$[].status": "Cancelled",
+              status: "Cancelled",
+              paymentStatus: "Refund",
+            },
+          },
+          { new: true }
+        );
+      }
 
       if (result) {
-        res.status(200).json({ success: true, message: "Order returned successfully" });
+        res.status(200).json({ success: true, message: `Order ${action}led successfully` });
       } else {
         res.status(404).json({ success: false, message: "Order not found" });
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
-
-  // cancelOrder: async (req,res) =>{
-  //   let orderId = req.params.id;
-  //   try {
-  //     const result = await Order.findByIdAndUpdate(orderId, )
-  //   } catch (error) {
-
-  //   }
-  // }
 };

@@ -100,7 +100,7 @@
 
         <!-- Actions -->
         <div class="order-actions p-5 d-flex justify-content-center">
-          <% if (singleOrder.canReturn) { %> 
+          <% if (singleOrder.canReturn) { %>
 
           <button
             class="btn btn-outline-primary return-btn"
@@ -110,7 +110,13 @@
             Return
           </button>
           <% } else if (singleOrder.canCancel) { %>
-          <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= singleOrder._id %>">Cancel Order</button>
+          <button
+            class="btn btn-outline-danger cancel-btn"
+            data-order-id="<%= singleOrder._id %>"
+            onclick="confirmAction('<%- singleOrder._id %>','cancel')"
+          >
+            Cancel Order
+          </button>
           <% } %>
         </div>
 
@@ -126,16 +132,18 @@
 <%- include("../partials/user/footer") %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
 <script>
-
-  const confirmAction = (orderId, action ) =>{
+  const confirmAction = (orderId, action) => {
     let actionText, confirmButtonText;
 
     switch (action) {
       case "return":
         actionText = "return";
         confirmButtonText = "Yes, Return the order !";
+        break;
+      case "cancel":
+        actionText = "cancel";
+        confirmButtonText = "Yes, Cancel the order !"
         break;
       default:
         return;
@@ -152,72 +160,104 @@
       reverseButtons: true,
       timer: 5000,
       timerProgressBar: true,
-    }).then((result) =>{
-      if(result.isConfirmed){
-        if(action === "return"){
-          returnTheOrder(orderId);
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (action === "return") {
+          returnTheOrder(orderId, action);
+        }else if(action === "cancel"){
+          cancelTheOrder(orderId, action);
         }
       }
-    })
-  }
+    });
+  };
 
-  const returnTheOrder = async (orderId) =>{
+  const returnTheOrder = async (orderId, action) => {
     try {
       const response = await fetch(`/order/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({orderId})
+        body: JSON.stringify({ orderId, action }),
       });
       const result = await response.json();
-      if(result.success){
+      if (result.success) {
         Swal.fire({
           title: "Return Accepted",
-          text: "The order has been sucessfully returned",
+          text: "The order has been successfully returned",
           icon: "success",
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
           location.reload();
         });
-      }else {
+      } else {
         Swal.fire({
           title: "Error returning the product",
           text: "Something went wrong, kindly do again later",
           icon: "error",
-          showConfirmButton: true,
-          // timer: 1500,
-
+          showConfirmButton: false,
+          timer: 1500,
         });
       }
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Your facing some internal error while returning the product",
+        text: "Your facing some internal error while returning the order",
         icon: "error",
         showConfirmButton: false,
         timer: 1500,
-      }).then(() =>{
+      }).then(() => {
         location.reload();
       });
-      
     }
+  };
+
+  const cancelTheOrder = async (orderId, action) => {
+  try {
+    const response = await fetch(`/order/${orderId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ orderId, action }),
+    });
+    const result = await response.json();
+
+    if (response.ok && result.success) { // Ensure both the response and success are true
+      Swal.fire({
+        title: "Cancel Accepted",
+        text: "The order has been successfully cancelled",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        location.reload();
+      });
+    } else {
+      Swal.fire({
+        title: "Error cancelling the order",
+        text: result.message || "The order is not cancelled, try cancelling later",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  } catch (error) {
+    Swal.fire({
+      title: "Error",
+      text: "You're facing some internal error while cancelling the order",
+      icon: "error",
+      showConfirmButton: false,
+      timer: 1500,
+    }).then(() => {
+      location.reload();
+    });
   }
+};
 
-  document.querySelectorAll(".return-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const orderId = this.getAttribute("data-order-id");
-    });
-  });
 
-  document.querySelectorAll(".cancel-btn").forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const orderId = this.getAttribute("data-order-id");
-      // Handle cancel logic here
-      alert(`Cancel request initiated for order ${orderId}`);
-    });
-  });
+ 
 </script>
 
 <%- include('../partials/user/footer') %>

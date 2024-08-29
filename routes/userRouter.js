@@ -72,12 +72,11 @@ router
   
   .get(orderController.getOrders);
 
-router 
+  router
   .route("/order/:orderId")
   .all(userAuth, checkUserStatus)
   .get(orderController.getOrder)
-  .put(orderController.returnOrder)
-  // .delete(orderController.cancelOrder);
+  .put(orderController.updateOrder);
 
 
 
