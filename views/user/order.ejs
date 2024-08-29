@@ -43,65 +43,73 @@
     </div>
   </div>
 </section>
+
 <section>
   <div class="container mt-5">
     <div class="row">
       <div class="col-12 col-md-8 offset-md-2">
-        <!-- Order Summary -->
-        <div class="order-summary mb-4 p-4 border rounded bg-light">
-          <h4>Order Details</h4>
-          <p><strong>Order Number:</strong> <%= order._id %></p>
-          <p>
-            <strong>Status:</strong>
-            <span
-              class="badge <%= order.status === 'Delivered' ? 'badge-success' : order.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
-            >
-              <%= order.status %>
-            </span>
-          </p>
-          <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
-          <p><strong>Total:</strong> ₹<%= order.total %></p>
-        </div>
-
-        <!-- Items List -->
-        <div class="items-list mb-4">
-          <h5>Items in Your Order</h5>
-          <% order.forEach(order => { %> <% order.items.forEach(item => { %>
-          <div class="order-item p-3 mb-3 border rounded">
-            <div class="d-flex justify-content-between">
-              <div>
-                <p><strong>Quantity:</strong> <%= item.quantity %></p>
-                <p><strong>Price:</strong> ₹<%= item.itemTotal %></p>
-              </div>
+        <!-- Iterate over each order -->
+        <% order.forEach(singleOrder => { %> 
+          <!-- Check if the order ID matches the selected orderId -->
+          <% if (singleOrder._id.toString() === orderId.toString()) { %>
+            
+            <!-- Order Summary -->
+            <div class="order-summary mb-4 p-4 border rounded bg-light">
+              <h4>Order Details</h4>
+              <p><strong>Order Number:</strong> <%= singleOrder._id %></p>
+              <p>
+                <strong>Status:</strong>
+                <span
+                  class="badge <%= singleOrder.status === 'Delivered' ? 'badge-success' : singleOrder.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                >
+                  <%= singleOrder.status %>
+                </span>
+              </p>
+              <p><strong>Order Date:</strong> <%= new Date(singleOrder.createdAt).toLocaleDateString() %></p>
+              <p><strong>Total:</strong> ₹<%= singleOrder.totalPrice %></p>
             </div>
-          </div>
-          <% }) %> 
-        </div>
 
-        <!-- Shipping Information -->
-        <div class="shipping-info mb-4 p-4 border rounded bg-light">
-          <h5>Shipping Information</h5>
-          <p><strong>Address:</strong> <%= order.shippingAddress.address %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.zip %></p>
-          <p><strong>Phone:</strong> <%= order.shippingAddress.phone %></p>
-          <% if (order.trackingNumber) { %>
-          <p><strong>Tracking Number:</strong> <%= order.trackingNumber %></p>
-          <% } %>
-        </div>
+            <!-- Items List -->
+            <div class="items-list mb-4">
+              <h5>Items in Your Order</h5>
+              <% singleOrder.items.forEach(item => { %>
+              <div class="order-item p-3 mb-3 border rounded">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p><strong>Quantity:</strong> <%= item.quantity %></p>
+                    <p><strong>Price:</strong> ₹<%= item.itemTotal %></p>
+                  </div>
+                </div>
+              </div>
+              <% }) %> <!-- End of items loop -->
+            </div>
 
-        <% }) %>
-        
-        <!-- Actions -->
-        <div class="order-actions">
-          <% if (order.canReturn) { %>
-          <button class="btn btn-outline-primary return-btn" data-order-id="<%= order._id %>">Return</button>
-          <% } else if (order.canCancel) { %>
-          <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= order._id %>">Cancel Order</button>
-          <% } %>
-        </div>
+            <!-- Shipping Information -->
+            <div class="shipping-info mb-4 p-4 border rounded bg-light">
+              <h5>Shipping Information</h5>
+              <p><strong>Address:</strong> <%= singleOrder.shippingAddress.address %>, <%= singleOrder.shippingAddress.city %>, <%= singleOrder.shippingAddress.zip %></p>
+              <p><strong>Phone:</strong> <%= singleOrder.shippingAddress.phone %></p>
+              <% if (singleOrder.trackingNumber) { %>
+              <p><strong>Tracking Number:</strong> <%= singleOrder.trackingNumber %></p>
+              <% } %>
+            </div>
+
+            <!-- Actions -->
+            <div class="order-actions">
+              <% if (singleOrder.canReturn) { %>
+              <button class="btn btn-outline-primary return-btn" data-order-id="<%= singleOrder._id %>">Return</button>
+              <% } else if (singleOrder.canCancel) { %>
+              <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= singleOrder._id %>">Cancel Order</button>
+              <% } %>
+            </div>
+
+          <% } %> <!-- End of order ID check -->
+        <% }) %> <!-- End of orders loop -->
       </div>
     </div>
   </div>
 </section>
+
 
 <script>
   document.querySelectorAll(".return-btn").forEach((btn) => {

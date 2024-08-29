@@ -68,7 +68,7 @@ module.exports = {
         console.log("No orders found.");
       }
 
-      res.render("user/order", { order });
+      res.render("user/order", { order,orderId });
     } catch (error) {
       console.error("Error fetching order details:", error);
       res.status(500).send("Server Error");
