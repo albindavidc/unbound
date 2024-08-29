@@ -17,8 +17,14 @@
   }
 
   .order-item {
-    padding: 15px 0;
+    padding: 10px;
+    transition: background-color 0.3s ease;
   }
+
+  .order-item:hover {
+    background-color: #f0f8ff; /* Change to the color you prefer */
+  }
+
   .return-btn,
   .cancel-btn {
     margin-top: 10px;
@@ -35,50 +41,101 @@
 </section>
 
 <section>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-          <div class="col-10">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-10">
+        
             <div class="card p-4">
               <h4 class="mb-4">Order Summary</h4>
-              <% order.forEach(order => { %> <!-- Loop through each order -->
-                <% order.items.forEach(item => { %> <!-- Loop through each item within the order -->
-                  <div class="order-item mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <p>Name: <%= item.productId.name %></p>
-                        <p>Price: ₹<%= item.itemTotal %></p>
-                        <p>Quantity: <%= item.quantity %></p>
-                        <p>
-                          Status:
-                          <span class="badge <%= order.status === 'Delivered' ? 'badge-success' : order.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>">
-                            <%= order.status %>
-                          </span>
-                        </p>
-                        <p>Order Date: <%= new Date(order.createdAt).toLocaleDateString() %></p>
-                        <% if (order.status === 'Delivered') { %>
-                          <p>Delivery Date: <%= new Date(order.deliveredOn).toLocaleDateString() %></p>
-                        <% } %>
-                      </div>
-                      <div>
-                        <% if (order.canReturn) { %>
-                          <button class="btn btn-outline-primary return-btn" data-order-id="<%= order._id %>">Return</button>
-                        <% } else if (order.canCancel) { %>
-                          <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= order._id %>">Cancel Order</button>
-                        <% } %>
-                      </div>
-                    </div>
-                    <% if (order.canReturn) { %>
-                      <small class="text-muted">You can return this item within 7 days of delivery.</small>
+              <% order.forEach(order => { %>
+                <a href="/order/<%= order._id %>" class="order-link">
+                  <div class="order-summary">
+              <!-- Loop through each order -->
+              <% order.items.forEach(item => { %>
+              <!-- Loop through each item within the order -->
+              <div class="order-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p>Name: <%= item.productId.name %></p>
+                    <p>Price: ₹<%= item.itemTotal %></p>
+                    <p>Quantity: <%= item.quantity %></p>
+                    <p>
+                      Status:
+                      <span
+                        class="badge <%= order.status === 'Delivered' ? 'badge-success' : order.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                      >
+                        <%= order.status %>
+                      </span>
+                    </p>
+                    <p>Order Date: <%= new Date(order.createdAt).toLocaleDateString() %></p>
+                    <% if (order.status === 'Delivered') { %>
+                    <p>Delivery Date: <%= new Date(order.deliveredOn).toLocaleDateString() %></p>
                     <% } %>
-                    <hr />
                   </div>
-                <% }) %>
-              <% }) %>
+                  <div>
+                    <% if (order.canReturn) { %>
+                    <button class="btn btn-outline-primary return-btn" data-order-id="<%= order._id %>">Return</button>
+                    <% } else if (order.canCancel) { %>
+                    <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+                    <% } %>
+                  </div>
+                </div>
+                <% if (order.canReturn) { %>
+                <small class="text-muted">You can return this item within 7 days of delivery.</small>
+                <% } %>
+                <hr />
+              </div>
+              <% }) %> <% }) %>
             </div>
           </div>
-        </div>
+        </a>
       </div>
-      
+    </div>
+  </div>
+
+  <!-- Pagination-->
+  <% if (order.length > 0 && nextPage || current == pages) { %>
+  <nav aria-label="Product Pagination">
+    <ul class="pagination justify-content-center mt-5">
+      <% if (current == 1) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link">First</a>
+      </li>
+
+      <% } else { %>
+      <li class="page-item">
+        <a href="/user/orders/?page=1" class="page-link">First</a>
+      </li>
+      <% } %> <% var i = (Number(current)> 5 ? Number(current) - 4 : 1) %> <% if (i !== 1) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link">...</a>
+      </li>
+      <% } %> <% for( ; i < Number(current) + 4 && i <= pages ; i++ ) { %> <% if (i == current) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link"><%= i %> </a>
+      </li>
+      <% } else { %>
+      <li class="page-item">
+        <a href="/user/orders?page=<%= i %>" class="page-link text-primary fw-bold"><%= i %></a>
+      </li>
+
+      <% } %> <% if (i == Number(current)+ 4 && i < pages) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link">...</a>
+      </li>
+      <% } %> <% } %> <% if (current == pages) { %>
+      <li class="page-item disabled">
+        <a href="#" class="page-link">Last</a>
+      </li>
+      <% } else { %>
+      <li class="page-item">
+        <a href="/user/orders?page=<%= pages %>" class="page-link">Last</a>
+      </li>
+
+      <% } %>
+    </ul>
+  </nav>
+  <% } %>
 </section>
 
 //

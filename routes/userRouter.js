@@ -71,6 +71,10 @@ router
   .route("/orders")
   .get(orderController.getOrders);
 
+router 
+  .route("/order/:orderId")
+  .get(orderController.getOrder);
+
 
 //User-Address
 router.get("/address", userController.getAddress);

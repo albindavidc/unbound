@@ -10,21 +10,21 @@ module.exports = {
       let orderDetails = await Order.find()
         .populate({
           path: "customerId",
-          select: "name email", // Select the fields you want from the user
+          select: "name email", 
         })
         .populate({
           path: "items.productId",
-          select: "name price", // Select the fields you want from the product
+          select: "name price", 
         })
         .populate({
           path: "items.color",
-          select: "name", // Select the fields you want from the color
+          select: "name", 
         })
         .populate({
           path: "items.size",
-          select: "name", // Select the fields you want from the size
+          select: "name",
         })
-        .sort({ createdAt: -1 }); // Sort by latest order
+        .sort({ createdAt: -1 });
 
       const statuses = ["Pending", "Shipped", "Delivered", "Cancelled"];
 
@@ -32,19 +32,16 @@ module.exports = {
       orderDetails.forEach((order) => {
         let commonStatus = order.items[0].status;
 
-        // Determine if all items have the same status
         const allSameStatus = order.items.every((item) => item.status === commonStatus);
 
-        // If not all items share the same status, use a fallback
         if (!allSameStatus) {
-          commonStatus = "Pending"; // Or another fallback status
+          commonStatus = "Pending"; 
         }
-
-        // Attach the commonStatus to the order object
         order.commonStatus = commonStatus;
       });
 
-      // Render the order list on the admin side
+
+     
       res.render("admin/orderList", {
         orders: orderDetails,
         statuses,
