@@ -78,6 +78,8 @@ const orderSchema = new Schema(
         },
         paymentStatus: {
           type: String,
+          enum: ["Paid", "Pending", "COD", "Failed", "Refund", "Cancelled"],
+          // required: true,
         },
         returnReason: {
           type: String,
@@ -158,7 +160,7 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      required: true,
+      // required: true,
     },
     deliveredOn: {
       type: Date,

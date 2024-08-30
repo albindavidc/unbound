@@ -11,7 +11,7 @@ module.exports = {
       // Fetch and populate order details
       let orderDetails = await Order.find()
         .populate({ path: "customerId", select: "name email" })
-        .populate({ path: "items.productId", select: "name price" })
+        .populate({ path: "items.productId", select: "name price sellingPrice" })
         .populate({ path: "items.color", select: "name" })
         .populate({ path: "items.size", select: "name" })
         .sort({ createdAt: -1 });

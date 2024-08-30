@@ -19,6 +19,14 @@
   .breadcrumbCls {
     background-color: rgb(0, 0, 0);
   }
+  .custom-table thead th {
+  text-align: center;
+  vertical-align: middle;
+  padding: 15px;
+  color: #ffffff;
+}
+
+
 </style>
 
 <section>
@@ -28,63 +36,114 @@
     </div>
   </div>
 </section>
-
 <section class="container my-5">
-  <div class="container table-responsive text-capitalize">
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr class="text-center">
-          <th scope="col">#</th>
-          <th scope="col">Customer Name</th>
-          <th scope="col">Date</th>
-          <th scope="col">Product(s)</th>
-          <th scope="col">Payment Status</th>
-          <th scope="col">Payment Method</th>
-          <th scope="col">Amount</th>
-          <th scope="col">Delivery Status</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (orders && orders.length > 0) { %> <% orders.forEach((order, index) => { %>
-        <tr class="align-middle text-center">
-          <td class="p-4"><%- index + 1 %></td>
-          <td>
-            <%= order.customerId.name %> (<%= order.customerId.email %>)<br /><br />
-            <p id="orderId" data-order-id="<%= order._id %>">Order Id: <%= order._id %></p>
-          </td>
-          <td><%- order.createdAt.toLocaleDateString('en-GB') %></td>
-          <td>
-            <% order.items.forEach(item => { %> <%= item.productId.name %><br />
-            <% }) %>
-          </td>
-          <td>
-            <p name="paymentStatus" id="paymentStatus" value="<%= order.paymentStatus %>"><%= order.paymentStatus %></p>
-          </td>
-          <td><%- order.paymentMethod %></td>
-          <td>₹<%= order.totalPrice %></td>
-          <td>
-            <select class="form-select" name="paymentStatus" id="deliveryStatus-<%= order._id %>" data-order-id="<%= order._id %>" aria-label="Select Delivery Status">
-              <% statuses.forEach(status => { %>
-                <option value="<%= status %>" <%= status === order.commonStatus ? 'selected' : '' %>><%= status %></option>
-              <% }); %>
-            </select>
-            
-          </td>
-          <td>
-            <div class="d-flex justify-content-center p-4">
-              <button type="button" class="btn btn-sm btn-dark update-button" data-order-id="<%= order._id %>">Update</button>
-            </div>
-          </td>
-          
-        </tr>
-        <% }) %> <% } else { %>
-        <td colspan="8" class="text-danger">No Orders Available</td>
-        <% } %>
-      </tbody>
-    </table>
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <% if (orders && orders.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-hover custom-table">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Order ID</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Date</th>
+                <th scope="col">Payment </th>
+                <th scope="col">Status</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Products</th>
+                <th scope="col">Delivery Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% orders.forEach((order, index) => { %>
+                <tr>
+                  <td><%- index + 1 %></td>
+                  <td><%= order._id %></td>
+                  <td>
+                    <strong><%= order.customerId.name %></strong><br>
+                    <small>(<%= order.customerId.email %>)</small>
+                  </td>
+                  <td><%- order.createdAt.toLocaleDateString('en-GB') %></td>
+                  <td class="d-flex justify-content-center">
+                  <%- order.paymentMethod %><br>
+                  </td>
+                    <td>
+                      <% order.items.forEach((item, itemIndex) => { %>
+
+                        <div>
+
+                          <%= item.productId.paymentStatus %>
+                        </div>
+
+
+                        <% }) %>
+
+                      </td>
+                  <td>
+                    <% order.items.forEach((item, itemIndex) => { %>
+                        
+                      <div class="pb-3">
+
+                        ₹<%= item.productId.sellingPrice %>
+                      </div>
+               
+                  
+                    <% }) %>
+                  </td>
+
+                  <td>
+                    <% order.items.forEach((item, itemIndex) => { %>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                          <strong><%= item.productId.name %></strong><br>
+                          <small>Qty: <%= item.quantity %></small>
+                        </li>
+                      </ul>
+                      <% }) %>
+                  </td>
+                  <td>
+                    <% order.items.forEach((item, itemIndex) => { %>
+
+                      <div class="p-2">
+
+                        <select class="form-select" name="paymentStatus" id="deliveryStatus-<%= order._id %>" data-order-id="<%= order._id %>" aria-label="Select Delivery Status">
+                          <% statuses.forEach(status => { %>
+                            <option value="<%= status %>" <%= status === order.commonStatus ? 'selected' : '' %>><%= status %></option>
+                          <% }); %>
+                        </select>
+
+                      </div>
+                    <% }) %>
+
+                  </td>
+        
+                  <td>
+                    <% order.items.forEach((item, itemIndex) => { %>
+
+                      <div class="p-2">
+
+                        <button type="button" class="btn btn-sm btn-primary update-button" data-order-id="<%= order._id %>">Update</button>
+                      </div>
+                    <% }) %>
+
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="text-danger text-center">
+          No Orders Available
+        </div>
+      <% } %>
+    </div>
   </div>
 </section>
+
+
 
 <%- include('../partials/admin/footer') %>
 
