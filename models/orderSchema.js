@@ -43,23 +43,23 @@ const orderSchema = new Schema(
           required: true,
           min: [1, `Quantity Can't be less than 1`],
         },
-        productDetail: {
-          name: {
-            type: String,
-          },
-          color: {
-            type: String,
-          },
-          size: {
-            type: Number,
-          },
-          quantity: {
-            type: Number,
-          },
-          price: {
-            type: Number,
-          },
-        },
+        // productDetail: {
+        //   name: {
+        //     type: String,
+        //   },
+        //   color: {
+        //     type: String,
+        //   },
+        //   size: {
+        //     type: Number,
+        //   },
+        //   quantity: {
+        //     type: Number,
+        //   },
+        //   price: {
+        //     type: Number,
+        //   },
+        // },
         price: {
           type: Number,
           required: true,

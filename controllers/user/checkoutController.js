@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 const checkProductExistence = async (cartItem) => {
   const product = await Product.findById(cartItem.productId._id);
   if (!product || !product.isActive) {
-    throw new Error(`${product.product_name}`);
+    throw new Error(`${product.name}`);
   }
   return product;
 };
@@ -26,48 +26,13 @@ const checkStockAvailability = async (cartItem) => {
   return product;
 };
 
-// async function assignUniqueOrderIDs(items) {
-//   for (const item of items) {
-//     let isUnique = false;
-//     while (!isUnique) {
-//       const generatedOrderID = generateOrderID();
-//       const existingOrder = await Order.findOne({
-//         "items.orderID": generatedOrderID,
-//       });
-//       if (!existingOrder) {
-//         item.orderID = generatedOrderID;
-//         isUnique = true;
-//       }
-//     }
-//   }
-// }
 
-// let orderCounter = 0;
-
-// function generateOrderID() {
-//   const date = new Date();
-//   const year = date.getFullYear().toString().slice(-2); // Last two digits of the year
-//   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Month as two digits
-//   const day = date.getDate().toString().padStart(2, "0"); // Day as two digits
-
-//   // Increment and format the counter part
-//   orderCounter = (orderCounter + 1) % 1000; // Resets every 1000
-//   const counterPart = orderCounter.toString().padStart(3, "0");
-
-//   return `ODR${year}${month}${day}${counterPart}`;
-// }
 
 module.exports = {
   getCheckout: async (req, res) => {
     const userId = req.session.user;
 
     const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId");
-    // if (!userCart) {
-    //   return res.redirect("/cart");
-    // }
-    // if (!userCart.items.length > 0) {
-    //   return res.redirect("/cart");
-    // }
 
     let user = await User.findById(userId);
 
