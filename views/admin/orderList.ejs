@@ -42,7 +42,7 @@
       <% if (orders && orders.length > 0) { %>
         <div class="table-responsive">
           <table class="table table-hover custom-table">
-            <thead class="table-dark">
+            <thead class="table " style="background-color: black;">
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Order ID</th>
@@ -121,7 +121,7 @@
                   <td>
                     <% order.items.forEach((item, itemIndex) => { %>
                       <div class="p-2">
-                        <button type="button" class="btn btn-sm btn-primary update-button" data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>">Update</button>
+                        <button type="button" class="btn btn-sm btn-dark update-button" data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>">Update</button>
                       </div>
                     <% }) %>
                   </td>
