@@ -7,16 +7,50 @@
     text-align: left; /* Optional: change the text alignment if needed */
     padding: 10px; /* Optional: change the padding if needed */
   }
+
+
+    
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+
+  .breadcrumbCls {
+    background-color: rgb(0, 0, 0);
+  }
 </style>
 
-<section class="content-main">
-  <div class="content-header">
-    <div>
-      <h2 class="content-title card-title">Products List</h2>
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Products</h1>
     </div>
-    <div>
-      <a href="/admin/stocks" class="btn btn-primary btn-sm rounded">Manage Stocks</a>
-      <a href="/admin/add-product" class="btn btn-primary btn-sm rounded">Add products</a>
+  </div>
+</section>
+
+
+
+<section class="content-main">
+
+    <div class="d-flex justify-content-end">
+      <div class="p-3">
+
+        <a href="/admin/stocks" class="btn btn-dark btn-sm rounded">Manage Stocks</a>
+      </div>
+      <div class="p-3">
+
+        <a href="/admin/add-product" class="btn btn-dark btn-sm rounded">Add products</a>
+      </div>
     </div>
   </div>
 
@@ -40,7 +74,6 @@
           <tbody>
             <% if (product && product.length > 0) { %> <% product.forEach((product, index) => { %>
             <tr>
-              <td><%= (current - 1) * perPage + index + 1 %></td>
               <td>
                 <img
                   class="img-fluid img-thumbnail"
@@ -78,7 +111,7 @@
                 <% } %>
               </td>
               <td>
-                <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-dark">
                   <i class="material-icons md-edit"></i> Edit
                 </a>
               </td>
@@ -107,39 +140,11 @@
       </div>
     </div>
   </div>
-  <% if (product.length > 0 && (nextPage || current == pages)) { %>
-  <nav aria-label="Dashboard pagination">
-    <ul class="pagination justify-content-center mt-5">
-      <% if (current == 1) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">First</a>
-      </li>
-      <% } else { %>
-      <li class="page-item">
-        <a href="/admin/products/?page=1" class="page-link">First</a>
-      </li>
-      <% } %> <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %> <% if (i !== 1) { %>
-      <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
-      <% } %> <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %> <% if (i == current) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link"><%= i %></a>
-      </li>
-      <% } else { %>
-      <li class="page-item">
-        <a href="/admin/products?page=<%= i %>" class="page-link"><%= i %></a>
-      </li>
-      <% } %> <% if (i == Number(current) + 4 && i < pages) { %>
-      <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
-      <% } %> <% } %> <% if (current == pages) { %>
-      <li class="page-item disabled"><a href="#" class="page-link">Last</a></li>
-      <% } else { %>
-      <li class="page-item">
-        <a href="/admin/products/?page=<%= pages %>" class="page-link">Last</a>
-      </li>
-      <% } %>
-    </ul>
-  </nav>
-  <% } %>
+
+
+  <%- include('.././pagination') %>
+
+  
 </section>
 <!-- content-main end// -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

@@ -1,38 +1,119 @@
 <%- include("../../views/partials/admin/header") %>
+
+<style>
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+
+  .breadcrumbCls {
+    background-color: rgb(0, 0, 0);
+  }
+
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: "Roboto", sans-serif;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .icontext .icon {
+    background-color: #2a2a2a;
+    color: #ffffff;
+  }
+
+  .icontext .text h6 {
+    color: #ffffff;
+  }
+
+  .icontext .text span {
+    color: #bdbdbd;
+    font-size: 1.2rem;
+  }
+
+  .icontext .icon:hover {
+    background-color: #ffffff;
+    color: #1f1f1f;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .content-main {
+    padding: 30px;
+  }
+
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 15px;
+    }
+  }
+</style>
+
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Dashboard</h1>
+    </div>
+  </div>
+</section>
+
 <section class="content-main">
-    <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Dashboard </h2>
-        </div>
-       
+  <div class="row">
+    <!-- Total Users Card -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle">
+            <i class="material-icons md-people"></i>
+          </span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Total Users</h6>
+            <span><%- userCount %></span>
+          </div>
+        </article>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="card card-body mb-4">
-                <article class="icontext">
-                    <span class="icon icon-sm rounded-circle bg-primary-light"> <i class="icon material-icons md-people"></i></span>
-                    <div class="text">
-                        <h6 class="mb-1 card-title">Total Users</h6>
-                        <span><%- userCount  %></span>
-                        
-                    </div>
-                </article>
-            </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="card card-body mb-4">
-                <article class="icontext">
-                    <span class="icon icon-sm rounded-circle bg-primary-light" > <i class="icon material-icons md-shopping_bag"></i></span>
-                    <div class="text">
-                        <h6 class="mb-1 card-title">Total Products</h6>
-                        <span><%- productCount  %></span>
-                        
-                    </div>
-                </article>
-            </div>
-        </div>
-    
-        
+    <!-- Total Products Card -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle">
+            <i class="material-icons md-shopping_bag"></i>
+          </span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Total Products</h6>
+            <span><%- productCount %></span>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <!-- Other Cards Here -->
+  </div>
 </section>
+
 <%- include("../../views/partials/admin/footer") %>

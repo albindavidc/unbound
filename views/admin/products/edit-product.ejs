@@ -95,38 +95,59 @@
     .padding {
       padding: 40px 0 10px 0;
     }
-  </style>
-</head>
 
-<body>
-  <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
-          <button id="closeImageButton" style="margin: 10px" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="img-container">
-            <img id="imageToCrop" src="" />
+    .userProfileMain {
+      width: 100%;
+      height: 30%;
+      margin: 0 auto;
+      background-color: rgb(0, 0, 0);
+    }
+
+    .userProfileH1 {
+      width: 100%;
+      margin: 10px;
+      font-family: "Baloo", cursive;
+      color: white;
+      font-size: 6vw;
+    }
+
+    .breadcrumbCls {
+      background-color: rgb(0, 0, 0);
+    }
+  </style>
+
+  <section>
+    <div class="pb-5 text-center">
+      <div class="card userProfileMain rounded">
+        <h1 class="userProfileH1">Edit Product</h1>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
+            <button id="closeImageButton" style="margin: 10px" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="img-container">
+              <img id="imageToCrop" src="" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="closeImageButton" style="margin: 10px" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" style="margin: 10px" class="btn btn-primary" id="cropButton">Crop</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button id="closeImageButton" style="margin: 10px" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" style="margin: 10px" class="btn btn-primary" id="cropButton">Crop</button>
-        </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <section class="content-main">
-    <div class="row">
-      <div class="col-9">
-        <div class="content-header">
-          <h2 class="content-title">Edit Product - <%= product.name %></h2>
-        </div>
-      </div>
-    </div>
+
 
     <form id="addProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data">
       <div class="container mt-4">
@@ -141,7 +162,7 @@
                 </div>
                 <div class="mb-4">
                   <label for="status" class="form-label">Status</label>
-                  <select class="form-select" id="status"  name="isActive" aria-label="Active or Inactive">
+                  <select class="form-select" id="status" name="isActive" aria-label="Active or Inactive">
                     <% if (product.isActive) { %>
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
@@ -338,7 +359,7 @@
                     </div>
                     <div class="padding">
                       <input type="file" class="form-control" id="primaryImageInput" accept="image/*" style="display: none" />
-                      <button id="primaryInputButton" type="button" style="color: white" class="btn btn-md rounded font-sm">Upload Image</button>
+                      <button id="primaryInputButton" type="button" style="color: white" class="btn rounded font-sm btn-dark">Upload Image</button>
                       <div id="croppedPrimaryImages" style="display: none"></div>
                     </div>
                   </div>
@@ -363,7 +384,7 @@
                     </div>
                     <div class="padding">
                       <input type="file" class="form-control" id="secondaryImageInput1" style="display: none" />
-                      <button id="secondaryImageButton1" type="button" class="btn btn-md" style="color: white">Upload Image</button>
+                      <button id="secondaryImageButton1" type="button" class="btn btn-dark" style="color: white">Upload Image</button>
                       <div id="croppedSecondaryImage1" style="display: none"></div>
                     </div>
                   </div>
@@ -387,7 +408,7 @@
                     </div>
                     <div class="padding">
                       <input type="file" class="form-control" id="secondaryImageInput2" style="display: none" />
-                      <button id="secondaryImageButton2" style="color: white" type="button" class="btn btn-md rounded font-sm">Upload Image</button>
+                      <button id="secondaryImageButton2" style="color: white" type="button" class="btn btn-dark rounded font-sm">Upload Image</button>
                       <div id="croppedSecondaryImage2" style="display: none"></div>
                     </div>
                   </div>
@@ -411,7 +432,7 @@
                     </div>
                     <div class="padding">
                       <input type="file" class="form-control" id="secondaryImageInput3" style="display: none" />
-                      <button id="secondaryImageButton3" style="color: white" type="button" class="btn btn-md rounded font-sm">Upload Image</button>
+                      <button id="secondaryImageButton3" style="color: white" type="button" class="btn btn-dark rounded font-sm">Upload Image</button>
                       <div id="croppedSecondaryImage3" style="display: none"></div>
                     </div>
                   </div>
@@ -437,7 +458,7 @@
                       <!-- <div class="row">
                         <div class="col-lg-6"> -->
                       <input type="file" class="form-control" id="secondaryImageInput4" style="display: none" />
-                      <button id="secondaryImageButton4" style="color: white" type="button" class="btn btn-md">Upload Image</button>
+                      <button id="secondaryImageButton4" style="color: white" type="button" class="btn btn-dark">Upload Image</button>
                     </div>
                     <div class="col-lg-6">
                       <!-- <button
@@ -461,7 +482,7 @@
             <div class="d-flex justify-content-center padding">
               <div class="row">
                 <div class="col text-center padding">
-                  <button class="btn btn-md rounded font-sm" type="submit">Update</button>
+                  <button class="btn btn-dark rounded font-sm" type="submit">Update</button>
                   <a href="/admin/products" class="btn btn-light rounded font-sm">Cancel</a>
                 </div>
               </div>
@@ -1125,8 +1146,6 @@
         // }
         return isFormValid;
       });
-  
-
 
       // // Validate price
       // const priceElement = document.getElementById("priceError");
@@ -1188,5 +1207,5 @@
       return isValid;
     }
   </script>
-</body>
-<%- include("../../partials/admin/footer") %>
+  <%- include("../../partials/admin/footer") %>
+</head>

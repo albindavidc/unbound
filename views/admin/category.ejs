@@ -1,446 +1,379 @@
 <%- include("../../views/partials/admin/header") %>
-<head>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"
-  />
-  <style>
-    .col-md-3 {
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      margin: 10px;
-    }
 
-    .form-label {
-      margin-bottom: 8px;
-    }
+<style>
+  .col-md-3 {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 10px;
+  }
 
-    .form-control {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
+  .form-label {
+    margin-bottom: 8px;
+  }
 
-    .d-grid {
-      margin-top: 20px;
-    }
+  .form-control {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
 
-    .btn-primary {
-      background-color: #007bff;
-      color: #fff;
-      border: 1px solid #007bff;
-      border-radius: 5px;
-      padding: 10px 20px;
-      cursor: pointer;
-    }
+  .d-grid {
+    margin-top: 20px;
+  }
 
-    .btn-primary:hover {
-      background-color: #0056b3;
-      border-color: #0056b3;
-    }
+  .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
 
-    .pagination-container {
-      text-align: center;
-    }
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
 
-    .pagination {
-      display: inline-block;
-    }
+  .pagination-container {
+    text-align: center;
+  }
 
-    .pagination a,
-    .pagination .current-page {
-      display: inline-block;
-      padding: 5px 10px;
-      margin: 0 2px;
-      border: 1px solid #ddd;
-      text-decoration: none;
-      color: #333;
-    }
+  .pagination {
+    display: inline-block;
+  }
 
-    .pagination a:hover {
-      background-color: #f5f5f5;
-    }
+  .pagination a,
+  .pagination .current-page {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 2px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+  }
 
-    .error-message {
-      color: red;
-    }
-  </style>
-</head>
-<body>
-  <section class="content-main">
-    <div class="content-header">
-      <div>
-        <h2 class="content-title card-title">Category</h2>
+  .pagination a:hover {
+    background-color: #f5f5f5;
+  }
+
+  .error-message {
+    color: red;
+  }
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+
+  .breadcrumbCls {
+    background-color: rgb(0, 0, 0);
+  }
+</style>
+
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Category</h1>
+    </div>
+  </div>
+</section>
+
+<section class="content-main">
+  <header class="card-header text-center mb-20">
+    <form action="/admin/category" method="get" class="d-inline">
+      <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px">
+        <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search" />
+        <button class="btn" type="submit">Search</button>
       </div>
-    </div>
-    <header class="card-header text-center mb-20">
-      <form action="/admin/category" method="get" class="d-inline">
-        <div
-          class="input-group input-group-sm border border-1 border-grey rounded-pill"
-          style="width: 500px; margin-left: 230px"
-        >
-          <input
-            type="text"
-            class="form-control border-0 rounded-pill mt-3"
-            placeholder="Search categories"
-            name="search"
-          />
-          <button class="btn" type="submit">Search</button>
-        </div>
-      </form>
-    </header>
+    </form>
+  </header>
 
-    <div class="text-center" style="padding: 0 0 0 700px">
-      <button
-        class="btn btn-primary"
-        id="new-category-button"
-        style="margin-top: 20px"
-      >
-        New Category
-      </button>
-    </div>
+  <div class="text-center d-flex justify-content-end">
+    <button class="btn btn-dark" id="new-category-button" style="margin-top: 20px">New Category</button>
+  </div>
 
-    <div id="add-category-form" style="display: none; margin-top: 20px">
-      <form method="post" action="/admin/addCategory">
+  <div id="add-category-form" style="display: none; margin-top: 20px">
+    <form method="post" action="/admin/addCategory">
+      <div class="mb-4">
+        <label for="product_name" class="form-label">Name</label>
+        <input type="text" name="name" placeholder="Type here" class="form-control" id="product_name" required />
+        <div id="name-error" class="error-message"></div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Description</label>
+        <textarea placeholder="Type here" name="description" class="form-control" id="descriptionId" required></textarea>
+        <div id="description-error" class="error-message"></div>
+      </div>
+      <div class="d-grid">
+        <button class="btn btn-dark" type="submit">Create category</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="edit-category-form" style="display: none">
+    <form id="editForm" method="post" action="/admin/editCategory">
+      <input type="hidden" id="editCategoryId" name="id" />
+
+      <div class="mb-4">
+        <label for="editName" class="form-label">Name</label>
+        <input type="text" name="name" id="editName" placeholder="Type Here" class="form-control" required />
+
+        <div id="edit-name-error" class="error-message"></div>
+
         <div class="mb-4">
-          <label for="product_name" class="form-label">Name</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Type here"
-            class="form-control"
-            id="product_name"
-            required
-          />
-          <div id="name-error" class="error-message"></div>
-        </div>
-        <div class="mb-4">
-          <label class="form-label">Description</label>
-          <textarea
-            placeholder="Type here"
-            name="description"
-            class="form-control"
-            id="descriptionId"
-            required
-          ></textarea>
-          <div id="description-error" class="error-message"></div>
+          <label class="form-label"> Description</label>
+          <textarea placeholder="Type Here" name="description" id="editDescription" class="form-control" required> </textarea>
+
+          <div id="edit-description-error" class="error-message"></div>
         </div>
         <div class="d-grid">
-          <button class="btn btn-primary" type="submit">Create category</button>
+          <button class="btn btn-primary" type="submit">Update Category</button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
+  </div>
 
-    <div id="edit-category-form" style="display: none">
-      <form id="editForm" method="post" action="/admin/editCategory">
-        <input type="hidden" id="editCategoryId" name="id" />
+  <div class="card" style="margin: 50px 0">
+    <div class="card-body">
+      <div class="row">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>
+                  <span style="margin: 0px 40px"> Status </span>
+                  <span style="margin: 0px 30px">List/Unlist</span>
+                </th>
+                <th class="text-start">Edit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for (let i = 0; i < cat.length; i++) { %>
+              <tr>
+                <td><%= cat[i].name %></td>
+                <td><%= cat[i].description %></td>
+                <td>
+                  <% if (cat[i].isListed === false) { %>
 
-        <div class="mb-4">
-          <label for="editName" class="form-label">Name</label>
-          <input
-            type="text"
-            name="name"
-            id="editName"
-            placeholder="Type Here"
-            class="form-control"
-            required
-          />
+                  <span class="badge rounded-pill alert-danger" style="width: 60px; margin: 0px 40px">Unlisted</span>
+                  <button class="btn btn-success" style="width: 80px">
+                    <a href="/admin/category/<%= cat[i]._id %>/list" class="text-white" style="text-decoration: none">List</a>
+                  </button>
+                  <% } else { %>
 
-          <div id="edit-name-error" class="error-message"></div>
-
-          <div class="mb-4">
-            <label class="form-label"> Description</label>
-            <textarea
-              placeholder="Type Here"
-              name="description"
-              id="editDescription"
-              class="form-control"
-              required
-            >
-            </textarea>
-
-            <div id="edit-description-error" class="error-message"></div>
-          </div>
-          <div class="d-grid">
-            <button class="btn btn-primary" type="submit">
-              Update Category
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <div class="card" style="margin: 50px 0">
-      <div class="card-body">
-        <div class="row">
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>
-                    <span style="margin: 0px 40px"> Status </span>
-                    <span style="margin: 0px 30px">List/Unlist</span>
-                  </th>
-                  <th class="text-start">Edit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% for (let i = 0; i < cat.length; i++) { %>
-                <tr>
-                  <td><%= cat[i].name %></td>
-                  <td><%= cat[i].description %></td>
-                  <td>
-                    <% if (cat[i].isListed === false) { %>
-
-                    <span
-                      class="badge rounded-pill alert-danger"
-                      style="width: 60px; margin: 0px 40px"
-                      >Unlisted</span
-                    >
-                    <button class="btn btn-success" style="width: 80px">
-                      <a
-                        href="/admin/category/<%= cat[i]._id %>/list"
-                        class="text-white"
-                        style="text-decoration: none"
-                        >List</a
-                      >
-                    </button>
-                    <% } else { %>
-
-                    <span
-                      class="badge rounded-pill alert-success"
-                      style="width: 60px; margin: 0px 40px"
-                      >Listed</span
-                    >
-                    <button class="btn btn-danger" style="width: 80px">
-                      <a
-                        href="/admin/category/<%= cat[i]._id %>/unlist"
-                        class="text-white"
-                        style="text-decoration: none"
-                        >Unlist</a
-                      >
-                    </button>
-                    <% } %>
-                  </td>
-                  <td class="text-start">
-                    <button
-                      class="btn btn-info"
-                      data-id="<%= cat[i]._id %>"
-                      onclick="openEditForm(this.getAttribute('data-id'))"
-                    >
-                      <a href="#" class="text-white">Edit</a>
-                    </button>
-                  </td>
-                </tr>
-                <% } %>
-              </tbody>
-            </table>
-          </div>
+                  <span class="badge rounded-pill alert-success" style="width: 60px; margin: 0px 40px">Listed</span>
+                  <button class="btn btn-danger" style="width: 80px">
+                    <a href="/admin/category/<%= cat[i]._id %>/unlist" class="text-white" style="text-decoration: none">Unlist</a>
+                  </button>
+                  <% } %>
+                </td>
+                <td class="text-start">
+                  <button class="btn btn-info" data-id="<%= cat[i]._id %>" onclick="openEditForm(this.getAttribute('data-id'))">
+                    <a href="#" class="text-white">Edit</a>
+                  </button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
+  </div>
 
-    <%- include('./pagination') %>
-    
-  </section>
+  <%- include('./pagination') %>
+</section>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Hide or Show category
-      function openEditForm(id) {
-        fetch(`/admin/category/${id}`)
-          .then((response) => response.json())
-          .then((category) => {
-            document.getElementById("editCategoryId").value = category._id;
-            document.getElementById("editName").value = category.name;
-            document.getElementById("editDescription").value =
-              category.description;
-            document.getElementById("edit-category-form").style.display =
-              "block";
-            document.getElementById("add-category-form").style.display = "none"; // Hide add form
-            document.getElementById("new-category-button").style.display =
-              "none"; // Hide new category button
-          })
-          .catch((error) => {
-            console.error("Error fetching category details:", error);
-          });
-      }
-
-      // Function to show the form for creating a new category
-      function showNewCategoryForm() {
-        document.getElementById("add-category-form").style.display = "block";
-        document.getElementById("edit-category-form").style.display = "none"; // Hide edit form
-        document.getElementById("new-category-button").style.display = "none"; // Hide new category button
-      }
-
-      // Function to handle form submission for adding a category
-      function handleAddFormSubmit(event) {
-        event.preventDefault();
-        const name = document.getElementById("product_name").value;
-        const description = document.getElementById("descriptionId").value;
-
-        if (!validateForm(name, description)) {
-          return;
-        }
-
-        fetch("/admin/addCategory", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name, description }),
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Hide or Show category
+    function openEditForm(id) {
+      fetch(`/admin/category/${id}`)
+        .then((response) => response.json())
+        .then((category) => {
+          document.getElementById("editCategoryId").value = category._id;
+          document.getElementById("editName").value = category.name;
+          document.getElementById("editDescription").value = category.description;
+          document.getElementById("edit-category-form").style.display = "block";
+          document.getElementById("add-category-form").style.display = "none"; // Hide add form
+          document.getElementById("new-category-button").style.display = "none"; // Hide new category button
         })
-          .then((response) => {
-            if (!response.ok) {
-              return response.json().then((err) => {
-                throw new Error(err.error);
-              });
-            }
-            return response.json();
-          })
-          .then(() => {
-            Swal.fire({
-              icon: "success",
-              title: "Success",
-              timer: 3000,
-              showConfirmButton: false,
+        .catch((error) => {
+          console.error("Error fetching category details:", error);
+        });
+    }
 
-              text: "Category added successfully!",
-            }).then(() => location.reload());
-          })
-          .catch((error) => {
-            Swal.fire({
-              icon: "error",
-              title: "Oops",
-              timer: 3000,
-              showConfirmButton: false,
+    // Function to show the form for creating a new category
+    function showNewCategoryForm() {
+      document.getElementById("add-category-form").style.display = "block";
+      document.getElementById("edit-category-form").style.display = "none"; // Hide edit form
+      document.getElementById("new-category-button").style.display = "none"; // Hide new category button
+    }
 
-              text:
-                error.message || "An error occurred while adding the category",
-            });
-          });
+    // Function to handle form submission for adding a category
+    function handleAddFormSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById("product_name").value;
+      const description = document.getElementById("descriptionId").value;
+
+      if (!validateForm(name, description)) {
+        return;
       }
 
-      // Function to handle form submission for editing a category
-      function handleEditFormSubmit(event) {
-        event.preventDefault();
-        const id = document.getElementById("editCategoryId").value;
-        const name = document.getElementById("editName").value;
-        const description = document.getElementById("editDescription").value;
-
-        if (!validateForm(name, description)) {
-          return;
-        }
-
-        fetch("/admin/editCategory", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id, name, description }),
+      fetch("/admin/addCategory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, description }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((err) => {
+              throw new Error(err.error);
+            });
+          }
+          return response.json();
         })
-          .then((response) => {
-            if (!response.ok) {
-              return response.json().then((err) => {
-                throw new Error(err.error);
-              });
-            }
-            return response.json();
-          })
-          .then(() => {
-            Swal.fire({
-              icon: "success",
-              title: "Success",
-              timer: 3000,
-              showConfirmButton: false,
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            timer: 3000,
+            showConfirmButton: false,
 
-              text: "Category updated successfully!",
-            }).then(() => location.reload());
-          })
-          .catch((error) => {
-            Swal.fire({
-              icon: "error",
-              title: "Oops",
-              timer: 3000,
-              showConfirmButton: false,
+            text: "Category added successfully!",
+          }).then(() => location.reload());
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Oops",
+            timer: 3000,
+            showConfirmButton: false,
 
-              text: "The category is already existed",
-            });
+            text: error.message || "An error occurred while adding the category",
           });
-      }
-
-      // Function to validate form inputs
-      function validateForm(name, description) {
-        clearErrorMessages();
-        let isValid = true;
-
-        if (!name.trim()) {
-          displayErrorMessage("name-error", "Please enter a name");
-          isValid = false;
-        } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-          displayErrorMessage(
-            "name-error",
-            "Category name should contain only alphabetic characters"
-          );
-          isValid = false;
-        }
-        if (!description.trim()) {
-          displayErrorMessage(
-            "description-error",
-            "Please enter a valid description"
-          );
-          isValid = false;
-        }
-        return isValid;
-      }
-
-      // Function to display error messages
-      function displayErrorMessage(elementId, message) {
-        var errorElement = document.getElementById(elementId);
-        errorElement.innerHTML = message;
-        errorElement.style.display = "block";
-      }
-
-      // Function to clear error messages
-      function clearErrorMessages() {
-        const errorElements = document.getElementsByClassName("error-message");
-        Array.from(errorElements).forEach((element) => {
-          element.innerText = "";
-          element.style.display = "none";
         });
+    }
+
+    // Function to handle form submission for editing a category
+    function handleEditFormSubmit(event) {
+      event.preventDefault();
+      const id = document.getElementById("editCategoryId").value;
+      const name = document.getElementById("editName").value;
+      const description = document.getElementById("editDescription").value;
+
+      if (!validateForm(name, description)) {
+        return;
       }
 
-      // Attach event listener to add and edit forms
-      document
-        .getElementById("add-category-form")
-        .addEventListener("submit", handleAddFormSubmit);
-      document
-        .getElementById("edit-category-form")
-        .addEventListener("submit", handleEditFormSubmit);
+      fetch("/admin/editCategory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, name, description }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((err) => {
+              throw new Error(err.error);
+            });
+          }
+          return response.json();
+        })
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            timer: 3000,
+            showConfirmButton: false,
 
-      // Attach event listener to new category button
-      document
-        .getElementById("new-category-button")
-        .addEventListener("click", showNewCategoryForm);
+            text: "Category updated successfully!",
+          }).then(() => location.reload());
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Oops",
+            timer: 3000,
+            showConfirmButton: false,
 
-      // Attach event listener to category edit buttons
-      document.querySelectorAll(".btn-info").forEach((button) => {
-        button.addEventListener("click", function () {
-          const id = this.dataset.id;
-          openEditForm(id);
+            text: "The category is already existed",
+          });
         });
+    }
+
+    // Function to validate form inputs
+    function validateForm(name, description) {
+      clearErrorMessages();
+      let isValid = true;
+
+      if (!name.trim()) {
+        displayErrorMessage("name-error", "Please enter a name");
+        isValid = false;
+      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+        displayErrorMessage("name-error", "Category name should contain only alphabetic characters");
+        isValid = false;
+      }
+      if (!description.trim()) {
+        displayErrorMessage("description-error", "Please enter a valid description");
+        isValid = false;
+      }
+      return isValid;
+    }
+
+    // Function to display error messages
+    function displayErrorMessage(elementId, message) {
+      var errorElement = document.getElementById(elementId);
+      errorElement.innerHTML = message;
+      errorElement.style.display = "block";
+    }
+
+    // Function to clear error messages
+    function clearErrorMessages() {
+      const errorElements = document.getElementsByClassName("error-message");
+      Array.from(errorElements).forEach((element) => {
+        element.innerText = "";
+        element.style.display = "none";
+      });
+    }
+
+    // Attach event listener to add and edit forms
+    document.getElementById("add-category-form").addEventListener("submit", handleAddFormSubmit);
+    document.getElementById("edit-category-form").addEventListener("submit", handleEditFormSubmit);
+
+    // Attach event listener to new category button
+    document.getElementById("new-category-button").addEventListener("click", showNewCategoryForm);
+
+    // Attach event listener to category edit buttons
+    document.querySelectorAll(".btn-info").forEach((button) => {
+      button.addEventListener("click", function () {
+        const id = this.dataset.id;
+        openEditForm(id);
       });
     });
-  </script>
+  });
+</script>
 
-  <%- include("../../views/partials/admin/footer") %>
-</body>
+<%- include("../../views/partials/admin/footer") %>

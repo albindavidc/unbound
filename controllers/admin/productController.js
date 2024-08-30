@@ -13,21 +13,29 @@ const Brand = require("../../models/attributes/brandSchema");
 
 module.exports = {
   getProducts: async (req, res) => {
-    const locals = {
-      title: "Products",
-    };
     try {
-      let perPage = 7;
-      let page = req.query.page || 1;
+      let search = "";
+      if (req.query.search) {
+        search = req.query.search;
+      }
+
+      let page = parseInt(req.query.page) || 1; // Ensure page is an integer
+      const limit = 4;
+
+      // Count documents
+      const count = await Product.find({
+        $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
+      }).countDocuments();
+
+      // Calculate total pages
+      const totalPages = Math.ceil(count / limit);
+
       const product = await Product.find()
-        .populate("category") // Adjust to populate `categoryid` as it references the `Category` model
+        .populate("category")
         .sort({ createdAt: -1 })
-        .skip(perPage * (page - 1))
-        .limit(perPage)
+        .limit(limit)
+        .skip((page - 1) * limit)
         .exec();
-      const count = await Product.find().countDocuments({});
-      const nextPage = parseInt(page) + 1;
-      const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
       const breadcrumbs = [
         { name: "Home", url: "/admin" },
@@ -36,13 +44,10 @@ module.exports = {
       ];
 
       res.render("admin/products/products", {
-        locals,
         product,
-        current: page,
-        perPage: perPage,
-        pages: Math.ceil(count / perPage),
-        nextPage: hasNextPage ? nextPage : null,
         breadcrumbs,
+        totalPages,
+        currentPage: page,
       });
     } catch (error) {
       console.error(error);
@@ -130,7 +135,7 @@ module.exports = {
           sellingPrice,
           bundlePrice,
           quantity,
-          onOffer:offer,
+          onOffer: offer,
           offerDiscountPrice,
           offerDiscountRate,
         });
@@ -268,15 +273,15 @@ module.exports = {
         await deleteAndUpdateSecondaryImage(0);
       }
 
-      if(req.files.secondaryImage1){
+      if (req.files.secondaryImage1) {
         await deleteAndUpdateSecondaryImage(1);
       }
 
-      if(req.files.secondaryImage2){
+      if (req.files.secondaryImage2) {
         await deleteAndUpdateSecondaryImage(2);
       }
 
-      if(req.files.secondaryImage3){
+      if (req.files.secondaryImage3) {
         await deleteAndUpdateSecondaryImage(3);
       }
 

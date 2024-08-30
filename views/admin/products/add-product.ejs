@@ -99,7 +99,37 @@
   .padding {
     padding: 40px 0 10px 0;
   }
+
+
+    
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+
+  .breadcrumbCls {
+    background-color: rgb(0, 0, 0);
+  }
 </style>
+
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Add Products</h1>
+    </div>
+  </div>
+</section>
+
 
 <section>
   <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
@@ -126,14 +156,12 @@
     <main>
       <div class="bottom-data">
         <div class="orders">
-          <div class="header">
-            <h3 style="padding: 70px">Add Product</h3>
-          </div>
+
           <div class="form-container">
             <div class="form-wrapper">
               <form id="addProductForm" action="/admin/add-product" method="POST" enctype="multipart/form-data" onsubmit="addproduct(event)">
                 <div>
-                  <button type="button" class="btn btn-primary" id="addPrimaryImageButton">Add Primary Image</button>
+                  <button type="button" class="btn btn-dark" id="addPrimaryImageButton">Add Primary Image</button>
                   <input type="file" id="primaryInput" accept="image/*" style="display: none" />
                   <div id="croppedPrimaryImages"></div>
                   <!-- <div id="primary-image-error" class="error-div"></div> -->
@@ -142,7 +170,7 @@
                 <hr />
 
                 <div>
-                  <button type="button" class="btn btn-primary" id="addSecondaryImageButton">Add Secondary Image</button>
+                  <button type="button" class="btn btn-dark" id="addSecondaryImageButton">Add Secondary Image</button>
                   <input type="file" id="imageInput" accept="image/*" style="display: none" />
                   <div id="croppedImages"></div>
                   <div id="secondaryImageError" class="error-div"></div>
@@ -309,7 +337,7 @@
                 </div>
                 <div class="d-flex justify-content-center mt-5" style="padding: 40px">
                   <div class="d-grid col-md-5">
-                    <button class="btn btn-primary" type="submit">Add Product</button>
+                    <button class="btn btn-dark" type="submit">Add Product</button>
                   </div>
                 </div>
               </form>
