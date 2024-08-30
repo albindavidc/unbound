@@ -215,7 +215,7 @@ module.exports = {
         item.paymentStatus = order.paymentStatus;
       });
       
-      console.log("These are the orders:", order);
+      // console.log("These are the orders:", order);
 
       //   order.items.forEach((item) => {
       //   item.status = "Pending";

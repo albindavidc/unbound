@@ -49,40 +49,38 @@ module.exports = {
 
   updateDeliveryStatus: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { status } = req.body;
+      const {orderId} = req.params
+      const { itemIndex, status } = req.body;
 
       // Update the status of all items in the order
-      await Order.updateOne({ _id: id }, { $set: { "items.$[].status": status, status } });
+      // await Order.updateOne({ _id: id }, { $set: { "items.$[].status": status, status } });
 
-      const order = await Order.findById(id);
+      const order = await Order.findById(orderId);
+      order.items[itemIndex].status = status;
 
-      if (!order) {
-        return res.status(400).json({ error: "Order not found" });
-      }
+      console.log("this is order", order)
 
-      // Update status and paymentStatus based on deliveryStatus
       switch (status) {
         case "Shipped":
-          order.status = "Shipped";
-          order.paymentStatus = "Pending";
+          order.items[itemIndex].status = "Shipped";
+          order.items[itemIndex].paymentStatus = "Pending";
           break;
         case "Delivered":
-          order.status = "Delivered";
-          order.paymentStatus = "Paid";
-          order.deliveredOn = new Date();
+          order.items[itemIndex].status = "Delivered";
+          order.items[itemIndex].paymentStatus = "Paid";
+          order.items[itemIndex].deliveredOn = new Date();
           break;
         case "Cancelled":
-          order.status = "Cancelled";
-          order.paymentStatus = "Refund";
+          order.items[itemIndex].status = "Cancelled";
+          order.items[itemIndex].paymentStatus = "Refund";
           break;
         case "Pending":
-          order.status = "Pending";
-          order.paymentStatus = "Pending";
+          order.items[itemIndex].status = "Pending";
+          order.items[itemIndex].paymentStatus = "Pending";
           break;
         case "Return":
-          order.status = "Return";
-          order.paymentStatus = "Refund";
+          order.items[itemIndex].status = "Return";
+          order.items[itemIndex].paymentStatus = "Refund";
           break;
         default:
           return res.status(400).json({ error: "Invalid delivery status" });

@@ -72,10 +72,13 @@
                     <td>
                       <% order.items.forEach((item, itemIndex) => { %>
 
-                        <div>
+                        <div class="pb-4">
 
-                          <%= item.productId.paymentStatus %>
-                        </div>
+
+                            <p name="paymentStatus" id="paymentStatus" value="<%= item.paymentStatus %>"><%= item.paymentStatus %></p>
+                                              
+                          
+                          </div>
 
 
                         <% }) %>
@@ -84,7 +87,7 @@
                   <td>
                     <% order.items.forEach((item, itemIndex) => { %>
                         
-                      <div class="pb-3">
+                      <div class="pb-4">
 
                         ₹<%= item.productId.sellingPrice %>
                       </div>
@@ -105,30 +108,24 @@
                   </td>
                   <td>
                     <% order.items.forEach((item, itemIndex) => { %>
-
                       <div class="p-2">
-
-                        <select class="form-select" name="paymentStatus" id="deliveryStatus-<%= order._id %>" data-order-id="<%= order._id %>" aria-label="Select Delivery Status">
+                        <select class="form-select" name="paymentStatus" id="deliveryStatus-<%= order._id %>-<%= itemIndex %>" data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>" aria-label="Select Delivery Status">
                           <% statuses.forEach(status => { %>
-                            <option value="<%= status %>" <%= status === order.commonStatus ? 'selected' : '' %>><%= status %></option>
+                            <option value="<%= status %>" <%= status === item.status ? 'selected' : '' %>><%= status %></option>
                           <% }); %>
                         </select>
-
                       </div>
                     <% }) %>
-
                   </td>
-        
+                  
                   <td>
                     <% order.items.forEach((item, itemIndex) => { %>
-
                       <div class="p-2">
-
-                        <button type="button" class="btn btn-sm btn-primary update-button" data-order-id="<%= order._id %>">Update</button>
+                        <button type="button" class="btn btn-sm btn-primary update-button" data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>">Update</button>
                       </div>
                     <% }) %>
-
                   </td>
+                  
                 </tr>
               <% }) %>
             </tbody>
@@ -154,16 +151,16 @@ document.querySelectorAll('.update-button').forEach(button => {
   button.addEventListener('click', async function(e) {
     e.preventDefault(); // Prevent the default link behavior
 
-    const id = this.getAttribute('data-order-id');
-    console.log("this is id", id);
-    const selectedStatus = document.querySelector(`#deliveryStatus-${id}`).value;
+     const orderId = this.getAttribute('data-order-id');
+    const itemIndex = this.getAttribute('data-item-index');
+    const selectedStatus = document.querySelector(`#deliveryStatus-${orderId}-${itemIndex}`).value;
 
-    fetch(`/admin/orderList/updateOrder/${id}`, {
+    fetch(`/admin/orderList/updateOrder/${orderId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({id, status: selectedStatus }),
+      body: JSON.stringify({itemIndex, status: selectedStatus }),
     })
     .then(response => {
       if (!response.ok) {

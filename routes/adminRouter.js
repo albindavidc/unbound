@@ -136,7 +136,7 @@ router
   .route("/orderList")
   .get(orderController.getOrderList);
 
-router.put('/orderList/updateOrder/:id', orderController.updateDeliveryStatus);
+router.put('/orderList/updateOrder/:orderId', orderController.updateDeliveryStatus);
 
 
 
