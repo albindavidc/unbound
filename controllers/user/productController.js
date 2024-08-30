@@ -9,6 +9,8 @@ const mongoose = require("mongoose");
 
 module.exports = {
   loadProductList: async (req, res) => {
+
+
     const { color, size, price, brand, category, sort } = req.query;
   
     const currentCategoryId = req.query.categoryId;
@@ -42,25 +44,25 @@ module.exports = {
   
     switch (sort) {
       case "low-to-high":
-        sortQuery.sellingPrice = 1; // Ascending order
+        sortQuery.sellingPrice = 1; 
         break;
       case "high-to-low":
-        sortQuery.sellingPrice = -1; // Descending order
+        sortQuery.sellingPrice = -1; 
         break;
       case "a-z":
-        sortQuery.name = 1; // Ascending order
+        sortQuery.name = 1; 
         break;
       case "z-a":
-        sortQuery.name = -1; // Descending order
+        sortQuery.name = -1;
         break;
       case "new_arrival":
         sortQuery.arrivalDate = -1;
         break;
       case "in_stock":
-        filterQuery.variants = { $elemMatch: { stock: { $gt: 0 } } }; // Use $elemMatch to filter out-of-stock products
+        filterQuery.variants = { $elemMatch: { stock: { $gt: 0 } } }; 
         break;
       default:
-        sortQuery = {}; // No sorting
+        sortQuery = {}; 
     }
   
     try {

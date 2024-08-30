@@ -408,24 +408,24 @@
 
   //
   <script>
-      // function myFunction() {
-    //     var input, filter, ul, li, h6, i, txtValue;
-    //     input = document.getElementById("myInput");
-    //     filter = input.value.toUpperCase();
-    //     ul = document.getElementById("myUL");
-    //     li = ul.getElementsByClassName("product-item");
+      function myFunction() {
+        var input, filter, ul, li, h6, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myUL");
+        li = ul.getElementsByClassName("product-item");
 
-    //     for (i = 0; i < li.length; i++) {
-    //       h6 = li[i].getElementsByTagName("h6")[0];
-    //       txtValue = h6.textContent || h6.innerText;
-    //       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-    //         li[i].style.display = "";
-    //       } else {
-    //         li[i].style.display = "none";
-    //       }
-    //     }
-    //   }
-    //
+        for (i = 0; i < li.length; i++) {
+          h6 = li[i].getElementsByTagName("h6")[0];
+          txtValue = h6.textContent || h6.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+          } else {
+            li[i].style.display = "none";
+          }
+        }
+      }
+    
   </script>
 
   <script>
