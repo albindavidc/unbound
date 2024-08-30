@@ -8,43 +8,38 @@ const Variants = require("../../models/attributes/variantSchema")
 const mongoose = require("mongoose");
 
 module.exports = {
-  // Fetch all products
   loadProductList: async (req, res) => {
-    //----------------------------------//
     const { color, size, price, brand, category, sort } = req.query;
-
+  
     const currentCategoryId = req.query.categoryId;
     const currentBrandId = req.query.brandId;
     const currentSizeId = req.query.sizeId;
     let query = {};
-
-    console.log(`Sort parameter received: ${sort}`); // Debugging log
-
+  
     if (category && category !== "all") {
       query.category = category;
     }
-
+  
     if (brand && brand !== "all") {
       query.brand = brand;
     }
-
-    // Add price filter
+  
     if (price) {
       const [minPrice, maxPrice] = price.split("-").map(Number);
       query.sellingPrice = { $gte: minPrice, $lte: maxPrice };
     }
-
-    // Check if size is a valid ObjectId and set query accordingly
+  
     if (size && mongoose.Types.ObjectId.isValid(size) && size !== "all") {
-      query["variants.size"] = size; // Assuming size is in variant array
+      query["variants.size"] = size;
     }
-
-    // Check if color is a valid ObjectId and set query accordingly
+  
     if (color && mongoose.Types.ObjectId.isValid(color) && color !== "all") {
-      query["variants.color"] = color; // Assuming color is in variant array
+      query["variants.color"] = color;
     }
-
+  
     let sortQuery = {};
+    let filterQuery = {}; // Initialize filter query
+  
     switch (sort) {
       case "low-to-high":
         sortQuery.sellingPrice = 1; // Ascending order
@@ -61,28 +56,25 @@ module.exports = {
       case "new_arrival":
         sortQuery.arrivalDate = -1;
         break;
+      case "in_stock":
+        filterQuery.variants = { $elemMatch: { stock: { $gt: 0 } } }; // Use $elemMatch to filter out-of-stock products
+        break;
       default:
         sortQuery = {}; // No sorting
     }
-
-    //---------------------------------------//
-
+  
     try {
-      const product = await Product.find({ isActive: true }).populate("variants.color").populate("variants.stock"); // Ensure color data is populated
-
+      const product = await Product.find({ isActive: true }).populate("variants.color").populate("variants.stock");
+  
       const categories = await Category.find({});
       const brand = await Brand.find({});
       const size = await Size.find({});
       const colors = await Color.find({ isListed: true });
-      const variants = await Variants.find({isListed: true});
-
-      //----------------------//
-
-      const products = await Product.find(query).sort(sortQuery);
-      const productCount = await Product.countDocuments(query);
-
-      //--------------------------//
-
+      const variants = await Variants.find({ isListed: true });
+  
+      const products = await Product.find({ ...query, ...filterQuery }).sort(sortQuery);
+      const productCount = await Product.countDocuments({ ...query, ...filterQuery });
+  
       res.render("user/product-list", {
         user: req.session.user,
         product,
@@ -93,7 +85,7 @@ module.exports = {
         colors,
         productCount,
         req: req.query,
-        currentCategoryId: currentCategoryId,
+        currentCategoryId,
         currentBrandId,
         currentSizeId,
         variants,
@@ -103,6 +95,7 @@ module.exports = {
       res.status(500).send("Error loading products");
     }
   },
+  
 
   loadProductDetails: async (req, res) => {
     try {
