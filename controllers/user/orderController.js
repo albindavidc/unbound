@@ -1,5 +1,6 @@
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
+const { loadProductDetails } = require("./productController");
 module.exports = {
   getOrders: async (req, res) => {
     let userId = req.session.user;
@@ -58,9 +59,10 @@ module.exports = {
       let order = await Order.find({ customerId: userId })
         .populate({
           path: "items.productId",
-          select: "name price", // Select the fields you want from the product
+          select: "name price primaryImages secondaryImages", // Select specific fields if needed
         })
-        .populate("items.color items.size shippingAddress _id");
+        .populate("items.color items.size shippingAddress _id")
+        .populate("items.productId.primaryImages");
 
       if (order.length > 0) {
         console.log("This is the first order ID on this page:", order[0]._id);
@@ -79,6 +81,7 @@ module.exports = {
         order.canCancel = !isDelivered && !isCancelled;
         return order;
       });
+
 
       res.render("user/order", { order, orderId, user: req.session.user });
     } catch (error) {

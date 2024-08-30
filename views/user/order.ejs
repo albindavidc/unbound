@@ -72,16 +72,36 @@
         <!-- Items List -->
         <div class="items-list mb-4">
           <h5>Items in Your Order</h5>
-          <% singleOrder.items.forEach(item => { %>
-          <div class="order-item p-3 mb-3 border rounded">
-            <div class="d-flex justify-content-between">
-              <div>
-                <p><strong>Quantity:</strong> <%= item.quantity %></p>
-                <p><strong>Price:</strong> ₹<%= item.itemTotal %></p>
+          <% singleOrder.items.forEach((item, index) => { %>
+            <div class="order-item p-3 mb-3 border rounded">
+              <div class="d-flex justify-content-between">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <% let imagePath = ''; %>
+                      <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %>
+                        <% imagePath = item.productId.primaryImages[0].name; %>
+                    
+                      <% } %>
+                      <img
+                        id="main-product-image"
+                        class="img-fluid h-100 w-100"
+                        src="/uploads/images/<%= imagePath %>"
+                        alt="<%= item.productId.name %>"
+                      />
+                    </div>
+                    <div class="col-md-8">
+                      <p><strong>Name:</strong> <%= item.productId.name %></p>
+                      <p><strong>Quantity:</strong> <%= item.quantity %></p>
+                      <p><strong>Price:</strong> ₹<%= item.itemTotal %></p>
+                    </div>
+                  </div>
+                </div>
+                
               </div>
             </div>
-          </div>
           <% }) %>
+          
           <!-- End of items loop -->
         </div>
 
