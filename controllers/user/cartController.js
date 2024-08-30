@@ -217,24 +217,45 @@ module.exports = {
   },
 
   removeCartItem: async (req, res) => {
-    try {
-      const userId = req.session.user;
-      const productId = req.body.productId;
+    let productId = req.params.productId;
+    let variantId = req.params.variantId;
+    let userId = req.session.user;
+  
 
-      const cart = await Cart.findOne({ userId }).populate("items.productId");
+    console.log("these are the productId, variantId, UserId: ", productId, variantId, userId);
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-      const itemIndex = cart.items.findIndex((item) => {
-        item.productId.toString() === productId;
-      });
-
-      cart.items.splice(itemIndex, 1);
-      await cart.save();
-
-      res.status(200).json({ message: "Item removed from the cart successfully" });
-    } catch (error) {
-      res.status(500).json({ error: "An error occured while deleting the product" });
+    console.log("this is cart", cart);
+    
+    if (!cart) {
+      return res.status(404).json({ status: false, message: "Cart not found" });
+    }
+  
+    const itemIndex = cart.items.findIndex(
+      (item) =>
+        item.productId._id.toString() === productId &&
+        item.variantId.toString() === variantId
+    );
+  
+    if (itemIndex === -1) {
+      return res.status(404).json({ status: false, message: "Item not found in cart" });
+    }
+  
+    cart.items.splice(itemIndex, 1);
+    
+    // Recalculate the total price after removing the item
+    cart.totalPrice = cart.items.reduce((total, item) => {
+      return total + item.productId.sellingPrice * item.quantity;
+    }, 0);
+  
+    await cart.save();
+    if(cart) {
+      res.status(200).json({ success: true, message: `Product remove successfull` });
+    }else{
+      res.status(404).json({success: false, message: "Product removal failed"});
     }
   },
+  
 
   incrementCartItem: async (req, res) => {
     handleCartUpdate(req, res, "increment"); // For increment

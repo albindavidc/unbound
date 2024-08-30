@@ -111,7 +111,7 @@
                       </div>
                       <div class="col-2 d-none d-md-block text-center">
                         <button
-                          onclick="confirmAction('<%- item.productId._id %>','delete', '<%- item.productId.name %>')"
+                          onclick="confirmAction('<%- item.productId._id %>',' <%- item.variantId._id %>', 'delete', '<%- item.productId.name %>')"
                           class="btn btn-danger cart-remove"
                         >
                           <i class="delete bi bi-trash"></i>
@@ -181,7 +181,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  const confirmAction = (productId, action, productName) => {
+  const confirmAction = (productId, variantId, action, productName) => {
     let actionText, confirmButtonText;
 
     switch (action) {
@@ -207,29 +207,31 @@
     }).then((result) => {
       if (result.isConfirmed) {
         if (action === "delete") {
-          removeFromCart(productId);
+          removeFromCart(productId, variantId);
         }
       }
     });
   };
 
-  const removeFromCart = async (productId) => {
+  const removeFromCart = async (productId, variantId) => {
     try {
-      const response = await fetch("/remove-from-cart", {
+      variantId = variantId.trim();
+
+      const response = await fetch(`/cart/remove/${productId}/${variantId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ productId }),
       });
+
       const result = await response.json();
       if (result.success) {
         Swal.fire({
           title: "Deleted!",
           text: "Product has been deleted.",
           icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
+          showConfirmButton: true,
+          // timer: 1500,
         }).then(() => {
           location.reload();
         });
@@ -244,11 +246,11 @@
       }
     } catch {
       Swal.fire({
-        title: "Success",
-        text: "You have successfully deleted your product",
-        icon: "success",
-        showConfirmButton: false,
-        timer: 1500,
+        title: "Error",
+        text: "There is an error in the server side",
+        icon: "error",
+        showConfirmButton: true,
+        // timer: 1500,
       }).then(() => {
         location.reload();
       });

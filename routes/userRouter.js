@@ -99,14 +99,12 @@ router.get("/cart", userAuth, cartController.getCart);
 router.post("/user/add-to-cart", cartController.addToCart);
 
 
-// router.get("/shop/order-success", cartController.getOrderSuccess);
+// router.get(
+//   "/cart/remove",
+//   cartController.removeCartItem
+// );
 
-
-router.get(
-  "/cart/remove",
-  cartController.removeCartItem
-);
-router.delete('/remove-from-cart', cartController.removeCartItem);
+router.delete('/cart/remove/:productId/:variantId', cartController.removeCartItem);
 
 
 router.put('/cart/:id/:variant/increment', userAuth, cartController.incrementCartItem);
