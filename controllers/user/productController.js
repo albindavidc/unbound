@@ -3,6 +3,7 @@ const Category = require("../../models/categorySchema");
 const Color = require("../../models/attributes/colorSchema");
 const Brand = require("../../models/attributes/brandSchema");
 const Size = require("../../models/attributes/sizeSchema");
+const Variants = require("../../models/attributes/variantSchema")
 
 const mongoose = require("mongoose");
 
@@ -67,12 +68,13 @@ module.exports = {
     //---------------------------------------//
 
     try {
-      const product = await Product.find({ isActive: true }).populate("variants.color"); // Ensure color data is populated
+      const product = await Product.find({ isActive: true }).populate("variants.color").populate("variants.stock"); // Ensure color data is populated
 
       const categories = await Category.find({});
       const brand = await Brand.find({});
       const size = await Size.find({});
       const colors = await Color.find({ isListed: true });
+      const variants = await Variants.find({isListed: true});
 
       //----------------------//
 
@@ -94,6 +96,7 @@ module.exports = {
         currentCategoryId: currentCategoryId,
         currentBrandId,
         currentSizeId,
+        variants,
       });
     } catch (error) {
       console.error(error);

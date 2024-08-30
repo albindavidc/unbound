@@ -160,6 +160,7 @@
         <div class="col-lg-8">
           <div class="product__details__text">
             <h4><%= product.name %></h4>
+           
             <div class="rating">
               <% for (let i = 0; i < product.rating; i++) { %>
               <i class="fa fa-star"></i>
@@ -230,6 +231,16 @@
                 </div>
               </div>
             </div>
+
+            <div class="pb-3">
+              
+              <% product.variants.forEach(variant => { %>
+               
+               <h6>Total number of stocks: <%= variant.stock %></h6>
+             <% }) %>
+              
+              </div>
+
 
             <div class="product__details__cart__option">
               <div class="quantity">

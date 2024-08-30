@@ -257,7 +257,12 @@
                     </ul>
                   </div>
                   <div class="product__item__text">
+
+                    
                     <h6><%= product.name %></h6>
+                    <% product.variants.forEach(variant => { %>
+                      <p>Total Number of stock:  <%=variant.stock  %></p>
+                      <% }) %>
                     <div class="rating">
                       <i class="fa fa-star"></i>
                       <i class="fa fa-star"></i>
