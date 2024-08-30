@@ -12,167 +12,173 @@
   </div>
 </section>
 
-<% if (cartCount && cartCount > 0 && cartList !== 'undefined') { %>
-<!-- Shopping Cart Section-->
-
 <section>
-  <div class="container">
-    <div class="row mb-5">
-      <div class="col-lg-8">
-        <div class="cart">
-          <div class="cart-header text-center">
-            <div class="row">
-              <div class="col-md-5">Item</div>
-              <div class="col-md-7 d-none d-md-block">
-                <div class="row">
-                  <div class="col-md-3">Price</div>
-                  <div class="col-md-4">Quantity</div>
-                  <div class="col-md-3">Total</div>
-                  <div class="col-md-2"></div>
+  <% if (cartCount && cartCount > 0 && cartList !== 'undefined') { %>
+  <!-- Shopping Cart Section-->
+
+  <section>
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-lg-8">
+          <div class="cart">
+            <div class="cart-header text-center">
+              <div class="row">
+                <div class="col-md-5">Item</div>
+                <div class="col-md-7 d-none d-md-block">
+                  <div class="row">
+                    <div class="col-md-3">Price</div>
+                    <div class="col-md-4">Quantity</div>
+                    <div class="col-md-3">Total</div>
+                    <div class="col-md-2"></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="cart-body">
-            <!-- Product-->
-            <% cartList.forEach(item => { %>
-            <div class="cart-item">
-              <div class="row d-flex align-items-center text-start text-md-center">
-                <div class="col-12 col-md-5">
-                  <button class="btn cart-remove close mt-3 d-md-none" onclick="removeFromCart('<%- item.productId._id %>', '<%- item.variant %>')">
-                    <i class="bi bi-x-lg text-danger"> </i>
-                  </button>
-                  <div class="d-flex align-items-center">
-                    <a href="/shop/product/<%- item.productId._id %>"
-                      ><img
-                        class="cart-item-img"
-                        src="/uploads/images/<%= item.productId.primaryImages[0].name ? item.productId.primaryImages[0].name : item.productId.secondaryImages[0].name %>"
-                        alt="..."
-                    /></a>
-                    <div class="cart-title text-start">
-                      <a class="text-uppercase text-dark" href="/shop/product/<%- item.productId._id %>"
-                        ><strong><%= item.productId.name %></strong></a
-                      ><br /><span class="text-muted text-sm">Size: <%- item.sizeId.value %></span><br /><span class="text-muted text-sm"
-                        >Colour: <span class="text-capitalize"><%- item.colorId.name %></span></span
-                      >
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12 col-md-7 mt-4 mt-md-0">
-                  <div class="row align-items-center">
-                    <div class="col-md-3">
-                      <div class="row">
-                        <div class="col-6 d-md-none text-muted">Price per item</div>
-                        <div class="col-6 col-md-12 text-end text-md-center">
-                          <% if (item.productId.onOffer) { %> ₹ <%= item.productId.offerDiscountPrice %> <% } else { %> ₹ <%= item.productId.sellingPrice
-                          %> <% } %>
-                          <p style="text-decoration: line-through;">₹<%- item.price %></p>
-                        </div>
+            <div class="cart-body">
+              <!-- Product-->
+              <% cartList.forEach(item => { %>
+              <div class="cart-item">
+                <div class="row d-flex align-items-center text-start text-md-center">
+                  <div class="col-12 col-md-5">
+                    <button class="btn cart-remove close mt-3 d-md-none" onclick="removeFromCart('<%- item.productId._id %>', '<%- item.variant %>')">
+                      <i class="bi bi-x-lg text-danger"> </i>
+                    </button>
+                    <div class="d-flex align-items-center">
+                      <a href="/shop/product/<%- item.productId._id %>"
+                        ><img
+                          class="cart-item-img"
+                          src="/uploads/images/<%= item.productId.primaryImages[0].name ? item.productId.primaryImages[0].name : item.productId.secondaryImages[0].name %>"
+                          alt="..."
+                      /></a>
+                      <div class="cart-title text-start">
+                        <a class="text-uppercase text-dark" href="/shop/product/<%- item.productId._id %>"
+                          ><strong><%= item.productId.name %></strong></a
+                        ><br /><span class="text-muted text-sm">Size: <%- item.sizeId.value %></span><br /><span class="text-muted text-sm"
+                          >Colour: <span class="text-capitalize"><%- item.colorId.name %></span></span
+                        >
                       </div>
                     </div>
-                    <div class="col-md-4">
-                      <div class="row align-items-center">
-                        <div class="d-md-none col-7 col-sm-9 text-muted">Quantity</div>
-                        <div class="col-5 col-sm-3 col-md-12">
-                          <div class="d-flex align-items-center">
-                            <button
-                              onclick="decreaseCartQuantity('<%- item.productId._id %>','<%- item.variant %>')"
-                              class="btn btn-outline-dark btn-items btn-items-decrease col-3"
-                            >
-                              -
-                            </button>
-                            <input
-                              id="quantityInput-<%- item.productId._id %>-<%- item.variant %>"
-                              readonly
-                              min="1"
-                              name="quantity"
-                              class="form-control text-center border-0 border-md input-items"
-                              type="text"
-                              value="<%= item.quantity %>"
-                            />
-                            <button
-                              onclick="increaseCartQuantity('<%- item.productId._id %>' ,'<%- item.variant %>')"
-                              class="btn btn-outline-dark btn-items btn-items-increase col-3"
-                            >
-                              +
-                            </button>
+                  </div>
+                  <div class="col-12 col-md-7 mt-4 mt-md-0">
+                    <div class="row align-items-center">
+                      <div class="col-md-3">
+                        <div class="row">
+                          <div class="col-6 d-md-none text-muted">Price per item</div>
+                          <div class="col-6 col-md-12 text-end text-md-center">
+                            <% if (item.productId.onOffer) { %> ₹ <%= item.productId.offerDiscountPrice %> <% } else { %> ₹ <%=
+                            item.productId.sellingPrice %> <% } %>
+                            <p style="text-decoration: line-through">₹<%- item.price %></p>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-md-3">
-                      <div class="row">
-                        <div class="col-6 d-md-none text-muted">Total price</div>
-                        <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
-                          ₹<%= item.price %>
+                      <div class="col-md-4">
+                        <div class="row align-items-center">
+                          <div class="d-md-none col-7 col-sm-9 text-muted">Quantity</div>
+                          <div class="col-5 col-sm-3 col-md-12">
+                            <div class="d-flex align-items-center">
+                              <button
+                                onclick="decreaseCartQuantity('<%- item.productId._id %>','<%- item.variantId._id %>')"
+                                class="btn btn-outline-dark btn-items btn-items-decrease col-3"
+                              >
+                                -
+                              </button>
+                              <input
+                                id="quantityInput-<%- item.productId._id %>-<%- item.variantId._id %>"
+                                readonly
+                                min="1"
+                                name="quantity"
+                                class="form-control text-center border-0 border-md input-items"
+                                type="text"
+                                value="<%= item.quantity %>"
+                              />
+                              <button
+                                onclick="increaseCartQuantity('<%- item.productId._id %>' ,'<%- item.variantId._id %>')"
+                                class="btn btn-outline-dark btn-items btn-items-increase col-3"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="col-2 d-none d-md-block text-center">
-                      <button
-                        onclick="confirmAction('<%- item.productId._id %>','delete', '<%- item.productId.name %>')"
-                        class="btn btn-danger cart-remove"
-                      >
-                        <i class="delete bi bi-trash"></i>
-                      </button>
+                      <div class="col-md-3">
+                        <div class="row">
+                          <div class="col-6 d-md-none text-muted">Total price</div>
+                          <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
+                            ₹<%= item.price %>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-2 d-none d-md-block text-center">
+                        <button
+                          onclick="confirmAction('<%- item.productId._id %>','delete', '<%- item.productId.name %>')"
+                          class="btn btn-danger cart-remove"
+                        >
+                          <i class="delete bi bi-trash"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <% }) %>
             </div>
-            <% }) %>
+          </div>
+          <div class="my-5 d-flex justify-content-between flex-column flex-lg-row">
+            <a class="btn btn-link text-muted" href="/shop">
+              <i class="bi bi-chevron-left"></i>
+              Continue Shopping
+            </a>
+            <a class="btn btn-dark" href="/checkout">
+              Proceed to checkout
+              <i class="bi bi-chevron-right"></i>
+            </a>
           </div>
         </div>
-        <div class="my-5 d-flex justify-content-between flex-column flex-lg-row">
-          <a class="btn btn-link text-muted" href="/shop">
-            <i class="bi bi-chevron-left"></i>
-            Continue Shopping
-          </a>
-          <a class="btn btn-dark" href="/checkout">
-            Proceed to checkout
-            <i class="bi bi-chevron-right"></i>
-          </a>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="block mb-5">
-          <div class="block-header">
-            <h6 class="text-uppercase mb-0">Order Summary</h6>
-          </div>
-          <div class="block-body bg-light pt-1">
-            <p class="text-sm">Shipping and additional costs are calculated based on values you have entered.</p>
-            <ul class="order-summary mb-0 list-unstyled">
-              <li class="order-summary-item"><span>Order Subtotal </span><span id="cartTotal">₹<%= totalPrice %></span></li>
-              <li class="order-summary-item">
-                <span>Shipping and handling <span class="text-muted">(free)</span></span
-                ><span>₹ <%= shipmentFee %></span>
-              </li>
-              <!-- <li class="order-summary-item"><span>Tax</span><span>₹0.00</span></li> -->
-              <li class="order-summary-item border-0">
-                <span>Total</span><strong id="grandTotal" class="order-summary-total">₹<%= totalPrice %></strong>
-              </li>
-            </ul>
+        <div class="col-lg-4">
+          <div class="block mb-5">
+            <div class="block-header">
+              <h6 class="text-uppercase mb-0">Order Summary</h6>
+            </div>
+            <div class="block-body bg-light pt-1">
+              <p class="text-sm">Shipping and additional costs are calculated based on values you have entered.</p>
+              <ul class="order-summary mb-0 list-unstyled">
+                <li class="order-summary-item"><span>Order Subtotal </span><span id="cartTotal">₹<%= totalPrice %></span></li>
+                <li class="order-summary-item">
+                  <span>Shipping and handling <span class="text-muted">(free)</span></span
+                  ><span>₹ <%= shipmentFee %></span>
+                </li>
+                <!-- <li class="order-summary-item"><span>Tax</span><span>₹0.00</span></li> -->
+                <li class="order-summary-item border-0">
+                  <span>Total</span><strong id="grandTotal" class="order-summary-total">₹<%= totalPrice %></strong>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  </section>
+
+  <% } else { %>
+  <!-- If cart is empty -->
+  <div class="container my-5 mb-6">
+    <div class="col my-5 text-center">
+      <h2 class="h1">Cart is empty...</h2>
+      <h3 class="my-5">
+        <a href="/user/product-list">
+          <button class="btn btn-lg btn-primary">Shop Now</button>
+        </a>
+      </h3>
+    </div>
   </div>
+
+  <% } %>
 </section>
 
-<% } else { %>
-<!-- If cart is empty -->
-<div class="container my-5 mb-6">
-  <div class="col my-5 text-center">
-    <h2 class="h1">Cart is empty...</h2>
-    <h3 class="my-5">
-      <a href="/user/product-list">
-        <button class="btn btn-lg btn-primary">Shop Now</button>
-      </a>
-    </h3>
-  </div>
-</div>
+<%- include("../partials/user/footer") %>
 
-<% } %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   const confirmAction = (productId, action, productName) => {
@@ -248,6 +254,54 @@
       });
     }
   };
-</script>
 
-<%- include("../partials/user/footer") %>
+  function updateCartQuantity(productId, variantId, incrementOrDecrement) {
+    const operation = incrementOrDecrement ? "increment" : "decrement";
+
+    fetch(`/cart/${productId}/${variantId}/${operation}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operation }),
+    })
+      .then((response) => response.json())
+      .then(() => location.reload())
+      .then((data) => {
+        if (!data.success) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message,
+            showConfirmButton: true,
+          });
+          return;
+        }
+
+        const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
+        quantityInput.value = data.cart.quantity;
+
+        const totalStock = data.stock;
+        console.log("This is the total stocks available: ", totalStock);
+
+        if (quantityInput.value > totalStock) {
+          Swal.fire({
+            icon: "error",
+            title: "Limited Stock",
+            text: `This product has only ${totalStock} stock left`,
+            showConfirmButton: true,
+          });
+          return;
+        }
+
+        document.getElementById("totalPrice").innerText = data.totalPrice;
+      })
+      .catch((error) => console.error("Error updating cart:", error));
+  }
+
+  function increaseCartQuantity(productId, variantId) {
+    updateCartQuantity(productId, variantId, true);
+  }
+
+  function decreaseCartQuantity(productId, variantId) {
+    updateCartQuantity(productId, variantId, false);
+  }
+</script>

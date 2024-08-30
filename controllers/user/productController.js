@@ -122,8 +122,8 @@ module.exports = {
       product.variants.forEach((variant) => {
         console.log("This is stock:", variant.stock || "Stock not available");
         stocks = variant.stock;
-
       });
+
       console.log("this is stock", stocks);
 
       // Check variant stock and calculate offer price if applicable

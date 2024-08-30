@@ -109,14 +109,9 @@ router.get(
 router.delete('/remove-from-cart', cartController.removeCartItem);
 
 
-router.get(
-  "/cart/increase-quantity/:id/:variant",
-  cartController.incrementCartItem
-);
-router.get(
-  "/cart/decrease-quantity/:id/:variant",
-  cartController.decrementCartItem
-);
+router.put('/cart/:id/:variant/increment', userAuth, cartController.incrementCartItem);
+router.put('/cart/:id/:variant/decrement', userAuth, cartController.decrementCartItem);
+
 
 
 router.get("/checkout", checkoutController.getCheckout);
