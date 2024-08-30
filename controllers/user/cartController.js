@@ -147,6 +147,8 @@ module.exports = {
 
       await cart.save();
 
+      
+
       res.render("user/cart", {
         cartList: cart.items,
         cartCount: cart.items.length,

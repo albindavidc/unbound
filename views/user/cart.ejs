@@ -82,12 +82,12 @@
                               >
                                 -
                               </button>
+
                               <input
-                                id="quantityInput-<%- item.productId._id %>-<%- item.variantId._id %>"
-                                readonly
+                                id="quantityInput-<%-item.productId._id%>-<%-item.variantId._id%>"
                                 min="1"
                                 name="quantity"
-                                class="form-control text-center border-0 border-md input-items"
+                                class="form-control text-center border-0 border-md input-items alerted"
                                 type="text"
                                 value="<%= item.quantity %>"
                               />
@@ -260,13 +260,44 @@
   function updateCartQuantity(productId, variantId, incrementOrDecrement) {
     const operation = incrementOrDecrement ? "increment" : "decrement";
 
+    const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
+    let currentQuantity = parseInt(quantityInput.value);
+
+    // Check for increment and maximum quantity
+    if (incrementOrDecrement && currentQuantity >= 10) {
+      Swal.fire({
+        icon: "error",
+        title: "Limited Stock",
+        text: "You cannot add more than 10 items of this product.",
+        showConfirmButton: true,
+      }).then(() => {
+        // Reload the page to ensure correct quantity
+        location.reload();
+      });
+      return;
+    }
+
+    // Check for decrement and minimum quantity
+    if (!incrementOrDecrement && currentQuantity <= 1) {
+      Swal.fire({
+        icon: "error",
+        title: "Minimum Quantity",
+        text: "You must order at least one item of this product.",
+        showConfirmButton: true,
+      }).then(() => {
+        // Reload the page to ensure correct quantity
+        location.reload();
+      });
+      return;
+    }
+
+    // Proceed with the fetch operation to update the cart
     fetch(`/cart/${productId}/${variantId}/${operation}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ operation }),
     })
       .then((response) => response.json())
-      .then(() => location.reload())
       .then((data) => {
         if (!data.success) {
           Swal.fire({
@@ -274,29 +305,47 @@
             title: "Error",
             text: data.message,
             showConfirmButton: true,
+          }).then(() => {
+            // Reload the page in case of an error
+            location.reload();
           });
           return;
         }
 
-        const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
+        // Update the quantity input with the new value from the server
         quantityInput.value = data.cart.quantity;
 
         const totalStock = data.stock;
-        console.log("This is the total stocks available: ", totalStock);
 
+        // Check if the new quantity exceeds the available stock (again)
         if (quantityInput.value > totalStock) {
           Swal.fire({
             icon: "error",
             title: "Limited Stock",
-            text: `This product has only ${totalStock} stock left`,
+            text: `This product has only ${totalStock} items left.`,
             showConfirmButton: true,
+          }).then(() => {
+            // Reload the page to adjust the quantity correctly
+            location.reload();
           });
           return;
         }
 
-        document.getElementById("totalPrice").innerText = data.totalPrice;
+        // Optional: Reload the page to reflect any changes if needed
+        location.reload();
       })
-      .catch((error) => console.error("Error updating cart:", error));
+      .catch((error) => {
+        console.error("Error updating cart:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "There was an error updating your cart. Please try again.",
+          showConfirmButton: true,
+        }).then(() => {
+          // Reload the page in case of an error
+          location.reload();
+        });
+      });
   }
 
   function increaseCartQuantity(productId, variantId) {
