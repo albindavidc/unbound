@@ -39,104 +39,75 @@
     </div>
   </div>
 </section>
-
 <section>
   <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-10">
-        
-            <div class="card p-4">
-              <h4 class="mb-4">Order Summary</h4>
-              <% order.forEach(order => { %>
-                <a href="/order/<%= order._id %>" class="order-link">
-                  <div class="order-summary">
-              <!-- Loop through each order -->
-              <% order.items.forEach(item => { %>
-              <!-- Loop through each item within the order -->
-              <div class="order-item mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <p>Name: <%= item.productId.name %></p>
-                    <p>Price: ₹<%= item.itemTotal %></p>
-                    <p>Quantity: <%= item.quantity %></p>
-                    <p>
-                      Status:
-                      <span
-                        class="badge <%= order.status === 'Delivered' ? 'badge-success' : order.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
-                      >
-                        <%= order.status %>
-                      </span>
-                    </p>
-                    <p>Order Date: <%= new Date(order.createdAt).toLocaleDateString() %></p>
-                    <% if (order.status === 'Delivered') { %>
-                    <p>Delivery Date: <%= new Date(order.deliveredOn).toLocaleDateString() %></p>
-                    <% } %>
+        <div class="card p-4">
+          <h4 class="mb-4">Order Summary</h4>
+
+          <% order.forEach(order => { %>
+            <a href="/order/<%= order._id %>" class="order-link">
+            <div class="mb-4">
+              <h5 class="order-id mb-3">Order ID: <%= order._id %></h5>
+              <div class="row">
+
+
+                <% order.items.forEach((item, index) => { %>
+                  <div class="col-md-6">
+                    <div class="order-item p-3 mb-3 border rounded">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <% let imagePath = ''; %>
+                          <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %>
+                            <% imagePath = item.productId.primaryImages[0].name; %>
+                          <% } %>
+                          <img
+                            id="main-product-image"
+                            class="img-fluid h-100"
+                            src="/uploads/images/<%= imagePath %>"
+                            alt="<%= item.productId.name %>"
+                          />
+                        </div>
+                        <div class="col-md-8">
+                          <p><%= item.productId.name %>(<%= item.quantity %>)</p>
+                          <p></p>
+                          <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
+                          <p>
+                            <strong>Price:</strong> ₹<%= item.itemTotal %>
+                            <span
+                              class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                            >
+                              <%= item.status %>
+                            </span>
+                          </p>
+                          <% if (item.status === 'Delivered') { %>
+                            <p><strong>Delivery Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
+                            <% const returnByDate = new Date(order.createdAt); returnByDate.setDate(returnByDate.getDate() + 7); %>
+                            <p><strong>Return By:</strong> <%= returnByDate.toLocaleDateString() %></p>
+                          <% }else{ %>
+
+                            <p><strong>Delivery Date: --</strong></p>
+                            <p><strong>Return By: --</strong></p>
+                            <% } %>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <% if (order.canReturn) { %>
-                    <button class="btn btn-outline-primary return-btn" data-order-id="<%= order._id %>">Return</button>
-                    <% } else if (order.canCancel) { %>
-                    <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= order._id %>">Cancel Order</button>
-                    <% } %>
-                  </div>
-                </div>
-                <% if (order.canReturn) { %>
-                <small class="text-muted">You can return this item within 7 days of delivery.</small>
-                <% } %>
-                <hr />
+                  <% if ((index + 1) % 2 === 0 && index !== order.items.length - 1) { %>
+                    </div><div class="row">
+                  <% } %>
+                <% }) %>
               </div>
-              <% }) %> <% }) %>
+              <hr />
             </div>
-          </div>
-        </a>
+          <% }) %>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- Pagination-->
-  <% if (order.length > 0 && nextPage || current == pages) { %>
-  <nav aria-label="Product Pagination">
-    <ul class="pagination justify-content-center mt-5">
-      <% if (current == 1) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">First</a>
-      </li>
-
-      <% } else { %>
-      <li class="page-item">
-        <a href="/user/orders/?page=1" class="page-link">First</a>
-      </li>
-      <% } %> <% var i = (Number(current)> 5 ? Number(current) - 4 : 1) %> <% if (i !== 1) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">...</a>
-      </li>
-      <% } %> <% for( ; i < Number(current) + 4 && i <= pages ; i++ ) { %> <% if (i == current) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link"><%= i %> </a>
-      </li>
-      <% } else { %>
-      <li class="page-item">
-        <a href="/user/orders?page=<%= i %>" class="page-link text-primary fw-bold"><%= i %></a>
-      </li>
-
-      <% } %> <% if (i == Number(current)+ 4 && i < pages) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">...</a>
-      </li>
-      <% } %> <% } %> <% if (current == pages) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">Last</a>
-      </li>
-      <% } else { %>
-      <li class="page-item">
-        <a href="/user/orders?page=<%= pages %>" class="page-link">Last</a>
-      </li>
-
-      <% } %>
-    </ul>
-  </nav>
-  <% } %>
 </section>
+
 
 //
 <script>

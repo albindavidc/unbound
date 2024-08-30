@@ -16,7 +16,7 @@ module.exports = {
     let order = await Order.find({ customerId: userId })
       .populate({
         path: "items.productId",
-        select: "name price", // Select the fields you want from the product
+        select: "name price primaryImages secondaryImages", // Select the fields you want from the product
       })
       .populate("items.color items.size shippingAddress")
       .sort({ createdAt: -1 })
