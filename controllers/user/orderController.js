@@ -27,17 +27,17 @@ module.exports = {
     console.log(order);
     const product = await Product.find({});
 
-    // Calculate canReturn and canCancel for each order
-    order = order.map((order) => {
-      const isDelivered = order.status === "Delivered";
-      const isCancelled = order.status === "Cancelled";
-      const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
-      const isWithinReturnPeriod = new Date() - new Date(order.deliveredOn) <= oneWeekInMilliseconds;
+    // // Calculate canReturn and canCancel for each order
+    // order = order.map((order) => {
+    //   const isDelivered = order.status === "Delivered";
+    //   const isCancelled = order.status === "Cancelled";
+    //   const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+    //   const isWithinReturnPeriod = new Date() - new Date(order.deliveredOn) <= oneWeekInMilliseconds;
 
-      order.canReturn = isDelivered && isWithinReturnPeriod;
-      order.canCancel = !isDelivered && !isCancelled;
-      return order;
-    });
+    //   order.canReturn = isDelivered && isWithinReturnPeriod;
+    //   order.canCancel = !isDelivered && !isCancelled;
+    //   return order;
+    // });
 
     res.render("user/orders", {
       order,
@@ -61,7 +61,7 @@ module.exports = {
           path: "items.productId",
           select: "name price primaryImages secondaryImages", // Select specific fields if needed
         })
-        .populate("items.color items.size shippingAddress _id")
+        .populate("items.color items.size shippingAddress _id items.orderID")
         .populate("items.productId.primaryImages");
 
       if (order.length > 0) {
@@ -70,40 +70,35 @@ module.exports = {
         console.log("No orders found.");
       }
 
-      // Calculate canReturn and canCancel for each order
-      order = order.map((order) => {
-        const isDelivered = order.status === "Delivered";
-        const isCancelled = order.status === "Cancelled";
-        const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
-        const isWithinReturnPeriod = new Date() - new Date(order.deliveredOn) <= oneWeekInMilliseconds;
-
-        order.canReturn = isDelivered && isWithinReturnPeriod;
-        order.canCancel = !isDelivered && !isCancelled;
-        return order;
-      });
 
 
+      // Example of accessing the first orderID
+      console.log("This is the first item's orderID:", order[0].items[0].orderID);
+
+      console.log("this is orderId");
       res.render("user/order", { order, orderId, user: req.session.user });
     } catch (error) {
       console.error("Error fetching order details:", error);
       res.status(500).send("Server Error");
     }
   },
-
   updateOrder: async (req, res) => {
     const { orderId } = req.params;
     const { action } = req.body;
 
-    console.log("this is orderId", orderId);
-    console.log("this is action", action);
+    console.log("Received orderId:", orderId, action); // Debugging the received orderId
+
     try {
       let result;
       if (action === "return") {
-        result = await Order.findByIdAndUpdate(
-          orderId,
+        result = await Order.findOneAndUpdate(
+          {
+            "items.orderID": orderId, // Corrected to search by the orderID inside items array
+          },
           {
             $set: {
-              "items.$[].status": "Return",
+              "items.$.status": "Return", // Use $ to update the matched element in the array
+              "items.$.paymentStatus":"Refund",
               status: "Return",
               paymentStatus: "Refund",
             },
@@ -111,11 +106,14 @@ module.exports = {
           { new: true }
         );
       } else if (action === "cancel") {
-        result = await Order.findByIdAndUpdate(
-          orderId,
+        result = await Order.findOneAndUpdate(
+          {
+            "items.orderID": orderId, // Corrected to search by the orderID inside items array
+          },
           {
             $set: {
-              "items.$[].status": "Cancelled",
+              "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+              "items.$.paymentStatus":"Refund",
               status: "Cancelled",
               paymentStatus: "Refund",
             },
@@ -124,13 +122,16 @@ module.exports = {
         );
       }
 
-      if (result) {
-        res.status(200).json({ success: true, message: `Order ${action}led successfully` });
+      if (!result) {
+        console.log("Order not found");
+        res.status(400).json({ message: "Detailed error message" });
       } else {
-        res.status(404).json({ success: false, message: "Order not found" });
+        console.log("Updated order:", result);
       }
+
+      res.status(200).json({ success: true, message: `Order ${action}ed successfully` });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
