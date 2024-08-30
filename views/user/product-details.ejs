@@ -234,7 +234,7 @@
             <div class="product__details__cart__option">
               <div class="quantity">
                 <div class="pro-qty">
-                  <input name="quantity" type="text" id="productQuantity" value="1" />
+                  <input name="quantity" type="text" id="productQuantity" value="1" data-stock="<% stocks %>" />
                 </div>
               </div>
 
@@ -481,6 +481,41 @@
 
   function addToCart(productId) {
     const quantity = document.getElementById("productQuantity").value;
+
+    if (quantity > 10) {
+      Swal.fire({
+        icon: "error",
+        title: "Quantity Exceeded",
+        text: "You have entered the maximum quantity per order",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    if(quantity == 0){
+      Swal.fire({
+        icon: "error",
+        title: "Quantity cannot be zero",
+        text: "You have entered invalid quantity",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    const totalStock = `<%- JSON.stringify(stocks) %>`;
+    console.log("this is the total stocks available: ", totalStock);
+
+    if (quantity > totalStock) {
+      Swal.fire({
+        icon: "error",
+        title: "Limited Stock",
+        text: `This product has only ${totalStock} stock left`,
+        showConfirmButton: true,
+      });
+      return;
+    }
 
     if (selectedColorId && selectedSizeId) {
       fetch("/user/add-to-cart", {

@@ -152,7 +152,6 @@ module.exports = {
           }
         }
         await cart.save();
-        // Assuming totalPrice is needed for the response
       }
 
       // for (let i = 0; i < cart.items.length; i++) {
@@ -239,7 +238,7 @@ module.exports = {
         cart = new Cart({ userId: req.session.user });
       }
 
-      const product = await Product.findById(productId).populate("variants.color").populate("variants.size");
+      const product = await Product.findById(productId).populate("variants.color").populate("variants.size").populate("variants.stock");
 
       if (!product) {
         return res.status(404).json({ success: false, message: "Product not found" });

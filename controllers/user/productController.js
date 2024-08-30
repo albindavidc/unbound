@@ -6,7 +6,6 @@ const Size = require("../../models/attributes/sizeSchema");
 
 const mongoose = require("mongoose");
 
-
 module.exports = {
   // Fetch all products
   loadProductList: async (req, res) => {
@@ -111,19 +110,28 @@ module.exports = {
         .populate("variants.color")
         .populate("variants.size")
         .populate("ratings.user")
-        .populate("brand");
+        .populate("brand")
+        .populate("variants.stock");
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
+
+
+      let stocks ;
+      product.variants.forEach((variant) => {
+        console.log("This is stock:", variant.stock || "Stock not available");
+        stocks = variant.stock;
+
+      });
+      console.log("this is stock", stocks);
 
       // Check variant stock and calculate offer price if applicable
       product.variants.forEach((variant) => {
         variant.isOutOfStock = variant.stock <= 0;
       });
 
-      // Calculate the offer price if there's an offer
-      const offerPrice = product.offerpercentage > 0 ? product.price * (1 - product.offerpercentage / 100) : product.price;
+      // const offerPrice = product.offerpercentage > 0 ? product.price * (1 - product.offerpercentage / 100) : product.price;
 
       // Fetch related products based on the category
       const relatedProducts = await Product.find({
@@ -139,13 +147,12 @@ module.exports = {
         productData,
         relatedProducts,
         user: req.session.user,
-        offerPrice,
+        // offerPrice,
+        stocks,
       });
     } catch (error) {
       console.error("Error fetching product details:", error);
       res.status(500).send("Internal Server Error");
     }
   },
-
- 
 };
