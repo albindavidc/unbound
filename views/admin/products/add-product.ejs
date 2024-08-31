@@ -626,9 +626,11 @@
 
     if (!isRequired(description)) {
       showError(descriptionEl, "Description cannot be blank.");
-    } else if (!/^[a-zA-Z\s]+$/.test(description)) {
-      showError(descriptionEl, "Description should not contain numbers.");
-    } else {
+    } 
+    // else if (!/^[a-zA-Z\s]+$/.test(description)) {
+    //   showError(descriptionEl, "Description should not contain numbers.");
+    // } 
+    else {
       showSuccess(descriptionEl);
       isValid = true;
     }

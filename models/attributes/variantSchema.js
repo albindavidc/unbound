@@ -16,6 +16,7 @@ const variantSchema = new mongoose.Schema({
       ref: 'Size',
     },
     stock: { type: Number, required: true },
+    isListed: { type: Boolean, default: true },
     // Other variant-specific fields...
   }, { timestamps: true });
   

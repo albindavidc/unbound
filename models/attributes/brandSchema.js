@@ -7,14 +7,14 @@ const brandSchema = new Schema({
         required: true,
         unique: true,
     },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
     image: {
         type: [String],
         required: true,
     },
+    isListed:{
+        type: Boolean,
+        default: true,
+    }
     
 },{timestamps:true})
 

@@ -74,6 +74,8 @@
           <tbody>
             <% if (product && product.length > 0) { %> <% product.forEach((product, index) => { %>
             <tr>
+              <td><%- index + 1 %></td>
+
               <td>
                 <img
                   class="img-fluid img-thumbnail"
@@ -84,7 +86,7 @@
               </td>
               <td><%= product.name %></td>
               <td><%= product.category.name %></td>
-              <td><%= product.price %></td>
+              <td>₹<%= product.sellingPrice %></td>
 
 
 
@@ -118,11 +120,11 @@
               <td class="text-center">
                 <% if (product.isActive) { %>
                 <button class="btn btn-danger btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'unlist', '<%= product.name %>')">
-                  <i class="material-icons"></i> Unlist
+                  Unlist
                 </button>
                 <% } else { %>
                 <button class="btn btn-warning btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')">
-                  <i class="material-icons"></i> List
+                 List
                 </button>
                 <% } %>
                 

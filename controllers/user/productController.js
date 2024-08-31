@@ -68,11 +68,11 @@ module.exports = {
     try {
       const product = await Product.find({ isActive: true }).populate("variants.color").populate("variants.stock");
   
-      const categories = await Category.find({});
-      const brand = await Brand.find({});
+      const categories = await Category.find({ isListed: true});
+      const brand = await Brand.find({isListed: true});
       const size = await Size.find({});
       const colors = await Color.find({ isListed: true });
-      const variants = await Variants.find({ isListed: true });
+      const variants = await Variants.find({ });
   
       const products = await Product.find({ ...query, ...filterQuery }).sort(sortQuery);
       const productCount = await Product.countDocuments({ ...query, ...filterQuery });
