@@ -157,6 +157,7 @@
                   <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                     <div class="card-body">
                       <div class="shop__sidebar__color">
+ 
                         <% colors.forEach(color => { %>
                         <label class="color-filter" data-color="<%= color._id %>" style="background-color: <%= color.hex %>" for="color_<%= color._id %>">
                           <input
@@ -166,6 +167,7 @@
                             name="color"
                             value="<%= color._id %>"
                           />
+                          
                         </label>
                         <% }); %>
                       </div>

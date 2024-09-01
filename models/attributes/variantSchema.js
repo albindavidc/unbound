@@ -1,24 +1,25 @@
 const mongoose = require("mongoose");
 
-
-const variantSchema = new mongoose.Schema({
+const variantSchema = new mongoose.Schema(
+  {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: "Product",
       required: true,
     },
     colorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Color',
+      ref: "Color",
     },
     sizeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Size',
+      ref: "Size",
     },
     stock: { type: Number, required: true },
     isListed: { type: Boolean, default: true },
-    // Other variant-specific fields...
-  }, { timestamps: true });
-  
-  const Variant = mongoose.model('Variant', variantSchema);
-  module.exports = Variant;
+  },
+  { timestamps: true }
+);
+
+const Variant = mongoose.model("Variant", variantSchema);
+module.exports = Variant;
