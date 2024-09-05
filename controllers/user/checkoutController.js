@@ -3,9 +3,20 @@ const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
-const crypto = require("crypto");
+const Payment = require("../../models/paymentSchema");
 
 const mongoose = require("mongoose");
+
+//Razorpay
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+
+var instance = new Razorpay({
+  key_id: process.env.RAZ_KEY_ID,
+  key_secret: process.env.RAZ_KEY_SECRET,
+})
+
+
 
 // Function to check if a product exists and is active
 const checkProductExistence = async (cartItem) => {
@@ -26,7 +37,15 @@ const checkStockAvailability = async (cartItem) => {
   return product;
 };
 
-
+const createRazorpayOrder = async(order_id, total) =>{
+  let options = {
+    amount: total *100,
+    currency: "INR",
+    receipt: order_id. toString(),
+  };
+  const order = await instance.orders.create(options);
+  return order;
+}
 
 module.exports = {
   getCheckout: async (req, res) => {
@@ -72,6 +91,10 @@ module.exports = {
 
     let isCOD = true;
 
+    if(totalPrice > 1000){
+      isCOD = false;
+    }
+
     res.render("user/checkout", {
       user,
       address,
@@ -89,6 +112,7 @@ module.exports = {
       const { paymentMethod, address } = req.body;
 
       const userId = req.session.user;
+      const user = await User.findById(userId);
 
       let shippingAddress = await Address.findOne({
         _id: address,
@@ -118,61 +142,6 @@ module.exports = {
       const paymentStatus = paymentMethod == "COD" ? "Pending" : "Paid";
 
      
-      
-
-
-
-
-
-      // for (const item of userCart.items) {
-      //   // Find the product by ID
-      //   const product = await Product.findById(item.productId);
-      //   const orders = await Order.find();
-
-      //   for (let order of orders) {
-      //     const updatedItems = await Promise.all(order.items.map(async (item) => {
-      //       if (!item.productDetail || !item.productDetail.name) {
-      //         item.productDetail = {
-      //           name: product.name,
-      //           color: product.variants.color,
-      //           size: size.variants.size,
-      //           price: product.actualPrice,
-      //         };
-      //       }
-      //       return item;
-      //     }));
-
-      //     order.items = updatedItems;
-      //     await order.save();
-      //   }
-      //   console.log('productdetails  added successfully.');
-      // }
-      
-      // for (const item of userCart.items) {
-
-      // const product = await Product.findById(item.productId);
-
-      // const variant = product.variants.find(
-      //   (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
-      // );
-      //   const orders = await Order.find();
-
-
-      //   for (let order of orders) {
-      //     const updatedItems = await Promise.all(order.items.map(async (item) => {
-      //       if (!item.productDetail || !item.productDetail.name) {
-      //         item.productDetail = {
-      //           name: product.name,
-      //           color: product.variants.color,
-      //           size: size.variants.size,
-      //           price: product.actualPrice,
-      //         };
-      //       }
-      //       return item;
-      //     }));
-
-      //     order.items = updatedItems;
-      //   }
 
       let order = new Order({
         customerId: userId,
@@ -180,7 +149,6 @@ module.exports = {
         totalPrice: userCart.totalPrice,
         payable: userCart.payable,
         paymentMethod,
-        // productDetail:item,
         paymentStatus,
         status,
         shippingAddress,
@@ -189,36 +157,21 @@ module.exports = {
       console.log("these are the orders:", order);
 
       order.items.forEach((item) => {
-        item.status = "Pending";
+        item.status = status;
       });
-
-      order.status = paymentMethod == "COD" ? "Confirmed" : "Pending";
-
-
 
       order.items.forEach((item) => {
         item.paymentStatus = order.paymentStatus;
       });
       
-      // console.log("These are the orders:", order);
-
-      //   order.items.forEach((item) => {
-      //   item.status = "Pending";
-      // });
-
-
-
       switch (paymentMethod) {
         case "COD":
-          if (!order) {
-            return res.status(500).json({ error: "Failed to create order" });
-          }
 
           // Save the order
-          // const orderPlaced = await order.save();
-          // req.session.orderDetails = orderPlaced; // Store order details in session
+          const orderPlaced = await order.save();
+          req.session.orderDetails = orderPlaced; // Store order details in session
 
-          // if (orderPlaced) {
+          if (orderPlaced) {
             // // reduce stock of the variant
             for (const item of userCart.items) {
               const product = await Product.findById(item.productId);
@@ -279,9 +232,42 @@ module.exports = {
               success: true,
               message: "Order has been placed successfully.",
             });
-          // }
+          }
 
           break;
+
+        case "Online": 
+          const createOrder = await Order.create(order);
+          let total = parseInt(userCart.payable);
+          let order_id = createOrder._id;
+
+          const RazorpayOrder = await createRazorpayOrder(order_id, total). then(
+            (order) => order
+          );
+
+          const timestamp = RazorpayOrder.created_at;
+          const date = new Date(timestamp*1000);
+
+          const formattedDate = date.toISOString();
+
+          let payment = new Payment({
+            paymentId: RazorpayOrder.id,
+            amount: parseInt(RazorpayOrder.amount) /100,
+            currency: RazorpayOrder.currency,
+            orderId: order_id,
+            status: RazorpayOrder.status,
+            createdAt: formattedDate,
+
+          })
+          await payment.save();
+          return res.json({
+            status: true,
+            order: RazorpayOrder,
+            user,
+          });
+
+          break;
+
 
         default:
           return res.status(400).json({ error: "Invalid payment method" });
@@ -296,6 +282,63 @@ module.exports = {
       console.log(error.stack);
 
       res.status(500).json({ error: "An error occured while placing the order" });
+    }
+  },
+
+  verifyPayment: async (req, res) => {
+    try {
+      const secret = process.env.RAZ_KEY_SECRET;
+
+      const {razorpay_order_id, razorpay_payment_id,razorpay_signature }= req.body.response;
+      
+      let hmac = crypto.createHmac("sha256", secret);
+      hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+      hmac = hmac.digest("hex");
+      const isSignatureValid = hmac === razorpay_signature;
+
+      if(isSignatureValid) {
+        let customerId = req.session.user;
+        let userCart = await Cart.findOne({userId: customerId}).catch(
+          (error) =>{
+            console.error(error);
+            return res.status(500)
+            .json({error: "Failed to find user's cart"});
+          }
+        )
+
+        //Reduce the stock of the Variant
+        for(const item of userCart.items){
+          const product = await Product.findById(item.productId);
+
+          const variantIndex = product.variants.findIndex((variant) => variant._id.toString() === item.variant.toString());
+
+          if(variantIndex === -1){
+            return res.status(404).json({error: "variant not found"});
+          }
+
+          product.variants[variantIndex].stock -= item.quantity;
+          await product.save()
+        }
+
+      }
+      await Cart.clearCart(req.session.user)
+      let paymentId = razorpay_order_id;
+
+      const orderID = await Payment.findOne(
+        {paymentId: paymentId},
+        {_id:0, orderId:1}
+      );
+
+      const order_id = orderID.orderId
+
+      const updateOrder = await Order.updateOne(
+        {_id: order_id},
+        {$set: {"items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid"}}
+      )
+
+      
+    } catch (error) {
+      
     }
   },
 };

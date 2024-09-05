@@ -97,13 +97,6 @@ router
 //Cart
 router.get("/cart", userAuth, cartController.getCart);
 router.post("/user/add-to-cart", cartController.addToCart);
-
-
-// router.get(
-//   "/cart/remove",
-//   cartController.removeCartItem
-// );
-
 router.delete('/cart/remove/:productId/:variantId', cartController.removeCartItem);
 
 
@@ -122,11 +115,8 @@ router
 .post(userController.editAddress)
 .delete(userController.deleteAddress);
 
-router
-.route("/place-order")
-.post(checkoutController.placeOrder);
-
-
+router.post("/place-order", checkoutController.placeOrder);
+router.post("/verify-payment", checkoutController.verifyPayment);
 router.get("/order-success", cartController.getOrderSuccess);
 
 

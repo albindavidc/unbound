@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", function () {
               }
 
               if(data.status){
-                showRazorPay(data.order, data.user);
+                showRazorpay(data.order, data.user);
               }
 
               if (data.success) {
@@ -388,81 +388,82 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-
-const showRazorpay = (order, user) =>{
+const showRazorpay = (order, user) => {
   console.log(order, user);
 
   var options = {
-    key: "rzp_test_FGSvpGKo4JrSBW",
+    key: "rzp_test_FGSvpGKo4JrSBW", // Use your Razorpay key
     amount: order.amount,
     currency: "INR",
     name: "Unbound",
     description: "Test Transaction",
-    order_id: order.id,
-    handler: async function(response){
+    orderId: order.id, // Order ID from backend
+    handler: async function (response) {
       console.log(response);
-      await verifyPayment(response)
+      await verifyPayment(response); // Call the verification function
     },
-    prefill:{
+    prefill: {
       name: user.username,
-      email: user.Error,
+      email: user.email, // Fixed typo here (should be user.email, not user.Error)
       contact: user.phone,
-
     },
     notes: {
       address: "Razorpay Corporate Office",
-
     },
     theme: {
       color: "#2ade99",
     },
-  }
-
-var rzp1 = new Razorpay(options);
-
-rzp1.open();
-rzp1.on("payment.failed", function(response){
-  swal.fire("Failed!", response.error.description,"error").then(() =>{
-    location.assign("/");
-  })
-})
-};
-
-
-const verifyPayment = async (response) =>{
-  const res = await fetch ("/checkout/verify-payment",{
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({response}),
-  })
-  .then((response) => response.json())
-  .then((data) => {
-    console.log(data);
-    if(data.success) {
-      location.assign("/user/order-success");
-    }
-  })
-  const data = await res.json();
-
-  console.log(data);
-  if(data.success){
-    location.assign("/user/order-success");
-  }
-}
-
-const debounce = (fn, delay = 50) => {
-  let timeoutId;
-  return (...args) => {
-    // cancel the previous timer
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    // setup a new timer
-    timeoutId = setTimeout(() => {
-      fn.apply(null, args);
-    }, delay);
   };
+
+  var rzp1 = new Razorpay(options);
+
+  rzp1.open();
+  rzp1.on("payment.failed", function (response) {
+    swal.fire("Failed!", response.error.description, "error").then(() => {
+      location.assign("/");
+    });
+  });
 };
+
+const verifyPayment = async (response) => {
+  try {
+    const res = await fetch("/verify-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ response }),
+    });
+
+    const data = await res.json(); // Parse the JSON response once
+
+    console.log(data); // Log the response
+
+    if (data.success) {
+      location.assign("/order-success"); // Redirect to success page
+    } else {
+      swal.fire("Payment Verification Failed!", "Please try again.", "error").then(() => {
+        location.assign("/"); // Redirect to home if verification fails
+      });
+    }
+  } catch (error) {
+    console.error("Payment verification failed", error);
+    swal.fire("Error!", "Payment verification could not be completed.", "error");
+  }
+};
+
+
+// const debounce = (fn, delay = 50) => {
+//   let timeoutId;
+//   return (...args) => {
+//     // cancel the previous timer
+//     if (timeoutId) {
+//       clearTimeout(timeoutId);
+//     }
+//     // setup a new timer
+//     timeoutId = setTimeout(() => {
+//       fn.apply(null, args);
+//     }, delay);
+//   };
+// };
 
 form.addEventListener(
   "input",

@@ -32,6 +32,7 @@
     "nodemailer": "^6.9.14",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "razorpay": "^2.9.4",
     "sharp": "^0.33.4",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.12.4",
