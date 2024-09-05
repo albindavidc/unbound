@@ -81,6 +81,9 @@ const orderSchema = new Schema(
           enum: ["Paid", "Pending", "COD", "Failed", "Refund", "Cancelled"],
           // required: true,
         },
+        cancelReason: {
+          type: String,
+        },
         returnReason: {
           type: String,
         },

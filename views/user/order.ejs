@@ -35,6 +35,11 @@
   }
 </style>
 
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+<!-- Bootstrap 5 JS (necessary for modal functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 <section>
   <!-- Hero-Content -->
   <div class="pb-5 text-center">
@@ -57,7 +62,7 @@
         <div class="order-summary mb-4 p-4 border rounded bg-light shadow">
           <h4 class="mb-3">Order Details</h4>
           <p><strong>Order Number:</strong> <%= singleOrder._id %></p>
-          
+
           <p><strong>Order Date:</strong> <%= new Date(singleOrder.createdAt).toLocaleDateString() %></p>
           <p><strong>Total:</strong> ₹<%= singleOrder.totalPrice %></p>
         </div>
@@ -69,18 +74,19 @@
           <div class="order-item p-3 mb-3 border rounded shadow">
             <div class="row align-items-center">
               <div class="col-md-4">
-                <% let imagePath = ''; %>
-                <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %>
-                  <% imagePath = item.productId.primaryImages[0].name; %>
-                <% } %>
-                <img class="img-fluid rounded shadow-sm" src="/uploads/images/<%= imagePath %>" alt="<%= item.productId.name %>">
+                <% let imagePath = ''; %> <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %> <% imagePath =
+                item.productId.primaryImages[0].name; %> <% } %>
+                <img class="img-fluid rounded shadow-sm" src="/uploads/images/<%= imagePath %>" alt="<%= item.productId.name %>" />
               </div>
               <div class="col-md-8">
                 <p><strong>Name:</strong> <%= item.productId.name %></p>
                 <p><strong>Quantity:</strong> <%= item.quantity %></p>
                 <p><strong>Price:</strong> ₹<%= item.itemTotal %></p>
-                <p><strong>Status:</strong>
-                  <span class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>">
+                <p>
+                  <strong>Status:</strong>
+                  <span
+                    class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                  >
                     <%= item.status %>
                   </span>
                 </p>
@@ -98,9 +104,63 @@
                 <!-- Actions -->
                 <div class="order-actions mt-3 d-flex">
                   <% if (item.status === "Delivered") { %>
-                  <button class="btn btn-outline-primary return-btn mr-2" data-order-id="<%= item.orderID %>" onclick="confirmAction('<%- item.orderID %>', 'return')">Return Order</button>
+                  <button
+                    class="btn btn-outline-primary return-btn mr-2"
+                    data-order-id="<%= item.orderID %>"
+                    onclick="confirmAction('<%- item.orderID %>', 'return')"
+                  >
+                    Return Order
+                  </button>
+
                   <% } else if (item.status !== "Cancelled" && item.status !== "Return") { %>
-                  <button class="btn btn-outline-danger cancel-btn" data-order-id="<%= item.orderID %>" onclick="confirmAction('<%- item.orderID %>', 'cancel')">Cancel Order</button>
+                  <button class="btn btn-outline-danger cancel-btn" data-bs-toggle="modal" data-bs-target="#orderCancelModal-<%= item.orderID %>">
+                    Cancel Order
+                  </button>
+
+                  <!-- Modal (Unique for each product) -->
+                  <div
+                    class="modal fade"
+                    id="orderCancelModal-<%= item.orderID %>"
+                    tabindex="-1"
+                    aria-labelledby="orderActionModalLabel-<%= item.orderID %>"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="orderActionModalLabel-<%= item.orderID %>">
+                            Cancel Order for Item: <%= item.productId.name %>
+                          </h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form id="orderActionForm">
+                            <div class="mb-3">
+                              <label for="orderCancel-<%= item.orderID %>" class="form-label">Reason for Cancel</label>
+                              <textarea
+                                class="form-control"
+                                id="orderCancel-<%= item.orderID %>"
+                                rows="3"
+                                placeholder="Please describe the reason"
+                                required
+                              ></textarea>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-order-id="<%= item.orderID %>"
+                            onclick="confirmAction('<%= item.orderID %>', 'cancel')"
+                          >
+                            Cancel Order
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <% } %>
                 </div>
               </div>
@@ -112,7 +172,10 @@
         <!-- Shipping Information -->
         <div class="shipping-info mb-4 p-4 border rounded bg-light shadow">
           <h5>Shipping Information</h5>
-          <p><strong>Address:</strong> <%= singleOrder.shippingAddress.address %>, <%= singleOrder.shippingAddress.city %>, <%= singleOrder.shippingAddress.zip %></p>
+          <p>
+            <strong>Address:</strong> <%= singleOrder.shippingAddress.address %>, <%= singleOrder.shippingAddress.city %>, <%=
+            singleOrder.shippingAddress.zip %>
+          </p>
           <p><strong>Phone:</strong> <%= singleOrder.shippingAddress.phone %></p>
           <% if (singleOrder.trackingNumber) { %>
           <p><strong>Tracking Number:</strong> <%= singleOrder.trackingNumber %></p>
@@ -127,7 +190,6 @@
     </div>
   </div>
 </section>
-
 
 <script>
   const confirmAction = (orderId, action) => {
@@ -182,13 +244,14 @@
       Swal.fire("Error", "An error occurred while returning the order.", "error");
     }
   };
-
+  
   const cancelTheOrder = async (orderId) => {
+    const orderCancel = document.getElementById(`orderCancel-${orderId}`).value;
     try {
       const response = await fetch(`/order/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel" }),
+        body: JSON.stringify({ action: "cancel", cancelReason: orderCancel}),
       });
       const result = await response.json();
       if (result.success) {
@@ -200,6 +263,11 @@
       Swal.fire("Error", "An error occurred while cancelling the order.", "error");
     }
   };
+
+  //Close the modal after submissions
+
+  // const orderCancelModal = new bootstrap.Modal(document.getElementById("orderCancelModal"));
+  // orderCancelModal.hide();
 </script>
 
 <%- include('../partials/user/footer') %>

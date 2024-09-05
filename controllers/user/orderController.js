@@ -70,8 +70,6 @@ module.exports = {
         console.log("No orders found.");
       }
 
-
-
       // Example of accessing the first orderID
       console.log("This is the first item's orderID:", order[0].items[0].orderID);
 
@@ -84,7 +82,7 @@ module.exports = {
   },
   updateOrder: async (req, res) => {
     const { orderId } = req.params;
-    const { action } = req.body;
+    const { action, cancelReason } = req.body;
 
     console.log("Received orderId:", orderId, action); // Debugging the received orderId
 
@@ -98,7 +96,7 @@ module.exports = {
           {
             $set: {
               "items.$.status": "Return", // Use $ to update the matched element in the array
-              "items.$.paymentStatus":"Refund",
+              "items.$.paymentStatus": "Refund",
               status: "Return",
               paymentStatus: "Refund",
             },
@@ -113,7 +111,9 @@ module.exports = {
           {
             $set: {
               "items.$.status": "Cancelled", // Use $ to update the matched element in the array
-              "items.$.paymentStatus":"Refund",
+              "items.$.paymentStatus": "Refund",
+              "items.$.cancelReason": cancelReason,
+
               status: "Cancelled",
               paymentStatus: "Refund",
             },
