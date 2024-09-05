@@ -120,11 +120,9 @@
                   
                   <td>
                     <% order.items.forEach((item, itemIndex) => { %>
-                      <% if( item.status !== "Return" && item.status !== "Cancelled"){ %>
                       <div class="p-2">
                         <button type="button" class="btn btn-sm btn-dark update-button" data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>">Update</button>
                       </div>
-                      <% } %>
                     <% }) %>
                   </td>
                   

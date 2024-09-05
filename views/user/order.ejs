@@ -104,13 +104,54 @@
                 <!-- Actions -->
                 <div class="order-actions mt-3 d-flex">
                   <% if (item.status === "Delivered") { %>
-                  <button
-                    class="btn btn-outline-primary return-btn mr-2"
-                    data-order-id="<%= item.orderID %>"
-                    onclick="confirmAction('<%- item.orderID %>', 'return')"
-                  >
+                  <button class="btn btn-outline-primary return-btn mr-2" data-bs-toggle="modal" data-bs-target="#orderReturnModal-<%=item.orderID%>">
                     Return Order
                   </button>
+
+                  <!-- Return Modal -->
+                  <div
+                    class="modal fade"
+                    id="orderReturnModal-<%=item.orderID%>"
+                    tabindex="-1"
+                    aria-labelledby="orderReturnModalLabel-<%=item.orderID%>"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="orderReturnModalLabel-<%=item.orderID%>">Return Item: <%= item.productId.name %></h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form id="orderActionForm" class="return-form" data-order-id="<%= item.orderID %>">
+                            <div class="mb-3">
+                              <label for="orderReturn-<%=item.orderID%>" class="form-label">Reason for Return</label>
+                              <textarea
+                                class="form-control"
+                                id="orderReturn-<%=item.orderID%>"
+                                rows="3"
+                                placeholder="Please describe the reason"
+                                required
+                              ></textarea>
+                              <!-- Word count display -->
+                              <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-order-id="<%=item.orderID%>"
+                            onclick="confirmAction('<%=item.orderID%>', 'return')"
+                          >
+                            Return Product
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   <% } else if (item.status !== "Cancelled" && item.status !== "Return") { %>
                   <button class="btn btn-outline-danger cancel-btn" data-bs-toggle="modal" data-bs-target="#orderCancelModal-<%= item.orderID %>">
@@ -128,13 +169,11 @@
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="orderActionModalLabel-<%= item.orderID %>">
-                            Cancel Order for Item: <%= item.productId.name %>
-                          </h5>
+                          <h5 class="modal-title" id="orderActionModalLabel-<%= item.orderID %>">Cancel Item: <%= item.productId.name %></h5>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                          <form id="orderActionForm">
+                          <form id="orderActionForm" class="cancel-form" data-order-id="<%= item.orderID %>">
                             <div class="mb-3">
                               <label for="orderCancel-<%= item.orderID %>" class="form-label">Reason for Cancel</label>
                               <textarea
@@ -144,6 +183,8 @@
                                 placeholder="Please describe the reason"
                                 required
                               ></textarea>
+                              <!-- Word count display -->
+                              <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
                           </form>
                         </div>
@@ -155,7 +196,7 @@
                             data-order-id="<%= item.orderID %>"
                             onclick="confirmAction('<%= item.orderID %>', 'cancel')"
                           >
-                            Cancel Order
+                            Cancel Product
                           </button>
                         </div>
                       </div>
@@ -192,6 +233,67 @@
 </section>
 
 <script>
+  const MAX_WORDS = 1000;
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const cancelForms = document.querySelectorAll(".cancel-form");
+
+    cancelForms.forEach((form) => {
+      const orderId = form.dataset.orderId;
+      const textarea = document.getElementById(`orderCancel-${orderId}`);
+      const wordCountEl = document.getElementById(`wordCount-${orderId}`);
+
+      const updateWordCount = () => {
+        const words = textarea.value.trim().split(/\s+/);
+        const wordCount = words.filter((word) => word.length > 0).length;
+
+        // If word count exceeds the max limit, truncate the extra words
+        if (wordCount > MAX_WORDS) {
+          textarea.value = words.slice(0, MAX_WORDS).join(" ");
+        }
+
+        // Update the word count display
+        wordCountEl.textContent = `${Math.min(wordCount, MAX_WORDS)}/${MAX_WORDS} words`;
+      };
+
+      // Listen to textarea input and call updateWordCount
+      textarea.addEventListener("input", updateWordCount);
+
+      // Initial word count update
+      updateWordCount();
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const returnForms = document.querySelectorAll(".return-form");
+
+    returnForms.forEach((form) => {
+      const orderId = form.dataset.orderId;
+      const textarea = document.getElementById(`orderReturn-${orderId}`);
+      const wordCountEl = document.getElementById(`wordCount-${orderId}`);
+
+      const updateWordCount = () => {
+        const words = textarea.value.trim().split(/\s+/);
+        const wordCount = words.filter((word) => word.length > 0).length;
+
+        // If word count exceeds the max limit, truncate the extra words
+        if (wordCount > MAX_WORDS) {
+          textarea.value = words.slice(0, MAX_WORDS).join(" ");
+        }
+
+        // Update the word count display
+        wordCountEl.textContent = `${Math.min(wordCount, MAX_WORDS)}/${MAX_WORDS} words`;
+      };
+
+      // Listen to textarea input and call updateWordCount
+      textarea.addEventListener("input", updateWordCount);
+
+      // Initial word count update
+      updateWordCount();
+    });
+  });
+
+
   const confirmAction = (orderId, action) => {
     let actionText, confirmButtonText;
 
@@ -228,11 +330,17 @@
   };
 
   const returnTheOrder = async (orderId) => {
+    const orderReturn = document.getElementById(`orderReturn-${orderId}`).value;
     try {
+      let isReturnValid = checkReturnReason(orderId);
+      if (!isReturnValid) {
+        throw new Error("Form is not valid");
+      }
+
       const response = await fetch(`/order/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "return" }),
+        body: JSON.stringify({ action: "return", returnReason: orderReturn }),
       });
       const result = await response.json();
       if (result.success) {
@@ -244,14 +352,19 @@
       Swal.fire("Error", "An error occurred while returning the order.", "error");
     }
   };
-  
+
   const cancelTheOrder = async (orderId) => {
     const orderCancel = document.getElementById(`orderCancel-${orderId}`).value;
     try {
+      let isCancelValid = checkCancelReason(orderId); // Pass orderId here
+      if (!isCancelValid) {
+        throw new Error("Form is not valid");
+      }
+
       const response = await fetch(`/order/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel", cancelReason: orderCancel}),
+        body: JSON.stringify({ action: "cancel", cancelReason: orderCancel }),
       });
       const result = await response.json();
       if (result.success) {
@@ -264,10 +377,67 @@
     }
   };
 
-  //Close the modal after submissions
+  // const form = document.getElementById("orderActionForm");
 
-  // const orderCancelModal = new bootstrap.Modal(document.getElementById("orderCancelModal"));
-  // orderCancelModal.hide();
+  const isRequired = (value) => (value === "" ? false : true);
+
+  const checkCancelReason = (orderId) => {
+    const cancelReason = document.getElementById(`orderCancel-${orderId}`);
+    const cancelProduct = cancelReason.value.trim();
+    let isValid = false;
+
+    if (!isRequired(cancelProduct)) {
+      showError(cancelReason, "Reason cannot be blank.");
+    } else if (cancelProduct.split(" ").length < 5) {
+      showError(cancelReason, "Reason should be a minimum of 5 words.");
+    } else {
+      showSuccess(cancelReason);
+      isValid = true;
+    }
+    return isValid;
+  };
+
+  const checkReturnReason = (orderId) => {
+    const returnEl = document.getElementById(`orderReturn-${orderId}`);
+    const returnProduct = returnEl.value.trim();
+    let isValid = false;
+
+    if (!isRequired(returnProduct)) {
+      showError(returnEl, "Reason cannot be blank.");
+    } else if (returnProduct.split(" ").length < 5) {
+      showError(returnEl, "Reason should be a minimum of 5 words");
+    } else {
+      showSuccess(returnEl);
+      isValid = true;
+    }
+    return isValid;
+  };
+
+  const showError = (input, message) => {
+    const formField = input.parentElement;
+    formField.classList.remove("success", "is-valid");
+    formField.classList.add("error", "is-invalid");
+    input.classList.add("error", "is-invalid");
+
+    const error = formField.querySelector("small");
+    if (error) {
+      error.textContent = message;
+    }
+  };
+
+  const showSuccess = (input) => {
+    const formField = input.parentElement;
+    formField.classList.remove("error", "is-invalid");
+    input.classList.remove("error", "is-invalid");
+
+    formField.classList.add("success", "is-valid");
+    input.classList.add("success", "is-valid");
+
+    const error = formField.querySelector("small");
+    if (error) {
+      error.textContent = "";
+    }
+  };
 </script>
 
 <%- include('../partials/user/footer') %>

@@ -82,7 +82,7 @@ module.exports = {
   },
   updateOrder: async (req, res) => {
     const { orderId } = req.params;
-    const { action, cancelReason } = req.body;
+    const { action, cancelReason , returnReason} = req.body;
 
     console.log("Received orderId:", orderId, action); // Debugging the received orderId
 
@@ -97,6 +97,7 @@ module.exports = {
             $set: {
               "items.$.status": "Return", // Use $ to update the matched element in the array
               "items.$.paymentStatus": "Refund",
+              "items.$.returnReason": returnReason,
               status: "Return",
               paymentStatus: "Refund",
             },
