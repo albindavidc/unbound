@@ -358,6 +358,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error(`HTTP error! status: ${response.status}`);
               }
 
+              if(data.status){
+                showRazorPay(data.order, data.user);
+              }
+
               if (data.success) {
                 Swal.fire({
                   icon: "success",
@@ -383,6 +387,82 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+
+const showRazorpay = (order, user) =>{
+  console.log(order, user);
+
+  var options = {
+    key: "rzp_test_FGSvpGKo4JrSBW",
+    amount: order.amount,
+    currency: "INR",
+    name: "Unbound",
+    description: "Test Transaction",
+    order_id: order.id,
+    handler: async function(response){
+      console.log(response);
+      await verifyPayment(response)
+    },
+    prefill:{
+      name: user.username,
+      email: user.Error,
+      contact: user.phone,
+
+    },
+    notes: {
+      address: "Razorpay Corporate Office",
+
+    },
+    theme: {
+      color: "#2ade99",
+    },
+  }
+
+var rzp1 = new Razorpay(options);
+
+rzp1.open();
+rzp1.on("payment.failed", function(response){
+  swal.fire("Failed!", response.error.description,"error").then(() =>{
+    location.assign("/");
+  })
+})
+};
+
+
+const verifyPayment = async (response) =>{
+  const res = await fetch ("/checkout/verify-payment",{
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({response}),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+    if(data.success) {
+      location.assign("/user/order-success");
+    }
+  })
+  const data = await res.json();
+
+  console.log(data);
+  if(data.success){
+    location.assign("/user/order-success");
+  }
+}
+
+const debounce = (fn, delay = 50) => {
+  let timeoutId;
+  return (...args) => {
+    // cancel the previous timer
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    // setup a new timer
+    timeoutId = setTimeout(() => {
+      fn.apply(null, args);
+    }, delay);
+  };
+};
 
 form.addEventListener(
   "input",

@@ -43,12 +43,6 @@ module.exports = {
     // Filter out the rejected promises to identify which items are not valid
     const invalidCartItems = productExistenceResults.filter((result) => result.status === "rejected").map((result) => result.reason);
 
-    // if (invalidCartItems.length > 0) {
-    //   console.log(invalidCartItems);
-    //   req.flash("error", `The following items are not available: ${invalidCartItems.join(", ").replaceAll("Error:", "")}`);
-
-    //   return res.redirect("/cart");
-    // }
 
     // Correctly use map with async functions
     const stockAvailabilityPromises = userCart.items.map((item) => checkStockAvailability(item));
@@ -56,13 +50,6 @@ module.exports = {
 
     // Filter out the rejected promises to identify which items have insufficient stock
     const insufficientStockItems = stockAvailabilityResults.filter((result) => result.status === "rejected").map((result) => result.reason);
-
-    // if (insufficientStockItems.length > 0) {
-    //   console.log(insufficientStockItems);
-    //   req.flash("error", `Insufficient stock for the following items: ${insufficientStockItems.join(", ").replaceAll("Error: ", "")}`);
-
-    //   return res.redirect("/cart");
-    // }
 
     const address = await Address.find({
       customerId: userId,
@@ -100,7 +87,6 @@ module.exports = {
   placeOrder: async (req, res) => {
     try {
       const { paymentMethod, address } = req.body;
-      console.log("eeeeeeeeeeeeeeeee", req.body);
 
       const userId = req.session.user;
 
@@ -122,22 +108,21 @@ module.exports = {
         address: `${shippingAddress.name}, ${shippingAddress.houseName}(H),  ${shippingAddress.locality}, ${shippingAddress.town}, ${shippingAddress.state}, PIN: ${shippingAddress.zipcode}. PH: ${shippingAddress.phone}`,
       };
 
-      if (!req.body.address) {
-        return res.status(400).json({ status: false, message: "Please add the address" });
-      }
-
-      const user = await User.findById(userId);
       let userCart = await Cart.findOne({ userId: userId });
 
-      if (!userCart) {
-        return res.status(404).json({ error: "User's cart not found" });
-      }
+      // if (!userCart) {
+      //   return res.status(404).json({ error: "User's cart not found" });
+      // }
 
       const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
       const paymentStatus = paymentMethod == "COD" ? "Pending" : "Paid";
 
-      console.log("hhhhhhhhhhhhhhhhhhhh", userCart.items);
-      console.log("hjjjjjjjjjjjjjjjjjjjjjj", req.body.items);
+     
+      
+
+
+
+
 
       // for (const item of userCart.items) {
       //   // Find the product by ID
