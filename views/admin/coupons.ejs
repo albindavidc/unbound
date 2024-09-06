@@ -1,0 +1,222 @@
+<%- include('../partials/admin/header') %>
+<style>
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Coupons Management</h1>
+    </div>
+  </div>
+</section>
+
+<section class="content-main">
+  <div class="text-center d-flex justify-content-end">
+    <button class="btn btn-dark" id="new_coupon_button" style="margin-top: 20px">New Coupon</button>
+  </div>
+
+  <div id="add_coupon_form" style="display: none; margin-top: 20px">
+    <form action="/admin/addCoupon" method="post">
+      <div class="mb-4">
+        <label for="coupon_code" class="form-label">Code</label>
+        <input type="text" name="couponCode" placeholder="Enter your code here" class="form-control" id="coupon_code" required />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="coupon_description" class="form-label">Description</label>
+        <input type="text" name="couponDescription" id="coupon_description" class="form-control" placeholder="Enter a description" required />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="coupon_rate_of_discount" class="form-label">Rate of Discount</label>
+        <input
+          type="number"
+          name="couponRateOfDiscount"
+          id="coupon_rate_of_discount"
+          class="form-control"
+          placeholder="Enter the rate of discount"
+          required
+        />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="coupon_min_purchase_amount" class="form-label">Min. purcahse amount</label>
+        <input
+          type="number"
+          name="couponMinPurchaseAmount"
+          id="coupon_min_purchase_amount"
+          class="form-control"
+          placeholder="Minimum purhcase amount"
+          required
+        />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="coupon_max_discount" class="form-label">Max. discount amount</label>
+        <input
+          type="number"
+          name="couponMaxDiscount"
+          id="coupon_max_discount_amount"
+          class="form-control"
+          placeholder="Maximum purchase amount"
+          required
+        />
+      </div>
+
+      <div class="d-flex justify-content-center gap-5">
+        <button type="submit" class="btn btn-dark btn-max-width">Create Coupon</button>
+        <button type="button" id="close_button" class="btn btn-secondary btn-max-width" onclick="closeForm()">Close</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="margin: 50px 0">
+    <div class="card-body">
+      <div class="row">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Rate of Discount</th>
+                <th>Min. purchase amount</th>
+                <th>Max. discount</th>
+                <th></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(let i = 0; i < coup.length; i++) { %>
+              <tr>
+                <td><%= coup[i].code %></td>
+                <td><%= coup[i].description %></td>
+                <td><%= coup[i].rateOfDiscount %></td>
+                <td><%= coup[i].minPurchaseAmount %></td>
+                <td><%= coup[i].maximumDiscount %></td>
+                <td>
+                  <!-- Edit Button -->
+                  <button class="btn btn-info" data-id="<%= coup[i]._id %>" onclick="openEditForm('<%= coup[i]._id %>')">Edit</button>
+                </td>
+                <td>
+                  <!-- Delete Button -->
+                  <button class="btn btn-danger" data-id="<%= coup[i]._id %>" onclick="deleteCoupon('<%= coup[i]._id %>')">Delete</button>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  // Show Add Coupon Form
+  const showAddCouponForm = () => {
+    document.getElementById("add_coupon_form").style.display = "block";
+    document.getElementById("new_coupon_button").style.display = "none";
+  };
+
+  document.getElementById("new_coupon_button").addEventListener("click", showAddCouponForm);
+
+  // Close Add Coupon Form
+  const closeForm = () => {
+    document.getElementById("add_coupon_form").style.display = "none";
+    document.getElementById("new_coupon_button").style.display = "block";
+  };
+
+  document.getElementById("close_button").addEventListener("click", closeForm);
+
+  // Handle form submission
+  const handleAddCouponFormSubmit = (event) => {
+    event.preventDefault();
+
+    const couponCode = document.getElementById("coupon_code").value.trim();
+    const couponDescription = document.getElementById("coupon_description").value.trim();
+    const couponRateOfDiscount = parseFloat(document.getElementById("coupon_rate_of_discount").value);
+    const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
+    const couponMaxDiscount = parseFloat(document.getElementById("coupon_max_discount_amount").value);
+
+    // Validate form fields
+    if (!validateCouponForm(couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Input",
+        text: "Please make sure all fields are correctly filled.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    fetch("/admin/addCoupon", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        couponCode,
+        couponDescription,
+        couponRateOfDiscount,
+        couponMinPurchaseAmount,
+        couponMaxDiscount,
+      }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: data.message, // Success message from backend
+          timer: 3000,
+          showConfirmButton: false,
+        }).then(() => location.reload());
+      } else {
+        throw new Error(data.error || "An error occurred");
+      }
+    })
+    .catch((error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    });
+  };
+
+  const validateCouponForm = (couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount) => {
+    // Validate if all fields are provided and have valid values
+    return (
+      couponCode.length > 0 &&
+      couponDescription.length > 0 &&
+      couponRateOfDiscount > 0 &&
+      couponMinPurchaseAmount >= 0 &&
+      couponMaxDiscount >= 0
+    );
+  };
+
+  document.querySelector("form").addEventListener("submit", handleAddCouponFormSubmit);
+});
+
+</script>

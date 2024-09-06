@@ -8,6 +8,8 @@ const { userAuth, adminAuth } = require("../middlewares/auth");
 const { productUpload } = require("../middlewares/multer"); // Adjust path accordingly
 const attributeController = require("../controllers/admin/attributeController")
 const orderController = require("../controllers/admin/orderController");
+const couponController = require("../controllers/admin/couponController")
+
 
 // Error page
 router.get("/pageerror", adminController.pageerror);
@@ -129,7 +131,7 @@ router.post("/attributes/add-brand", attributeController.addBrand);
 
 
 /**
- * Order Managment
+ * Order Management
  */
 
 router
@@ -138,6 +140,13 @@ router
 
 router.put('/orderList/updateOrder/:orderId', orderController.updateDeliveryStatus);
 
+
+/**
+ * Coupon Management
+ */
+
+router.get("/couponList", couponController.getCouponList);
+router.post("/addCoupon", couponController.addCoupons);
 
 
 module.exports = router;
