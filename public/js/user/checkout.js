@@ -392,19 +392,18 @@ const showRazorpay = (order, user) => {
   console.log(order, user);
 
   var options = {
-    key: "rzp_test_FGSvpGKo4JrSBW", // Use your Razorpay key
+    key: "rzp_test_FGSvpGKo4JrSBW",
     amount: order.amount,
     currency: "INR",
     name: "Unbound",
     description: "Test Transaction",
-    orderId: order.id, // Order ID from backend
+    order_id: order.id, // Corrected 'orderId' to 'order_id' to match Razorpay's API
     handler: async function (response) {
-      console.log(response);
-      await verifyPayment(response); // Call the verification function
+      await verifyPayment(response); // Pass correct 'response'
     },
     prefill: {
       name: user.username,
-      email: user.email, // Fixed typo here (should be user.email, not user.Error)
+      email: user.email,
       contact: user.phone,
     },
     notes: {
@@ -414,6 +413,7 @@ const showRazorpay = (order, user) => {
       color: "#2ade99",
     },
   };
+  
 
   var rzp1 = new Razorpay(options);
 
@@ -427,21 +427,22 @@ const showRazorpay = (order, user) => {
 
 const verifyPayment = async (response) => {
   try {
-    const res = await fetch("/verify-payment", {
+    console.log("Verifying payment with response:", response);
+
+    const res = await fetch("/user/verify-payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ response }),
     });
 
-    const data = await res.json(); // Parse the JSON response once
-
-    console.log(data); // Log the response
+    const data = await res.json();
+    console.log("Verification result:", data);
 
     if (data.success) {
-      location.assign("/order-success"); // Redirect to success page
+      location.assign("/order-success");
     } else {
       swal.fire("Payment Verification Failed!", "Please try again.", "error").then(() => {
-        location.assign("/"); // Redirect to home if verification fails
+        location.assign("/");
       });
     }
   } catch (error) {
@@ -449,6 +450,7 @@ const verifyPayment = async (response) => {
     swal.fire("Error!", "Payment verification could not be completed.", "error");
   }
 };
+
 
 
 // const debounce = (fn, delay = 50) => {

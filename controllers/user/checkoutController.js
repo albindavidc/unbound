@@ -41,7 +41,7 @@ const createRazorpayOrder = async(order_id, total) =>{
   let options = {
     amount: total *100,
     currency: "INR",
-    receipt: order_id. toString(),
+    receipt: order_id.toString(),
   };
   const order = await instance.orders.create(options);
   return order;
@@ -284,61 +284,62 @@ module.exports = {
       res.status(500).json({ error: "An error occured while placing the order" });
     }
   },
-
   verifyPayment: async (req, res) => {
     try {
       const secret = process.env.RAZ_KEY_SECRET;
-
-      const {razorpay_order_id, razorpay_payment_id,razorpay_signature }= req.body.response;
-      
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body.response;
+  
       let hmac = crypto.createHmac("sha256", secret);
       hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
       hmac = hmac.digest("hex");
+  
       const isSignatureValid = hmac === razorpay_signature;
+  
+      if (!isSignatureValid) {
+        console.log("Signature mismatch", { razorpay_order_id, razorpay_payment_id, razorpay_signature, generated_hmac: hmac });
+        return res.status(400).json({ success: false, message: "Invalid signature" });
+      }
+  
+      // Proceed with stock update and order confirmation logic
+      let customerId = req.session.user;
+      let userCart = await Cart.findOne({ userId: customerId });
+      
+      // Reduce the stock of the Variant
+      for (const item of userCart.items) {
+        const product = await Product.findById(item.productId);
+        
+        const variant = product.variants.find(
+          (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
+        );
 
-      if(isSignatureValid) {
-        let customerId = req.session.user;
-        let userCart = await Cart.findOne({userId: customerId}).catch(
-          (error) =>{
-            console.error(error);
-            return res.status(500)
-            .json({error: "Failed to find user's cart"});
-          }
-        )
-
-        //Reduce the stock of the Variant
-        for(const item of userCart.items){
-          const product = await Product.findById(item.productId);
-
-          const variantIndex = product.variants.findIndex((variant) => variant._id.toString() === item.variant.toString());
-
-          if(variantIndex === -1){
-            return res.status(404).json({error: "variant not found"});
-          }
-
-          product.variants[variantIndex].stock -= item.quantity;
-          await product.save()
+        if (!variant) {
+          return res.status(404).json({ error: "Variant not found" });
+        }
+        if (variant.stock < item.quantity) {
+          return res.status(400).json({ error: "Insufficient stock" });
         }
 
+        variant.stock -= item.quantity;
+
+        await product.save();
       }
-      await Cart.clearCart(req.session.user)
+  
+      await Cart.clearCart(req.session.user);
+  
       let paymentId = razorpay_order_id;
-
-      const orderID = await Payment.findOne(
-        {paymentId: paymentId},
-        {_id:0, orderId:1}
-      );
-
-      const order_id = orderID.orderId
-
+      const orderID = await Payment.findOne({ paymentId }, { _id: 0, orderId: 1 });
+  
+      const order_id = orderID.orderId;
       const updateOrder = await Order.updateOne(
-        {_id: order_id},
-        {$set: {"items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid"}}
-      )
-
-      
+        { _id: order_id },
+        { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } }
+      );
+  
+      return res.json({ success: true, message: "Payment verified successfully" });
     } catch (error) {
-      
+      console.error("Error in payment verification:", error);
+      return res.status(500).json({ success: false, message: "Payment verification failed" });
     }
-  },
+  }
+  
 };

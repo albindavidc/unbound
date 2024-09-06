@@ -116,7 +116,7 @@ router
 .delete(userController.deleteAddress);
 
 router.post("/place-order", checkoutController.placeOrder);
-router.post("/verify-payment", checkoutController.verifyPayment);
+router.post("/user/verify-payment", checkoutController.verifyPayment);
 router.get("/order-success", cartController.getOrderSuccess);
 
 
