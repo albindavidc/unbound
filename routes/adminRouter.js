@@ -147,6 +147,7 @@ router.put('/orderList/updateOrder/:orderId', orderController.updateDeliveryStat
 
 router.get("/couponList", couponController.getCouponList);
 router.post("/addCoupon", couponController.addCoupons);
+router.put("/editCoupon", couponController.editCoupon);
 router.delete("/deleteCoupon", couponController.deleteCoupon);
 
 

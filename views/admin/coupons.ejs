@@ -32,7 +32,7 @@
 
   <!-- Add coupon form -->
   <div id="add_coupon_form" style="display: none; margin-top: 20px">
-    <form action="/admin/addCoupon" method="post">
+    <form action="/admin/addCoupon" id="add_form" method="post">
       <div class="mb-4">
         <label for="coupon_code" class="form-label">Code</label>
         <input type="text" placeholder="Enter your code here" class="form-control" id="coupon_code" required />
@@ -69,7 +69,7 @@
   <% coup.forEach(item => { %>
 
   <div id="edit_coupon_form" style="display: none; margin-top: 20px">
-    <form action="/admin/editCoupon" method="post">
+    <form action="/admin/editCoupon" id="edit_form" method="post">
       <div class="mb-4">
         <label for="edit_coupon_code" class="form-label">Code</label>
         <input type="text" id="edit_coupon_code" value="<%= item.code %>" placeholder="Enter your code here" class="form-control" required />
@@ -104,7 +104,7 @@
         <input
           type="number"
           value="<%= item.minPurchaseAmount %>"
-          id="coupon_min_purchase_amount"
+          id="edit_coupon_min_purchase_amount"
           class="form-control"
           placeholder="Minimum purchase amount"
           required
@@ -112,11 +112,11 @@
         <small></small>
       </div>
       <div class="mb-4">
-        <label for="edit_coupon_max_discount" class="form-label">Max. discount amount</label>
+        <label for="edit_coupon_max_discount_amount" class="form-label">Max. discount amount</label>
         <input
           type="number"
           value="<%= item.maximumDiscount %>"
-          id="edit_coupon_max_discount"
+          id="edit_coupon_max_discount_amount"
           class="form-control"
           placeholder="Maximum purchase amount"
           required
@@ -303,16 +303,78 @@
       );
     };
 
-    document.querySelector("form").addEventListener("submit", handleAddCouponFormSubmit);
+    document.getElementById("add_form").addEventListener("submit", handleAddCouponFormSubmit);
+  });
 
-    // Edit Coupon Form and Validation
+  //----------------------------------//
+  // Edit Coupon Form and Validation //
+  //---------------------------------//
 
+  document.addEventListener("DOMContentLoaded", () => {
+    // Show the edit form
     const showEditCouponForm = () => {
       document.getElementById("edit_coupon_form").style.display = "block";
       document.getElementById("add_coupon_form").style.display = "none";
       document.getElementById("new_coupon_button").style.display = "none";
     };
 
+    // Bind the showEditCouponForm to the edit button
     document.getElementById("edit_coupon_button").addEventListener("click", showEditCouponForm);
+
+    // Handle form submission
+    const handleEditCouponFormSubmit = (event) => {
+      event.preventDefault();
+
+      // Get form values
+      const couponCode = document.getElementById("edit_coupon_code")?.value.trim();
+      const couponDescription = document.getElementById("edit_coupon_description")?.value.trim();
+      const couponRateOfDiscount = parseFloat(document.getElementById("edit_coupon_rate_of_discount")?.value);
+      const couponMinPurchaseAmount = parseFloat(document.getElementById("edit_coupon_min_purchase_amount")?.value);
+      const couponMaxDiscount = parseFloat(document.getElementById("edit_coupon_max_discount_amount")?.value);
+
+      console.log("this is coupons: ", couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount)
+     
+
+      // Proceed with the form submission
+      fetch("/admin/editCoupon", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          couponCode,
+          couponDescription,
+          couponRateOfDiscount,
+          couponMinPurchaseAmount,
+          couponMaxDiscount,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: data.message,
+              timer: 3000,
+              showConfirmButton: false,
+            }).then(() => location.reload());
+          } else {
+            throw new Error(data.error || "An error occurred");
+          }
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+            timer: 3000,
+            showConfirmButton: false,
+          });
+        });
+    };
+
+    // Bind the form submit event
+    document.getElementById("edit_form").addEventListener("submit", handleEditCouponFormSubmit);
   });
 </script>
