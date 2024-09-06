@@ -30,52 +30,32 @@
     <button class="btn btn-dark" id="new_coupon_button" style="margin-top: 20px">New Coupon</button>
   </div>
 
+  <!-- Add coupon form -->
   <div id="add_coupon_form" style="display: none; margin-top: 20px">
     <form action="/admin/addCoupon" method="post">
       <div class="mb-4">
         <label for="coupon_code" class="form-label">Code</label>
-        <input type="text" name="couponCode" placeholder="Enter your code here" class="form-control" id="coupon_code" required />
+        <input type="text" placeholder="Enter your code here" class="form-control" id="coupon_code" required />
         <small></small>
       </div>
       <div class="mb-4">
         <label for="coupon_description" class="form-label">Description</label>
-        <input type="text" name="couponDescription" id="coupon_description" class="form-control" placeholder="Enter a description" required />
+        <input type="text" id="coupon_description" class="form-control" placeholder="Enter a description" required />
         <small></small>
       </div>
       <div class="mb-4">
         <label for="coupon_rate_of_discount" class="form-label">Rate of Discount</label>
-        <input
-          type="number"
-          name="couponRateOfDiscount"
-          id="coupon_rate_of_discount"
-          class="form-control"
-          placeholder="Enter the rate of discount"
-          required
-        />
+        <input type="number" id="coupon_rate_of_discount" class="form-control" placeholder="Enter the rate of discount" required />
         <small></small>
       </div>
       <div class="mb-4">
         <label for="coupon_min_purchase_amount" class="form-label">Min. purcahse amount</label>
-        <input
-          type="number"
-          name="couponMinPurchaseAmount"
-          id="coupon_min_purchase_amount"
-          class="form-control"
-          placeholder="Minimum purhcase amount"
-          required
-        />
+        <input type="number" id="coupon_min_purchase_amount" class="form-control" placeholder="Minimum purhcase amount" required />
         <small></small>
       </div>
       <div class="mb-4">
         <label for="coupon_max_discount" class="form-label">Max. discount amount</label>
-        <input
-          type="number"
-          name="couponMaxDiscount"
-          id="coupon_max_discount_amount"
-          class="form-control"
-          placeholder="Maximum purchase amount"
-          required
-        />
+        <input type="number" id="coupon_max_discount_amount" class="form-control" placeholder="Maximum purchase amount" required />
       </div>
 
       <div class="d-flex justify-content-center gap-5">
@@ -84,6 +64,73 @@
       </div>
     </form>
   </div>
+
+  <!-- Edit coupon form -->
+  <% coup.forEach(item => { %>
+
+  <div id="edit_coupon_form" style="display: none; margin-top: 20px">
+    <form action="/admin/editCoupon" method="post">
+      <div class="mb-4">
+        <label for="edit_coupon_code" class="form-label">Code</label>
+        <input type="text" id="edit_coupon_code" value="<%= item.code %>" placeholder="Enter your code here" class="form-control" required />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="edit_coupon_description" class="form-label">Description</label>
+        <input
+          type="text"
+          value="<%= item.description %>"
+          id="edit_coupon_description"
+          placeholder="Enter your description here"
+          class="form-control"
+          required
+        />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="edit_coupon_rate_of_discount" class="form-label">Rate of Discount</label>
+        <input
+          type="number"
+          value="<%= item.rateOfDiscount %>"
+          id="edit_coupon_rate_of_discount"
+          class="form-control"
+          placeholder="Enter the rate of discount"
+          required
+        />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <lable for="edit_coupon_min_purchase_amount" class="form-label">Min. purchase amount</lable>
+        <input
+          type="number"
+          value="<%= item.minPurchaseAmount %>"
+          id="coupon_min_purchase_amount"
+          class="form-control"
+          placeholder="Minimum purchase amount"
+          required
+        />
+        <small></small>
+      </div>
+      <div class="mb-4">
+        <label for="edit_coupon_max_discount" class="form-label">Max. discount amount</label>
+        <input
+          type="number"
+          value="<%= item.maximumDiscount %>"
+          id="edit_coupon_max_discount"
+          class="form-control"
+          placeholder="Maximum purchase amount"
+          required
+        />
+      </div>
+
+      <div class="d-flex justify-content-center gap-5">
+        <button type="submit" class="btn btn-dark">Edit Coupon</button>
+        <button type="button" id="close_button" class="btn btn-secondary btn-max-width" onclick="closeForm()">Close</button>
+      </div>
+    </form>
+  </div>
+
+  <% }) %>
 
   <div class="card" style="margin: 50px 0">
     <div class="card-body">
@@ -111,7 +158,7 @@
                 <td><%= coup[i].maximumDiscount %></td>
                 <td>
                   <!-- Edit Button -->
-                  <button class="btn btn-info" data-id="<%= coup[i]._id %>" onclick="openEditForm('<%= coup[i]._id %>')">Edit</button>
+                  <button class="btn btn-dark" id="edit_coupon_button">Edit</button>
                 </td>
                 <td>
                   <!-- Delete Button -->
@@ -128,11 +175,18 @@
 </section>
 
 <script>
+  const deleteCoupon = async (couponCode) => {
+    const result = await Swal.fire({
+      icon: "warning",
+      title: "Are you sure ?",
+      text: "You won't be able to revert this process",
+      confirmButtonText: "Yes, delete it!",
+      confirmButtonColor: "#3085d6",
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+    });
 
-const deleteCoupon = async (couponCode) => {
-
-      console.log("Coupon ID:", couponCode); // Debugging purpose
-
+    if (result.isConfirmed) {
       const response = await fetch("/admin/deleteCoupon", {
         method: "DELETE",
         headers: {
@@ -158,26 +212,29 @@ const deleteCoupon = async (couponCode) => {
           showConfirmButton: false,
         });
       }
-    };
+    }
+  };
+
+  // Close Add Coupon Form
+  const closeForm = () => {
+    document.getElementById("add_coupon_form").style.display = "none";
+    document.getElementById("edit_coupon_form").style.display = "none";
+    document.getElementById("new_coupon_button").style.display = "block";
+  };
+
+  document.getElementById("close_button").addEventListener("click", closeForm);
 
   document.addEventListener("DOMContentLoaded", () => {
-    
+    // Add coupon Form and Validation
 
     // Show Add Coupon Form
     const showAddCouponForm = () => {
       document.getElementById("add_coupon_form").style.display = "block";
+      document.getElementById("edit_coupon_form").style.display = "none";
       document.getElementById("new_coupon_button").style.display = "none";
     };
 
     document.getElementById("new_coupon_button").addEventListener("click", showAddCouponForm);
-
-    // Close Add Coupon Form
-    const closeForm = () => {
-      document.getElementById("add_coupon_form").style.display = "none";
-      document.getElementById("new_coupon_button").style.display = "block";
-    };
-
-    document.getElementById("close_button").addEventListener("click", closeForm);
 
     // Handle form submission
     const handleAddCouponFormSubmit = (event) => {
@@ -247,5 +304,15 @@ const deleteCoupon = async (couponCode) => {
     };
 
     document.querySelector("form").addEventListener("submit", handleAddCouponFormSubmit);
+
+    // Edit Coupon Form and Validation
+
+    const showEditCouponForm = () => {
+      document.getElementById("edit_coupon_form").style.display = "block";
+      document.getElementById("add_coupon_form").style.display = "none";
+      document.getElementById("new_coupon_button").style.display = "none";
+    };
+
+    document.getElementById("edit_coupon_button").addEventListener("click", showEditCouponForm);
   });
 </script>
