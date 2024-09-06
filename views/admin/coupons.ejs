@@ -115,7 +115,7 @@
                 </td>
                 <td>
                   <!-- Delete Button -->
-                  <button class="btn btn-danger" data-id="<%= coup[i]._id %>" onclick="deleteCoupon('<%= coup[i]._id %>')">Delete</button>
+                  <button class="btn btn-danger" onclick="deleteCoupon('<%= coup[i].code %>')">Delete</button>
                 </td>
               </tr>
               <% } %>
@@ -128,95 +128,124 @@
 </section>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-  // Show Add Coupon Form
-  const showAddCouponForm = () => {
-    document.getElementById("add_coupon_form").style.display = "block";
-    document.getElementById("new_coupon_button").style.display = "none";
-  };
 
-  document.getElementById("new_coupon_button").addEventListener("click", showAddCouponForm);
+const deleteCoupon = async (couponCode) => {
 
-  // Close Add Coupon Form
-  const closeForm = () => {
-    document.getElementById("add_coupon_form").style.display = "none";
-    document.getElementById("new_coupon_button").style.display = "block";
-  };
+      console.log("Coupon ID:", couponCode); // Debugging purpose
 
-  document.getElementById("close_button").addEventListener("click", closeForm);
-
-  // Handle form submission
-  const handleAddCouponFormSubmit = (event) => {
-    event.preventDefault();
-
-    const couponCode = document.getElementById("coupon_code").value.trim();
-    const couponDescription = document.getElementById("coupon_description").value.trim();
-    const couponRateOfDiscount = parseFloat(document.getElementById("coupon_rate_of_discount").value);
-    const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
-    const couponMaxDiscount = parseFloat(document.getElementById("coupon_max_discount_amount").value);
-
-    // Validate form fields
-    if (!validateCouponForm(couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount)) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Input",
-        text: "Please make sure all fields are correctly filled.",
-        timer: 3000,
-        showConfirmButton: false,
+      const response = await fetch("/admin/deleteCoupon", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ couponCode }),
       });
-      return;
-    }
-
-    fetch("/admin/addCoupon", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        couponCode,
-        couponDescription,
-        couponRateOfDiscount,
-        couponMinPurchaseAmount,
-        couponMaxDiscount,
-      }),
-    })
-    .then((response) => response.json())
-    .then((data) => {
+      const data = await response.json();
       if (data.success) {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: data.message, // Success message from backend
-          timer: 3000,
+          text: "Coupon Deleted Successfully",
+          timer: 2000,
           showConfirmButton: false,
         }).then(() => location.reload());
       } else {
-        throw new Error(data.error || "An error occurred");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Coupon is not deleted",
+          timer: 5000,
+          showConfirmButton: false,
+        });
       }
-    })
-    .catch((error) => {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message,
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    });
-  };
+    };
 
-  const validateCouponForm = (couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount) => {
-    // Validate if all fields are provided and have valid values
-    return (
-      couponCode.length > 0 &&
-      couponDescription.length > 0 &&
-      couponRateOfDiscount > 0 &&
-      couponMinPurchaseAmount >= 0 &&
-      couponMaxDiscount >= 0
-    );
-  };
+  document.addEventListener("DOMContentLoaded", () => {
+    
 
-  document.querySelector("form").addEventListener("submit", handleAddCouponFormSubmit);
-});
+    // Show Add Coupon Form
+    const showAddCouponForm = () => {
+      document.getElementById("add_coupon_form").style.display = "block";
+      document.getElementById("new_coupon_button").style.display = "none";
+    };
 
+    document.getElementById("new_coupon_button").addEventListener("click", showAddCouponForm);
+
+    // Close Add Coupon Form
+    const closeForm = () => {
+      document.getElementById("add_coupon_form").style.display = "none";
+      document.getElementById("new_coupon_button").style.display = "block";
+    };
+
+    document.getElementById("close_button").addEventListener("click", closeForm);
+
+    // Handle form submission
+    const handleAddCouponFormSubmit = (event) => {
+      event.preventDefault();
+
+      const couponCode = document.getElementById("coupon_code").value.trim();
+      const couponDescription = document.getElementById("coupon_description").value.trim();
+      const couponRateOfDiscount = parseFloat(document.getElementById("coupon_rate_of_discount").value);
+      const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
+      const couponMaxDiscount = parseFloat(document.getElementById("coupon_max_discount_amount").value);
+
+      // Validate form fields
+      if (!validateCouponForm(couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount)) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Input",
+          text: "Please make sure all fields are correctly filled.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+        return;
+      }
+
+      fetch("/admin/addCoupon", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          couponCode,
+          couponDescription,
+          couponRateOfDiscount,
+          couponMinPurchaseAmount,
+          couponMaxDiscount,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: data.message, // Success message from backend
+              timer: 3000,
+              showConfirmButton: false,
+            }).then(() => location.reload());
+          } else {
+            throw new Error(data.error || "An error occurred");
+          }
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+            timer: 3000,
+            showConfirmButton: false,
+          });
+        });
+    };
+
+    const validateCouponForm = (couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount) => {
+      // Validate if all fields are provided and have valid values
+      return (
+        couponCode.length > 0 && couponDescription.length > 0 && couponRateOfDiscount > 0 && couponMinPurchaseAmount >= 0 && couponMaxDiscount >= 0
+      );
+    };
+
+    document.querySelector("form").addEventListener("submit", handleAddCouponFormSubmit);
+  });
 </script>

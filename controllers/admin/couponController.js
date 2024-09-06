@@ -36,5 +36,23 @@ module.exports ={
             console.error(error);
             return res.status(500).json({error: "Internal server error"});
         }
+    },
+
+    deleteCoupon: async(req, res) => {
+        try {
+            const {couponId} = req.body;
+            console.log("this is coupon id",couponId);
+    
+            const deleteCouponFromDB = await Coupon.deleteOne({couponId});
+            if(deleteCouponFromDB.deletedCount >0 ){
+                return res.json({success:true, message: "Coupon deleted successfully"});
+            }else{
+                return res.json({success: false, message: "Coupon deletion incomplete"})
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({error: "Internal server error"})
+        }
     }
+    
 }
