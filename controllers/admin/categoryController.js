@@ -47,7 +47,9 @@ const categoryInfo = async (req, res) => {
 };
 
 const addCategory = async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description,offer } = req.body;
+
+  console.log(req.body)
   try {
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
@@ -57,9 +59,11 @@ const addCategory = async (req, res) => {
     const newCategory = new Category({
       name,
       description,
+      categoryOffer: offer,
     });
     await newCategory.save();
     return res.json({ message: "Category added successfully" });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -79,8 +83,9 @@ const getCategoryDetails = async (req, res) => {
 };
 
 const editCategory = async (req, res) => {
-  const { id, name, description } = req.body;
+  const { id, name, description,offer } = req.body;
 
+  console.log("this is edit category",req.body)
   try {
     const category = await Category.findById(id);
     if (!category) {
@@ -89,9 +94,12 @@ const editCategory = async (req, res) => {
 
     category.name = name;
     category.description = description;
+    category.categoryOffer = offer;
     await category.save();
 
-    res.json({ message: "Category update successfully" });
+
+    res.redirect("/admin/category")
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
