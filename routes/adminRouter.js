@@ -147,8 +147,13 @@ router.put('/orderList/updateOrder/:orderId', orderController.updateDeliveryStat
 
 router.get("/couponList", couponController.getCouponList);
 router.post("/addCoupon", couponController.addCoupons);
-router.put("/editCoupon", couponController.editCoupon);
+// Route to fetch a single coupon for editing
+router.get('/getCoupon/:id', couponController.getCouponById);
+// Route to update a specific coupon
+router.put('/updateCoupon/:id', couponController.updateCoupon);
 router.delete("/deleteCoupon", couponController.deleteCoupon);
+
+
 
 
 module.exports = router;

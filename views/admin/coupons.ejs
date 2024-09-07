@@ -16,6 +16,11 @@
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 
 <section>
   <div class="pb-5 text-center">
@@ -66,72 +71,77 @@
     </form>
   </div>
 
-  <!-- Edit coupon form -->
-  <% coup.forEach(item => { %>
+  <!-- Edit Coupon Modal -->
+  <div id="edit_coupon_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Coupon</h5>
+          
+          <button type="button" class="btn-close" id="close_button" onclick="closeForm()">
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="edit_coupon_form">
+            <input type="hidden" id="coupon_id" name="couponId" />
 
-  <div id="edit_coupon_form" style="display: none; margin-top: 20px">
-    <form action="/admin/editCoupon" id="edit_form" method="post">
-      <div class="mb-4">
-        <label for="edit_coupon_code" class="form-label">Code</label>
-        <input type="text" id="edit_coupon_code" value="<%= item.code %>" placeholder="Enter your code here" class="form-control" required />
-        <small></small>
-      </div>
-      <div class="mb-4">
-        <label for="edit_coupon_description" class="form-label">Description</label>
-        <input
-          type="text"
-          value="<%= item.description %>"
-          id="edit_coupon_description"
-          placeholder="Enter your description here"
-          class="form-control"
-          required
-        />
-        <small></small>
-      </div>
-      <div class="mb-4">
-        <label for="edit_coupon_rate_of_discount" class="form-label">Rate of Discount</label>
-        <input
-          type="number"
-          value="<%= item.rateOfDiscount %>"
-          id="edit_coupon_rate_of_discount"
-          class="form-control"
-          placeholder="Enter the rate of discount"
-          required
-        />
-        <small></small>
-      </div>
-      <div class="mb-4">
-        <lable for="edit_coupon_min_purchase_amount" class="form-label">Min. purchase amount</lable>
-        <input
-          type="number"
-          value="<%= item.minPurchaseAmount %>"
-          id="edit_coupon_min_purchase_amount"
-          class="form-control"
-          placeholder="Minimum purchase amount"
-          required
-        />
-        <small></small>
-      </div>
-      <div class="mb-4">
-        <label for="edit_coupon_max_discount_amount" class="form-label">Max. discount amount</label>
-        <input
-          type="number"
-          value="<%= item.maximumDiscount %>"
-          id="edit_coupon_max_discount_amount"
-          class="form-control"
-          placeholder="Maximum purchase amount"
-          required
-        />
-      </div>
+            <div class="form-group">
+              <label for="edit_coupon_code">Coupon Code</label>
+              <input type="text" class="form-control" id="edit_coupon_code" name="couponCode" placeholder="Enter Coupon Code" />
+              <small></small>
+            </div>
 
-      <div class="d-flex justify-content-center gap-5">
-        <button type="submit" class="btn btn-dark">Edit Coupon</button>
-        <button type="button" id="close_button" class="btn btn-secondary btn-max-width" onclick="closeForm()">Close</button>
+            <div class="form-group">
+              <label for="edit_coupon_description">Coupon Description</label>
+              <textarea class="form-control" id="edit_coupon_description" name="couponDescription" placeholder="Enter Coupon Description"></textarea>
+              <small></small>
+            </div>
+
+            <div class="form-group">
+              <label for="edit_coupon_rate_of_discount">Rate of Discount (%)</label>
+              <input
+                type="number"
+                class="form-control"
+                id="edit_coupon_rate_of_discount"
+                name="couponRateOfDiscount"
+                placeholder="Enter Discount Rate"
+              />
+              <small></small>
+            </div>
+
+            <div class="form-group">
+              <label for="edit_coupon_min_purchase_amount">Minimum Purchase Amount</label>
+              <input
+                type="number"
+                class="form-control"
+                id="edit_coupon_min_purchase_amount"
+                name="couponMinPurchaseAmount"
+                placeholder="Enter Minimum Purchase"
+              />
+              <small></small>
+            </div>
+
+            <div class="form-group">
+              <label for="edit_coupon_max_discount_amount">Maximum Discount Amount</label>
+              <input
+                type="number"
+                class="form-control"
+                id="edit_coupon_max_discount_amount"
+                name="couponMaxDiscount"
+                placeholder="Enter Maximum Discount"
+              />
+              <small></small>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"  id="close_button" onclick="closeForm()">Close</button>
+              <button type="submit" class="btn btn-primary">Update Coupon</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
+    </div>
   </div>
-
-  <% }) %>
 
   <div class="card" style="margin: 50px 0">
     <div class="card-body">
@@ -159,7 +169,7 @@
                 <td><%= coup[i].maximumDiscount %></td>
                 <td>
                   <!-- Edit Button -->
-                  <button class="btn btn-dark" id="edit_coupon_button">Edit</button>
+                  <button class="btn btn-dark edit_coupon_button" data-coupon-id="<%= coup[i]._id %>">Edit</button>
                 </td>
                 <td>
                   <!-- Delete Button -->
@@ -221,6 +231,8 @@
     document.getElementById("add_coupon_form").style.display = "none";
     document.getElementById("edit_coupon_form").style.display = "none";
     document.getElementById("new_coupon_button").style.display = "block";
+    document.getElementById("edit_coupon_modal").style.display ="none";
+    location.reload();
   };
 
   document.getElementById("close_button").addEventListener("click", closeForm);
@@ -238,17 +250,18 @@
     const handleAddCouponFormSubmit = async (event) => {
       event.preventDefault();
 
+      // Validate form before submitting
+      const isFormValid = await formValid();
+      if (!isFormValid) {
+        console.error("Form validation failed.");
+        return;
+      }
+
       const couponCode = document.getElementById("coupon_code").value.trim();
       const couponDescription = document.getElementById("coupon_description").value.trim();
       const couponRateOfDiscount = parseFloat(document.getElementById("coupon_rate_of_discount").value);
       const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
       const couponMaxDiscount = parseFloat(document.getElementById("coupon_max_discount_amount").value);
-
-      // Validate form
-      if (!formValid()) {
-        console.error("The form is not valid");
-        return;
-      }
 
       // Perform fetch request if form is valid
       fetch("/admin/addCoupon", {
@@ -455,231 +468,359 @@
   // Edit Coupon Form and Validation //
   //---------------------------------//
 
-  document.addEventListener("DOMContentLoaded", () => {
-    // Show the edit form
-    const showEditCouponForm = () => {
-      document.getElementById("edit_coupon_form").style.display = "block";
-      document.getElementById("add_coupon_form").style.display = "none";
-      document.getElementById("new_coupon_button").style.display = "none";
-    };
+  // Open Edit Coupon Modal and Populate Data
+  document.querySelectorAll(".edit_coupon_button").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      const couponId = event.target.dataset.couponId; // Assuming edit button has a data attribute with coupon ID
 
-    // Bind the showEditCouponForm to the edit button
-    document.getElementById("edit_coupon_button").addEventListener("click", showEditCouponForm);
-
-    // Handle form submission
-    const handleEditCouponFormSubmit = (event) => {
-      event.preventDefault();
-
-      // Get form values
-      const couponCode = document.getElementById("edit_coupon_code")?.value.trim();
-      const couponDescription = document.getElementById("edit_coupon_description")?.value.trim();
-      const couponRateOfDiscount = parseFloat(document.getElementById("edit_coupon_rate_of_discount")?.value);
-      const couponMinPurchaseAmount = parseFloat(document.getElementById("edit_coupon_min_purchase_amount")?.value);
-      const couponMaxDiscount = parseFloat(document.getElementById("edit_coupon_max_discount_amount")?.value);
-
-      // Validate form
-      if (!formValid()) {
-        console.error("The form is not valid");
-        return;
-      }
-      // Proceed with the form submission
-      fetch("/admin/editCoupon", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          couponCode,
-          couponDescription,
-          couponRateOfDiscount,
-          couponMinPurchaseAmount,
-          couponMaxDiscount,
-        }),
-      })
+      console.log("this is couponId", couponId);
+      fetch(`/admin/getCoupon/${couponId}`)
         .then((response) => response.json())
         .then((data) => {
-          if (data.success) {
-            Swal.fire({
-              icon: "success",
-              title: "Success",
-              text: data.message,
-              timer: 3000,
-              showConfirmButton: false,
-            }).then(() => location.reload());
-          } else {
-            throw new Error(data.error || "An error occurred");
-          }
+          // Populate the form fields with coupon data
+          document.getElementById("coupon_id").value = data._id;
+          document.getElementById("edit_coupon_code").value = data.code;
+          document.getElementById("edit_coupon_description").value = data.description;
+          document.getElementById("edit_coupon_rate_of_discount").value = data.rateOfDiscount;
+          document.getElementById("edit_coupon_min_purchase_amount").value = data.minPurchaseAmount;
+          document.getElementById("edit_coupon_max_discount_amount").value = data.maximumDiscount;
+
+          // Show the modal
+          $("#edit_coupon_modal").modal("show");
         })
         .catch((error) => {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: error.message ,
-            timer: 3000,
-            showConfirmButton: false,
-          });
+          console.error("Error fetching coupon data:", error);
+          Swal.fire("Error", "Failed to load coupon data", "error");
         });
-    };
+    });
+  });
 
-    const formValid = () => {
-      const addForm = document.querySelector("#edit_form");
+  // Function to validate Coupon Code (No spaces, at least 5 characters)
+  const checkCode = () => {
+    const codeEl = document.getElementById("edit_coupon_code");
+    const code = codeEl.value.trim();
 
-      const checkCode = () => {
-        const codeEl = document.querySelector("#edit_coupon_code");
-        let valid = false;
-        const code = codeEl.value.trim();
+    const regex = /^\S{5,}$/; // No spaces, minimum 5 characters
 
-        if (!isRequired(code)) {
-          showError(codeEl, "Code cannot be blank");
-        } else if (code.length < 5) {
-          showError(codeEl, "The code must have at least 5 characters");
-        } else if (/\s/.test(code)) {
-          showError(codeEl, "Code cannot contain white spaces.");
-        } else {
-          showSuccess(codeEl);
-          valid = true;
-        }
-        return valid;
-      };
+    if (!code) {
+      showError(codeEl, "Coupon Code cannot be blank.");
+      return false;
+    } else if (!regex.test(code)) {
+      showError(codeEl, "Coupon Code must be at least 5 characters long with no spaces.");
+      return false;
+    } else {
+      showSuccess(codeEl);
+      return true;
+    }
+  };
 
-      const checkDescription = () => {
-        const descriptionEl = document.querySelector("#edit_coupon_description");
-        let valid = false;
-        const description = descriptionEl.value.trim();
+  // Function to validate Coupon Description
+  const checkDescription = () => {
+    const descEl = document.getElementById("edit_coupon_description");
+    const description = descEl.value.trim();
 
-        if (!isRequired(description)) {
-          showError(descriptionEl, "Description cannot be blank");
-        } else if (description.length < 5) {
-          showError(descriptionEl, "The description must have at least 5 words");
-        } else {
-          showSuccess(descriptionEl);
-          valid = true;
-        }
-        return valid;
-      };
+    if (!description) {
+      showError(descEl, "Coupon Description cannot be blank.");
+      return false;
+    } else {
+      showSuccess(descEl);
+      return true;
+    }
+  };
 
-      const checkRateOfDiscount = () => {
-        const rateOfDiscountEl = document.querySelector("#edit_coupon_rate_of_discount");
-        let valid = false;
-        const rateOfDiscount = rateOfDiscountEl.value.trim();
+  // Function to validate Rate of Discount (must be between 0 and 100)
+  const checkRateOfDiscount = () => {
+    const rateEl = document.getElementById("edit_coupon_rate_of_discount");
+    const rate = parseFloat(rateEl.value);
 
-        if (!isRequired(rateOfDiscount)) {
-          showError(rateOfDiscountEl, "Rate of Discount cannot  be blank");
-        } else if (rateOfDiscount <= 0) {
-          showError(rateOfDiscountEl, "Rate of Discount cannot be Zero");
-        } else {
-          showSuccess(rateOfDiscountEl);
-          valid = true;
-        }
-        return valid;
-      };
+    if (isNaN(rate) || rate <= 0 || rate > 100) {
+      showError(rateEl, "Rate of Discount must be a valid percentage (between 0 and 100).");
+      return false;
+    } else {
+      showSuccess(rateEl);
+      return true;
+    }
+  };
 
-      const checkMinPurchaseAmount = () => {
-        const minPurchaseAmountEl = document.querySelector("#edit_coupon_min_purchase_amount");
-        let valid = false;
-        const minPurchaseAmount = minPurchaseAmountEl.value.trim();
+  // Function to validate Minimum Purchase Amount (must be a positive number)
+  const checkMinPurchaseAmount = () => {
+    const minPurchaseEl = document.getElementById("edit_coupon_min_purchase_amount");
+    const minPurchase = parseFloat(minPurchaseEl.value);
 
-        if (!isRequired(minPurchaseAmount)) {
-          showError(minPurchaseAmountEl, "Min.purchase amount cannot be blank");
-        } else if (minPurchaseAmount <= 0) {
-          showError(minPurchaseAmountEl, "Min purchae amount cannot be zero");
-        } else {
-          showSuccess(minPurchaseAmountEl);
-          valid = true;
-        }
-        return valid;
-      };
+    if (isNaN(minPurchase) || minPurchase <= 0) {
+      showError(minPurchaseEl, "Minimum Purchase Amount must be a positive number.");
+      return false;
+    } else {
+      showSuccess(minPurchaseEl);
+      return true;
+    }
+  };
 
-      const checkMaxDiscountAmount = () => {
-        const maxDiscountAmountEl = document.querySelector("#edit_coupon_max_discount_amount");
-        let valid = false;
-        const maxDiscountAmount = maxDiscountAmountEl.value.trim();
+  // Function to validate Maximum Discount Amount (must be a positive number)
+  const checkMaxDiscountAmount = () => {
+    const maxDiscountEl = document.getElementById("edit_coupon_max_discount_amount");
+    const maxDiscount = parseFloat(maxDiscountEl.value);
 
-        if (!isRequired(maxDiscountAmount)) {
-          showError(maxDiscountAmountEl, "Max. discount amount cannot be blank");
-        } else if (maxDiscountAmount <= 0) {
-          showError(maxDiscountAmountEl, "Max. discount ammount cannot be zero");
-        } else {
-          showSuccess(maxDiscountAmountEl);
-          valid = true;
-        }
-        return valid;
-      };
+    if (isNaN(maxDiscount) || maxDiscount <= 0) {
+      showError(maxDiscountEl, "Maximum Discount Amount must be a positive number.");
+      return false;
+    } else {
+      showSuccess(maxDiscountEl);
+      return true;
+    }
+  };
 
-      const isRequired = (value) => (value === "" ? false : true);
+  const showError = (input, message) => {
+    const formField = input.parentElement;
+    formField.classList.remove("success", "is-valid");
+    input.classList.remove("success", "is-valid");
+    formField.classList.add("error", "is-invalid");
+    input.classList.add("error", "is-invalid");
+    const error = formField.querySelector("small");
+    if (error) {
+      error.textContent = message;
+    }
+  };
 
-      const showError = (input, message) => {
-        const formField = input.parentElement;
-        formField.classList.remove("success", "is-valid");
-        input.classList.remove("success", "is-valid");
-        formField.classList.add("error", "is-invalid");
-        input.classList.add("error", "is-invalid");
-        const error = formField.querySelector("small");
-        error.textContent = message;
-      };
+  const showSuccess = (input) => {
+    const formField = input.parentElement;
+    formField.classList.remove("error", "is-invalid");
+    input.classList.remove("error", "is-invalid");
+    formField.classList.add("success", "is-valid");
+    input.classList.add("success", "is-valid");
+    const error = formField.querySelector("small");
+    if (error) {
+      error.textContent = "";
+    }
+  };
 
-      const showSuccess = (input) => {
-        const formField = input.parentElement;
-        formField.classList.remove("error", "is-invalid");
-        input.classList.remove("error", "is-invalid");
-        formField.classList.add("success", "is-valid");
-        input.classList.add("success", "is-valid");
-        const error = formField.querySelector("small");
-        if (error) {
-          error.textContent = "";
-        }
-      };
-
-      // Validate the form fields and return boolean result
-      let isCodeValid = checkCode(),
-        isDescriptionValid = checkDescription();
-      isRateOfDiscountValid = checkRateOfDiscount();
-      isMinPurchaseAmountValid = checkMinPurchaseAmount();
+  // Form validation functions
+  const formValid = async () => {
+    let isCodeValid = checkCode(),
+      isDescriptionValid = checkDescription(),
+      isRateOfDiscountValid = checkRateOfDiscount(),
+      isMinPurchaseAmountValid = checkMinPurchaseAmount(),
       isMaxDiscountAmountValid = checkMaxDiscountAmount();
 
-      let isFormValid = isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid;
+    // Form is valid only if all fields are valid
+    return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid;
+  };
 
-      return isFormValid;
-    };
+  // Handle Edit Coupon Form Submission
+  document.getElementById("edit_coupon_form").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-    // Attach event listener to form submission
-    const addForm = document.querySelector("#edit_form");
-    addForm.addEventListener("submit", handleEditCouponFormSubmit);
+    const isFormValid = await formValid();
+    if (!isFormValid) {
+      Swal.fire("Error", "Validation is not complete", "error");
+      console.error("Form validation failed.");
+      return;
+    }
 
-    // Debouncing for real-time validation
-    const debounce = (fn, delay = 500) => {
-      let timeoutId;
-      return (...args) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        timeoutId = setTimeout(() => {
-          fn.apply(null, args);
-        }, delay);
-      };
-    };
+    const couponId = document.getElementById("coupon_id").value;
+    const couponCode = document.getElementById("edit_coupon_code").value.trim();
+    const couponDescription = document.getElementById("edit_coupon_description").value.trim();
+    const couponRateOfDiscount = parseFloat(document.getElementById("edit_coupon_rate_of_discount").value);
+    const couponMinPurchaseAmount = parseFloat(document.getElementById("edit_coupon_min_purchase_amount").value);
+    const couponMaxDiscount = parseFloat(document.getElementById("edit_coupon_max_discount_amount").value);
 
-    addForm.addEventListener(
-      "input",
-      debounce(function (e) {
-        switch (e.target.id) {
-          case "edit_coupon_code":
-            formValid();
-            break;
-          case "edit_coupon_description":
-            formValid();
-            break;
-          case "edit_coupon_rate_of_discount":
-            formValid();
-            break;
-          case "edit_coupon_min_purchase_amount":
-            formValid();
-            break;
-          case "edit_coupon_max_discount_amount":
-            formValid();
-            break;
+    fetch(`/admin/updateCoupon/${couponId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        couponCode,
+        couponDescription,
+        couponRateOfDiscount,
+        couponMinPurchaseAmount,
+        couponMaxDiscount,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Coupon updated successfully!",
+            timer: 3000,
+            showConfirmButton: false,
+          }).then(() => {
+            location.reload(); // Reload page to see updated coupon list
+          });
+        } else {
+          throw new Error(data.message || "Failed to update coupon");
         }
       })
-    );
-     });
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.message,
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      });
+  });
+
+  // // Form validation functions
+  // const formValid = async () => {
+  //   let isCodeValid = checkCode(),
+  //     isDescriptionValid = checkDescription(),
+  //     isRateOfDiscountValid = checkRateOfDiscount(),
+  //     isMinPurchaseAmountValid = checkMinPurchaseAmount(),
+  //     isMaxDiscountAmountValid = checkMaxDiscountAmount();
+
+  //   // Form is valid only if all fields are valid
+  //   return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid;
+  // };
+
+  // // Specific field validation functions
+  // const checkCode = () => {
+  //   const codeEl = document.querySelector("#edit_coupon_code");
+  //   let valid = false;
+  //   const code = codeEl.value.trim();
+
+  //   if (!isRequired(code)) {
+  //     showError(codeEl, "Code cannot be blank");
+  //   } else if (code.length < 5) {
+  //     showError(codeEl, "The code must have at least 5 characters");
+  //   } else if (/\s/.test(code)) {
+  //     showError(codeEl, "Code cannot contain white spaces.");
+  //   } else {
+  //     showSuccess(codeEl);
+  //     valid = true;
+  //   }
+  //   return valid;
+  // };
+
+  // const checkDescription = () => {
+  //   const descriptionEl = document.querySelector("#edit_coupon_description");
+  //   let valid = false;
+  //   const description = descriptionEl.value.trim();
+
+  //   if (!isRequired(description)) {
+  //     showError(descriptionEl, "Description cannot be blank");
+  //   } else if (description.length < 5) {
+  //     showError(descriptionEl, "The description must have at least 5 words");
+  //   } else {
+  //     showSuccess(descriptionEl);
+  //     valid = true;
+  //   }
+  //   return valid;
+  // };
+
+  // const checkRateOfDiscount = () => {
+  //   const rateOfDiscountEl = document.querySelector("#edit_coupon_rate_of_discount");
+  //   let valid = false;
+  //   const rateOfDiscount = parseFloat(rateOfDiscountEl.value.trim());
+
+  //   if (!isRequired(rateOfDiscount)) {
+  //     showError(rateOfDiscountEl, "Rate of Discount cannot  be blank");
+  //   } else if (rateOfDiscount <= 0) {
+  //     showError(rateOfDiscountEl, "Rate of Discount cannot be Zero");
+  //   } else {
+  //     showSuccess(rateOfDiscountEl);
+  //     valid = true;
+  //   }
+  //   return valid;
+  // };
+
+  // const checkMinPurchaseAmount = () => {
+  //   const minPurchaseAmountEl = document.querySelector("#edit_coupon_min_purchase_amount");
+  //   let valid = false;
+  //   const minPurchaseAmount = parseFloat(minPurchaseAmountEl.value.trim());
+
+  //   if (!isRequired(minPurchaseAmount)) {
+  //     showError(minPurchaseAmountEl, "Min. purchase amount cannot be blank");
+  //   } else if (minPurchaseAmount <= 0) {
+  //     showError(minPurchaseAmountEl, "Min purchase amount cannot be zero");
+  //   } else {
+  //     showSuccess(minPurchaseAmountEl);
+  //     valid = true;
+  //   }
+  //   return valid;
+  // };
+
+  // const checkMaxDiscountAmount = () => {
+  //   const maxDiscountAmountEl = document.querySelector("#edit_coupon_max_discount_amount");
+  //   let valid = false;
+  //   const maxDiscountAmount = parseFloat(maxDiscountAmountEl.value.trim());
+
+  //   if (!isRequired(maxDiscountAmount)) {
+  //     showError(maxDiscountAmountEl, "Max. discount amount cannot be blank");
+  //   } else if (maxDiscountAmount <= 0) {
+  //     showError(maxDiscountAmountEl, "Max. discount amount cannot be zero");
+  //   } else {
+  //     showSuccess(maxDiscountAmountEl);
+  //     valid = true;
+  //   }
+  //   return valid;
+  // };
+
+  // // Utility functions
+  // const isRequired = (value) => value !== "";
+
+  // const showError = (input, message) => {
+  //   const formField = input.parentElement;
+  //   formField.classList.remove("success", "is-valid");
+  //   input.classList.remove("success", "is-valid");
+  //   formField.classList.add("error", "is-invalid");
+  //   input.classList.add("error", "is-invalid");
+  //   const error = formField.querySelector("small");
+  //   if (error) {
+  //     error.textContent = message;
+  //   }
+  // };
+
+  // const showSuccess = (input) => {
+  //   const formField = input.parentElement;
+  //   formField.classList.remove("error", "is-invalid");
+  //   input.classList.remove("error", "is-invalid");
+  //   formField.classList.add("success", "is-valid");
+  //   input.classList.add("success", "is-valid");
+  //   const error = formField.querySelector("small");
+  //   if (error) {
+  //     error.textContent = "";
+  //   }
+  // };
+
+  // // Debouncing for real-time validation
+  // const debounce = (fn, delay = 500) => {
+  //   let timeoutId;
+  //   return (...args) => {
+  //     if (timeoutId) {
+  //       clearTimeout(timeoutId);
+  //     }
+  //     timeoutId = setTimeout(() => {
+  //       fn.apply(null, args);
+  //     }, delay);
+  //   };
+  // };
+
+  // // Attach real-time validation to input fields
+  // const editForm = document.querySelector("#edit_form");
+  // editForm.addEventListener(
+  //   "input",
+  //   debounce(function (e) {
+  //     switch (e.target.id) {
+  //       case "edit_coupon_code":
+  //         checkCode();
+  //         break;
+  //       case "edit_coupon_description":
+  //         checkDescription();
+  //         break;
+  //       case "edit_coupon_rate_of_discount":
+  //         checkRateOfDiscount();
+  //         break;
+  //       case "edit_coupon_min_purchase_amount":
+  //         checkMinPurchaseAmount();
+  //         break;
+  //       case "edit_coupon_max_discount_amount":
+  //         checkMaxDiscountAmount();
+  //         break;
+  //     }
+  //   })
+  // );
 </script>
