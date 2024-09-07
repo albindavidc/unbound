@@ -50,6 +50,10 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    wishlist:{
+      type:Boolean,
+      default:false,
+    },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",

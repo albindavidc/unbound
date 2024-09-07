@@ -245,12 +245,43 @@
                       />
                     </a>
                     <ul class="product__hover">
-                      <li>
-                        <!-- <a href="" data-product-id=">" id="wishlist_add"> -->
-                        <a href="javascript:void(0);" onclick="addWishlist(event,'<%= product._id %>')">
-                          <img src="../../public/img/icon/heart.png" alt="" />
-                        </a>
-                      </li>
+
+                      <% if (product.wishlist === true) { %>
+                        <li>
+                          <div style="background-color: rgb(255, 255, 255);">
+  
+                            <a
+                              href="javascript:void(0);"
+                              onclick="addWishlist(event, '<%= product._id %>',this)"
+                              id="wishlist_add"
+                              aria-label="Add to Wishlist"
+                            >
+                            <img src="../../public/img/red_heart.svg" id="wishlist_img_notfilled" alt="" />
+
+                            </a>
+                          </div>
+                        </li>
+                      <% }else{ %>
+                        <li>
+                          <div style="background-color: rgb(255, 255, 255);">
+  
+                            <a
+                              href="javascript:void(0);"
+                              onclick="addWishlist(event, '<%= product._id %>',this)"
+                              id="wishlist_add"
+                              aria-label="Add to Wishlist"
+                            >
+                            <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
+
+                            </a>
+                          </div>
+                        </li>
+
+                        <% } %>
+
+                     
+
+
                       <li>
                         <a href="#">
                           <img src="../../public/img/icon/compare.png" alt="" />
@@ -312,18 +343,14 @@
   <!-- Shop Section End -->
 
   <script>
-    // const wishlistAdd = document.getElementById("wishlist_add");
-
-    // async function addProductToWishlist(event) {
-    //   const id = document.getAttribute("data-product-id");
-    // }
-
-    // wishlistAdd.addEventListener("submit", addProductToWishlist);
-
-    async function addWishlist(event, productId) {
+    async function addWishlist(event, productId, element) {
       event.preventDefault();
 
       console.log("this is productId", productId);
+
+      const imgEl = element.querySelector("#wishlist_img_notfilled");
+      imgEl.src ="../../public/img/red_heart.svg"
+
 
       try {
         const response = await fetch(`/wishlist/${productId}`, {
@@ -353,8 +380,7 @@
             location.reload();
           });
         } else {
-          Swal.fire("Error", result.message || "Failed to add product to wishlist", "error")
-          .then(() => {
+          Swal.fire("Error", result.message || "Failed to add product to wishlist", "error").then(() => {
             location.reload();
           });
         }

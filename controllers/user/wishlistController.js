@@ -27,6 +27,8 @@ module.exports = {
         return res.status(404).json({ message: "Product already exists in the wishlist" });
       }
 
+      await Product.updateOne({ _id: productId }, { $set: { wishlist: true } }, { upsert: true });
+
       console.log("this is backend", userId, productId);
       const newWishlist = new Wishlist({
         userId: userId,
