@@ -7,6 +7,7 @@ const productController = require("../controllers/user/productController");
 const cartController = require('../controllers/user/cartController');
 const checkoutController = require("../controllers/user/checkoutController");
 const orderController = require("../controllers/user/orderController");
+const wishlistController = require("../controllers/user/wishlistController");
 
 
 //Home page - Page not found
@@ -60,7 +61,7 @@ router.get("/user/product-list",userAuth,checkUserStatus, productController.load
 // User-Profile
 router
 .route("/profile")
-.all(userAuth, checkUserStatus)  // Ensure authentication and user status check for both GET and POST
+.all(userAuth, checkUserStatus) 
 .get(userController.getUserProfile)
 .post(userController.editProfile);
 
@@ -69,16 +70,18 @@ router.post('/reset-password', userController.resetPassword);
 
 router
   .route("/orders")
-  
   .get(orderController.getOrders);
-
-  router
+router
   .route("/order/:orderId")
   .all(userAuth, checkUserStatus)
   .get(orderController.getOrder)
   .put(orderController.updateOrder);
 
-
+router
+  .route("/wishlist")
+  .get(wishlistController.getWishlist)
+  
+router.post("/wishlist/:productId", wishlistController.addWishlist);
 
 //User-Address
 router.get("/address", userController.getAddress);

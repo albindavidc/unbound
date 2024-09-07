@@ -1,0 +1,16 @@
+<%- include('../partials/user/header') %>
+
+<section>
+    <% product.forEach(item => { %>
+    <div class="row">
+        <div class="card">
+            <img class="img-fluid rounded shadow-sm"  src="/uploads/images/<%= item.productId.primaryImages[0].name %>" alt="<%= item.productId.name %>">
+            <div class="container">
+                <p><strong>Name:</strong> <%= item.productId.name %></p>
+            </div>
+        </div>
+    </div>
+    <% }) %>
+</section>
+
+<%- include('../partials/user/footer') %>

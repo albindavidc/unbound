@@ -157,17 +157,21 @@
                   <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                     <div class="card-body">
                       <div class="shop__sidebar__color">
- 
                         <% colors.forEach(color => { %>
-                        <label class="color-filter" data-color="<%= color._id %>" style="background-color: <%= color.hex %>" for="color_<%= color._id %>">
+                        <label
+                          class="color-filter"
+                          data-color="<%= color._id %>"
+                          style="background-color: <%= color.hex %>"
+                          for="color_<%= color._id %>"
+                        >
                           <input
-                          class="color-filter" data-color="<%= color._id %>"
+                            class="color-filter"
+                            data-color="<%= color._id %>"
                             type="radio"
                             id="color_<%= color._id %>"
                             name="color"
                             value="<%= color._id %>"
                           />
-                          
                         </label>
                         <% }); %>
                       </div>
@@ -242,7 +246,8 @@
                     </a>
                     <ul class="product__hover">
                       <li>
-                        <a href="#">
+                        <!-- <a href="" data-product-id=">" id="wishlist_add"> -->
+                        <a href="javascript:void(0);" onclick="addWishlist(event,'<%= product._id %>')">
                           <img src="../../public/img/icon/heart.png" alt="" />
                         </a>
                       </li>
@@ -260,12 +265,10 @@
                     </ul>
                   </div>
                   <div class="product__item__text">
-
-                    
                     <h6><%= product.name %></h6>
                     <% product.variants.forEach(variant => { %>
-                      <p>Total Number of stock:  <%=variant.stock  %></p>
-                      <% }) %>
+                    <p>Total Number of stock: <%=variant.stock %></p>
+                    <% }) %>
                     <div class="rating">
                       <i class="fa fa-star"></i>
                       <i class="fa fa-star"></i>
@@ -309,6 +312,58 @@
   <!-- Shop Section End -->
 
   <script>
+    // const wishlistAdd = document.getElementById("wishlist_add");
+
+    // async function addProductToWishlist(event) {
+    //   const id = document.getAttribute("data-product-id");
+    // }
+
+    // wishlistAdd.addEventListener("submit", addProductToWishlist);
+
+    async function addWishlist(event, productId) {
+      event.preventDefault();
+
+      console.log("this is productId", productId);
+
+      try {
+        const response = await fetch(`/wishlist/${productId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // You can include productId in the body if needed
+          body: JSON.stringify({ productId }),
+        });
+
+        // Check if the response is OK (status 200-299)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Ensure the response is JSON
+        const result = await response.json();
+        if (result.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "You have successfully added this product to wishlist",
+            timer: 3000, // 3-second timer
+            showConfirmButton: false, // Optionally hide the confirm button
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire("Error", result.message || "Failed to add product to wishlist", "error")
+          .then(() => {
+            location.reload();
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire("Error", "An error occurred while adding the product to the wishlist", "error");
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       // Combine event listeners for category, brand, and price filters
       document.querySelectorAll(".category-filter, .brand-filter, .price-filter, .size-filter,.color-filter").forEach(function (element) {
@@ -410,24 +465,23 @@
 
   //
   <script>
-      function myFunction() {
-        var input, filter, ul, li, h6, i, txtValue;
-        input = document.getElementById("myInput");
-        filter = input.value.toUpperCase();
-        ul = document.getElementById("myUL");
-        li = ul.getElementsByClassName("product-item");
+    function myFunction() {
+      var input, filter, ul, li, h6, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("myUL");
+      li = ul.getElementsByClassName("product-item");
 
-        for (i = 0; i < li.length; i++) {
-          h6 = li[i].getElementsByTagName("h6")[0];
-          txtValue = h6.textContent || h6.innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
-          } else {
-            li[i].style.display = "none";
-          }
+      for (i = 0; i < li.length; i++) {
+        h6 = li[i].getElementsByTagName("h6")[0];
+        txtValue = h6.textContent || h6.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
         }
       }
-    
+    }
   </script>
 
   <script>
