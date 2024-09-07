@@ -252,11 +252,11 @@
   
                             <a
                               href="javascript:void(0);"
-                              onclick="addWishlist(event, '<%= product._id %>',this)"
-                              id="wishlist_add"
+                              onclick="deleteWishlist(event, '<%= product._id %>',this)"
+                              id="wishlist_delete"
                               aria-label="Add to Wishlist"
                             >
-                            <img src="../../public/img/red_heart.svg" id="wishlist_img_notfilled" alt="" />
+                            <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
 
                             </a>
                           </div>
@@ -346,12 +346,6 @@
     async function addWishlist(event, productId, element) {
       event.preventDefault();
 
-      console.log("this is productId", productId);
-
-      const imgEl = element.querySelector("#wishlist_img_notfilled");
-      imgEl.src ="../../public/img/red_heart.svg"
-
-
       try {
         const response = await fetch(`/wishlist/${productId}`, {
           method: "POST",
@@ -389,6 +383,48 @@
         Swal.fire("Error", "An error occurred while adding the product to the wishlist", "error");
       }
     }
+
+    async function deleteWishlist(event, productId, element) {
+      event.preventDefault();
+
+      try {
+        const response = await fetch(`/wishlist/${productId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // You can include productId in the body if needed
+          body: JSON.stringify({ productId }),
+        });
+
+        // Check if the response is OK (status 200-299)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Ensure the response is JSON
+        const result = await response.json();
+        if (result.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "You have successfully removed this product from the wishlist",
+            timer: 3000, // 3-second timer
+            showConfirmButton: false, // Optionally hide the confirm button
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire("Error", result.message || "Failed to remove product from the wishlist", "error").then(() => {
+            location.reload();
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire("Error", "An error occurred while removing the product from the wishlist", "error");
+      }
+    }
+
 
     document.addEventListener("DOMContentLoaded", function () {
       // Combine event listeners for category, brand, and price filters

@@ -80,7 +80,8 @@ router
 router
   .route("/wishlist")
   .get(wishlistController.getWishlist)
-  
+
+router.delete("/wishlist/:productId", wishlistController.deleteWishlist)
 router.post("/wishlist/:productId", wishlistController.addWishlist);
 
 //User-Address
