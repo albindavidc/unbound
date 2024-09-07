@@ -41,88 +41,69 @@
 </section>
 <section>
   <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-10">
-        <div class="card p-4">
-          <h4 class="mb-4">Order Summary</h4>
+    <div class="row">
+      <%- include('../partials/user/sidebar.ejs') %>
+      <section class="col-lg-8">
+        <div class="row justify-content-center">
+          <div class="col-10">
+            <div class="card p-4  mb-5">
+              <h4 class="mb-4">Order Summary</h4>
 
-          <% order.forEach(order => { %>
-            <a href="/order/<%= order._id %>" class="order-link">
-            <div class="mb-4">
-              <h5 class="order-id mb-3">Order ID: <%= order._id %></h5>
-              <div class="row">
-
-
-                <% order.items.forEach((item, index) => { %>
-                  <div class="col-md-6">
-                    <div class="order-item p-3 mb-3 border rounded">
-                      <div class="row">
-                        <div class="col-md-4">
-                          <% let imagePath = ''; %>
-                          <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %>
-                            <% imagePath = item.productId.primaryImages[0].name; %>
-                          <% } %>
-                          <img
-                            id="main-product-image"
-                            class="img-fluid h-100"
-                            src="/uploads/images/<%= imagePath %>"
-                            alt="<%= item.productId.name %>"
-                          />
-                        </div>
-                        <div class="col-md-8">
-                          <p><%= item.productId.name %>(<%= item.quantity %>)</p>
-                          <p></p>
-                          <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
-                          <p>
-                            <strong>Price:</strong> ₹<%= item.itemTotal %>
-                            <span
-                              class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
-                            >
-                              <%= item.status %>
-                            </span>
-                          </p>
-                          <% if (item.status === 'Delivered') { %>
+              <% order.forEach(order => { %>
+              <a href="/order/<%= order._id %>" class="order-link">
+                <div class="mb-4">
+                  <h5 class="order-id mb-3">Order ID: <%= order._id %></h5>
+                  <div class="row">
+                    <% order.items.forEach((item, index) => { %>
+                    <div class="col-md-6 ">
+                      <div class="order-item p-3 mb-3 border rounded">
+                        <div class="row ">
+                          <div class="col-md-12">
+                            <% let imagePath = ''; %> <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %> <%
+                            imagePath = item.productId.primaryImages[0].name; %> <% } %>
+                            <img
+                              id="main-product-image"
+                              class="img-fluid w-100"
+                              src="/uploads/images/<%= imagePath %>"
+                              alt="<%= item.productId.name %>"
+                            />
+                          </div>
+                          <div class="col-md-10">
+                            <p><%= item.productId.name %> (<%= item.quantity %>)</p>
+                            <p></p>
+                            <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
+                            <p>
+                              <strong>Price:</strong> ₹<%= item.itemTotal %>
+                              <span
+                                class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                              >
+                                <%= item.status %>
+                              </span>
+                            </p>
+                            <% if (item.status === 'Delivered') { %>
                             <p><strong>Delivery Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
                             <% const returnByDate = new Date(order.createdAt); returnByDate.setDate(returnByDate.getDate() + 7); %>
                             <p><strong>Return By:</strong> <%= returnByDate.toLocaleDateString() %></p>
-                          <% }else{ %>
-
-                            <p><strong>Delivery Date: --</strong></p>
-                            <p><strong>Return By: --</strong></p>
+                            <% } else { %>
+                            <p><strong>Delivery Date:</strong> --</p>
+                            <p><strong>Return By:</strong> --</p>
                             <% } %>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    <% }) %>
                   </div>
-
-                <% }) %>
-              </div>
-              <hr />
+                  <hr />
+                </div>
+              </a>
+              <% }) %>
             </div>
-          <% }) %>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </section>
-
-
-//
-<script>
-  //   document.querySelectorAll(".return-btn").forEach((button) => {
-  //     button.addEventListener("click", function () {
-  //       const orderId = this.dataset.orderId;
-  //       // Add logic to handle return request here
-  //     });
-  //   });
-
-  //   document.querySelectorAll(".cancel-btn").forEach((button) => {
-  //     button.addEventListener("click", function () {
-  //       const orderId = this.dataset.orderId;
-  //       // Add logic to handle cancellation here
-  //     });
-  //   });
-  //
-</script>
 
 <%- include('../partials/user/footer') %>
