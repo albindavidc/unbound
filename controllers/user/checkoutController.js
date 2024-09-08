@@ -4,7 +4,7 @@ const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const Payment = require("../../models/paymentSchema");
-const Coupons = require("../../models/couponSchema")
+const Coupons = require("../../models/couponSchema");
 
 const mongoose = require("mongoose");
 
@@ -16,9 +16,7 @@ const Coupon = require("../../models/couponSchema");
 var instance = new Razorpay({
   key_id: process.env.RAZ_KEY_ID,
   key_secret: process.env.RAZ_KEY_SECRET,
-})
-
-
+});
 
 // Function to check if a product exists and is active
 const checkProductExistence = async (cartItem) => {
@@ -39,15 +37,15 @@ const checkStockAvailability = async (cartItem) => {
   return product;
 };
 
-const createRazorpayOrder = async(order_id, total) =>{
+const createRazorpayOrder = async (order_id, total) => {
   let options = {
-    amount: total *100,
+    amount: total * 100,
     currency: "INR",
     receipt: order_id.toString(),
   };
   const order = await instance.orders.create(options);
   return order;
-}
+};
 
 module.exports = {
   getCheckout: async (req, res) => {
@@ -63,7 +61,6 @@ module.exports = {
 
     // Filter out the rejected promises to identify which items are not valid
     const invalidCartItems = productExistenceResults.filter((result) => result.status === "rejected").map((result) => result.reason);
-
 
     // Correctly use map with async functions
     const stockAvailabilityPromises = userCart.items.map((item) => checkStockAvailability(item));
@@ -92,14 +89,12 @@ module.exports = {
     let couponDiscount = 0;
     if (userCart.coupon) {
       const coupon = await Coupon.findById(userCart.coupon);
-      if (
-        coupon &&
-        coupon.isActive &&
-        new Date() <= coupon.expiringDate &&
-        totalPrice >= coupon.minPurchaseAmount
-      ) {
+      if (coupon && coupon.isActive && new Date() <= coupon.expiringDate && totalPrice >= coupon.minPurchaseAmount) {
         couponDiscount = totalPrice * (coupon.rateOfDiscount / 100);
         totalPrice -= couponDiscount;
+
+        await Cart.findOneAndUpdate({_id: userCart._id}, {$set: {totalPrice:totalPrice, couponDiscount: couponDiscount}})
+
       } else {
         // If the total is less than the minimum purchase amount, remove the coupon
         userCart.coupon = undefined;
@@ -108,11 +103,9 @@ module.exports = {
       }
     }
 
-    
     // Correctly calculate cartCount
     let cartCount = userCart.items.length;
 
-    
     const coupons = await Coupon.find({
       isActive: true,
       minPurchaseAmount: { $lte: totalPriceBeforeOffer },
@@ -121,11 +114,9 @@ module.exports = {
     });
     // console.log(coupons);
 
-
-
     let isCOD = true;
 
-    if(totalPrice > 1000){
+    if (totalPrice > 1000) {
       isCOD = false;
     }
 
@@ -177,18 +168,37 @@ module.exports = {
       const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
       const paymentStatus = paymentMethod == "COD" ? "Pending" : "Paid";
 
-     
+      let order;
 
-      let order = new Order({
-        customerId: userId,
-        items: userCart.items,
-        totalPrice: userCart.totalPrice,
-        payable: userCart.payable,
-        paymentMethod,
-        paymentStatus,
-        status,
-        shippingAddress,
-      });
+      if (userCart.coupon) {
+        order = new Order({
+          customerId: userId,
+          items: userCart.items,
+          totalPrice: userCart.totalPrice,
+          coupon: userCart.coupon,
+          couponDiscount: userCart.couponDiscount,
+          payable: userCart.payable,
+          paymentMethod,
+          paymentStatus,
+          status,
+          shippingAddress,
+        });
+
+        order.items.forEach((item) => {
+          item.status = status;
+        });
+      } else {
+        order = new Order({
+          customerId: userId,
+          items: userCart.items,
+          totalPrice: userCart.totalPrice,
+          payable: userCart.payable,
+          paymentMethod,
+          paymentStatus,
+          status,
+          shippingAddress,
+        });
+      }
 
       console.log("these are the orders:", order);
 
@@ -199,15 +209,18 @@ module.exports = {
       order.items.forEach((item) => {
         item.paymentStatus = order.paymentStatus;
       });
-      
+
       switch (paymentMethod) {
         case "COD":
-
           // Save the order
           const orderPlaced = await order.save();
           req.session.orderDetails = orderPlaced; // Store order details in session
 
           if (orderPlaced) {
+            if (order.coupon) {
+              await Coupon.findOneAndUpdate({ _id: userCart.coupon }, { $push: { usedBy: { userId: req.session.user } } });
+            }
+
             // // reduce stock of the variant
             for (const item of userCart.items) {
               const product = await Product.findById(item.productId);
@@ -244,7 +257,6 @@ module.exports = {
                 price: product.price,
               };
 
-
               await product.save();
             }
 
@@ -262,8 +274,6 @@ module.exports = {
 
             await Cart.clearCart(userId);
 
-
-            
             return res.status(200).json({
               success: true,
               message: "Order has been placed successfully.",
@@ -272,29 +282,26 @@ module.exports = {
 
           break;
 
-        case "Online": 
+        case "Online":
           const createOrder = await Order.create(order);
-          let total = parseInt(userCart.payable);
+          let total = parseInt(userCart.totalPrice);
           let order_id = createOrder._id;
 
-          const RazorpayOrder = await createRazorpayOrder(order_id, total). then(
-            (order) => order
-          );
+          const RazorpayOrder = await createRazorpayOrder(order_id, total).then((order) => order);
 
           const timestamp = RazorpayOrder.created_at;
-          const date = new Date(timestamp*1000);
+          const date = new Date(timestamp * 1000);
 
           const formattedDate = date.toISOString();
 
           let payment = new Payment({
             paymentId: RazorpayOrder.id,
-            amount: parseInt(RazorpayOrder.amount) /100,
+            amount: parseInt(RazorpayOrder.amount) / 100,
             currency: RazorpayOrder.currency,
             orderId: order_id,
             status: RazorpayOrder.status,
             createdAt: formattedDate,
-
-          })
+          });
           await payment.save();
           return res.json({
             status: true,
@@ -304,46 +311,39 @@ module.exports = {
 
           break;
 
-
         default:
           return res.status(400).json({ error: "Invalid payment method" });
+          break;
       }
     } catch (error) {
       console.error(error);
-
       res.status(400).json({ message: "Detailed error message" });
-
-      console.log("ddddddddddddddddddddddddddddddddddd");
-      console.log(error.status);
-      console.log(error.stack);
-
-      res.status(500).json({ error: "An error occured while placing the order" });
     }
   },
   verifyPayment: async (req, res) => {
     try {
       const secret = process.env.RAZ_KEY_SECRET;
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body.response;
-  
+
       let hmac = crypto.createHmac("sha256", secret);
       hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
       hmac = hmac.digest("hex");
-  
+
       const isSignatureValid = hmac === razorpay_signature;
-  
+
       if (!isSignatureValid) {
         console.log("Signature mismatch", { razorpay_order_id, razorpay_payment_id, razorpay_signature, generated_hmac: hmac });
         return res.status(400).json({ success: false, message: "Invalid signature" });
       }
-  
+
       // Proceed with stock update and order confirmation logic
       let customerId = req.session.user;
       let userCart = await Cart.findOne({ userId: customerId });
-      
+
       // Reduce the stock of the Variant
       for (const item of userCart.items) {
         const product = await Product.findById(item.productId);
-        
+
         const variant = product.variants.find(
           (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
         );
@@ -359,23 +359,44 @@ module.exports = {
 
         await product.save();
       }
-  
+
       await Cart.clearCart(req.session.user);
-  
+
       let paymentId = razorpay_order_id;
       const orderID = await Payment.findOne({ paymentId }, { _id: 0, orderId: 1 });
-  
+
       const order_id = orderID.orderId;
       const updateOrder = await Order.updateOne(
         { _id: order_id },
         { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } }
       );
-  
+      
+
+      let couponId = await Order.findOne({ _id: order_id }).populate(
+        "coupon"
+      );
+
+      console.log(couponId);
+      if (couponId.coupon) {
+        couponId = couponId.coupon._id;
+        if (couponId) {
+          let updateCoupon = await Coupon.findByIdAndUpdate(
+            { _id: couponId },
+            {
+              $push: { usedBy: {userId: customerId} },
+            },
+            {
+              new: true,
+              upsert:true,
+            }
+          );
+        }
+      }
+
       return res.json({ success: true, message: "Payment verified successfully" });
     } catch (error) {
       console.error("Error in payment verification:", error);
       return res.status(500).json({ success: false, message: "Payment verification failed" });
     }
-  }
-  
+  },
 };

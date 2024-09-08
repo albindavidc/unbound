@@ -73,7 +73,7 @@
                             <p></p>
                             <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
                             <p>
-                              <strong>Price:</strong> ₹<%= item.itemTotal %>
+                              <strong>Price:</strong> ₹<%= order.totalPrice %>
                               <span
                                 class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
                               >
