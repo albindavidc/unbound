@@ -55,7 +55,7 @@ const cartSchema = new mongoose.Schema(
     },
     shipmentFee:{
       type: Number,
-      default: 0,
+      default: 40,
     },
     payable: {
       type: Number,

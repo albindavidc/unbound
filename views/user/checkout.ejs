@@ -21,14 +21,7 @@
     }
   </style>
   
-  <section>
-    <div class="container">
-      <ol class="breadcrumb breadcrumbCls justify-content-right">
-        <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item active">Checkout</li>
-      </ol>
-    </div>
-  
+  <section>  
     <div class="pb-5 text-center">
       <div class="card userProfileMain">
         <h1 class="userProfileH1">Checkout</h1>
@@ -62,23 +55,95 @@
               </div>
             </li>
             <% }) %>
-            <li class="list-group-item d-flex justify-content-between bg-body-tertiary d-none" id="appliedCoupon">
-              <div class="text-success">
-                <h6 class="my-0">Coupon code</h6>
-                <small class="text-uppercase" id="coupon"></small>
-              </div>
-              <span class="text-success" id="discountAmount">−₹</span>
-            </li>
-            <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %>
-            <li class="list-group-item d-flex justify-content-between bg-body-tertiary" id="appliedCoupon">
-              <div class="text-success">
-                <h6 class="my-0">Coupon code</h6>
-                <small class="text-uppercase" id="coupon"><%- userCart.coupon.code %></small>
-              </div>
-              <span class="text-success" id="discountAmount">−₹<%- userCart.couponDiscount.toFixed(2) %></span>
-            </li>
-            <% } %>
-  
+
+
+<!-- Applied Coupon Section -->
+<li class="list-group-item d-flex justify-content-between bg-body-tertiary d-none" id="appliedCoupon">
+  <div class="text-success">
+    <h6 class="my-0">Coupon code</h6>
+    <small class="text-uppercase" id="coupon"></small>
+  </div>
+  <span class="text-success" id="discountAmount">−₹</span>
+</li>
+
+<% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %>
+  <li class="list-group-item d-flex justify-content-between bg-body-tertiary" id="appliedCoupon">
+    <div class="text-success">
+      <h6 class="my-0">Coupon code</h6>
+      <small class="text-uppercase" id="coupon"><%- userCart.coupon.code %></small>
+    </div>
+    <span class="text-success" id="discountAmount">−₹<%- userCart.couponDiscount.toFixed(2) %></span>
+  </li>
+<% } %>
+
+<!-- Apply Coupon Form -->
+<form class="card p-2" id="applyCoupon">
+  <label class="form-label text-dark" for="couponCode">Apply Coupon Code</label>
+  <fieldset>
+    <div class="input-group">
+      <input 
+        <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> 
+          disabled="disabled" 
+        <% } %> 
+        id="couponCode" name="code" type="text" class="form-control text-uppercase" placeholder="Coupon code" 
+        <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> 
+          value="<%- userCart.coupon.code %>" 
+        <% } %>>
+      
+      <button 
+        <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> 
+          disabled="disabled" 
+        <% } %> 
+        type="submit" class="btn btn-outline-primary <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? 'd-none' : '' %>">
+        Apply
+      </button>
+
+      <button 
+        onclick="removeCoupon()" 
+        type="button" 
+        class="btn btn-outline-warning <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? '' : 'd-none' %>">
+        Remove Coupon
+      </button>
+    </div>
+  </fieldset>
+</form>
+
+<!-- Available Coupons Accordion -->
+<div id="couponsAccordion" class="text-capitalize accordion mt-4">
+  <h6 class="mb-3 fs-5">Available Coupons</h6>
+
+  <% if (typeof coupons !== 'undefined' && coupons.length > 0) { %>
+    <% coupons.forEach(function(coupon, index) { %>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading<%= index %>">
+          <button class="accordion-button collapsed text-uppercase text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>" aria-expanded="false" aria-controls="collapse<%= index %>">
+            <%= coupon.code %>
+          </button>
+        </h2>
+        <div id="collapse<%= index %>" class="accordion-collapse collapse" aria-labelledby="heading<%= index %>" data-bs-parent="#couponsAccordion">
+          <div class="accordion-body">
+            <!-- Coupon Card -->
+            <div class="coupon-card">
+              <h4 class="coupon-title"><%= coupon.Description %></h4>
+              <p>Discount: <%= coupon.rateOfDiscount + '%' %></p>
+              <p>Min Order Amount: <%= coupon.minPurchaseAmount %></p>
+              <p>Expiry Date: <%= coupon.expiringDate.toDateString() %></p>
+              <button type="button" onclick="copyCode('<%= coupon.code %>')" class="btn btn-primary btn-sm">Copy Code</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  <% } else { %>
+    <p class="lead text-warning">No Coupons Available</p>
+  <% } %>
+</div>
+
+
+
+
+
+
             <li class="list-group-item d-flex justify-content-between">
               <span>Grand Total (INR)</span>
               <strong>₹<span id="grandTotal"><%- totalPrice %></span></strong>
