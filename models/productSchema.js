@@ -22,6 +22,7 @@ const imageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+
 const variantSchema = new mongoose.Schema({
   color: {
     type: mongoose.Schema.Types.ObjectId, // Reference to Color object ID
