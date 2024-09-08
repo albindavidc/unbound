@@ -85,6 +85,9 @@ router
 router
 .route("/wallet")
 .get(walletController.getWallet);
+router.post('/add-to-wallet', walletController.addToWallet)
+router.post('/verify-wallet-payment', walletController.verifyPayment)
+
 
 router.delete("/wishlist/:productId", wishlistController.deleteWishlist)
 router.post("/wishlist/:productId", wishlistController.addWishlist);

@@ -4,14 +4,13 @@ const Order = require("../../models/orderSchema");
 const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const Payment = require("../../models/paymentSchema");
-const Coupons = require("../../models/couponSchema");
+const Coupon = require("../../models/couponSchema");
 
 const mongoose = require("mongoose");
 
 //Razorpay
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-const Coupon = require("../../models/couponSchema");
 
 var instance = new Razorpay({
   key_id: process.env.RAZ_KEY_ID,

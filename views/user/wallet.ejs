@@ -10,13 +10,14 @@
       <div class="flex justify-center">
         <div class="absolute bg-white rounded shadow-lg shadow-black mb-5" style="width: 80%; height: 500px; top: 200px">
           <div class="container">
-            <div class="row align-items-start">
+            <div class="row">
               <div class="col-6 m-4">
-                <h2 class="text-xl font-bold mt-4 mb-5">Transactions</h2>
-
+                <div class="bg-white border-2 rounded-lg py-1 shadow-md w-full mt-0 mb-5">
+                  <h2 class="text-xl font-bold text-center text-black-700">Transactions</h2>
+                </div>
                 <div class="row p-8 m-4">
                   <div class="col-8 flex items-center h-full justify-center">
-                    <h4 class="text-center">Available Balance</h4>
+                    <h4 class="text-left">Available Balance</h4>
                   </div>
 
                   <div class="col-4 bg-black rounded">
@@ -24,8 +25,8 @@
                   </div>
                 </div>
                 <% wallet.transactions.forEach(item => { %>
-                <div class="row rounded p-3" style="background-color: rgb(224, 224, 224)">
-                  <div class="col-8 text-left">
+                <div class="row rounded p-3 m-2" style="background-color: rgb(224, 224, 224)">
+                  <div class="col-8 text-left ">
                     <%= item.message %>
                     <p><%= new Date(item.date).toLocaleString() %></p>
                   </div>
@@ -34,27 +35,242 @@
                     <p><%= item.type %></p>
                   </div>
                 </div>
+                <% }) %>
               </div>
 
-              <div class="col-4 m-4" style="border-left: 2px solid black; height: 350px">
-                <h2 class="text-xl font-bold mt-4 mb-3">Add Money</h2>
-                <div class="block-body py-5 d-flex align-items-center">
-                  <input type="radio" name="walletRazorPay" id="wallet_razor_pay" class="mr-3" />
 
+              <div class="col-5 pt-4" style="border-left: 2px solid black; height: 350px">
+                <div class="bg-white border-2 rounded-lg py-1 shadow-md w-full mt-0">
+                  <h2 class="text-xl font-bold text-center text-black-700">Add Money</h2>
+                </div>
+                <div class="block-body py-5">
                   <label for="wallet_razor_pay" class="ml-2">
                     <!-- Corrected the 'for' attribute -->
                     <strong class="d-block text-uppercase mb-1 text-left">Add to Wallet</strong>
                     <span class="">Add through Razorpay</span>
                   </label>
                 </div>
-                <button id="add_money_to_wallet" class=" btn btn-dark btn-sm" type="submit">Add Money</button>
-
+                <button data-bs-toggle="modal" data-bs-target="#addMoneyModal" class="btn btn-outline-success" type="button">Add Money</button>
               </div>
-              <% }) %>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="addMoneyModal" tabindex="-1" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addMoneyForm" action="/user/add-to-wallet" method="POST">
+            <div class="mb-3 form-group">
+              <label for="amount" class="form-label">Amount</label>
+              <input type="number" class="form-control" id="amount" name="amount" placeholder="Enter Amount" required />
+              <small></small>
+            </div>
+            <div class="flex justify-center mt-6">
+              <button type="submit" class="btn btn-primary">Add Money</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
+<%- include('../partials/user/footer') %>
+
+<script defer>
+  const showError = (input, message) => {
+    // get the form-field element
+    const formField = input.parentElement;
+    // add the error class
+    formField.classList.remove("success", "is-valid");
+    input.classList.remove("success", "is-valid");
+    formField.classList.add("error", "is-invalid");
+    input.classList.add("error", "is-invalid");
+
+    // show the error message
+    const error = formField.querySelector("small");
+    error.textContent = message;
+  };
+
+  const showSuccess = (input) => {
+    // get the form-field element
+    const formField = input.parentElement;
+
+    // remove the error class
+    formField.classList.remove("error", "is-invalid");
+    input.classList.remove("error", "is-invalid");
+    formField.classList.add("success", "is-valid");
+    input.classList.add("success", "is-valid");
+
+    // hide the error message
+    const error = formField.querySelector("small");
+    error.textContent = "";
+  };
+
+  const checkAmount = () => {
+    let value = false;
+    const amountEl = document.querySelector("#amount");
+    const amount = amountEl.value;
+    if (!amount) {
+      showError(amountEl, "Amount is required");
+    } else if (amount <= 0) {
+      showError(amountEl, "Amount can't be negative or zero");
+    } else {
+      showSuccess(amountEl);
+      valid = true;
+    }
+
+    return valid;
+  };
+
+  addMoneyForm = document.querySelector("#addMoneyForm");
+  addMoneyForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const amount = document.querySelector("#amount").value;
+
+    let valid = checkAmount();
+
+    if (valid) {
+      Swal.fire({
+        icon: "warning",
+        title: "Are you sure?",
+        text: "Do you want to add money to your wallet?",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const res = await fetch("/add-to-wallet", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                amount,
+              }), // convert amount to a string
+            });
+
+            console.log(res);
+
+            const data = await res.json();
+            console.log(data);
+            if (data.success) {
+              razorpayPayment(data.payment, data.user);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: data.message,
+              });
+            }
+          } catch (error) {
+            console.log(error);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: error.message,
+            });
+          }
+        }
+      });
+    }
+  });
+
+  const razorpayPayment = (order, user) => {
+    console.log(order);
+    let details = structuredClone(order);
+    var options = {
+      key: "rzp_test_FGSvpGKo4JrSBW",
+      amount: order.amount,
+      currency: "INR",
+      name: "Unbound",
+      description: "Test Transaction",
+      order_id: order.id,
+      handler: async function (response) {
+        console.log(response, order);
+        await verifyPayment(response, order);
+      },
+      prefill: {
+        name: user.username,
+        email: user.email,
+        contact: user.phone,
+      },
+      notes: {
+        address: "Razorpay Corporate Office",
+      },
+      theme: {
+        color: "#2ade99",
+      },
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+    rzp1.on("payment.failed", function (response) {
+      swal.fire("Failed!", response.error.description, "error").then(() => {
+        location.assign("/");
+      });
+    });
+  };
+
+  const verifyPayment = async (response, order) => {
+    console.log(response, order);
+    const res = await fetch("/verify-wallet-payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        response,
+        order,
+      }),
+    })
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: data.message,
+          }).then(() => {
+            location.assign("/wallet");
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.message,
+        });
+      });
+
+    const data = await res.json();
+
+    console.log(data);
+    if (data.success) {
+      location.assign("/user/wallet");
+    }
+  };
+</script>
