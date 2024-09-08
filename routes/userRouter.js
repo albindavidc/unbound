@@ -9,6 +9,7 @@ const checkoutController = require("../controllers/user/checkoutController");
 const orderController = require("../controllers/user/orderController");
 const wishlistController = require("../controllers/user/wishlistController");
 const couponController = require("../controllers/user/couponController")
+const walletController = require("../controllers/user/walletController")
 
 //Home page - Page not found
 router.get("/",checkUserStatus,userAuth, userController.loadHomepage);
@@ -78,8 +79,12 @@ router
   .put(orderController.updateOrder);
 
 router
-  .route("/wishlist")
-  .get(wishlistController.getWishlist)
+.route("/wishlist")
+.get(wishlistController.getWishlist)
+
+router
+.route("/wallet")
+.get(walletController.getWallet);
 
 router.delete("/wishlist/:productId", wishlistController.deleteWishlist)
 router.post("/wishlist/:productId", wishlistController.addWishlist);
