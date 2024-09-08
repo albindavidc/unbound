@@ -64,10 +64,24 @@
         <small></small>
       </div>
 
+      <div class="mb-4">
+        <label for="starting_date" class="form-label">Starting Date</label>
+        <input type="date" name="startingDate" id="starting_date" class="form-control">
+        <small></small>
+      </div>
+
+      <div class="mb-4">
+        <label for="expiring_date" class="form-label">Expiring Date</label>
+        <input type="date" name="expiringDate" id="expiring_date" class="form-control">
+        <small></small>
+      </div>
+
       <div class="d-flex justify-content-center gap-5">
         <button type="submit" class="btn btn-dark btn-max-width">Create Coupon</button>
         <button type="button" id="close_button" class="btn btn-secondary btn-max-width" onclick="closeForm()">Close</button>
       </div>
+
+
     </form>
   </div>
 
@@ -133,6 +147,17 @@
               <small></small>
             </div>
 
+            <div class="form-group">
+              <label for="edit_starting_date">Starting Date</label>
+              <input type="date" name="startingDate" id="edit_starting_date" class="form-control">
+              <small></small>
+            </div>
+            <div class="form-group"></div>
+              <label for="edit_expiring_date">Expiring Date</label>
+              <input type="date" name="expiringDate" id="edit_expiring_date" class="form-control">
+              <small></small>
+            </div>
+
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary"  id="close_button" onclick="closeForm()">Close</button>
               <button type="submit" class="btn btn-dark">Update Coupon</button>
@@ -152,21 +177,26 @@
               <tr>
                 <th>Code</th>
                 <th>Description</th>
-                <th>Rate of Discount</th>
+                <th>Rate of Discount (%)</th>
                 <th>Min. purchase amount</th>
                 <th>Max. discount</th>
+                <th>Start Date</th>
+                <th>Expiry Date</th>
                 <th></th>
                 <th>Actions</th>
+
               </tr>
             </thead>
             <tbody>
               <% for(let i = 0; i < coup.length; i++) { %>
               <tr>
-                <td><%= coup[i].code %></td>
+                <td ><%= coup[i].code %></td>
                 <td><%= coup[i].description %></td>
-                <td><%= coup[i].rateOfDiscount %></td>
+                <td><%= coup[i].rateOfDiscount %> %</td>
                 <td><%= coup[i].minPurchaseAmount %></td>
                 <td><%= coup[i].maximumDiscount %></td>
+                <th><%= new Date(coup[i].startingDate).toLocaleString() %></th>
+                <th><%= new Date(coup[i].expiringDate).toLocaleString() %></th>
                 <td>
                   <!-- Edit Button -->
                   <button class="btn btn-dark edit_coupon_button" data-coupon-id="<%= coup[i]._id %>">Edit</button>
@@ -262,6 +292,9 @@
       const couponRateOfDiscount = parseFloat(document.getElementById("coupon_rate_of_discount").value);
       const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
       const couponMaxDiscount = parseFloat(document.getElementById("coupon_max_discount_amount").value);
+      const startingDate = document.getElementById("starting_date").value;
+      const expiringDate = document.getElementById("expiring_date").value;
+      
 
       // Perform fetch request if form is valid
       fetch("/admin/addCoupon", {
@@ -275,6 +308,8 @@
           couponRateOfDiscount,
           couponMinPurchaseAmount,
           couponMaxDiscount,
+          startingDate,
+          expiringDate,
         }),
       })
         .then((response) => response.json())
@@ -387,6 +422,34 @@
         return valid;
       };
 
+      const checkStartingDate =() =>{
+        const startingDateEl = document.querySelector("#starting_date");
+        let valid = false;
+        const startingDate = startingDateEl.value.trim();
+
+        if(!isRequired(startingDate)){
+          showError(startingDateEl, "Starting Date cannot be blank");
+        }else{
+          showSuccess(startingDateEl);
+          valid= true;
+        }
+        return valid;
+      }
+
+      const checkExpiringDate = () =>{
+        const expiringDateEl = document.querySelector("#expiring_date");
+        let valid = false;
+        const expiringDate = expiringDateEl.value.trim();
+
+        if(!isRequired(expiringDate)){
+          showError(expiringDate, "Expiring Date cannot be blank");
+        }else{
+          showSuccess(expiringDateEl);
+          valid= true;
+        }
+        return valid;
+      }
+
       const isRequired = (value) => (value === "" ? false : true);
 
       const showError = (input, message) => {
@@ -417,8 +480,10 @@
       isRateOfDiscountValid = checkRateOfDiscount();
       isMinPurchaseAmountValid = checkMinPurchaseAmount();
       isMaxDiscountAmountValid = checkMaxDiscountAmount();
+      isStartingDateValid = checkStartingDate();
+      isExpiringDateValid = checkExpiringDate();
 
-      let isFormValid = isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid;
+      let isFormValid = isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid && isStartingDateValid && isExpiringDateValid ;
 
       return isFormValid;
     };
@@ -459,6 +524,12 @@
           case "coupon_max_discount_amount":
             formValid();
             break;
+          case "starting_date":
+            formValid();
+            break;
+          case "expiring_date":
+            formValid();
+            break;
         }
       })
     );
@@ -473,6 +544,18 @@
     btn.addEventListener("click", (event) => {
       const couponId = event.target.dataset.couponId; // Assuming edit button has a data attribute with coupon ID
 
+      const formatDateToInput = (date) => {
+        const d = new Date(date);
+        let month = '' + (d.getMonth() + 1); // Months are 0-based
+        let day = '' + d.getDate();
+        const year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [year, month, day].join('-');
+      };
+      
       console.log("this is couponId", couponId);
       fetch(`/admin/getCoupon/${couponId}`)
         .then((response) => response.json())
@@ -484,6 +567,8 @@
           document.getElementById("edit_coupon_rate_of_discount").value = data.rateOfDiscount;
           document.getElementById("edit_coupon_min_purchase_amount").value = data.minPurchaseAmount;
           document.getElementById("edit_coupon_max_discount_amount").value = data.maximumDiscount;
+          document.getElementById("edit_starting_date").value = formatDateToInput(data.startingDate);
+          document.getElementById("edit_expiring_date").value = formatDateToInput(data.expiringDate);
 
           // Show the modal
           $("#edit_coupon_modal").modal("show");
@@ -570,6 +655,35 @@
     }
   };
 
+  const checkStartingDate =() =>{
+    const startingDateEl = document.querySelector("#edit_starting_date");
+    let valid = false;
+    const startingDate = startingDateEl.value.trim();
+
+    if(!startingDate){
+      showError(startingDateEl, "Starting Date cannot be blank");
+    }else{
+      showSuccess(startingDateEl);
+      valid= true;
+    }
+    return valid;
+  }
+
+  const checkExpiringDate = () =>{
+    const expiringDateEl = document.querySelector("#edit_expiring_date");
+    let valid = false;
+    const expiringDate = expiringDateEl.value.trim();
+
+    if(!expiringDate){
+      showError(expiringDate, "Expiring Date cannot be blank");
+    }else{
+      showSuccess(expiringDateEl);
+      valid= true;
+    }
+    return valid;
+  }
+
+
   const showError = (input, message) => {
     const formField = input.parentElement;
     formField.classList.remove("success", "is-valid");
@@ -601,9 +715,11 @@
       isRateOfDiscountValid = checkRateOfDiscount(),
       isMinPurchaseAmountValid = checkMinPurchaseAmount(),
       isMaxDiscountAmountValid = checkMaxDiscountAmount();
+      isStartingDateValid = checkStartingDate();
+      isExpiringDateValid = checkExpiringDate();
 
     // Form is valid only if all fields are valid
-    return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid;
+    return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid && isStartingDateValid && isExpiringDateValid;
   };
 
   // Handle Edit Coupon Form Submission
@@ -623,6 +739,8 @@
     const couponRateOfDiscount = parseFloat(document.getElementById("edit_coupon_rate_of_discount").value);
     const couponMinPurchaseAmount = parseFloat(document.getElementById("edit_coupon_min_purchase_amount").value);
     const couponMaxDiscount = parseFloat(document.getElementById("edit_coupon_max_discount_amount").value);
+    const startingDate = document.getElementById("edit_starting_date").value;
+    const expiringDate = document.getElementById("edit_expiring_date").value;
 
     fetch(`/admin/updateCoupon/${couponId}`, {
       method: "PUT",
@@ -635,6 +753,8 @@
         couponRateOfDiscount,
         couponMinPurchaseAmount,
         couponMaxDiscount,
+        startingDate,
+        expiringDate,
       }),
     })
       .then((response) => response.json())

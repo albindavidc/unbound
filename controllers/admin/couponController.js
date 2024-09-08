@@ -13,7 +13,7 @@ module.exports = {
   },
 
   addCoupons: async (req, res) => {
-    const { couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount } = req.body;
+    const { couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, couponMaxDiscount, startingDate, expiringDate } = req.body;
 
     try {
       const existingCoupon = await Coupon.findOne({ couponCode });
@@ -27,6 +27,8 @@ module.exports = {
         rateOfDiscount: couponRateOfDiscount,
         minPurchaseAmount: couponMinPurchaseAmount,
         maximumDiscount: couponMaxDiscount,
+        startingDate,
+        expiringDate,
       });
       await newCoupon.save();
       return res.json({ success: true, message: "Coupon added successfully" });
@@ -64,6 +66,8 @@ module.exports = {
           rateOfDiscount: req.body.couponRateOfDiscount,
           minPurchaseAmount: req.body.couponMinPurchaseAmount,
           maximumDiscount: req.body.couponMaxDiscount,
+          startingDate:req.body.startingDate,
+          expiringDate:req.body.expiringDate,
         },
         { new: true }
       );

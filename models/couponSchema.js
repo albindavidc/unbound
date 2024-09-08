@@ -2,12 +2,10 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const couponSchema = new Schema({
-
   code: {
     type: String,
     required: true,
     trim: true,
-    lowercase: true,
     unique: true, // Ensures each coupon code is unique
   },
   description: {
@@ -42,9 +40,12 @@ const couponSchema = new Schema({
     type: Boolean,
     default: true,
   },
-  expirationDate: {
+  startingDate: {
     type: Date,
-    default: Date.now(),
+    required: true,
+  },
+  expiringDate: {
+    type: Date,
     required: true,
   },
 });
