@@ -8,7 +8,7 @@ const cartController = require('../controllers/user/cartController');
 const checkoutController = require("../controllers/user/checkoutController");
 const orderController = require("../controllers/user/orderController");
 const wishlistController = require("../controllers/user/wishlistController");
-
+const couponController = require("../controllers/user/couponController")
 
 //Home page - Page not found
 router.get("/",checkUserStatus,userAuth, userController.loadHomepage);
@@ -108,16 +108,15 @@ router.put('/cart/:id/:variant/increment', userAuth, cartController.incrementCar
 router.put('/cart/:id/:variant/decrement', userAuth, cartController.decrementCartItem);
 
 
-
 router.get("/checkout", checkoutController.getCheckout);
-
-
 router.post("/checkout/add-address", userController.addAddress);
 router
 .route("/checkout/edit-address/:id")
 .get(userController.getEditAddress)
 .post(userController.editAddress)
 .delete(userController.deleteAddress);
+router.post("/checkout/verify-coupon", couponController.applyCoupon);
+router.post("/checkout/remove-coupon", couponController.removeCoupon);
 
 router.post("/place-order", checkoutController.placeOrder);
 router.post("/user/verify-payment", checkoutController.verifyPayment);

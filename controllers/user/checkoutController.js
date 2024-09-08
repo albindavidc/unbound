@@ -53,7 +53,7 @@ module.exports = {
   getCheckout: async (req, res) => {
     const userId = req.session.user;
 
-    const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId");
+    const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId coupon");
 
     let user = await User.findById(userId);
 
@@ -88,10 +88,40 @@ module.exports = {
       totalPriceBeforeOffer += prod.price;
     }
 
-    const coupons = await Coupon.find();
+    // Apply coupon discount if applicable
+    let couponDiscount = 0;
+    if (userCart.coupon) {
+      const coupon = await Coupon.findById(userCart.coupon);
+      if (
+        coupon &&
+        coupon.isActive &&
+        new Date() <= coupon.expiringDate &&
+        totalPrice >= coupon.minPurchaseAmount
+      ) {
+        couponDiscount = totalPrice * (coupon.rateOfDiscount / 100);
+        totalPrice -= couponDiscount;
+      } else {
+        // If the total is less than the minimum purchase amount, remove the coupon
+        userCart.coupon = undefined;
+        userCart.couponDiscount = 0;
+        await userCart.save();
+      }
+    }
 
+    
     // Correctly calculate cartCount
     let cartCount = userCart.items.length;
+
+    
+    const coupons = await Coupon.find({
+      isActive: true,
+      minPurchaseAmount: { $lte: totalPriceBeforeOffer },
+      expiringDate: { $gte: Date.now() },
+      // usedBy: [{ $: req.user.id }],
+    });
+    // console.log(coupons);
+
+
 
     let isCOD = true;
 
@@ -104,6 +134,7 @@ module.exports = {
       address,
       userCart,
       coupons,
+      couponDiscount,
       isCOD,
       cartList: userCart.items,
       cartCount,

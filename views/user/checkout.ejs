@@ -549,6 +549,178 @@
 
 <script defer src="/public/js/user/checkout.js" ></script>
 
+
+<script>
+  const copyCode = async (code) => {
+    await navigator.clipboard.writeText(code);
+    Swal.fire({
+      icon: 'success',
+      title: 'Coupon Code Copied!',
+    })
+  }
+
+
+  const couponCodeVal = document.getElementById('couponCode').value;
+  document.querySelector('#applyCoupon').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+
+    // Get the coupon code from the input field
+    const couponCodeInput = document.getElementById('couponCode');
+    const couponCodeVal = document.getElementById('couponCode').value;
+
+    // Display a SweetAlert confirmation dialog
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to apply this coupon? " + couponCodeVal.toUpperCase(),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, apply it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // If confirmed, send a POST request to the server
+        try {
+          // should add a loading using sweetalert while the coupon is being applied
+          Swal.fire({
+            icon: 'info',
+            title: 'Applying Coupon',
+            html: 'Please wait while we verify and apply the coupon...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+            timer: 4200,
+          });
+
+          const response = await fetch('/checkout/verify-coupon', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              code: couponCodeVal.toLowerCase()
+            }),
+          });
+
+          Swal.close();
+
+          if (response.ok) {
+            const data = await response.json();
+
+            // If the response is successful, disable the input field
+            const coupon = document.getElementById('appliedCoupon');
+            const couponCode = document.getElementById('coupon');
+            const discountAmount = document.getElementById('discountAmount');
+            let grandTotal = document.getElementById('grandTotal').innerHTML;
+
+            coupon.classList.remove('d-none');
+            couponCode.innerText = `${data.coupon.code}`;
+            discountAmount.innerText = `-$${data.discountAmount}`;
+
+            couponCodeInput.disabled = true;
+            couponCodeInput.value = '';
+            Swal.fire(
+              'Applied!',
+              data.message,
+              'success'
+            ).then(() => {
+              location.reload()
+            });
+          } else {
+            // Handle errors
+            const errorData = await response.json();
+            Swal.fire(
+              'Error!',
+              errorData.message || 'There was an error applying the coupon.',
+              'error'
+            );
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire(
+            'Error!',
+            'There was an error applying the coupon.',
+            'error'
+          );
+        }
+      }
+    });
+
+  });
+
+
+
+  const removeCoupon = async () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to remove this coupon? " + couponCodeVal.toUpperCase(),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, remove it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // If confirmed, send a POST request to the server
+        try {
+
+          // should add a loading using sweetalert while the coupon is being removed
+          Swal.fire({
+            icon: 'info',
+            title: 'Removing Coupon',
+            html: 'Please wait while we remove the coupon...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          })
+
+          const response = await fetch('/checkout/remove-coupon', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          Swal.close();
+
+          if (response.ok) {
+            const data = await response.json();
+
+            Swal.fire(
+              'Removed!',
+              data.message,
+              'success'
+            ).then(() => {
+              location.reload()
+            });
+          } else {
+            // Handle errors
+            const errorData = await response.json();
+            Swal.fire(
+              'Error!',
+              errorData.message || 'There was an error removing the coupon.',
+              'error'
+            ).then(() => {
+              location.reload()
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire(
+            'Error!',
+            'There was an error removing the coupon.',
+            'error'
+          );
+        }
+      }
+    });
+  }
+</script>
+
+
+
 <script>
     
 const editForm = document.querySelector("#edit-address-form");
@@ -816,8 +988,6 @@ editForm.addEventListener(
 );
 
     
-    </script>
+</script>
 
-<div>
-    </div>
 <%- include('../../views/partials/user/footer') %>
