@@ -5,6 +5,7 @@ const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const Payment = require("../../models/paymentSchema");
 const Coupon = require("../../models/couponSchema");
+const Wallet = require("../../models/walletSchema")
 
 const mongoose = require("mongoose");
 
@@ -119,6 +120,16 @@ module.exports = {
       isCOD = false;
     }
 
+    const userWallet = await Wallet.find({userId: userId})
+
+    console.log(userWallet,"this is user wallet")
+
+    if(totalPrice > userWallet.balance){
+      userWallet.isInsufficient = true;
+    }else{
+      userWallet.isInsufficient = false;
+    }
+
     res.render("user/checkout", {
       user,
       address,
@@ -128,6 +139,7 @@ module.exports = {
       isCOD,
       cartList: userCart.items,
       cartCount,
+      wallet: userWallet,
       totalPrice,
       checkout: true,
     });
@@ -164,8 +176,9 @@ module.exports = {
       //   return res.status(404).json({ error: "User's cart not found" });
       // }
 
-      const status = paymentMethod == "COD" ? "Confirmed" : "Pending";
-      const paymentStatus = paymentMethod == "COD" ? "Pending" : "Paid";
+      const status = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Confirmed" : "Pending";
+      const paymentStatus = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Paid" : "Pending";
+
 
       let order;
 
@@ -309,6 +322,87 @@ module.exports = {
           });
 
           break;
+
+        case "Wallet":
+
+        const orderCreate = await Order.create(order);
+
+        if(orderCreate){
+          let wallet = await Wallet.findOne({ userId: req.session.user });
+          
+          wallet.balance = parseInt(wallet.balance) - parseInt(orderCreate.totalPrice);
+          
+          wallet.transactions.push({
+            date: new Date(),
+            amount: parseInt(orderCreate.totalPrice),
+            message: "Order placed successfully",
+            type: "Debit",
+          })
+
+          await wallet.save();
+
+          // reduce stock of the variant
+          for (const item of userCart.items) {
+            const product = await Product.findById(item.productId).catch(
+              (error) => {
+                console.error(error);
+                return res
+                  .status(500)
+                  .json({ error: "Failed to find product" });
+              }
+            );
+
+            if (!product) {
+              return res.status(404).json({ error: "Product not found" });
+            }
+
+            const variantIndex = product.variants.findIndex(
+              (variant) => variant._id.toString() === item.variantId.toString()
+            );
+
+            if (variantIndex === -1) {
+              return res.status(404).json({ error: "Variant not found" });
+            }
+
+            console.log(product.variants[variantIndex]);
+
+            product.variants[variantIndex].stock -= item.quantity;
+
+            await product.save().catch((error) => {
+              console.error(error);
+              return res
+                .status(500)
+                .json({ error: "Failed to update product stock" });
+            });
+          }
+
+          await Cart.clearCart(req.session.user);
+
+          orderCreate.status = "Confirmed";
+          orderCreate.items.forEach((item) => {
+            item.status = "Confirmed";
+          });
+
+          await orderCreate.save();
+
+          // coupon is used
+          if (order.coupon) {
+            await Coupon.findOneAndUpdate(
+              { _id: userCart.coupon },
+              { $push: { usedBy: { userId: req.session.user } } }
+            );
+          }
+
+
+          return res.status(200).json({
+            success: true,
+            message: "Order has been placed successfully.",
+          });
+        }
+
+        break;
+
+
 
         default:
           return res.status(400).json({ error: "Invalid payment method" });

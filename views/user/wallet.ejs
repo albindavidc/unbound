@@ -24,20 +24,22 @@
                     <h4 class="text-white p-2">₹ <%=wallet.balance %></h4>
                   </div>
                 </div>
-                <% wallet.transactions.forEach(item => { %>
-                <div class="row rounded p-3 m-2" style="background-color: rgb(224, 224, 224)">
-                  <div class="col-8 text-left ">
-                    <%= item.message %>
-                    <p><%= new Date(item.date).toLocaleString() %></p>
+                <!-- Wallet Transactions Container with Scrolling -->
+                <div class="transactions-container" style="max-height: 300px; overflow-y: auto">
+                  <% wallet.transactions.forEach(item => { %>
+                  <div class="row rounded p-3 m-2" style="background-color: rgb(224, 224, 224)">
+                    <div class="col-8 text-left">
+                      <%= item.message %>
+                      <p><%= new Date(item.date).toLocaleString() %></p>
+                    </div>
+                    <div class="col-4">
+                      ₹<%= item.amount %>
+                      <p><%= item.type %></p>
+                    </div>
                   </div>
-                  <div class="col-4">
-                    ₹<%= item.amount %>
-                    <p><%= item.type %></p>
-                  </div>
+                  <% }) %>
                 </div>
-                <% }) %>
               </div>
-
 
               <div class="col-5 pt-4" style="border-left: 2px solid black; height: 350px">
                 <div class="bg-white border-2 rounded-lg py-1 shadow-md w-full mt-0">
