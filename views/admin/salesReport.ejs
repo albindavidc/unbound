@@ -102,7 +102,7 @@
               <td><%=order.status%></td>
               <td><%=order.totalAmount%></td>
               <td class="text-uppercase"><%=order.coupon ? order.coupon.code : "No Coupon"%></td>
-              <td><%=order.couponDiscount%></td>
+              <td><%=Math.floor(order.couponDiscount)%></td>
               <td><%=order.payable.toFixed(2)%></td>
               <td class="text-center"><%=order.categoryDiscount.toFixed(2)%></td>
             </tr>
@@ -120,11 +120,8 @@
   </main>
 </section>
 
-<!-- data tables -->
-<!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" /> -->
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
-<!-- <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script> -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
@@ -136,6 +133,9 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="https://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
 <script type="text/javascript" src="https://www.shieldui.com/shared/components/latest/js/jszip.min.js"></script>
+
+<%- include('../partials/admin/footer') %>
+
 
 <script defer>
   let table = new DataTable("#salesReportTable", { pageLength: 10, responsive: true });
@@ -149,34 +149,5 @@
     window.location.href = url;
   };
 
-  const getPDF = async () => {
-    const start = document.getElementById("startDate").value;
-    const end = document.getElementById("endDate").value;
-
-    try {
-      Swal.fire({
-        icon: "info",
-        title: "Generating PDF...",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-        timer: 1200,
-      }).then(() => {
-        let url = `/admin/sales-report/pdf-download?startDate=${start}&endDate=${end}`;
-        window.location.href = url;
-      });
-    } catch (error) {
-      console.error("Error fetching content or generating PDF:", error);
-
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: error.message || "Something went wrong!",
-      });
-    }
-  };
 </script>
 
-<%- include('../partials/admin/footer') %>

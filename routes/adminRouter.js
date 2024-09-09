@@ -155,6 +155,7 @@ router.delete("/deleteCoupon", couponController.deleteCoupon);
 router
 .route("/salesReport")
 .get(salesReportController.getSalesReport);
+router.get('/sales-report/excel', salesReportController.salesReportExcel)
 
 
 module.exports = router;
