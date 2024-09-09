@@ -1,0 +1,131 @@
+<%- include('../partials/user/header') %>
+
+<style>
+    .userProfileMain {
+      width: 80%;
+      height: 30%;
+      margin: 0 auto;
+      background-color: rgb(0, 0, 0);
+    }
+  
+    .userProfileH1 {
+      width: 50%;
+      margin: auto;
+      font-family: "Baloo", cursive;
+      color: white;
+      font-size: 7vw;
+    }
+  
+    .breadcrumbCls {
+      background-color: aliceblue;
+    }
+  </style>
+  
+  <section>  
+    <div class="pb-5 text-center">
+      <div class="card userProfileMain">
+        <h1 class="userProfileH1">Referrals</h1>
+      </div>
+    </div>
+  </section>
+  
+  
+  
+  <div class="container mb-5">
+  
+    <div class="row">
+      <%- include('../partials/user/sidebar.ejs') %>
+      <!-- Content  -->
+      <section class="col-lg-8">
+        <div id="accordion" role="tablist">
+  
+          <div class="block mb-1">
+            <div class="block-header bg-secondary-light pb-1" id="refferalDetails" role="tab"><strong><a class="accordion-link collapsed" data-bs-toggle="collapse" href="#refferalCollapse" aria-expanded="false" aria-controls="refferalCollapse">Your Refferal Details</a></strong>
+              <p class="text-muted"></p>
+            </div>
+            <div class="collapse show" id="refferalCollapse" role="tabpanel" aria-labelledby="refferalDetails" data-parent="#accordion">
+              <div class="block-body row">
+                <div class="d-flex">
+                  <p class="lead bg-success-light fw-semibold text-muted  p-2">Your Refferal Code: <span class="text-dark fw-bold" id="refferalCode"><%- refferalCode %></span></p>
+                  <p class="lead bg-success-light fw-semibold text-muted text-uppercase p-2">Refferal Rewards: <%- user.refferalRewards ? user.refferalRewards : 0 %></p>
+                  <p class="lead bg-success-light fw-semibold text-muted text-uppercase p-2">Successful Refferals: <%- successfullRefferals ? successfullRefferals.length : 0 %> </p>
+                </div>
+                <div class="">
+                  <button type="button" data-clipboard-text="<%- refferalCode %>" id="copyCode" class="btn btn-outline-dark">Copy Code</button>
+                  <button type="button" data-clipboard-link="<%- refferalCode %>"  data-bs-toggle="tooltip" data-bs-placement="top"
+                    data-bs-title="Copy to clipboard." id="copyLink" class="btn btn-outline-primary">Copy Refferal Link</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="container table-responsive py-2 text-capitalize">
+          <table class="table table-striped table-hover">
+            <thead class="bg-dark-light">
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Username</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (successfullRefferals && successfullRefferals.length !== 0 ) { %>
+              <% successfullRefferals.forEach((element) => { %>
+              <tr class="align-middle table-success">
+                <td><%= element.date.toDateString() %></td>
+                <td><%- element.username %></td>
+                <td><%- element.status %></td>
+              </tr>
+              <% }) %>
+  
+              <% } else { %>
+              <tr>
+                <td colspan="4" class="text-center">No refferals yet</td>
+              </tr>
+              <% } %>
+  
+            </tbody>
+          </table>
+  
+      </section>
+    </div>
+  </div>
+  
+  <%- include('../partials/user/footer') %>
+  
+  <script defer>
+    // copy referral code
+    const copyCode = document.getElementById("copyCode");
+    const copyLink = document.getElementById("copyLink");
+  
+    copyCode.addEventListener("click", () => {
+      const copyCodeText = document.getElementById("refferalCode");
+      navigator.clipboard.writeText(copyCodeText.innerText);
+  
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Code Copied",
+        showConfirmButton: false,
+        timer: 1000,
+      })
+    });
+  
+    copyLink.addEventListener("click", (event) => {
+      const copyCodeText = document.getElementById("refferalCode");
+      const link = `${window.location.origin}/register/?ref=${copyCodeText.innerText}`;
+  
+      navigator.clipboard.writeText(link);
+  
+  
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Link Copied",
+        showConfirmButton: false,
+        timer: 1000,
+      })
+    
+    });
+  </script>

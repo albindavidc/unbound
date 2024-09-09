@@ -85,6 +85,9 @@ router
 router
 .route("/wallet")
 .get(walletController.getWallet);
+router.post('/add-to-wallet', walletController.addToWallet)
+router.post('/verify-wallet-payment', walletController.verifyPayment)
+
 
 router.delete("/wishlist/:productId", wishlistController.deleteWishlist)
 router.post("/wishlist/:productId", wishlistController.addWishlist);
@@ -126,6 +129,8 @@ router.post("/checkout/remove-coupon", couponController.removeCoupon);
 router.post("/place-order", checkoutController.placeOrder);
 router.post("/user/verify-payment", checkoutController.verifyPayment);
 router.get("/order-success", cartController.getOrderSuccess);
+
+router.get("/referrals", userController.getReferrals);
 
 
 module.exports = router;

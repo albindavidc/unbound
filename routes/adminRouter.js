@@ -9,7 +9,7 @@ const { productUpload } = require("../middlewares/multer"); // Adjust path accor
 const attributeController = require("../controllers/admin/attributeController")
 const orderController = require("../controllers/admin/orderController");
 const couponController = require("../controllers/admin/couponController")
-
+const salesReportController = require("../controllers/admin/salesReportController")
 
 // Error page
 router.get("/pageerror", adminController.pageerror);
@@ -147,13 +147,14 @@ router.put('/orderList/updateOrder/:orderId', orderController.updateDeliveryStat
 
 router.get("/couponList", couponController.getCouponList);
 router.post("/addCoupon", couponController.addCoupons);
-// Route to fetch a single coupon for editing
 router.get('/getCoupon/:id', couponController.getCouponById);
-// Route to update a specific coupon
 router.put('/updateCoupon/:id', couponController.updateCoupon);
 router.delete("/deleteCoupon", couponController.deleteCoupon);
 
 
+router
+.route("/salesReport")
+.get(salesReportController.getSalesReport);
 
 
 module.exports = router;

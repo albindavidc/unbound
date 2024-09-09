@@ -67,7 +67,7 @@
                           <div class="col-6 col-md-12 text-end text-md-center">
                             <% if (item.productId.onOffer) { %> ₹ <%= item.productId.offerDiscountPrice %> <% } else { %> ₹ <%=
                             item.productId.sellingPrice %> <% } %>
-                            <p style="text-decoration: line-through">₹<%- item.price %></p>
+                            <p style="text-decoration: line-through">₹<%- item.productId.actualPrice %></p>
                           </div>
                         </div>
                       </div>
