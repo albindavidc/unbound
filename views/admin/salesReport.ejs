@@ -1,0 +1,182 @@
+<%- include('../partials/admin/header') %>
+<style>
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+</style>
+
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Sales Report</h1>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><%= locals.title ? locals.title : 'Product Offers' %></h1>
+
+    <div class="d-flex align-items-center gap-2">
+      <div class="btn-toolbar mb-2 mb-md-0">
+        <form class="d-flex" method="get">
+          <div class="d-flex align-items-center gap-2">
+            <div class="form-group">
+              <label for="startDate">From</label>
+              <input type="date" name="startDate" id="startDate" class="form-control" placeholder="Start Date" value="<%- startDate %>" />
+            </div>
+            <div class="form-group">
+              <label for="endDate">To</label>
+              <input type="date" id="endDate" name="endDate" class="form-control" placeholder="End Date" value="<%- endDate %>" />
+            </div>
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+                Get Report
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="btn-toolbar">
+        <button onclick="getExcel()" type="button" class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i>Excel</button>
+        <button id="exportToButton" onclick="getPDF()" type="button" class="btn btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i>PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main my-5">
+    <div class="mx-5">
+      <% if(orders && orders.length>0) { %>
+
+      <div class="table-responsive container">
+        <table class="table table-striped align-middle display" id="salesReportTable">
+          <thead>
+            <tr class="text-center">
+              <th class="sorting" scope="col">#</th>
+              <th class="sorting" scope="col">Order Id</th>
+              <th class="sorting" scope="col">Order Date</th>
+              <th class="sorting" scope="col">User</th>
+              <th class="sorting" scope="col">Products</th>
+              <th class="sorting" scope="col">Shipping Address</th>
+              <th class="sorting" scope="col">Payment Method</th>
+              <th class="sorting" scope="col">Status</th>
+              <th class="sorting" scope="col">Total Amount</th>
+              <th class="sorting" scope="col">Coupon</th>
+              <th class="sorting" scope="col">Coupon Discount</th>
+              <th class="sorting" scope="col">Payable</th>
+              <th class="sorting" scope="col">Category Discount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach((order, index) => { %>
+            <tr class="text-capitalize">
+              <td class="text-center"><%=index+1%></td>
+              <td class="text-center"><%= order._id.toString().slice(-7).toUpperCase() %></td>
+              <td class="text-center"><%=order.createdAt.toDateString()%></td>
+              <td><%=order.userID[0].username%></td>
+              <td>
+                <ul>
+                  <% if(orders[index].orderedItems && orders[index].orderedItems.length>0) {%> <% for(let j=0 ; j< orders[index].orderedItems.length ;
+                  j++ ){%>
+
+                  <li class="text-uppercase list-unstyled mt-3">
+                    <%=orders[index].orderedItems[j].productDetails.product_name%> ( <%=orders[index].orderedItems[j].quantity%> )
+                  </li>
+                  <% }%> <%}%>
+                </ul>
+              </td>
+
+              <td class="text-center"><%=order.shippingAddress?.address%></td>
+              <td><%=order.paymentMethod%></td>
+              <td><%=order.status%></td>
+              <td><%=order.totalAmount%></td>
+              <td class="text-uppercase"><%=order.coupon ? order.coupon.code : "No Coupon"%></td>
+              <td><%=order.couponDiscount%></td>
+              <td><%=order.payable.toFixed(2)%></td>
+              <td class="text-center"><%=order.categoryDiscount.toFixed(2)%></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <%} else{%>
+        <div class="container">
+          <div class="text-danger h1">No Orders Found</div>
+        </div>
+      </div>
+
+      <%}%>
+    </div>
+  </main>
+</section>
+
+<!-- data tables -->
+<!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" /> -->
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+<!-- <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script> -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.4/purify.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+<script type="text/javascript" src="https://www.shieldui.com/shared/components/latest/js/jszip.min.js"></script>
+
+<script defer>
+  let table = new DataTable("#salesReportTable", { pageLength: 10, responsive: true });
+
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const getExcel = () => {
+    console.log(startDate, endDate);
+
+    let url = `/admin/sales-report/excel?startDate=${startDate}&endDate=${endDate}`;
+    window.location.href = url;
+  };
+
+  const getPDF = async () => {
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
+
+    try {
+      Swal.fire({
+        icon: "info",
+        title: "Generating PDF...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        timer: 1200,
+      }).then(() => {
+        let url = `/admin/sales-report/pdf-download?startDate=${start}&endDate=${end}`;
+        window.location.href = url;
+      });
+    } catch (error) {
+      console.error("Error fetching content or generating PDF:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message || "Something went wrong!",
+      });
+    }
+  };
+</script>
+
+<%- include('../partials/admin/footer') %>
