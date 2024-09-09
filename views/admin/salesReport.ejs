@@ -24,11 +24,9 @@
   </div>
 </section>
 <section>
-  <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2"><%= locals.title ? locals.title : 'Product Offers' %></h1>
-
+  <div class="container d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <div class="d-flex align-items-center gap-2">
-      <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-toolbar mb-2 mb-md-0 ">
         <form class="d-flex" method="get">
           <div class="d-flex align-items-center gap-2">
             <div class="form-group">
@@ -40,7 +38,7 @@
               <input type="date" id="endDate" name="endDate" class="form-control" placeholder="End Date" value="<%- endDate %>" />
             </div>
             <div class="form-group">
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-dark">
                 <i class="bi bi-search"></i>
                 Get Report
               </button>
@@ -49,8 +47,7 @@
         </form>
       </div>
       <div class="btn-toolbar">
-        <button onclick="getExcel()" type="button" class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i>Excel</button>
-        <button id="exportToButton" onclick="getPDF()" type="button" class="btn btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i>PDF</button>
+        <button onclick="getExcel()" type="button" class="btn btn-outline-dark m-2"><i class="bi bi-file-earmark-spreadsheet"></i>Excel</button>
       </div>
     </div>
   </div>
