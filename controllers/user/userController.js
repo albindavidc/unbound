@@ -596,6 +596,39 @@ const deleteAddress = async (req, res) => {
 //   console.log("Is this really working..  Yes it is")
 //   res.render("user/checkout");
 // };
+const getReferrals = async(req, res) => {
+
+  const user = await User.findOne({ _id: req.session.user });
+
+  function generateRefferalCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let referralCode = '';
+    for (let i = 0; i < length; i++) {
+        referralCode += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return referralCode;
+  }
+  
+  if(!user.referralCode){
+    const refferalCode = generateRefferalCode(8);
+
+    user.referralCode = refferalCode;
+    await user.save();
+  }
+
+  console.log(user);
+
+  let successfullRefferals = [];
+  if (user.successfullRefferals && Array.isArray(user.successfullRefferals)) {
+    successfullRefferals = user.successfullRefferals.reverse();
+  }
+
+  res.render("user/refferals", {
+    refferalCode: user.referralCode,
+    successfullRefferals,
+    user: req.session.user
+  })
+};
 
 module.exports = {
   pageNotFound,
@@ -625,7 +658,8 @@ module.exports = {
   deleteAddress,
   resetPassword,
 
-  // getCheckout,
+
+  getReferrals,
 
   logout,
 };

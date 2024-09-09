@@ -130,5 +130,7 @@ router.post("/place-order", checkoutController.placeOrder);
 router.post("/user/verify-payment", checkoutController.verifyPayment);
 router.get("/order-success", cartController.getOrderSuccess);
 
+router.get("/referrals", userController.getReferrals);
+
 
 module.exports = router;
