@@ -88,15 +88,15 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    onOffer: {
-      type: String,
-      required: true,
-    },
-    offerDiscountPrice: {
-      type: Number,
-      min: 0,
-      default: 0,
-    },
+    // onOffer: {
+    //   type: String,
+    //   required: true,
+    // },
+    // offerDiscountPrice: {
+    //   type: Number,
+    //   min: 0,
+    //   default: 0,
+    // },
     offerDiscountRate: {
       type: Number,
       min: 0,

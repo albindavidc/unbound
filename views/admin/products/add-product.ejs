@@ -100,8 +100,6 @@
     padding: 40px 0 10px 0;
   }
 
-
-    
   .userProfileMain {
     width: 100%;
     height: 30%;
@@ -130,7 +128,6 @@
   </div>
 </section>
 
-
 <section>
   <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -156,7 +153,6 @@
     <main>
       <div class="bottom-data">
         <div class="orders">
-
           <div class="form-container">
             <div class="form-wrapper">
               <form id="addProductForm" action="/admin/add-product" method="POST" enctype="multipart/form-data" onsubmit="addproduct(event)">
@@ -195,6 +191,14 @@
                   <small></small>
                   <!-- <div id="product-description-error" class="error-div"></div> -->
                 </div>
+
+                <div class="mb-4 mt-5">
+                  <label class="form-label">Selling Price is calculated automatically with product and category offer</label>
+                  <input placeholder="₹" id="selling-price" name="sellingPrice" type="number" class="form-control" value="0" disabled />
+                  <!-- <div id="selling-price-error" class="error-message error-div"></div> -->
+                  <small></small>
+                </div>
+
                 <div class="mb-4 mt-5">
                   <div class="row">
                     <div class="col-lg-4">
@@ -205,14 +209,7 @@
                         <!-- <div id="actual-price-error" class="error-message error-div"></div> -->
                       </div>
                     </div>
-                    <div class="col-lg-4">
-                      <div class="mb-4">
-                        <label class="form-label">Selling Price is calculated automatically with product and category offer</label>
-                        <input placeholder="₹" id="selling-price" name="sellingPrice" type="number" class="form-control" value="0" disabled />
-                        <!-- <div id="selling-price-error" class="error-message error-div"></div> -->
-                        <small></small>
-                      </div>
-                    </div>
+
                     <div class="col-lg-4">
                       <div class="mb-4">
                         <label class="form-label">Bundle Price </label>
@@ -221,34 +218,21 @@
                         <small></small>
                       </div>
                     </div>
-                  </div>
-                </div>
+                    <div class="col-lg-4">
 
-                <div class="mb-4 mt-5">
-                  <div class="row">
-                    <div class="col-lg-6">
-                      <div class="mb-4">
-                        <label for="variant-stock" class="form-label">Stock of Product</label>
-                        <input placeholder="Stock" id="variant-stock" name="variants[0][stock]" type="number" class="form-control" required />
-                        <!-- <div id="stock-error" class="error-message error-div"></div> -->
-                        <small></small>
-                      </div>
+                    <div class="mb-4">
+                      <label class="form-label">Max Product/Person</label>
+                      <input placeholder="Quantity" id="max-product" name="quantity" type="number" class="form-control" required />
+                      <small></small>
                     </div>
-                    <div class="col-lg-6">
-                      <div class="mb-4">
-                        <label class="form-label">Max Product/Person</label>
-                        <input placeholder="Quantity" id="max-product" name="quantity" type="number" class="form-control" required />
-                        <small></small>
-                      </div>
-
-                      <!-- <div id="quantity-error" class="error-div"></div> -->
                     </div>
                   </div>
                 </div>
 
+
                 <div class="mb-4 mt-5">
                   <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                       <div class="mb-4">
                         <label for="color" class="form-label">Color</label>
                         <select class="form-control" name="variants[0][color]" id="color" required>
@@ -262,7 +246,7 @@
                       </div>
                     </div>
 
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                       <div class="mb-4">
                         <label for="size" class="form-label">Size</label>
                         <select class="form-control" name="variants[0][size]" id="size" required>
@@ -275,6 +259,14 @@
                         <small></small>
                       </div>
                     </div>
+                    <div class="col-lg-4">
+                      <div class="mb-4">
+                        <label for="variant-stock" class="form-label">Stock of Product</label>
+                        <input placeholder="Stock" id="variant-stock" name="variants[0][stock]" type="number" class="form-control" required />
+                        <!-- <div id="stock-error" class="error-message error-div"></div> -->
+                        <small></small>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -282,28 +274,7 @@
                   <div class="row">
                     <div class="col-lg-4">
                       <div class="mb-4">
-                        <label class="form-label" for="on-offer">On Offer</label>
-                        <select class="form-control" name="offer" id="on-offer" required>
-                          <option value="selectOffer">Select offer status</option>
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                        <small></small>
-                      </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                      <div class="mb-4">
-                        <label class="form-label" for="offer-discount-price">Offer Discount Price</label>
-                        <input placeholder="₹" name="offerDiscountPrice" type="number" class="form-control" id="offer-discount-price" required />
-                        <!-- <div id="offer-discount-price-error" class="error-message error-div"></div> -->
-                        <small></small>
-                      </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                      <div class="mb-4">
-                        <label class="form-label" for="offer-discount-rate">Offer Discount Rate</label>
+                        <label class="form-label" for="offer-discount-rate">Product Offer(%)</label>
                         <input placeholder="%" name="offerDiscountRate" type="number" class="form-control" id="offer-discount-rate" required />
                         <!-- <div id="offer-discount-rate-error" class="error-message error-div"></div> -->
                         <small></small>
@@ -547,8 +518,6 @@
         isMaxProduct = checkMaxProduct(),
         isColor = checkColor(),
         isSize = checkSize(),
-        isOffer = checkOnOffer(),
-        isDiscountPrice = checkOfferDiscountPrice(),
         isDiscountRate = checkOfferDiscountRate(),
         isBrand = checkBrand(),
         isCategory = checkCategory();
@@ -562,8 +531,6 @@
         isMaxProduct &&
         isColor &&
         isSize &&
-        isOffer &&
-        isDiscountPrice &&
         isDiscountRate &&
         isBrand &&
         isCategory;
@@ -624,10 +591,10 @@
 
     if (!isRequired(description)) {
       showError(descriptionEl, "Description cannot be blank.");
-    } 
+    }
     // else if (!/^[a-zA-Z\s]+$/.test(description)) {
     //   showError(descriptionEl, "Description should not contain numbers.");
-    // } 
+    // }
     else {
       showSuccess(descriptionEl);
       isValid = true;
@@ -649,8 +616,6 @@
     }
     return isValid;
   };
-
-
 
   const checkBundlePrice = () => {
     const bundlePriceEl = document.querySelector("#bundle-price");

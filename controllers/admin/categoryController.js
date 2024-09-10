@@ -1,5 +1,5 @@
 const Category = require("../../models/categorySchema");
-const Product = require("../../models/productSchema")
+const Product = require("../../models/productSchema");
 
 // Fetch category data with pagination and search
 const categoryInfo = async (req, res) => {
@@ -52,7 +52,6 @@ const addCategory = async (req, res) => {
 
     const offer = parseFloat(offer);
 
-
     const newCategory = new Category({
       name,
       description,
@@ -67,9 +66,7 @@ const addCategory = async (req, res) => {
         {
           $set: {
             sellingPrice: {
-              $trunc: [
-                { $multiply: ["$sellingPrice", { $subtract: [1, offer / 100] }] },
-              ]
+              $trunc: [{ $multiply: ["$sellingPrice", { $subtract: [1, offer / 100] }] }],
             },
           },
         },
@@ -112,20 +109,24 @@ const editCategory = async (req, res) => {
     category.categoryOffer = offer;
     await category.save();
 
-    await Product.updateMany(
-      { category: category._id }, // Match all products in the given category
-      [
-        {
-          $set: {
-            sellingPrice: {
-              $trunc: [
-                { $multiply: ["$sellingPrice", { $subtract: [1, offer / 100] }] },
-              ]
+    const products = await Product.find({ category: category._id });
+
+    console.log("this is products in category", products)
+    for(let product of products){
+
+      const productOffer = product.offerDiscountRate;
+      const newSellingPrice = product.actualPrice*(1-offer/100)*(1-productOffer/100);
+      await Product.updateOne(
+        { _id: product._id }, // Match all products in the given category
+        [
+          {
+            $set: {
+              sellingPrice: Math.trunc(newSellingPrice)
             },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
 
     res.redirect("/admin/category");
   } catch (error) {

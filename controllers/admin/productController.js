@@ -147,12 +147,14 @@ module.exports = {
 
         console.log("this is an updation", catOffer, categoryOffer, categoryId);
 
-        if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100])) {
+        const productOffer = req.body.offerDiscountRate;
+
+        if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1- productOffer/100])) {
           await Product.updateMany({ category: categoryId }, [
             {
               $set: {
                 sellingPrice: {
-                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }] }],
+                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, {$subtract:[1, productOffer/100]}] }],
                 },
               },
             },
@@ -368,14 +370,16 @@ module.exports = {
       const catOffer = await Category.findOne({ _id: categoryId }, { categoryOffer: 1 });
       const categoryOffer = catOffer.categoryOffer;
 
+      const productOffer = req.body.offerDiscountRate;
+
       console.log("this is an updation", catOffer, categoryOffer, categoryId);
 
-      if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100])) {
+      if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1-productOffer/100])) {
         await Product.updateMany({ category: categoryId }, [
           {
             $set: {
               sellingPrice: {
-                $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }] }],
+                $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, {$subtract:[1,productOffer/100]}] }],
               },
             },
           },
