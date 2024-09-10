@@ -70,7 +70,6 @@ module.exports = {
 
   async addProducts(req, res) {
     console.log("add product req.files", req.files);
-    console.log("22222222222222222");
     console.log("add product", req.body);
 
     try {
@@ -78,7 +77,7 @@ module.exports = {
         productName,
         productDescription,
         actualPrice,
-        sellingPrice,
+        sellingPrice = "0",
         bundlePrice,
         offer,
         offerDiscountPrice,
@@ -129,10 +128,10 @@ module.exports = {
           brand,
           category,
           actualPrice,
+          sellingPrice,
           primaryImages,
           secondaryImages,
           variants: processedVariants,
-          sellingPrice,
           bundlePrice,
           quantity,
           onOffer: offer,
@@ -140,6 +139,25 @@ module.exports = {
           offerDiscountRate,
         });
         await newProduct.save();
+
+        //Calculate Offer
+        const categoryId = req.body.category;
+        const catOffer = await Category.findOne({ _id: categoryId }, { categoryOffer: 1 });
+        const categoryOffer = catOffer.categoryOffer;
+
+        console.log("this is an updation", catOffer, categoryOffer, categoryId);
+
+        if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100])) {
+          await Product.updateMany({ category: categoryId }, [
+            {
+              $set: {
+                sellingPrice: {
+                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }] }],
+                },
+              },
+            },
+          ]);
+        }
 
         res.json({ isvalid: true });
       } else {
@@ -341,34 +359,27 @@ module.exports = {
 
       await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
 
-
       //Calculate Offer
       const sellingPrice = req.body.sellingPrice;
       const actualPrice = req.body.actualPrice;
 
-      const categoryId = req.body.category; 
-      const catOffer = await Category.findOne({ _id: categoryId }, { categoryOffer: 1 }); 
-      const categoryOffer = catOffer.categoryOffer ; 
-      
+      const categoryId = req.body.category;
+      const catOffer = await Category.findOne({ _id: categoryId }, { categoryOffer: 1 });
+      const categoryOffer = catOffer.categoryOffer;
 
-      console.log("this is an updation",catOffer,  categoryOffer, categoryId)
-      
-      if (Number(sellingPrice) !== Number(actualPrice*[1-(categoryOffer/100)])) {
-        await Product.updateMany(
-          { category: categoryId }, 
-          [
-            {
-              $set: {
-                sellingPrice: {
-                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }] }],
-                },
+      console.log("this is an updation", catOffer, categoryOffer, categoryId);
+
+      if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100])) {
+        await Product.updateMany({ category: categoryId }, [
+          {
+            $set: {
+              sellingPrice: {
+                $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }] }],
               },
             },
-          ]
-        );
+          },
+        ]);
       }
-
-
 
       req.flash("success", "Product edited successfully");
 
