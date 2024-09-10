@@ -130,6 +130,9 @@ module.exports = {
       userWallet.isInsufficient = false;
     }
 
+    const getPayable = await Cart.findOne({ userId }, {_id:0, payable: 1 });
+    const payable = getPayable.payable;
+
     res.render("user/checkout", {
       user,
       address,
@@ -141,6 +144,7 @@ module.exports = {
       cartCount,
       wallet: userWallet,
       totalPrice,
+      payable,
       checkout: true,
     });
   },

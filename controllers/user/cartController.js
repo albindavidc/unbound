@@ -144,22 +144,26 @@ module.exports = {
 
       let shipmentFee = 50;
 
-      if(totalPrice < 1000){
+      const getPayable = await Cart.findOne({ userId }, {_id:0, payable: 1 });
+      const payable = getPayable.payable;
+
+      if(payable < 1000){
         cart.shipmentFee = shipmentFee;
-        cart.payable += shipmentFee;
+        cart.totalPrice += shipmentFee;
         await cart.save();
 
       }
 
       await cart.save();
 
-      const getPayable = await Cart.findOne({ userId }, {_id:0, payable: 1 });
-      const payable = getPayable.payable;
+      const getTotalPrice = await Cart.findOne({ userId }, {_id:0, totalPrice: 1 });
+      const totalPrices = getTotalPrice.totalPrice;
 
       res.render("user/cart", {
         cartList: cart.items,
         cartCount: cart.items.length,
         totalPrice,
+        totalPrices,
         shipmentFee,
         payable,
         errorMsg: errors,
