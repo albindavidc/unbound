@@ -249,8 +249,9 @@
                 </div>
               </div>
 
-              <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >
-              0) { %>
+              <% let totalStock = 0; %> 
+              <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
+              <% if (totalStock >0) { %>
               <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%= product._id %>')">
                 <i class="bi bi-cart me-2"></i>
                 Add to Cart
@@ -539,8 +540,19 @@
       });
       return;
     }
+    
+    const existingQuantityInCart = `<%- JSON.stringify(existingQuantity) %>` ;
+    if(Number(existingQuantityInCart) + Number(quantity) > Number(totalStock)){
+      Swal.fire({
+        icon: "error",
+        title: "Limited Stock",
+        text: `This product has only ${totalStock} stocks left`,
+        showConfirmButton: true,
+      })
+      return
+    }
+    console.log("this is the total stocks available: ", existingQuantityInCart);
 
-  
 
     if (selectedColorId && selectedSizeId) {
       fetch("/user/add-to-cart", {

@@ -144,19 +144,18 @@ module.exports = {
 
       let shipmentFee = 50;
 
-      const getPayable = await Cart.findOne({ userId }, {_id:0, payable: 1 });
+      const getPayable = await Cart.findOne({ userId }, { _id: 0, payable: 1 });
       const payable = getPayable.payable;
 
-      if(payable < 1000){
+      if (payable < 1000) {
         cart.shipmentFee = shipmentFee;
         cart.totalPrice += shipmentFee;
         await cart.save();
-
       }
 
       await cart.save();
 
-      const getTotalPrice = await Cart.findOne({ userId }, {_id:0, totalPrice: 1 });
+      const getTotalPrice = await Cart.findOne({ userId }, { _id: 0, totalPrice: 1 });
       const totalPrices = getTotalPrice.totalPrice;
 
       res.render("user/cart", {
@@ -206,6 +205,21 @@ module.exports = {
 
       console.log(existingCartItem);
 
+
+      // //Cart Quantity validation with product stock and cart added stock
+      // const currentCartQuantity = existingCartItem ? existingCartItem.quantity : 0;
+      // const totalQuantity = currentCartQuantity + Number(quantity);
+      // const availableStock = selectedVariant.stock;
+
+      // console.log("this is backend", currentCartQuantity, totalQuantity, availableStock)
+      // // Check if the total quantity exceeds the available stock
+      // if (totalQuantity > availableStock) {
+      //   return res.status(404).json({
+      //     success: false,
+      //     message: `You can't add more than ${availableStock} items to the cart. Current cart quantity: ${currentCartQuantity}`,
+      //   });
+      // }
+
       if (existingCartItem) {
         existingCartItem.quantity = Number(existingCartItem.quantity) + Number(quantity);
         existingCartItem.itemTotal = Number(existingCartItem.quantity) * Number(existingCartItem.price);
@@ -234,42 +248,36 @@ module.exports = {
     let productId = req.params.productId;
     let variantId = req.params.variantId;
     let userId = req.session.user;
-  
 
     console.log("these are the productId, variantId, UserId: ", productId, variantId, userId);
     const cart = await Cart.findOne({ userId }).populate("items.productId");
 
     console.log("this is cart", cart);
-    
+
     if (!cart) {
       return res.status(404).json({ status: false, message: "Cart not found" });
     }
-  
-    const itemIndex = cart.items.findIndex(
-      (item) =>
-        item.productId._id.toString() === productId &&
-        item.variantId.toString() === variantId
-    );
-  
+
+    const itemIndex = cart.items.findIndex((item) => item.productId._id.toString() === productId && item.variantId.toString() === variantId);
+
     if (itemIndex === -1) {
       return res.status(404).json({ status: false, message: "Item not found in cart" });
     }
-  
+
     cart.items.splice(itemIndex, 1);
-    
+
     // Recalculate the total price after removing the item
     cart.totalPrice = cart.items.reduce((total, item) => {
       return total + item.productId.sellingPrice * item.quantity;
     }, 0);
-  
+
     await cart.save();
-    if(cart) {
+    if (cart) {
       res.status(200).json({ success: true, message: `Product remove successfull` });
-    }else{
-      res.status(404).json({success: false, message: "Product removal failed"});
+    } else {
+      res.status(404).json({ success: false, message: "Product removal failed" });
     }
   },
-  
 
   incrementCartItem: async (req, res) => {
     handleCartUpdate(req, res, "increment"); // For increment

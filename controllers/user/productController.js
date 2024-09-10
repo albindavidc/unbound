@@ -4,6 +4,7 @@ const Color = require("../../models/attributes/colorSchema");
 const Brand = require("../../models/attributes/brandSchema");
 const Size = require("../../models/attributes/sizeSchema");
 const Variants = require("../../models/attributes/variantSchema")
+const Cart = require("../../models/cartSchema")
 
 const mongoose = require("mongoose");
 
@@ -129,8 +130,6 @@ module.exports = {
         variant.isOutOfStock = variant.stock <= 0;
       });
 
-      // const offerPrice = product.offerpercentage > 0 ? product.price * (1 - product.offerpercentage / 100) : product.price;
-
       // Fetch related products based on the category
       const relatedProducts = await Product.find({
         category: product.category._id,
@@ -140,13 +139,35 @@ module.exports = {
 
       const productData = await Product.find({ productId });
 
+
+      const cart = await Cart.findOne({userId: req.session.user})
+      let existingQuantity;
+      if(cart){
+        const existingItem = cart.items.find(item => item.productId.toString() === productId);
+
+        if(existingItem){
+          existingQuantity = existingItem.quantity;
+
+        }else{
+          existingQuantity = 0;
+        }
+
+      }else{
+        existingQuantity = 0;
+      }
+
+      console.log(existingQuantity, "this is existing cart item")
+
+
+
       res.render("user/product-details", {
         product,
         productData,
         relatedProducts,
         user: req.session.user,
-        // offerPrice,
+        cart,
         stocks,
+        existingQuantity,
       });
     } catch (error) {
       console.error("Error fetching product details:", error);
