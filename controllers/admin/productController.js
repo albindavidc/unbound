@@ -341,6 +341,7 @@ module.exports = {
 
       await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
 
+      
       req.flash("success", "Product edited successfully");
 
       res.json({ isvalid: true });
