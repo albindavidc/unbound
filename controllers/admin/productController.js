@@ -310,7 +310,7 @@ module.exports = {
 
       const variants = req.body.variants;
 
-      console.log("these are the product variatns",variants);
+      console.log("these are the product variatns", variants);
 
       // Process variants (assuming you have Color and Size models)
       const processedVariants = await Promise.all(
@@ -341,7 +341,35 @@ module.exports = {
 
       await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
 
+
+      //Calculate Offer
+      const sellingPrice = req.body.sellingPrice;
+      const actualPrice = req.body.actualPrice;
+
+      const categoryId = req.body.category; 
+      const catOffer = await Category.findOne({ _id: categoryId }, { categoryOffer: 1 }); 
+      const categoryOffer = catOffer.categoryOffer ; 
       
+
+      console.log("this is an updation",catOffer,  categoryOffer, categoryId)
+      
+      if (Number(sellingPrice) !== Number(actualPrice*[1-(categoryOffer/100)])) {
+        await Product.updateMany(
+          { category: categoryId }, 
+          [
+            {
+              $set: {
+                sellingPrice: {
+                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }] }],
+                },
+              },
+            },
+          ]
+        );
+      }
+
+
+
       req.flash("success", "Product edited successfully");
 
       res.json({ isvalid: true });
