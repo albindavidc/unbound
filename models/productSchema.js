@@ -50,6 +50,7 @@ const ProductSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+      trim: true,
     },
     wishlist:{
       type:Boolean,
@@ -67,7 +68,7 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     quantity: {
-      type: Number,
+      type: Number,   //Max product per person
     },
     primaryImages: { type: [imageSchema] },
     secondaryImages: { type: [imageSchema] },

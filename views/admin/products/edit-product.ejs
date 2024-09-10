@@ -147,8 +147,6 @@
   </section>
 
   <section class="content-main">
-
-
     <form id="addProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data">
       <div class="container mt-4">
         <div class="row">
@@ -162,7 +160,7 @@
                 </div>
                 <div class="mb-4">
                   <label for="status" class="form-label">Status</label>
-                  <select class="form-select" id="status" name="isActive" aria-label="Active or Inactive">
+                  <select class="form-select" id="status" name="status" aria-label="Active or Inactive">
                     <% if (product.isActive) { %>
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
@@ -174,9 +172,8 @@
                 </div>
                 <div class="mb-4">
                   <label for="product-description" class="form-label">Description</label>
-                  <textarea placeholder="Type here" id="product-description" class="form-control" name="description" rows="4">
-                <%= product.description %></textarea
-                  >
+                  <input placeholder="Type here" value="<%= product.description.trim() %>" id="product-description" class="form-control" name="description">
+                </input>
                   <div id="productDescriptionError" class="text-danger"></div>
                 </div>
 
@@ -191,21 +188,6 @@
                         type="number"
                         class="form-control"
                         id="actual-price"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label class="form-label" for="selling-price">Selling Price will calculate automatically with category and product offer</label>
-                      <input
-                        placeholder="Enter selling price"
-                        name="sellingPrice"
-                        value="<%= product.sellingPrice %>"
-                        type="number"
-                        class="form-control"
-                        id="selling-price"
-                        disabled
                       />
                     </div>
                   </div>
@@ -229,7 +211,7 @@
                       <label class="form-label" for="max-product">Max Product per Person</label>
                       <input
                         placeholder="Enter bundle price"
-                        name="bundlePrice"
+                        name="quantity"
                         value="<%= product.quantity %>"
                         type="number"
                         class="form-control"
@@ -238,6 +220,23 @@
                     </div>
                   </div>
 
+                  <div class="col-lg-12">
+                    <div class="mb-4">
+                      <label class="form-label" for="selling-price">Selling Price will calculate automatically with category and product offer</label>
+                      <input
+                        placeholder="Enter selling price"
+                        name="sellingPrice"
+                        value="<%= product.sellingPrice %>"
+                        type="number"
+                        class="form-control"
+                        id="selling-price"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
                   <div class="col-lg-4">
                     <div class="mb-4">
                       <label for="color" class="form-label">Color</label>
@@ -280,31 +279,7 @@
 
                   <div class="col-lg-4">
                     <div class="mb-4">
-                      <label for="on-offer" class="form-label">Offer</label>
-                      <select class="form-control border" name="onOffer" id="on-offer">
-                        <option value="true" <% if(product.onOffer){ %>selected <% } %>>Yes</option>
-                        <option value="false" <% if(!product.onOffer) { %>selected <% } %>>No</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label class="form-label" for="offer-discount-price">Offer Discount Price</label>
-                      <input
-                        placeholder="Enter discount price"
-                        name="offerDiscountPrice"
-                        value="<%= product.offerDiscountPrice %>"
-                        type="number"
-                        class="form-control"
-                        id="offer-discount-price"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label class="form-label" for="offer-discount-rate">Offer Discount Rate</label>
+                      <label class="form-label" for="offer-discount-rate">Product Offer (%)</label>
                       <input
                         placeholder="Enter discount Rate(%)"
                         name="offerDiscountRate"
@@ -734,7 +709,6 @@
           const response = await fetch(form.action, {
             method: "POST",
             body: formData,
-
           });
           const data = await response.json();
 
@@ -788,10 +762,10 @@
 
       if (!isRequired(description)) {
         showError(descriptionEl, "Description cannot be blank.");
-      } 
+      }
       // else if (!/^[a-zA-Z\s]+$/.test(description)) {
       //   showError(descriptionEl, "Description should not contain numbers.");
-      // } 
+      // }
       else {
         showSuccess(descriptionEl);
         isValid = true;
@@ -814,20 +788,6 @@
       return isValid;
     };
 
-    const checkSellingPrice = () => {
-      const sellingPriceEl = document.querySelector("#selling-price");
-      const sellingPrice = sellingPriceEl.value;
-
-      if (!isRequired(sellingPrice)) {
-        showError(sellingPriceEl, "Selling price cannot be blank");
-      } else if (parseFloat(sellingPrice) <= 0) {
-        showError(sellingPriceEl, "Selling price cannot be zero");
-      } else {
-        showSuccess(sellingPriceEl);
-        isValid = true;
-      }
-      return isValid;
-    };
 
     const checkBundlePrice = () => {
       const bundlePriceEl = document.querySelector("#bundle-price");
@@ -900,33 +860,7 @@
       return isValid;
     };
 
-    const checkOnOffer = () => {
-      const onOfferEl = document.querySelector("#on-offer");
-      const onOffer = onOfferEl.value;
-
-      if (onOffer === "selectOffer") {
-        showError(onOfferEl, "Select Yes or No");
-      } else {
-        showSuccess(onOfferEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkOfferDiscountPrice = () => {
-      const offerDiscountPriceEl = document.querySelector("#offer-discount-price");
-      const offerDiscountPrice = offerDiscountPriceEl.value;
-
-      if (!isRequired(offerDiscountPrice)) {
-        showError(offerDiscountPriceEl, "Offer discount cannot be blank");
-      } else if (parseFloat(offerDiscountPrice) <= 0) {
-        showError(offerDiscountPriceEl, "Offer discount cannot be zero or less");
-      } else {
-        showSuccess(offerDiscountPriceEl);
-        isValid = true;
-      }
-      return isValid;
-    };
+   
 
     const checkOfferDiscountRate = () => {
       const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
@@ -1020,9 +954,7 @@
           case "actual-price":
             checkActualPrice();
             break;
-          case "selling-price":
-            checkSellingPrice();
-            break;
+
           case "bundle-price":
             checkBundlePrice();
             break;
@@ -1038,12 +970,7 @@
           case "size":
             checkSize();
             break;
-          case "on-offer":
-            checkOnOffer();
-            break;
-          case "offer-discount-price":
-            checkOfferDiscountPrice();
-            break;
+
           case "offer-discount-rate":
             checkOfferDiscountRate();
             break;
@@ -1070,9 +997,7 @@
           case "actual-price":
             checkActualPrice();
             break;
-          case "selling-price":
-            checkSellingPrice();
-            break;
+     
           case "bundle-price":
             checkBundlePrice();
             break;
@@ -1088,12 +1013,7 @@
           case "size":
             checkSize();
             break;
-          case "on-offer":
-            checkOnOffer();
-            break;
-          case "offer-discount-price":
-            checkOfferDiscountPrice();
-            break;
+     
           case "offer-discount-rate":
             checkOfferDiscountRate();
             break;
@@ -1116,14 +1036,11 @@
         let isNameValid = checkName(),
           isDesciptionValid = checkDescription(),
           isActualPriceValid = checkActualPrice(),
-          isSellingPriceValid = checkSellingPrice(),
           isBundlePriceValid = checkBundlePrice(),
           isStockValid = checkVariantStock(),
           isMaxProduct = checkMaxProduct(),
           isColor = checkColor(),
           isSize = checkSize(),
-          isOffer = checkOnOffer(),
-          isDiscountPrice = checkOfferDiscountPrice(),
           isDiscountRate = checkOfferDiscountRate(),
           isBrand = checkBrand(),
           isCategory = checkCategory();
@@ -1132,14 +1049,11 @@
           isNameValid &&
           isDesciptionValid &&
           isActualPriceValid &&
-          isSellingPriceValid &&
           isBundlePriceValid &&
           isStockValid &&
           isMaxProduct &&
           isColor &&
           isSize &&
-          isOffer &&
-          isDiscountPrice &&
           isDiscountRate &&
           isBrand &&
           isCategory;

@@ -124,7 +124,7 @@ module.exports = {
 
         const newProduct = new Product({
           name: productName,
-          description: productDescription,
+          description: productDescription.trim(),
           brand,
           category,
           actualPrice,
@@ -342,17 +342,18 @@ module.exports = {
         })
       );
 
+
       const updateProduct = {
         name: req.body.name,
-        brand: req.body.brand,
-        category: req.body.category,
-        description: req.body.description.trim(),
-        variants: processedVariants,
+        isActive: req.body.status,
+        description: req.body.description.trim().trimStart(),
         actualPrice: req.body.actualPrice,
-        sellingPrice: req.body.sellingPrice,
-        offerDiscountPrice: req.body.offerDiscountPrice,
+        bundlePrice: req.body.bundlePrice,
+        quantity: req.body.quantity,
+        variants: processedVariants,
         offerDiscountRate: req.body.offerDiscountRate,
-        // offerpercentage: req.body.offerpercentage || 0,
+        category: req.body.category,
+        brand: req.body.brand,
         primaryImages,
         secondaryImages,
       };
