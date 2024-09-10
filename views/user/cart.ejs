@@ -145,12 +145,23 @@
               <ul class="order-summary mb-0 list-unstyled">
                 <li class="order-summary-item"><span>Order Subtotal </span><span id="cartTotal">₹<%= totalPrice %></span></li>
                 <li class="order-summary-item">
-                  <span>Shipping and handling <span class="text-muted">(free)</span></span
-                  ><span>₹ <%= shipmentFee %></span>
+                  <% if (totalPrice <1000) { %>
+                   
+                    <span>Shipping and handling <span class="text-muted"></span></span
+                    ><span>₹ <%= shipmentFee %></span>
+                  <% }else{ %>
+                    <span>Shipping and handling <span class="text-muted">(free)</span></span>
+                    <span style="text-decoration-line: line-through;">₹ <%= shipmentFee %></span>
+
+                    <% } %>
                 </li>
                 <!-- <li class="order-summary-item"><span>Tax</span><span>₹0.00</span></li> -->
                 <li class="order-summary-item border-0">
-                  <span>Total</span><strong id="grandTotal" class="order-summary-total">₹<%= totalPrice %></strong>
+                  <% cartList.forEach(item => { %>
+
+                  <span>Total</span><strong id="grandTotal" class="order-summary-total">₹<%= payable %>
+                    <% }) %>
+                  </strong>
                 </li>
               </ul>
             </div>
