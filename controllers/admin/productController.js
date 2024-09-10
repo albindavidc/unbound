@@ -308,18 +308,33 @@ module.exports = {
       //   }
       // }
 
+      const variants = req.body.variants;
+
+      console.log("these are the product variatns",variants);
+
+      // Process variants (assuming you have Color and Size models)
+      const processedVariants = await Promise.all(
+        variants.map(async (variant) => {
+          const { color, size, stock } = variant;
+          return {
+            color: await Color.findById(color),
+            size: await Size.findById(size),
+            stock: parseInt(stock, 10), // Ensure stock is a number
+          };
+        })
+      );
+
       const updateProduct = {
-        name: req.body.name.toLowerCase(),
+        name: req.body.name,
         brand: req.body.brand,
         category: req.body.category,
-        description: req.body.description,
-        stock: req.body.stock,
+        description: req.body.description.trim(),
+        variants: processedVariants,
         actualPrice: req.body.actualPrice,
         sellingPrice: req.body.sellingPrice,
         offerDiscountPrice: req.body.offerDiscountPrice,
         offerDiscountRate: req.body.offerDiscountRate,
         // offerpercentage: req.body.offerpercentage || 0,
-        color: req.body.color.split(","), // Assuming color is a comma-separated string
         primaryImages,
         secondaryImages,
       };

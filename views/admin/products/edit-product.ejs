@@ -240,7 +240,7 @@
                   <div class="col-lg-4">
                     <div class="mb-4">
                       <label for="color" class="form-label">Color</label>
-                      <select name="color" id="color" class="form-select">
+                      <select name="variants[0][color]" id="color" class="form-select">
                         <option value="<%= product.variants[0].color._id %>"><%= product.variants[0].color.name %></option>
 
                         <% colors.forEach(color => { %> <% if (color.name !== product.variants[0].color.name) { %>
@@ -253,7 +253,7 @@
                   <div class="col-lg-4">
                     <div class="mb-4">
                       <label for="size" class="form-label">Size</label>
-                      <select name="size" id="size" class="form-select">
+                      <select name="variants[0][size]" id="size" class="form-select">
                         <option value="<%= product.variants[0].size._id %>"><%= product.variants[0].size.value %></option>
 
                         <% sizes.forEach(size => { %> <% if (size.value !== product.variants[0].size.value) { %>
@@ -269,7 +269,7 @@
                       <input
                         type="number"
                         placeholder="Enter the stock"
-                        name="stock"
+                        name="variants[0][stock]"
                         value="<%= product.variants[0].stock %>"
                         class="form-control"
                         id="variant-stock"
@@ -733,6 +733,7 @@
           const response = await fetch(form.action, {
             method: "POST",
             body: formData,
+
           });
           const data = await response.json();
 
@@ -742,8 +743,7 @@
               title: "Success",
               text: "Product update successfully!",
             }).then(() => {
-              const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
-              window.location.href = `${API_BASE_URL}/admin/products`;
+              window.location.replace("/admin/products");
             });
           } else {
             Swal.fire({
