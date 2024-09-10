@@ -1,32 +1,30 @@
 <%- include("../../partials/admin/header") %>
 
 
-<section class="breadcrumb-option">
-    <div class="container">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-2">
-          <li class="breadcrumb-item">
-            <a class="link-body-emphasis" href="/admin">
- 
-              <span>Dashboard / </span>
-            </a>
-          </li>
-          <li>
-  
-            <a class="link-body-emphasis fw-semibold text-decoration-none" href="/admin/products"> Products</a>
-          </li>
-          <li class="breadcrumb-item active" aria-current="page">
-           / Manage Stocks
-          </li>
-        </ol>
-      </nav>
+<style>
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
+
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
+</style>
+
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Stock Management</h1>
     </div>
-  </section>
-  
-  <div class="container d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2"><%= locals.title ? locals.title : 'Stock Management' %></h1>
-  
   </div>
+</section>
   
   <section class="container text-capitalize">
     <div class="container table-responsive">
@@ -61,7 +59,7 @@
                     <input type="number" class="form-control" name="variants[<%= index %>][stock]" min="0" id="stock-<%= variant._id %>" value="<%= variant.stock %>">
                   </div>
                   <div class="col-auto">
-                    <button onclick="updateStock('<%= variant._id %>')" class="btn btn-primary btn-sm">Update</button>
+                    <button onclick="updateStock('<%= variant._id %>')" class="btn btn-dark btn-l">Update</button>
                   </div>
                 <% }); %>
               </div>
