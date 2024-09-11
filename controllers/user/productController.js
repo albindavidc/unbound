@@ -110,7 +110,8 @@ module.exports = {
         .populate("variants.size")
         .populate("ratings.user")
         .populate("brand")
-        .populate("variants.stock");
+        .populate("variants.stock")
+        .populate("wishlist");
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -158,9 +159,13 @@ module.exports = {
 
       console.log(existingQuantity, "this is existing cart item")
 
+      const productWishlist = product.wishlist;
 
+      console.log("this is product wishlist", productId)
 
       res.render("user/product-details", {
+        productWishlist,
+        productId,
         product,
         productData,
         relatedProducts,
