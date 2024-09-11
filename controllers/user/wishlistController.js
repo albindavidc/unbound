@@ -1,40 +1,60 @@
 const Wishlist = require("../../models/wishlistSchema");
 const Product = require("../../models/productSchema");
+const Cart = require("../../models/cartSchema");
 
 module.exports = {
   getWishlist: async (req, res) => {
     try {
       userId = req.session.user;
+      const wishlist = await Wishlist.find({ userId }).populate({
+        path: "products.productId",
+        populate: {
+          path: "variants",
+          populate: [{ path: "color" }, { path: "size" }],
+        },
+      });
 
-      // Populate the product variants as well
-      const wishlist = await Wishlist.find({ userId }).populate("products.productId products.addedOn products.productId.variants");
+      let products;
+      let allStocks ;
 
-      let products = []; // Collect all product IDs
-      let allStocks = []; // Collect all stocks
-
-      // Iterating through the wishlist items to collect product IDs and stock data
+      let productId;
       wishlist.forEach((wish) => {
         wish.products.forEach((product) => {
-          products.push(product.productId); // Collect the product ID
+          products = product.productId;
+          productId = product.productId;
 
           // Collect the stocks for each variant of the product
           product.productId.variants.forEach((variant) => {
-            allStocks.push(variant.stock);
+            allStocks = variant.stock;
           });
         });
       });
 
       // Fetch all products based on the collected product IDs
-      const product = await Product.find({ _id: { $in: products.map((p) => p._id) } });
+      const product = await Product.find({ _id: productId });
 
-      let variants ;
-      product.forEach(product =>{
-        variants = product.variants
-      })
+      let variants;
+      product.forEach((product) => {
+        variants = product.variants;
+      });
 
-      console.log("this is variants",variants)
+      const cart = await Cart.findOne({ userId: req.session.user });
+      let existingQuantity;
+      if (cart) {
+        const existingItem = cart.items.find((item) => item.productId.toString() === productId);
 
-      res.render("user/wishlist", { wishlist, user: userId, product,variants, stocks: allStocks });
+        if (existingItem) {
+          existingQuantity = existingItem.quantity;
+        } else {
+          existingQuantity = 0;
+        }
+      } else {
+        existingQuantity = 0;
+      }
+
+      console.log("this is variants", variants);
+
+      res.render("user/wishlist", { wishlist, user: userId, product, variants, stocks: allStocks, existingQuantity });
     } catch (error) {
       res.redirect("user/pageNotFound");
       console.log("Internal server Error", error);

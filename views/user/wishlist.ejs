@@ -30,57 +30,146 @@
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
     <% wishlist.forEach(item => { %> <% item.products.forEach(product => { %> <% if (product.wishlist === true) { %>
 
-      <div class="col">
-      <a style="color: black;" href= <%= `/user/product-list/${product.productId._id}` %> >
+    <div class="col">
       <div class="card h-100 shadow-sm">
-        <img
-          class="card-img-top img-fluid rounded"
-          src="/uploads/images/<%= product.productId.primaryImages[0].name %>"
-          alt="<%= product.productId.name %>"
-        />
+        <a style="color: black" href="<%= `/user/product-list/${product.productId._id}` %>">
+          <img
+            class="card-img-top img-fluid rounded"
+            src="/uploads/images/<%= product.productId.primaryImages[0].name %>"
+            alt="<%= product.productId.name %>"
+          />
 
-        <div class="card-body">
-          <h4 class="card-title text-center"><%= product.productId.name %></h4>
+          <div class="card-body">
+            <h4 class="card-title text-center"><%= product.productId.name %></h4>
+          </div>
+
+          <div class="d-flex justify-content-center align-items-center pb-3">
+            <h5 class="card-title text-center mr-2">₹<span id="productPrice"><%= product.productId.sellingPrice %></span></h5>
+            <h6 class="card-title text-center" style="text-decoration: line-through">₹<%= product.productId.actualPrice %>.00</h6>
+          </div>
+
+          <div class="d-flex flex-colmn justify-content-center">
+            <div class="d-flex justify-content-center mr-4">
+              <% if (product.productId.wishlist === true) { %>
+              <a
+                href="javascript:void(0);"
+                onclick="deleteWishlist(event, '<%= product.productId._id %>', this)"
+                id="wishlist_delete"
+                aria-label="Add to Wishlist"
+              >
+                <button class="btn btn-outline-danger">
+                  <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
+                </button>
+              </a>
+              <% } else { %>
+              <a
+                href="javascript:void(0);"
+                onclick="addWishlist(event, '<%= product.productId._id %>', this)"
+                id="wishlist_add"
+                aria-label="Add to Wishlist"
+              >
+                <button class="btn btn-outline-secondary">
+                  <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
+                </button>
+              </a>
+              <% } %>
+            </div>
+
+            <div class="product__details__cart__option">
+              <div class="quantity d-flex justify-content-center">
+                <div class="pro-qty">
+                  <input name="quantity" type="text" id="productQuantity" value="1" data-stock="<% stocks %>" />
+                  <% console.log("this is fronned stokcs", stocks) %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <div class="pb-3 d-flex justify-content-center">
+          <% product.productId.variants.forEach(variant => { %>
+          <h6>Total number of stocks: <%= variant.stock %></h6>
+          <% }) %>
         </div>
 
-        <div class="d-flex flex-colmn justify-content-center">
-          <h5 class="card-title text-center mr-2">₹<%= product.productId.sellingPrice %></h5>
-          <h6 class="card-title text-center" style="text-decoration: line-through">₹<%= product.productId.actualPrice %>.00</h6>
+        <div class="col">
+          <div class="row d-flex align-items-center">
+            <div class="product__details__option">
+              <div class="mt-3">
+                <div class="col-12 detail-option mb-3">
+                  <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
+                  <ul class="list-inline mb-0 colours-wrapper">
+                    <% let renderedColors = {}; %> <% product.productId.variants.forEach((variant, index) => { %> <% if (variant.color &&
+                    !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
+                    <li class="list-inline-item">
+                      <label
+                        onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
+                        class="btn-colour <%= index === 0 ? 'active' : '' %>"
+                        for="colour_<%= variant.color.name %>"
+                        data-color-hex="<%= variant.color.hex %>"
+                        data-color-id="<%= variant.color._id %>"
+                        data-size-id="<%= variant.size._id %>"
+                      ></label>
+
+                      <input
+                        class="input-invisible"
+                        type="radio"
+                        name="colour"
+                        value="<%= variant.color._id %>"
+                        id="colour_<%= variant.color.name %>"
+                        required
+                      />
+                    </li>
+                    <% } %> <% }); %>
+                  </ul>
+                </div>
+                <div class="col-12 detail-option mb-3">
+                  <h6 class="detail-option-heading">Size <span>(required)</span></h6>
+                  <ul class="list-inline mb-0 sizes-wrapper">
+                    <% let renderedSizes = {}; %> <% product.productId.variants.forEach((variant, index) => { %> <% if (variant.size &&
+                    !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
+                    <li class="list-inline-item">
+                      <label
+                        onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
+                        class="btn btn-sm btn-outline-secondary detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
+                        for="size_<%= variant.size.value %>"
+                        data-size-value="<%= variant.size.value %>"
+                        data-size-id="<%= variant.size._id %>"
+                        data-color-id="<%= variant.color._id %>"
+                      >
+                        <%= variant.size.value %>
+                        <input
+                          class="input-invisible"
+                          type="radio"
+                          name="size"
+                          value="<%= variant.size._id %>"
+                          id="size_<%= variant.size.value %>"
+                          required
+                        />
+                      </label>
+                    </li>
+                    <% } %> <% }); %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="m-4 d-flex justify-content-center">
-          <% if (product.productId.wishlist === true) { %>
-
-          <a
-            href="javascript:void(0);"
-            onclick="deleteWishlist(event, '<%= product.productId._id %>',this)"
-            id="wishlist_delete"
-            aria-label="Add to Wishlist"
-          >
-            <button class="btn btn-outline-danger">
-              <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
-            </button>
-          </a>
-          <% }else{ %>
-
-          <a
-            href="javascript:void(0);"
-            onclick="addWishlist(event, '<%= product.productId._id %>',this)"
-            id="wishlist_add"
-            aria-label="Add to Wishlist"
-          >
-            <button class="btn btn-outline-secondary">
-              <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
-            </button>
-          </a>
-
+        <div class="product__details__cart__option d-flex justify-content-center">
+          <% let totalStock = 0; %> <% product.productId.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if
+          (totalStock > 0) { %>
+          <button class="btn btn-dark btn-sm" onclick="addToCart('<%= product.productId._id %>')">
+            <i class="bi bi-cart me-2"></i>
+            Add to Cart
+          </button>
+          <% } else { %>
+          <a href="#" class="btn btn-danger btn-sm">Out of Stock</a>
           <% } %>
         </div>
-
-      
       </div>
     </div>
-  </a>
+
     <% } %> <% }) %> <% }) %>
   </div>
 </section>
@@ -170,6 +259,150 @@
     } catch (error) {
       console.error("Error:", error);
       Swal.fire("Error", "An error occurred while removing the product from the wishlist", "error");
+    }
+  }
+</script>
+
+<script defer>
+  document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".btn-colour");
+    buttons.forEach((btn) => {
+      const hex = btn.getAttribute("data-color-hex");
+      btn.style.backgroundColor = hex;
+    });
+  });
+
+  let selectedColorId = null;
+  let selectedSizeId = null;
+
+  const price = document.getElementById("productPrice").textContent;
+  const quantity = document.getElementById("productQuantity").value;
+
+  function selectColor(hex, colorId, sizeId) {
+    document.querySelectorAll(".btn-colour").forEach((el) => el.classList.remove("active"));
+    document.querySelector(`.btn-colour[data-color-hex="${hex}"]`).classList.add("active");
+    selectedColorId = colorId;
+    selectedSizeId = sizeId;
+  }
+
+  function selectSize(sizeValue, sizeId, colorId) {
+    document.querySelectorAll(".size-option").forEach((el) => el.classList.remove("active"));
+    document.querySelector(`.size-option[data-size-value="${sizeValue}"]`).classList.add("active");
+    selectedSizeId = sizeId;
+    selectedColorId = colorId;
+  }
+
+  function addToCart(productId) {
+    const quantity = document.getElementById("productQuantity").value;
+
+    console.log("this is details page", quantity);
+
+    if (!selectedColorId || !selectedSizeId) {
+      Swal.fire({
+        icon: "error",
+        title: "Select a Color & Size",
+        text: "Kindly select a color and size",
+        showConfirmButton: true,
+      });
+      return;
+    }
+
+    if (quantity > 10) {
+      Swal.fire({
+        icon: "error",
+        title: "Quantity Exceeded",
+        text: "You have entered the maximum quantity per order",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    if (quantity == 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Quantity cannot be zero",
+        text: "You have entered invalid quantity",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    const totalStock = `<%- JSON.stringify(stocks) %>`;
+    console.log("this is the total stocks available: ", totalStock);
+
+    if (quantity > totalStock) {
+      Swal.fire({
+        icon: "error",
+        title: "Limited Stock",
+        text: `This product has only ${totalStock} stock left`,
+        showConfirmButton: true,
+      });
+      return;
+    }
+
+    const existingQuantityInCart = `<%- JSON.stringify(existingQuantity) %>`;
+    if (Number(existingQuantityInCart) + Number(quantity) > Number(totalStock)) {
+      Swal.fire({
+        icon: "error",
+        title: "Limited Stock",
+        text: `This product has only ${totalStock} stocks left`,
+        showConfirmButton: true,
+      });
+      return;
+    }
+    console.log("this is the total stocks available: ", existingQuantityInCart);
+
+    if (selectedColorId && selectedSizeId) {
+      fetch("/user/add-to-cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          // variantId: variantId,
+          colorId: selectedColorId,
+          sizeId: selectedSizeId,
+          quantity, // Send the quantity
+          price,
+        }),
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log("Product added to cart!");
+          } else {
+            console.error("Error adding product to cart");
+          }
+        })
+        .then((data) => {
+          Swal.fire({
+            icon: "success",
+            title: "Added to Cart",
+            text: "The item has been successfully added to your cart!",
+            showCancelButton: true,
+            confirmButtonText: "Go to Cart",
+            cancelButtonText: "Continue Shopping",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Redirect to the cart page
+              window.location.href = "/cart";
+            }
+          });
+        })
+
+        .catch((error) => {
+          console.error("Error:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+        });
+    } else {
+      // Handle case where no variant is selected
+      // alert("Please select a color and size.");
     }
   }
 </script>

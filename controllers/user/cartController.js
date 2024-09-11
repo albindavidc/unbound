@@ -178,6 +178,8 @@ module.exports = {
     try {
       const { productId, colorId, sizeId, quantity, price } = req.body;
 
+
+      console.log("we have reached backend from wishlist", req.body)
       // Find the user's cart (or create a new one if it doesn't exist)
       let cart = await Cart.findOne({ userId: req.session.user });
 
