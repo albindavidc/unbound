@@ -7,6 +7,7 @@ const couponSchema = new Schema({
     required: true,
     trim: true,
     unique: true, // Ensures each coupon code is unique
+    set: (value) => value.toUpperCase() // Set the value to uppercase
   },
   description: {
     type: String,
@@ -31,11 +32,7 @@ const couponSchema = new Schema({
       },
     },
   ],
-  maximumDiscount: {
-    type: Number,
-    required: true,
-    min: 0, // Ensures the value is non-negative
-  },
+
   isActive: {
     type: Boolean,
     default: true,

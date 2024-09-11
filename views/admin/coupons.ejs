@@ -58,11 +58,6 @@
         <input type="number" id="coupon_min_purchase_amount" class="form-control" placeholder="Minimum purhcase amount" required />
         <small></small>
       </div>
-      <div class="mb-4">
-        <label for="coupon_max_discount" class="form-label">Max. discount amount</label>
-        <input type="number" id="coupon_max_discount_amount" class="form-control" placeholder="Maximum purchase amount" required />
-        <small></small>
-      </div>
 
       <div class="mb-4">
         <label for="starting_date" class="form-label">Starting Date</label>
@@ -135,17 +130,6 @@
               <small></small>
             </div>
 
-            <div class="form-group">
-              <label for="edit_coupon_max_discount_amount">Maximum Discount Amount</label>
-              <input
-                type="number"
-                class="form-control"
-                id="edit_coupon_max_discount_amount"
-                name="couponMaxDiscount"
-                placeholder="Enter Maximum Discount"
-              />
-              <small></small>
-            </div>
 
             <div class="form-group">
               <label for="edit_starting_date">Starting Date</label>
@@ -179,7 +163,6 @@
                 <th>Description</th>
                 <th>Rate of Discount (%)</th>
                 <th>Min. purchase amount</th>
-                <th>Max. discount</th>
                 <th>Start Date</th>
                 <th>Expiry Date</th>
                 <th></th>
@@ -192,9 +175,8 @@
               <tr>
                 <td ><%= coup[i].code %></td>
                 <td><%= coup[i].description %></td>
-                <td><%= coup[i].rateOfDiscount %> %</td>
-                <td><%= coup[i].minPurchaseAmount %></td>
-                <td><%= coup[i].maximumDiscount %></td>
+                <td class="text-center"><%= coup[i].rateOfDiscount %> %</td>
+                <td class="text-center"><%= coup[i].minPurchaseAmount %></td>
                 <th><%= new Date(coup[i].startingDate).toLocaleString() %></th>
                 <th><%= new Date(coup[i].expiringDate).toLocaleString() %></th>
                 <td>
@@ -291,7 +273,6 @@
       const couponDescription = document.getElementById("coupon_description").value.trim();
       const couponRateOfDiscount = parseFloat(document.getElementById("coupon_rate_of_discount").value);
       const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
-      const couponMaxDiscount = parseFloat(document.getElementById("coupon_max_discount_amount").value);
       const startingDate = document.getElementById("starting_date").value;
       const expiringDate = document.getElementById("expiring_date").value;
       
@@ -307,7 +288,6 @@
           couponDescription,
           couponRateOfDiscount,
           couponMinPurchaseAmount,
-          couponMaxDiscount,
           startingDate,
           expiringDate,
         }),
@@ -406,21 +386,7 @@
         return valid;
       };
 
-      const checkMaxDiscountAmount = () => {
-        const maxDiscountAmountEl = document.querySelector("#coupon_max_discount_amount");
-        let valid = false;
-        const maxDiscountAmount = maxDiscountAmountEl.value.trim();
-
-        if (!isRequired(maxDiscountAmount)) {
-          showError(maxDiscountAmountEl, "Max. discount amount cannot be blank");
-        } else if (maxDiscountAmount <= 0) {
-          showError(maxDiscountAmountEl, "Max. discount ammount cannot be zero");
-        } else {
-          showSuccess(maxDiscountAmountEl);
-          valid = true;
-        }
-        return valid;
-      };
+  
 
       const checkStartingDate =() =>{
         const startingDateEl = document.querySelector("#starting_date");
@@ -479,11 +445,10 @@
         isDescriptionValid = checkDescription();
       isRateOfDiscountValid = checkRateOfDiscount();
       isMinPurchaseAmountValid = checkMinPurchaseAmount();
-      isMaxDiscountAmountValid = checkMaxDiscountAmount();
       isStartingDateValid = checkStartingDate();
       isExpiringDateValid = checkExpiringDate();
 
-      let isFormValid = isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid && isStartingDateValid && isExpiringDateValid ;
+      let isFormValid = isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid  && isStartingDateValid && isExpiringDateValid ;
 
       return isFormValid;
     };
@@ -519,9 +484,6 @@
             formValid();
             break;
           case "coupon_min_purchase_amount":
-            formValid();
-            break;
-          case "coupon_max_discount_amount":
             formValid();
             break;
           case "starting_date":
@@ -566,7 +528,6 @@
           document.getElementById("edit_coupon_description").value = data.description;
           document.getElementById("edit_coupon_rate_of_discount").value = data.rateOfDiscount;
           document.getElementById("edit_coupon_min_purchase_amount").value = data.minPurchaseAmount;
-          document.getElementById("edit_coupon_max_discount_amount").value = data.maximumDiscount;
           document.getElementById("edit_starting_date").value = formatDateToInput(data.startingDate);
           document.getElementById("edit_expiring_date").value = formatDateToInput(data.expiringDate);
 
@@ -641,19 +602,6 @@
     }
   };
 
-  // Function to validate Maximum Discount Amount (must be a positive number)
-  const checkMaxDiscountAmount = () => {
-    const maxDiscountEl = document.getElementById("edit_coupon_max_discount_amount");
-    const maxDiscount = parseFloat(maxDiscountEl.value);
-
-    if (isNaN(maxDiscount) || maxDiscount <= 0) {
-      showError(maxDiscountEl, "Maximum Discount Amount must be a positive number.");
-      return false;
-    } else {
-      showSuccess(maxDiscountEl);
-      return true;
-    }
-  };
 
   const checkStartingDate =() =>{
     const startingDateEl = document.querySelector("#edit_starting_date");
@@ -714,12 +662,11 @@
       isDescriptionValid = checkDescription(),
       isRateOfDiscountValid = checkRateOfDiscount(),
       isMinPurchaseAmountValid = checkMinPurchaseAmount(),
-      isMaxDiscountAmountValid = checkMaxDiscountAmount();
       isStartingDateValid = checkStartingDate();
       isExpiringDateValid = checkExpiringDate();
 
     // Form is valid only if all fields are valid
-    return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid && isStartingDateValid && isExpiringDateValid;
+    return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isStartingDateValid && isExpiringDateValid;
   };
 
   // Handle Edit Coupon Form Submission
@@ -738,7 +685,6 @@
     const couponDescription = document.getElementById("edit_coupon_description").value.trim();
     const couponRateOfDiscount = parseFloat(document.getElementById("edit_coupon_rate_of_discount").value);
     const couponMinPurchaseAmount = parseFloat(document.getElementById("edit_coupon_min_purchase_amount").value);
-    const couponMaxDiscount = parseFloat(document.getElementById("edit_coupon_max_discount_amount").value);
     const startingDate = document.getElementById("edit_starting_date").value;
     const expiringDate = document.getElementById("edit_expiring_date").value;
 
@@ -752,7 +698,6 @@
         couponDescription,
         couponRateOfDiscount,
         couponMinPurchaseAmount,
-        couponMaxDiscount,
         startingDate,
         expiringDate,
       }),
