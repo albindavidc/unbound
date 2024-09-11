@@ -37,8 +37,33 @@
           src="/uploads/images/<%= product.productId.primaryImages[0].name %>"
           alt="<%= product.productId.name %>"
         />
+
         <div class="card-body">
-          <h5 class="card-title text-center"><%= product.productId.name %></h5>
+          <h4 class="card-title text-center"><%= product.productId.name %></h4>
+        </div>
+
+        <div class="d-flex flex-colmn justify-content-center">
+          <h5 class="card-title text-center mr-2">₹<%= product.productId.sellingPrice %></h5>
+          <h6 class="card-title text-center" style="text-decoration: line-through;">₹<%= product.productId.actualPrice %>.00</h6>
+        </div>
+
+        <div class="m-4 d-flex justify-content-center">
+          <% if (product.productId.wishlist === true) { %>
+
+          <a href="javascript:void(0);" onclick="deleteWishlist(event, '<%= product.productId._id %>',this)" id="wishlist_delete" aria-label="Add to Wishlist">
+            <button class="btn btn-outline-danger">
+              <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
+            </button>
+          </a>
+          <% }else{ %>
+
+          <a href="javascript:void(0);" onclick="addWishlist(event, '<%= product.productId._id %>',this)" id="wishlist_add" aria-label="Add to Wishlist">
+            <button class="btn btn-outline-secondary">
+              <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
+            </button>
+          </a>
+
+          <% } %>
         </div>
       </div>
     </div>
@@ -47,3 +72,91 @@
 </section>
 
 <%- include('../partials/user/footer') %>
+
+<script>
+
+async function addWishlist(event, productId, element) {
+  event.preventDefault();
+
+  console.log("these are the updates",  productId)
+  try {
+    const response = await fetch(`/wishlist/${productId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // You can include productId in the body if needed
+      body: JSON.stringify({ productId }),
+    });
+
+    // Check if the response is OK (status 200-299)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Ensure the response is JSON
+    const result = await response.json();
+    if (result.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "You have successfully added this product to wishlist",
+        timer: 3000, // 3-second timer
+        showConfirmButton: false, // Optionally hide the confirm button
+      }).then(() => {
+        location.reload();
+      });
+    } else {
+      Swal.fire("Error", result.message || "Failed to add product to wishlist", "error").then(() => {
+        location.reload();
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    Swal.fire("Error", "An error occurred while adding the product to the wishlist", "error");
+  }
+}
+
+async function deleteWishlist(event, productId, element) {
+  event.preventDefault();
+
+  console.log("these are the updates", event, productId, element)
+
+  try {
+    const response = await fetch(`/wishlist/${productId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // You can include productId in the body if needed
+      body: JSON.stringify({ productId }),
+    });
+
+    // Check if the response is OK (status 200-299)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Ensure the response is JSON
+    const result = await response.json();
+    if (result.success) {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "You have successfully removed this product from the wishlist",
+        timer: 3000, // 3-second timer
+        showConfirmButton: false, // Optionally hide the confirm button
+      }).then(() => {
+        location.reload();
+      });
+    } else {
+      Swal.fire("Error", result.message || "Failed to remove product from the wishlist", "error").then(() => {
+        location.reload();
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    Swal.fire("Error", "An error occurred while removing the product from the wishlist", "error");
+  }
+}
+</script>
