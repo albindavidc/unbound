@@ -51,7 +51,7 @@ module.exports = {
   getCheckout: async (req, res) => {
     const userId = req.session.user;
 
-    const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId coupon");
+    const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity");
 
     let user = await User.findById(userId);
 
@@ -76,14 +76,17 @@ module.exports = {
 
     let totalPrice = 0;
     let totalPriceBeforeOffer = 0;
+
+
     for (const prod of userCart.items) {
-      prod.price = prod.productId.onOffer ? prod.productId.offerDiscountPrice : prod.productId.sellingPrice;
+      prod.price = prod.productId.bundleQuantity > prod.quantity ?  prod.productId.sellingPrice :prod.productId.bundlePrice ;
 
       const itemTotal = prod.price * prod.quantity;
       prod.itemTotal = itemTotal;
       totalPrice += itemTotal;
       totalPriceBeforeOffer += prod.price;
     }
+
 
     // Apply coupon discount if applicable
     let couponDiscount = 0;
