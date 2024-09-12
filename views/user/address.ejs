@@ -1,4 +1,4 @@
-<%- include("../partials/user/header") %> 
+<%- include("../partials/user/header") %>
 
 <style>
   .userProfileMain {
@@ -132,7 +132,7 @@
                     <label class="form-label" for="alternate-phone">Alternate Phone</label>
                     <input name="alternativePhone" class="form-control" type="tel" id="alternate-phone" required />
                     <small></small>
-                    <input name="customerId" type="hidden" value="<%- user%>" class="form-control" />
+                    <input name="customerId" type="hidden" id="customerId" value="<%- user%>" class="form-control" />
                   </div>
                   <div class="col-sm-6 form-group">
                     <label class="form-label" for="form-check">Address Type</label>
@@ -351,9 +351,7 @@
       }
 
       const data = await response.json();
-
       const address = data.address;
-      console.log(address);
 
       document.getElementById("edit-address-fn").value = address.name;
       document.getElementById("edit-address-ph").value = address.phone;
@@ -611,7 +609,7 @@
     }
   };
 
-  form.addEventListener("submit", function (e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     let isNameValid = checkName(),
@@ -640,7 +638,49 @@
       isAddressTypeValid;
 
     if (isFormValid) {
-      form.submit();
+      try {
+        const response = await fetch("/address/add-address", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: document.querySelector("#address-fn").value,
+            phone: document.querySelector("#address-ph").value,
+            houseName: document.querySelector("#address-house-name").value,
+            areaStreet: document.querySelector("#address-area").value,
+            locality: document.querySelector("#address-locality").value,
+            town: document.querySelector("#address-town").value,
+            state: document.querySelector("#address-state").value,
+            zipcode: document.querySelector("#address-zip").value,
+            landmark: document.querySelector("#address-landmark").value,
+            alternativePhone: document.querySelector("#alternate-phone").value,
+            addressType: document.querySelector('input[name="addressType"]:checked').value,
+            customerId: document.querySelector("#customerId").value,
+          }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Address added successfully!",
+          }).then(() => location.reload());
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to add address.",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An unexpected error occurred.",
+        });
+      }
     }
   });
 
@@ -701,7 +741,7 @@
   );
 </script>
 
-<script>
+<script defer>
   const editForm = document.querySelector("#edit-address-form");
 
   const checkEditName = () => {
@@ -863,44 +903,124 @@
     return valid;
   };
 
-  editForm.addEventListener("submit", function (e) {
+  const editAddressModal = document.querySelector("#edit-address-modal");
+
+  // Show modal event to fetch and populate address data
+  editAddressModal.addEventListener("show.bs.modal", async (e) => {
+    try {
+      const editButton = e.relatedTarget; // Button that triggered the modal
+      const addressId = editButton.getAttribute("data-address-id"); // Extract address ID
+
+      console.log("this is addressId", addressId)
+      // Fetch address data from the server
+      const response = await fetch(`/address/edit-address/${addressId}`);
+      if (!response.ok) {
+        // If response is not ok, throw an error
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      const address = data.address;
+
+      // Populate the form with the retrieved address data
+      document.getElementById("edit-address-fn").value = address.name;
+      document.getElementById("edit-address-ph").value = address.phone;
+      document.getElementById("edit-address-house-name").value = address.houseName;
+      document.getElementById("edit-address-area").value = address.areaStreet;
+      document.getElementById("edit-address-locality").value = address.locality;
+      document.getElementById("edit-address-town").value = address.town;
+      document.getElementById("edit-address-state").value = address.state;
+      document.getElementById("edit-address-zip").value = address.zipcode;
+      document.getElementById("edit-address-landmark").value = address.landmark;
+      document.getElementById("edit-alternate-phone").value = address.alternativePhone;
+
+      // Set the appropriate radio button for address type
+      const addressTypeHome = document.getElementById("edit-flexRadioDefault1");
+      const addressTypeWork = document.getElementById("edit-flexRadioDefault2");
+      if (address.addressType === "HOME") {
+        addressTypeHome.checked = true;
+        addressTypeWork.checked = false;
+      } else if (address.addressType === "WORK") {
+        addressTypeHome.checked = false;
+        addressTypeWork.checked = true;
+      }
+
+      // Set the form action to include the address ID
+      editAddressForm.action = `/address/edit-address/${addressId}`;
+    } catch (error) {
+      // Display error using SweetAlert
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: error.message || "Something went wrong!",
+      });
+    }
+  });
+
+  // Form submission event to handle edit
+  editAddressForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    console.log(e);
-    const formData = new FormData(editForm);
-
-    // Log the form data
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
-    let isNameValid = checkEditName(),
-      isPhoneValid = checkEditPhone(),
-      isHouseNameValid = checkEditHouseName(),
-      isAreaStreetValid = checkEditAreaStreet(),
-      isLocalityValid = checkEditLocality(),
-      isTownValid = checkEditTown(),
-      isStateValid = checkEditState(),
-      isZipcodeValid = checkEditZipcode(),
-      isLandmarkValid = checkEditLandmark(),
-      isAlternatePhoneValid = checkEditAlternatePhone(),
-      isAddressTypeValid = checkEditAddressType();
-
-    let isFormValid =
-      isNameValid &&
-      isPhoneValid &&
-      isHouseNameValid &&
-      isAreaStreetValid &&
-      isLocalityValid &&
-      isTownValid &&
-      isStateValid &&
-      isZipcodeValid &&
-      isLandmarkValid &&
-      isAlternatePhoneValid &&
-      isAddressTypeValid;
+    // Validate the form fields
+    const isFormValid =
+      checkEditName() &&
+      checkEditPhone() &&
+      checkEditHouseName() &&
+      checkEditAreaStreet() &&
+      checkEditLocality() &&
+      checkEditTown() &&
+      checkEditState() &&
+      checkEditZipcode() &&
+      checkEditLandmark() &&
+      checkEditAlternatePhone() &&
+      checkEditAddressType();
 
     if (isFormValid) {
-      editForm.submit();
+      try {
+        // Use the action attribute of the form, which already contains the correct addressId
+        const response = await fetch(editAddressForm.action, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: document.querySelector("#edit-address-fn").value,
+            phone: document.querySelector("#edit-address-ph").value,
+            houseName: document.querySelector("#edit-address-house-name").value,
+            areaStreet: document.querySelector("#edit-address-area").value,
+            locality: document.querySelector("#edit-address-locality").value,
+            town: document.querySelector("#edit-address-town").value,
+            state: document.querySelector("#edit-address-state").value,
+            zipcode: document.querySelector("#edit-address-zip").value,
+            landmark: document.querySelector("#edit-address-landmark").value,
+            alternativePhone: document.querySelector("#edit-alternate-phone").value,
+            addressType: document.querySelector('input[name="addressType"]:checked').value,
+            // customerId: document.querySelector("#edit-customerId").value, // Assuming this exists in your form
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Address updated successfully!",
+          }).then(() => location.reload()); // Reload the page on success
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to update address.",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: `An unexpected error occurred: ${error.message}`,
+        });
+      }
     }
   });
 

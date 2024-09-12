@@ -527,7 +527,8 @@ const addAddress = async (req, res) => {
     console.log("New Address:", newAddress);
 
     req.flash("success", "Address Added");
-    res.redirect("/address");
+    // res.redirect("/address");
+    res.status(200).json({success: true, message: "Address added successfully"});
   } catch (error) {
     console.error("Error adding address:", error);
     req.flash("error", "Failed to add address. Please try again.");
@@ -568,7 +569,8 @@ const editAddress = async (req, res) => {
     }
 
     req.flash("success", "Address Edited");
-    res.redirect("/address");
+    // res.redirect("/address");
+    res.status(200).json({success:true, message: "Successfully edited address"})
   } catch (error) {
     console.error(error);
     req.flash("error", "Error editing address. Please try again.");
