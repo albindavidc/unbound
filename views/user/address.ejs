@@ -1,4 +1,4 @@
-<%- include("../partials/user/header") %> <%- include("../partials/flashMessage") %>
+<%- include("../partials/user/header") %> 
 
 <style>
   .userProfileMain {
@@ -143,6 +143,7 @@
                     </div>
                     <div class="form-check">
                       <input class="form-check-input" value="WORK" type="radio" name="addressType" id="flexRadioDefault2" />
+                      <small></small>
                       <label class="form-check-label" for="flexRadioDefault2"> WORK </label>
                     </div>
                   </div>
@@ -356,14 +357,14 @@
 
       document.getElementById("edit-address-fn").value = address.name;
       document.getElementById("edit-address-ph").value = address.phone;
-      document.getElementById("edit-address-house-name").value = address.house_name;
-      document.getElementById("edit-address-area").value = address.area_street;
+      document.getElementById("edit-address-house-name").value = address.houseName;
+      document.getElementById("edit-address-area").value = address.areaStreet;
       document.getElementById("edit-address-locality").value = address.locality;
       document.getElementById("edit-address-town").value = address.town;
       document.getElementById("edit-address-state").value = address.state;
       document.getElementById("edit-address-zip").value = address.zipcode;
       document.getElementById("edit-address-landmark").value = address.landmark;
-      document.getElementById("edit-alternate-phone").value = address.alternate_phone;
+      document.getElementById("edit-alternate-phone").value = address.alternativePhone;
 
       const addressTypeHome = document.getElementById("edit-flexRadioDefault1");
       const addressTypeWork = document.getElementById("edit-flexRadioDefault2");
@@ -850,7 +851,7 @@
   };
 
   const checkEditAddressType = () => {
-    const addressTypeEl = document.querySelector('input[name="address_type"]:checked');
+    const addressTypeEl = document.querySelector('input[name="addressType"]:checked');
     let valid = false;
 
     if (!addressTypeEl) {
