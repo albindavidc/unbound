@@ -43,50 +43,49 @@
             <h4 class="card-title text-center"><%= product.productId.name %></h4>
           </div>
 
-          <div class="d-flex justify-content-center align-items-center pb-3">
-            <h5 class="card-title text-center mr-2">₹<span id="productPrice"><%= product.productId.sellingPrice %></span></h5>
-            <h6 class="card-title text-center" style="text-decoration: line-through">₹<%= product.productId.actualPrice %>.00</h6>
-          </div>
-
-          <div class="d-flex flex-colmn justify-content-center">
-            <div class="d-flex justify-content-center mr-4">
-              <% if (product.productId.wishlist === true) { %>
-              <a
-                href="javascript:void(0);"
-                onclick="deleteWishlist(event, '<%= product.productId._id %>', this)"
-                id="wishlist_delete"
-                aria-label="Add to Wishlist"
-              >
-                <button class="btn btn-outline-danger">
-                  <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
-                </button>
-              </a>
-              <% } else { %>
-              <a
-                href="javascript:void(0);"
-                onclick="addWishlist(event, '<%= product.productId._id %>', this)"
-                id="wishlist_add"
-                aria-label="Add to Wishlist"
-              >
-                <button class="btn btn-outline-secondary">
-                  <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
-                </button>
-              </a>
-              <% } %>
+          <div class="d-flex flex-colmn justify-content-center ">
+            <div class="d-flex justify-content-center align-items-center pb-3">
+              <h5 class="card-title text-center mr-2">₹<span id="productPrice"><%= product.productId.sellingPrice %></span></h5>
+              <h6 class="card-title text-center" style="text-decoration: line-through">₹<%= product.productId.actualPrice %>.00</h6>
             </div>
 
-            <div class="product__details__cart__option" style="display: none;" >
-              <div class="quantity d-flex justify-content-center">
-                <div class="pro-qty">
-                  <input name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" />
-                  <% console.log("this is fronned stokcs", stocks) %>
-                </div>
+            <div class="d-flex flex-colmn justify-content-center ml-4">
+              <div class="d-flex justify-content-center">
+                <% if (product.productId.wishlist === true) { %>
+                <a
+                  href="javascript:void(0);"
+                  onclick="deleteWishlist(event, '<%= product.productId._id %>', this)"
+                  id="wishlist_delete"
+                  aria-label="Add to Wishlist"
+                >
+                  <button class="btn btn-outline-danger">
+                    <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
+                  </button>
+                </a>
+                <% } else { %>
+                <a
+                  href="javascript:void(0);"
+                  onclick="addWishlist(event, '<%= product.productId._id %>', this)"
+                  id="wishlist_add"
+                  aria-label="Add to Wishlist"
+                >
+                  <button class="btn btn-outline-secondary">
+                    <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
+                  </button>
+                </a>
+                <% } %>
               </div>
             </div>
-
+          </div>
+          <div class="product__details__cart__option" style="display: none">
+            <div class="quantity d-flex justify-content-center">
+              <div class="pro-qty">
+                <input name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" />
+                <% console.log("this is fronned stokcs", stocks) %>
+              </div>
+            </div>
           </div>
         </a>
-
 
         <div class="col">
           <div class="row d-flex align-items-center">
@@ -153,7 +152,6 @@
         </div>
 
         <div class="product__details__cart__option d-flex justify-content-center">
-          
           <% let totalStock = 0; %> <% product.productId.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if
           (totalStock > 0) { %>
           <button class="btn btn-dark btn-sm" onclick="addToCart('<%= product.productId._id %>', document.querySelector('#productQuantity').value)">
@@ -290,7 +288,7 @@
   }
 
   function addToCart(productId, quantity) {
-    let inputValue = document.querySelector("#productQuantity").value
+    let inputValue = document.querySelector("#productQuantity").value;
     console.log("this is wishlist page quantity", quantity);
 
     if (!selectedColorId || !selectedSizeId) {
@@ -339,7 +337,7 @@
     }
 
     const existingQuantityInCart = `<%- JSON.stringify(existingQuantity) %>`;
-    console.log("this is in cart from wishlist", existingQuantityInCart)
+    console.log("this is in cart from wishlist", existingQuantityInCart);
     if (Number(existingQuantityInCart) + Number(quantity) > Number(totalStock)) {
       Swal.fire({
         icon: "error",
