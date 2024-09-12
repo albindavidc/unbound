@@ -181,6 +181,8 @@
               <i class="fa fa-star-o"></i>
               <% } %>
             </div>
+            
+            <!-- Product Price -->
             <h3 id="productPrice"></h3>
 
             <div class="row d-flex align-items-center">
@@ -651,7 +653,10 @@
 
     const quantityPerPerson = `<%- JSON.stringify(product.quantity)%>`;
 
-    if (quantity > quantityPerPerson) {
+    console.log(quantityPerPerson)
+    
+
+    if (quantity > Number(quantityPerPerson)) {
       Swal.fire({
         icon: "error",
         title: "Quantity Exceeded",
@@ -676,7 +681,7 @@
     const totalStock = `<%- JSON.stringify(stocks) %>`;
     console.log("this is the total stocks available: ", totalStock);
 
-    if (quantity > totalStock) {
+    if (quantity > Number(totalStock)) {
       Swal.fire({
         icon: "error",
         title: "Limited Stock",
