@@ -71,6 +71,19 @@
   .img-zoom-container:hover .img-zoom-result {
     display: block; /* Display the zoom result */
   }
+
+
+  #productQuantity {
+  width: 80px; /* Adjust width as needed */
+  padding: 8px; /* Add padding for better touch targets */
+  border: 1px solid #ced4da; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Increase font size for better readability */
+  text-align: center; /* Center text inside the input */
+}
+
+
+
 </style>
 
 <!-- Shop Details Section Begin -->
@@ -238,9 +251,9 @@
               <h6>Total number of stocks: <%= variant.stock %></h6>
               <% }) %>
             </div>
-
-            <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
+            
             <div class="product__details__cart__option">
+              <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
               <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >0)
               { %>
               <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%= product._id %>')">
@@ -603,11 +616,10 @@
     if (quantity >= bundleQuantity) {
       // Apply the bundle price
       priceDisplayElement.innerHTML = `
-      <h3>₹${bundlePrice}</h3>
-      <h3 ><span style="font-size: 24px; font-weight: bold;">₹<%= product.sellingPrice %>.00</span> <span>₹<%= product.actualPrice %>.00</span></h3>
+      <h3>₹${bundlePrice} <span style="font-size: 24px; font-weight: bold;">₹<%= product.sellingPrice %>.00</span> <span>₹<%= product.actualPrice %>.00</span></h3>
       `;
     } else {
-      priceDisplayElement.innerHTML = `<h3>₹${sellingPrice}</h3>`;
+      priceDisplayElement.innerHTML = `<h3>₹${sellingPrice} <span>₹<%= product.actualPrice %>.00</span></h3>`;
     }
   }
 
