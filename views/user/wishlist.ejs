@@ -75,22 +75,18 @@
               <% } %>
             </div>
 
-            <div class="product__details__cart__option">
+            <div class="product__details__cart__option" style="display: none;" >
               <div class="quantity d-flex justify-content-center">
                 <div class="pro-qty">
-                  <input name="quantity" type="text" id="productQuantity" value="1" data-stock="<% stocks %>" />
+                  <input name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" />
                   <% console.log("this is fronned stokcs", stocks) %>
                 </div>
               </div>
             </div>
+
           </div>
         </a>
 
-        <div class="pb-3 d-flex justify-content-center">
-          <% product.productId.variants.forEach(variant => { %>
-          <h6>Total number of stocks: <%= variant.stock %></h6>
-          <% }) %>
-        </div>
 
         <div class="col">
           <div class="row d-flex align-items-center">
@@ -157,9 +153,10 @@
         </div>
 
         <div class="product__details__cart__option d-flex justify-content-center">
+          
           <% let totalStock = 0; %> <% product.productId.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if
           (totalStock > 0) { %>
-          <button class="btn btn-dark btn-sm" onclick="addToCart('<%= product.productId._id %>')">
+          <button class="btn btn-dark btn-sm" onclick="addToCart('<%= product.productId._id %>', document.querySelector('#productQuantity').value)">
             <i class="bi bi-cart me-2"></i>
             Add to Cart
           </button>
@@ -292,10 +289,9 @@
     selectedColorId = colorId;
   }
 
-  function addToCart(productId) {
-    const quantity = document.getElementById("productQuantity").value;
-
-    console.log("this is details page", quantity);
+  function addToCart(productId, quantity) {
+    let inputValue = document.querySelector("#productQuantity").value
+    console.log("this is wishlist page quantity", quantity);
 
     if (!selectedColorId || !selectedSizeId) {
       Swal.fire({
@@ -343,6 +339,7 @@
     }
 
     const existingQuantityInCart = `<%- JSON.stringify(existingQuantity) %>`;
+    console.log("this is in cart from wishlist", existingQuantityInCart)
     if (Number(existingQuantityInCart) + Number(quantity) > Number(totalStock)) {
       Swal.fire({
         icon: "error",

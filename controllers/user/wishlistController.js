@@ -15,7 +15,7 @@ module.exports = {
       });
 
       let products;
-      let allStocks ;
+      let allStocks;
 
       let productId;
       wishlist.forEach((wish) => {
@@ -38,21 +38,22 @@ module.exports = {
         variants = product.variants;
       });
 
-      const cart = await Cart.findOne({ userId: req.session.user });
+      const cart = await Cart.findOne({ userId });
       let existingQuantity;
       if (cart) {
-        const existingItem = cart.items.find((item) => item.productId.toString() === productId);
-
-        if (existingItem) {
-          existingQuantity = existingItem.quantity;
-        } else {
-          existingQuantity = 0;
-        }
+        let existingItem;
+        cart.items.forEach((item) => {
+          cart.items.forEach((item) => {
+            existingItem = item.productId.toString() === productId._id.toString();
+            existingQuantity = item.quantity;
+          });
+        });
+        
+        
       } else {
-        existingQuantity = 0;
+        existingQuantity = 3;
       }
-
-      console.log("this is variants", variants);
+      console.log("this is existing quantity in cart", existingQuantity);
 
       res.render("user/wishlist", { wishlist, user: userId, product, variants, stocks: allStocks, existingQuantity });
     } catch (error) {
