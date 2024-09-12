@@ -111,7 +111,8 @@ module.exports = {
         .populate("ratings.user")
         .populate("brand")
         .populate("variants.stock")
-        .populate("wishlist");
+        .populate("wishlist")
+        .populate("bundlePrice bundleQuantity");
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });

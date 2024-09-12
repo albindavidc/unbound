@@ -352,6 +352,7 @@ module.exports = {
         actualPrice: req.body.actualPrice,
         bundlePrice: req.body.bundlePrice,
         quantity: req.body.quantity,
+        bundleQuantity: req.body.bundleQuantity,
         variants: processedVariants,
         offerDiscountRate: req.body.offerDiscountRate,
         category: req.body.category,

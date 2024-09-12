@@ -178,7 +178,7 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-lg-4">
+                  <div class="col-lg-3">
                     <div class="mb-4">
                       <label class="form-label" for="actual-price">Actual Price</label>
                       <input
@@ -192,7 +192,10 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-4">
+
+
+
+                  <div class="col-lg-3">
                     <div class="mb-4">
                       <label class="form-label" for="bundle-price">Bundle Price</label>
                       <input
@@ -206,7 +209,21 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-4">
+                  <div class="col-lg-3">
+                    <div class="mb-4">
+                      <label class="form-label" for="max-bundle">Max Product per Bundle</label>
+                      <input
+                        placeholder="Enter bundle price"
+                        name="bundleQuantity"
+                        value="<%= product.bundleQuantity %>"
+                        type="number"
+                        class="form-control"
+                        id="max-bundle"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-lg-3">
                     <div class="mb-4">
                       <label class="form-label" for="max-product">Max Product per Person</label>
                       <input
@@ -219,6 +236,7 @@
                       />
                     </div>
                   </div>
+                 
 
                   <div class="col-lg-12">
                     <div class="mb-4">
@@ -834,6 +852,21 @@
       return isValid;
     };
 
+    const checkBundleMaxQuantity = () => {
+      const maxProductPerPersonEl = document.querySelector("#max-bundle");
+      const maxProductPerPerson = maxProductPerPersonEl.value;
+
+      if (!isRequired(maxProductPerPerson)) {
+        showError(maxProductPerPersonEl, "Max product cannot be blank");
+      } else if (parseFloat(maxProductPerPerson) <= 0) {
+        showError(maxProductPerPersonEl, "Max product cannot be Zero");
+      } else {
+        showSuccess(maxProductPerPersonEl);
+        isValid = true;
+      }
+      return isValid;
+    };
+
     const checkColor = () => {
       const colorEl = document.querySelector("#color");
       const color = colorEl.value;
@@ -964,6 +997,9 @@
           case "max-product":
             checkMaxProduct();
             break;
+          case "max-bundle":
+            checkBundleMaxQuantity();
+            break;
           case "color":
             checkColor();
             break;
@@ -980,6 +1016,7 @@
           case "category":
             checkCategory();
             break;
+          
         }
       })
     );
@@ -1007,6 +1044,10 @@
           case "max-product":
             checkMaxProduct();
             break;
+          case "max-bundle":
+            checkBundleMaxQuantity();
+            break;
+        
           case "color":
             checkColor();
             break;
@@ -1039,6 +1080,7 @@
           isBundlePriceValid = checkBundlePrice(),
           isStockValid = checkVariantStock(),
           isMaxProduct = checkMaxProduct(),
+          isMaxBundle = checkBundleMaxQuantity(),
           isColor = checkColor(),
           isSize = checkSize(),
           isDiscountRate = checkOfferDiscountRate(),
@@ -1052,6 +1094,7 @@
           isBundlePriceValid &&
           isStockValid &&
           isMaxProduct &&
+          isMaxBundle &&
           isColor &&
           isSize &&
           isDiscountRate &&

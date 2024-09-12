@@ -88,6 +88,9 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    bundleQuantity: {
+      type: Number,
+    },
     // onOffer: {
     //   type: String,
     //   required: true,
