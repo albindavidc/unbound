@@ -201,7 +201,7 @@
 
                 <div class="mb-4 mt-5">
                   <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                       <div class="mb-4">
                         <label class="form-label" for="actual-price">Actual Price</label>
                         <input placeholder="₹" name="actualPrice" type="number" id="actual-price" class="form-control" required />
@@ -210,25 +210,31 @@
                       </div>
                     </div>
 
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                       <div class="mb-4">
                         <label class="form-label">Bundle Price </label>
-                        <input placeholder="(5/Bundle)" id="bundle-price" name="bundlePrice" type="number" class="form-control" required />
+                        <input placeholder="₹" id="bundle-price" name="bundlePrice" type="number" class="form-control" required />
                         <!-- <div id="bundle-price-error" class="error-message error-div"></div> -->
                         <small></small>
                       </div>
                     </div>
-                    <div class="col-lg-4">
 
-                    <div class="mb-4">
-                      <label class="form-label">Max Product/Person</label>
-                      <input placeholder="Quantity" id="max-product" name="quantity" type="number" class="form-control" required />
-                      <small></small>
+                    <div class="col-lg-3">
+                      <div class="mb-4">
+                        <label class="form-label">Max Product/Bundle</label>
+                        <input placeholder="Quantity" id="max-bundle" name="maxBundle" type="number" class="form-control" required />
+                        <small></small>
+                      </div>
                     </div>
+                    <div class="col-lg-3">
+                      <div class="mb-4">
+                        <label class="form-label">Max Product/Person</label>
+                        <input placeholder="Quantity" id="max-product" name="quantity" type="number" class="form-control" required />
+                        <small></small>
+                      </div>
                     </div>
                   </div>
                 </div>
-
 
                 <div class="mb-4 mt-5">
                   <div class="row">
@@ -516,6 +522,7 @@
         isBundlePriceValid = checkBundlePrice(),
         isStockValid = checkVariantStock(),
         isMaxProduct = checkMaxProduct(),
+        isMaxBundle = checkMaxBundle(),
         isColor = checkColor(),
         isSize = checkSize(),
         isDiscountRate = checkOfferDiscountRate(),
@@ -529,6 +536,7 @@
         isBundlePriceValid &&
         isStockValid &&
         isMaxProduct &&
+        isMaxBundle &&
         isColor &&
         isSize &&
         isDiscountRate &&
@@ -642,6 +650,21 @@
       showError(variantStockEl, "Stock cannot be zero");
     } else {
       showSuccess(variantStockEl);
+      isValid = true;
+    }
+    return isValid;
+  };
+
+  const checkMaxBundle = () => {
+    const maxProductPerPersonEl = document.querySelector("#max-bundle");
+    const maxProductPerPerson = maxProductPerPersonEl.value;
+
+    if (!isRequired(maxProductPerPerson)) {
+      showError(maxProductPerPersonEl, "Max product cannot be blank");
+    } else if (parseFloat(maxProductPerPerson) <= 0) {
+      showError(maxProductPerPersonEl, "Max product cannot be Zero");
+    } else {
+      showSuccess(maxProductPerPersonEl);
       isValid = true;
     }
     return isValid;
@@ -817,6 +840,10 @@
         case "max-product":
           checkMaxProduct();
           break;
+        case "max-bundle":
+        checkMaxBundle();
+        break;
+
         case "color":
           checkColor();
           break;
@@ -864,6 +891,9 @@
         case "max-product":
           checkMaxProduct();
           break;
+        case "max-bundle":
+        checkMaxBundle();
+        break;
         case "color":
           checkColor();
           break;
@@ -901,6 +931,7 @@
         isBundlePriceValid = checkBundlePrice(),
         isStockValid = checkVariantStock(),
         isMaxProduct = checkMaxProduct(),
+        isMaxBundle = checkMaxBundle(),
         isColor = checkColor(),
         isSize = checkSize(),
         isOffer = checkOnOffer(),
@@ -916,6 +947,7 @@
         isBundlePriceValid &&
         isStockValid &&
         isMaxProduct &&
+        isMaxBundle &&
         isColor &&
         isSize &&
         isOffer &&
