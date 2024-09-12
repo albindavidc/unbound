@@ -112,7 +112,7 @@ module.exports = {
         .populate("brand")
         .populate("variants.stock")
         .populate("wishlist")
-        .populate("bundlePrice bundleQuantity");
+        .populate("bundlePrice bundleQuantity quantity");
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
