@@ -65,7 +65,7 @@
                         <div class="row">
                           <div class="col-6 d-md-none text-muted">Price per item</div>
                           <div class="col-6 col-md-12 text-end text-md-center">
-                            <% if (item.productId.onOffer) { %> ₹ <%= item.productId.offerDiscountPrice %> <% } else { %> ₹ <%=
+                            <% if (item.productId.bundleQuantity <= item.quantity) { %> ₹ <%= item.productId.bundlePrice %> <% } else { %> ₹ <%=
                             item.productId.sellingPrice %> <% } %>
                             <p style="text-decoration: line-through">₹<%- item.productId.actualPrice %></p>
                           </div>
@@ -105,7 +105,7 @@
                         <div class="row">
                           <div class="col-6 d-md-none text-muted">Total price</div>
                           <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
-                            ₹<%= item.price %>
+                            ₹<%= item.itemTotal %>
                           </div>
                         </div>
                       </div>

@@ -80,8 +80,33 @@ module.exports = {
     try {
       const userId = req.session.user;
       console.log(req.session.user);
-      let cart = await Cart.findOne({ userId }).populate("items.productId items.colorId items.sizeId");
+      let cart = await Cart.findOne({ userId }).populate("items.productId items.colorId items.sizeId items.productId.bundleQuantity");
 
+      let bundleQuantity;
+      let sellingPrice;
+      let bundlePrice;
+      let cartQuantity;
+      
+      cart.items.forEach(item => {
+        const product = item.productId;  // Assuming productId is an object, not an array.
+      
+        cartQuantity = item.quantity;
+        if (product) {  // Ensure product exists
+          bundleQuantity = product.bundleQuantity;
+          sellingPrice = product.sellingPrice;
+          bundlePrice = product.bundlePrice;
+        }
+      });
+      
+
+      console.log("this s bundleQuantity", bundleQuantity, sellingPrice, cartQuantity, bundlePrice, cart.quantity)
+
+
+      if(cartQuantity >= bundleQuantity){
+        sellingPrice = bundlePrice ;
+      }
+      
+      let totalPriceOfEachProduct = 0;
       let errors = [];
       let totalPrice = 0;
       if (!cart) {
@@ -91,18 +116,18 @@ module.exports = {
         });
         totalPrice = 0;
       } else {
-        let totalPriceBeforeOffer = 0;
         for (const prod of cart.items) {
-          prod.price = prod.productId.onOffer ? prod.productId.offerDiscountPrice : prod.productId.sellingPrice;
+          prod.price = prod.productId.bundleQuantity > prod.quantity ?  prod.productId.sellingPrice :prod.productId.bundlePrice ;
 
           const itemTotal = prod.price * prod.quantity;
           prod.itemTotal = itemTotal;
           totalPrice += itemTotal;
-          totalPriceBeforeOffer += prod.price;
+          totalPriceOfEachProduct += prod.price;
         }
         cart.totalPrice = totalPrice;
         cart.payable = totalPrice;
 
+        console.log("this is the total price", totalPriceOfEachProduct)
         // if category offer is active or product offer is active
 
         for (const item of cart.items) {
@@ -159,6 +184,7 @@ module.exports = {
       const totalPrices = getTotalPrice.totalPrice;
 
       res.render("user/cart", {
+        totalPriceOfEachProduct,
         cartList: cart.items,
         cartCount: cart.items.length,
         totalPrice,
