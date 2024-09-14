@@ -84,6 +84,13 @@ const orderSchema = new Schema(
         cancelReason: {
           type: String,
         },
+        cancelRefundMethod: {
+          type: String,
+          enum: ["Refund to Bank Account", "Refund to Wallet"],
+        },
+        cancelledOn: {
+          type: Date,
+        },
         returnReason: {
           type: String,
         },
@@ -93,8 +100,7 @@ const orderSchema = new Schema(
         outForDelivery: {
           type: Date,
         },
-        
-       
+
         returnedOn: {
           type: Date,
         },
@@ -166,9 +172,6 @@ const orderSchema = new Schema(
       // required: true,
     },
     deliveredOn: {
-      type: Date,
-    },
-    cancelledOn: {
       type: Date,
     },
   },

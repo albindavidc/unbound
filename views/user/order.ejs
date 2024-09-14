@@ -187,10 +187,10 @@
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
                             <div class="mb-3 row mt-4">
-                              <label for="orderCancelReason-<%= item.orderID%>" class="form-label">Refund method</label>
-                              <select name="orderCancelReason" id="orderCancelReason-<%= item.orderID%>">
-                                <option value="Refund">Refund to the bank</option>
-                                <option value="Wallet">Refund to the wallet</option>
+                              <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
+                              <select name="orderCancelRefundMethod" id="orderCancelRefundMethod-<%= item.orderID%>">
+                                <option value="RefundToBankAccount">Refund to the bank</option>
+                                <option value="RefundToWallet">Refund to the wallet</option>
                               </select>
                             </div>
                           </form>
@@ -248,6 +248,7 @@
     cancelForms.forEach((form) => {
       const orderId = form.dataset.orderId;
       const textarea = document.getElementById(`orderCancel-${orderId}`);
+      const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderCancelRefundMethod}`)
       const wordCountEl = document.getElementById(`wordCount-${orderId}`);
 
       const updateWordCount = () => {
@@ -362,6 +363,8 @@
 
   const cancelTheOrder = async (orderId) => {
     const orderCancel = document.getElementById(`orderCancel-${orderId}`).value;
+    const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderId}`).value;
+
     try {
       let isCancelValid = checkCancelReason(orderId); // Pass orderId here
       if (!isCancelValid) {
@@ -371,7 +374,7 @@
       const response = await fetch(`/order/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel", cancelReason: orderCancel }),
+        body: JSON.stringify({ action: "cancel", cancelReason: orderCancel, orderCancelRefundMethod }),
       });
       const result = await response.json();
       if (result.success) {

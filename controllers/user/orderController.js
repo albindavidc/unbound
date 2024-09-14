@@ -1,5 +1,6 @@
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
+const Wallet = require("../../models/walletSchema")
 const { loadProductDetails } = require("./productController");
 module.exports = {
   getOrders: async (req, res) => {
@@ -82,12 +83,14 @@ module.exports = {
   },
   updateOrder: async (req, res) => {
     const { orderId } = req.params;
-    const { action, cancelReason , returnReason} = req.body;
+    const { action, cancelReason , returnReason, orderCancelRefundMethod} = req.body;
 
     console.log("Received orderId:", orderId, action); // Debugging the received orderId
 
     try {
       let result;
+
+       
       if (action === "return") {
         result = await Order.findOneAndUpdate(
           {
@@ -105,6 +108,8 @@ module.exports = {
           { new: true }
         );
       } else if (action === "cancel") {
+        if(orderCancelRefundMethod === "RefundToBankAccount"){
+
         result = await Order.findOneAndUpdate(
           {
             "items.orderID": orderId, // Corrected to search by the orderID inside items array
@@ -114,13 +119,73 @@ module.exports = {
               "items.$.status": "Cancelled", // Use $ to update the matched element in the array
               "items.$.paymentStatus": "Refund",
               "items.$.cancelReason": cancelReason,
-
-              status: "Cancelled",
-              paymentStatus: "Refund",
+              "items.$.cancelRefundMethod": "Refund to Bank Account",
+              "items.$.cancelledOn": Date.now(),
             },
           },
           { new: true }
         );
+      }else if(orderCancelRefundMethod === "RefundToWallet"){
+
+
+        const order = await Order.findOne({
+          items: { $elemMatch: { orderID: orderId } }
+        });        
+        console.log("this is the ordercanel through wallet in backend", order)
+
+        let isPending = false;
+        let itemTotal = 0;
+    
+        order.items.forEach(item => {
+          if (item.orderID === orderId && item.paymentStatus === "Pending") {
+            isPending = true;
+          }
+    
+          if (item.orderID === orderId) {
+            itemTotal = item.itemTotal; // Only sum the specific item's total
+          }
+        });
+
+        console.log("this is item total in the backend", itemTotal)
+        console.log(itemTotal,"this is item total from the backend")
+
+          const wallet = await Wallet.findOne({userId: req.session.user});
+          console.log('Wallet balance', wallet.balance)
+
+
+          if (wallet) {
+            const amount = wallet.balance + itemTotal;
+            
+            // Update wallet balance and append a new transaction
+            wallet.balance = Math.round(amount);
+            wallet.transactions.push({
+              date: new Date(),
+              amount: Math.round(itemTotal), // Only round the new transaction
+              message: "Product Refund",
+              type: "Credit",
+            });
+          
+            await wallet.save();
+          }
+
+
+
+        result = await Order.findOneAndUpdate(
+          {
+            "items.orderID": orderId, // Corrected to search by the orderID inside items array
+          },
+          {
+            $set: {
+              "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+              "items.$.paymentStatus": "Refund",
+              "items.$.cancelReason": cancelReason,
+              "items.$.cancelRefundMethod": "Refund to Wallet",
+              "items.$.cancelledOn": Date.now(),
+            },
+          },
+          { new: true }
+        );
+      }
       }
 
       if (!result) {
