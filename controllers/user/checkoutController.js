@@ -179,12 +179,10 @@ module.exports = {
 
       let userCart = await Cart.findOne({ userId: userId });
 
-      // if (!userCart) {
-      //   return res.status(404).json({ error: "User's cart not found" });
-      // }
 
       const status = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Confirmed" : "Pending";
-      const paymentStatus = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Paid" : "Pending";
+      const paymentStatus = paymentMethod === "COD" ? "Pending" : paymentMethod === "Wallet" ? "Paid" : "Paid";
+
 
 
       let order;
