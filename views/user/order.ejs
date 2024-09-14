@@ -91,6 +91,10 @@
                   </span>
                 </p>
 
+                <% if (item.cancelRefundMethod) { %>
+                 <p><strong>Refund method: </strong> <%= item.cancelRefundMethod %></p>
+                <% } %>
+
                 <!-- Delivery & Return Dates -->
                 <% if (item.status === 'Delivered') { %>
                 <p><strong>Delivery Date:</strong> <%= new Date(singleOrder.createdAt).toLocaleDateString() %></p>
