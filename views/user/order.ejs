@@ -186,6 +186,13 @@
                               <!-- Word count display -->
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
+                            <div class="mb-3 row mt-4">
+                              <label for="orderCancelReason-<%= item.orderID%>" class="form-label">Refund method</label>
+                              <select name="orderCancelReason" id="orderCancelReason-<%= item.orderID%>">
+                                <option value="Refund">Refund to the bank</option>
+                                <option value="Wallet">Refund to the wallet</option>
+                              </select>
+                            </div>
                           </form>
                         </div>
                         <div class="modal-footer">
