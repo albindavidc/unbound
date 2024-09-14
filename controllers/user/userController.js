@@ -205,7 +205,8 @@ const resendOtp = async (req, res) => {
 //Load Login - Redirect Login
 const loadLogin = async (req, res) => {
   try {
-    return res.render("user/signup");
+    const referrals = req.query.ref;
+    return res.render("user/signup", {referrals});
   } catch (error) {
     res.redirect("/pageNotFound");
   }
@@ -226,6 +227,8 @@ const login = async (req, res) => {
         message: "User is blocked by the admin",
       });
     }
+
+   
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
 

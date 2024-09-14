@@ -134,11 +134,8 @@ router.get("/referrals", userController.getReferrals);
 router.get("/register", userController.loadLogin)
 
 
-// In userController
 exports.loadLogin = (req, res) => {
-  const ref = req.query.ref; // Retrieve the 'ref' query parameter
-  console.log("Referral ID:", ref);
-  // Your logic here...
+  const ref = req.query.ref;
   res.render("register", { ref });
 };
 

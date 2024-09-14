@@ -59,6 +59,12 @@
         <div id="error5" class="error-message"></div>
       </div>
 
+      <div class="elementsField">
+        <input type="text" name="referrals" id="referrals" value="<%= referrals %>" placeholder="Referrals(Optional)"/>
+        <div id="error6" class="error-message"></div>
+
+      </div>
+
       <%if(locals.message && message.length>0){%>
       <div class="alert alert-danger text-center"><%=message%></div>
       <%}%>
@@ -66,6 +72,9 @@
       <button type="submit" style="margin-top: 5%">Sign Up</button>
     </form>
   </div>
+
+
+
   <div class="form-container sign-in-container">
     <form id="loginform" method="post" action="/login">
       <h1 style="padding: 2rem">Sign in</h1>

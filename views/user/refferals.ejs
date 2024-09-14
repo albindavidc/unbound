@@ -121,15 +121,9 @@
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: "Link copied to the clipboard successfully",
-        showCancelButton: true, 
-        cancelButtonText: "Close",       
-        showConfirmButton: true,
-        confirmButtonText :"Go to Register",
-      }).then((result) =>{
-        if(result.isConfirmed){
-          window.location.href = link;
-        }
+        text: "Link copied to the clipboard successfully",     
+        showConfirmButton: false,
+        timer: 1500,
       })
     
     });

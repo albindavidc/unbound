@@ -31,6 +31,11 @@ const userSchema = new Schema({
         type:Boolean,
         default: false,
     },
+    referrals: {
+        type: Schema.Types.ObjectId,
+        ref: 'Referral', // The user who referred another person
+
+    },
 
     isBlocked: {
         type: Boolean,
