@@ -38,7 +38,7 @@ const userSchema = new Schema(
 
     },
     referrals: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Referral",
     },
     isBlocked: {

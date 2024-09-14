@@ -1,32 +1,41 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const referralSchema = new mongoose.Schema({
+const referralSchema = new Schema({
   referrer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // The user who referred another person
-    required: true,
+    ref: "User", // The user who referred another person
   },
-  referredUser: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // The referred user
-    required: false, // Can be null if the referral hasn't signed up yet
-  },
+  referredUserDetails: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // The referred user
+        required: true,
+      },
+      date: {
+        type: Date,
+        default: Date.now, // Automatically sets the current date
+      },
+      status: {
+        type: String,
+        default: "In Active",
+      },
+    },
+  ],
   referralCode: {
     type: String,
-    required: true,
-    unique: true,
   },
+
   referralType: {
     type: String,
-    enum: ['direct', 'tiered', 'affiliate'],
-    required: true,
+    enum: ["direct", "tiered", "affiliate"],
   },
   rewards: [
     {
       type: {
         type: String,
-        enum: ['discount', 'cashback', 'points'],
-        required: true,
+        enum: ["discount", "cashback", "points"],
       },
       amount: {
         type: Number,
@@ -34,33 +43,28 @@ const referralSchema = new mongoose.Schema({
       },
       status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected', 'redeemed'],
-        default: 'pending',
+        enum: ["pending", "approved", "rejected", "redeemed"],
+        default: "pending",
       },
     },
   ],
   referralLink: {
-    type: String, // Unique affiliate link for referral
-    required: false, // Only required for affiliate referral types
-  },
-  dateReferred: {
-    type: Date,
-    default: Date.now,
+    type: String,
   },
   referredPurchases: {
-    type: Number, // Total number of purchases made by referred users
+    type: Number,
     default: 0,
   },
   totalRewardsEarned: {
     type: Number,
-    default: 0, // Total rewards earned by the referrer
+    default: 0,
   },
   tieredReferrals: [
     {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      level: { type: Number, default: 1 }, // Level in the tier system (e.g., 1st, 2nd level)
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      level: { type: Number, default: 1 },
     },
   ],
 });
 
-module.exports = mongoose.model('Referral', referralSchema);
+module.exports = mongoose.model("Referral", referralSchema);

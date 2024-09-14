@@ -157,26 +157,34 @@ const verifyOtp = async (req, res) => {
         password: passwordHash,
       });
 
+
       await saveUserData.save();
       req.session.user = saveUserData._id;
 
       const referrer = await User.findOne({referralCode: user.referrals})
-      const referral = req.session.referrals;
+      const referralData = req.session.referrals;
       let addReferrals;
-      if(referral){      
+      if(referralData){      
         addReferrals = await Referral.findOneAndUpdate(
           { referrer: referrer._id },
-          { $addToSet: { referralCode: referral.referrals, referredUser: req.session.user } }, 
+          {$set: {referralCode: referrer.referralCode},
+           $push: {referredUserDetails: {user: req.session.user, status: "Active"}} }, 
           { new: true, upsert: true } 
         )
       }else{
         addReferrals = await Referral.findOneAndUpdate(
           { referrer: referrer._id },
-          { $addToSet: { referralCode: user.referrals, referredUser: req.session.user } },  
+          {$set: {referralCode: referrer.referralCode},
+          $push: {referredUserDetails: {user: req.session.user, status: "Active"}} }, 
           { new: true, upsert: true }  
         )
       }
 
+      await User.findOneAndUpdate(
+        {_id: req.session.user},
+        {$push: {referrals: addReferrals}},
+        {new: true, upsert: true}
+      )
 
       res.json({ success: true, redirectUrl: "/" });
     } else {
@@ -630,7 +638,7 @@ const deleteAddress = async (req, res) => {
 // };
 const getReferrals = async(req, res) => {
 
-  const user = await User.findOne({ _id: req.session.user });
+  const user = await User.findOne({ _id: req.session.user }).populate("referralCode referrals");
 
   function generateRefferalCode(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -641,25 +649,37 @@ const getReferrals = async(req, res) => {
     return referralCode;
   }
   
-  let refferalCode;
   if(!user.referralCode){
-    refferalCode = generateRefferalCode(8);
+    const refferalCode = generateRefferalCode(8);
     
     user.referralCode = refferalCode;
     await user.save();
   }
+
+
+  const referrals = await Referral.find({referrer: req.session.user}).populate("referredUserDetails.user")
+
+  let totalCountOfUsers =0;
+// Loop through each referral
+referrals.forEach(referral => {
+  // Loop through referredUserDetails array inside each referral
+  referral.referredUserDetails.forEach(item => {
+    totalCountOfUsers++;
+  });
+});
+    
+const newUser = await User.find({user:req.session.user});
+
+ // Log the fetched referrals for debugging
+ console.log("Fetched Referrals:", referrals);
+
   
-  let successfullRefferals = [];
-  if (user.successfullRefferals && Array.isArray(user.successfullRefferals)) {
-    successfullRefferals = user.successfullRefferals.reverse();
-  }
-
-
 
   res.render("user/refferals", {
     refferalCode: user.referralCode,
-    successfullRefferals,
+    successfullRefferals: referrals,
     user,
+    totalCountOfUsers,
   })
 };
 
