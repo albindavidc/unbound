@@ -131,6 +131,17 @@ router.post("/user/verify-payment", checkoutController.verifyPayment);
 router.get("/order-success", cartController.getOrderSuccess);
 
 router.get("/referrals", userController.getReferrals);
+router.get("/register", userController.loadLogin)
+
+
+// In userController
+exports.loadLogin = (req, res) => {
+  const ref = req.query.ref; // Retrieve the 'ref' query parameter
+  console.log("Referral ID:", ref);
+  // Your logic here...
+  res.render("register", { ref });
+};
+
 
 
 module.exports = router;

@@ -113,18 +113,23 @@
     });
   
     copyLink.addEventListener("click", (event) => {
-      const copyCodeText = document.getElementById("refferalCode");
-      const link = `${window.location.origin}/register/?ref=${copyCodeText.innerText}`;
-  
+      const copyCodeText = document.getElementById("refferalCode").innerText;
+      const link = `${window.location.origin}/register/?ref=${copyCodeText}`;
       navigator.clipboard.writeText(link);
   
   
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: "Link Copied",
-        showConfirmButton: false,
-        timer: 1000,
+        text: "Link copied to the clipboard successfully",
+        showCancelButton: true, 
+        cancelButtonText: "Close",       
+        showConfirmButton: true,
+        confirmButtonText :"Go to Register",
+      }).then((result) =>{
+        if(result.isConfirmed){
+          window.location.href = link;
+        }
       })
     
     });
