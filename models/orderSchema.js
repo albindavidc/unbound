@@ -94,14 +94,17 @@ const orderSchema = new Schema(
         returnReason: {
           type: String,
         },
+        returnRefundMethod: {
+          type: String,
+          enum: ["Refund to Bank Account", "Refund to Wallet"],
+        },
+        returnedOn: {
+          type: Date,
+        },
         shippedOn: {
           type: Date,
         },
         outForDelivery: {
-          type: Date,
-        },
-
-        returnedOn: {
           type: Date,
         },
       },

@@ -354,7 +354,9 @@
 
   const returnTheOrder = async (orderId) => {
     const orderReturn = document.getElementById(`orderReturn-${orderId}`).value;
-    const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderReturnRefundMethod}`)
+    const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderId}`).value;
+    
+
 
     try {
       let isReturnValid = checkReturnReason(orderId);
