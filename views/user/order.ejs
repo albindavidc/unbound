@@ -140,6 +140,15 @@
                               <!-- Word count display -->
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
+
+                            <div class="mb-3 row mt-4">
+                              <label for="orderReturnRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
+                              <select name="orderReturnRefundMethod" id="orderReturnRefundMethod-<%= item.orderID%>">
+                                <option value="RefundToBankAccount">Refund to the bank</option>
+                                <option value="RefundToWallet">Refund to the wallet</option>
+                              </select>
+                            </div>
+
                           </form>
                         </div>
                         <div class="modal-footer">
@@ -282,6 +291,8 @@
     returnForms.forEach((form) => {
       const orderId = form.dataset.orderId;
       const textarea = document.getElementById(`orderReturn-${orderId}`);
+      const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderReturnRefundMethod}`)
+
       const wordCountEl = document.getElementById(`wordCount-${orderId}`);
 
       const updateWordCount = () => {
@@ -343,6 +354,8 @@
 
   const returnTheOrder = async (orderId) => {
     const orderReturn = document.getElementById(`orderReturn-${orderId}`).value;
+    const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderReturnRefundMethod}`)
+
     try {
       let isReturnValid = checkReturnReason(orderId);
       if (!isReturnValid) {
@@ -352,7 +365,7 @@
       const response = await fetch(`/order/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "return", returnReason: orderReturn }),
+        body: JSON.stringify({ action: "return", returnReason: orderReturn, orderReturnRefundMethod }),
       });
       const result = await response.json();
       if (result.success) {
