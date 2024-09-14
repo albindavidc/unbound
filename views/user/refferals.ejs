@@ -101,6 +101,8 @@
   
     copyCode.addEventListener("click", () => {
       const copyCodeText = document.getElementById("refferalCode");
+      const referrer = `<%= user%>`;
+
       navigator.clipboard.writeText(copyCodeText.innerText);
   
       Swal.fire({

@@ -1,53 +1,57 @@
-const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const userSchema = new Schema({
+const userSchema = new Schema(
+  {
     name: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     email: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+      required: true,
+      unique: true,
     },
     phone: {
-        type: Number,
-        required: false,
-        unique: false,
-        sparse: true,
-        default: null,
+      type: Number,
+      required: false,
+      unique: false,
+      sparse: true,
+      default: null,
     },
     googleId: {
-        type: String,
-        unique: true,
+      type: String,
+      unique: true,
     },
     password: {
-        type: String,
-        required: false,
+      type: String,
+      required: false,
     },
 
-    isVerified:{
-        type:Boolean,
-        default: false,
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    referralCode: {
+      type: String,
+      unique: true,
+
     },
     referrals: {
-        type: Schema.Types.ObjectId,
-        ref: 'Referral', // The user who referred another person
-
+      type: Schema.Types.ObjectId,
+      ref: "Referral",
     },
-
     isBlocked: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
     isAdmin: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
-
-
-}, {timestamps:true})
+  },
+  { timestamps: true }
+);
 
 const User = mongoose.model("User", userSchema);
 

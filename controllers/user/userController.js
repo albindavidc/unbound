@@ -3,6 +3,7 @@ require("dotenv").config();
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
+const Referral = require("../../models/referralSchema")
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -84,7 +85,7 @@ async function sendVerificationEmail(email, otp) {
 
 const signup = async (req, res) => {
   try {
-    const { name, phone, email, password, cPassword } = req.body;
+    const { name, phone, email, password, cPassword, referrals, referrer } = req.body;
 
     if (password !== cPassword) {
       return res.render("user/signup", { message: "Password don't match" });
@@ -105,8 +106,11 @@ const signup = async (req, res) => {
       return res.json("email-error");
     }
 
+
     req.session.userOtp = otp;
-    req.session.userData = { name, phone, email, password };
+    req.session.userData = { name, phone, email, password, referrals };
+    req.session.referrals = {referrals};
+
 
     res.render("user/verify-otp");
     console.log(`OTP Sent: ${otp}`);
@@ -138,12 +142,6 @@ const verifyOtp = async (req, res) => {
       const user = req.session.userData;
       const passwordHash = await securePassword(user.password);
 
-      const saveUserData = new User({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        password: passwordHash,
-      });
 
       if (!req.session.userOtp || !req.session.userData) {
         return res.status(400).json({
@@ -152,8 +150,34 @@ const verifyOtp = async (req, res) => {
         });
       }
 
+      const saveUserData = new User({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        password: passwordHash,
+      });
+
       await saveUserData.save();
       req.session.user = saveUserData._id;
+
+      const referrer = await User.findOne({referralCode: user.referrals})
+      const referral = req.session.referrals;
+      let addReferrals;
+      if(referral){      
+        addReferrals = await Referral.findOneAndUpdate(
+          { referrer: referrer._id },
+          { $addToSet: { referralCode: referral.referrals, referredUser: req.session.user } }, 
+          { new: true, upsert: true } 
+        )
+      }else{
+        addReferrals = await Referral.findOneAndUpdate(
+          { referrer: referrer._id },
+          { $addToSet: { referralCode: user.referrals, referredUser: req.session.user } },  
+          { new: true, upsert: true }  
+        )
+      }
+
+
       res.json({ success: true, redirectUrl: "/" });
     } else {
       res.status(400).json({
@@ -206,7 +230,10 @@ const resendOtp = async (req, res) => {
 const loadLogin = async (req, res) => {
   try {
     const referrals = req.query.ref;
-    return res.render("user/signup", {referrals});
+    const referrer = req.query.referrer;
+
+    console.log("this is a referrer", referrer)
+    return res.render("user/signup", {referrals, referrer});
   } catch (error) {
     res.redirect("/pageNotFound");
   }
@@ -614,24 +641,25 @@ const getReferrals = async(req, res) => {
     return referralCode;
   }
   
+  let refferalCode;
   if(!user.referralCode){
-    const refferalCode = generateRefferalCode(8);
-
+    refferalCode = generateRefferalCode(8);
+    
     user.referralCode = refferalCode;
     await user.save();
   }
-
-  console.log(user);
-
+  
   let successfullRefferals = [];
   if (user.successfullRefferals && Array.isArray(user.successfullRefferals)) {
     successfullRefferals = user.successfullRefferals.reverse();
   }
 
+
+
   res.render("user/refferals", {
     refferalCode: user.referralCode,
     successfullRefferals,
-    user: req.session.user
+    user,
   })
 };
 
