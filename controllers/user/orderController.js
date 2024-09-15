@@ -199,13 +199,14 @@ module.exports = {
             }
           });
 
-          console.log("this is item total in the backend", itemTotal);
-          console.log(itemTotal, "this is item total from the backend");
+          console.log("this is pending", isPending)
+          // console.log("this is item total in the backend", itemTotal);
+          // console.log(itemTotal, "this is item total from the backend");
 
           const wallet = await Wallet.findOne({ userId: req.session.user });
-          console.log("Wallet balance", wallet.balance);
+          // console.log("Wallet balance", wallet.balance);
 
-          if (wallet) {
+          if (wallet && isPending === false) {
             const amount = wallet.balance + itemTotal;
 
             // Update wallet balance and append a new transaction
@@ -218,7 +219,7 @@ module.exports = {
             });
 
             await wallet.save();
-          }
+          
 
           result = await Order.findOneAndUpdate(
             {
@@ -235,6 +236,23 @@ module.exports = {
             },
             { new: true }
           );
+        }else{
+          result = await Order.findOneAndUpdate(
+            {
+              "items.orderID": orderId, // Corrected to search by the orderID inside items array
+            },
+            {
+              $set: {
+                "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+                "items.$.paymentStatus": "Refund",
+                "items.$.cancelReason": cancelReason,
+                "items.$.cancelledOn": Date.now(),
+              },
+            },
+            { new: true }
+          );
+        }
+
         }
       }
 

@@ -140,7 +140,7 @@
                               <!-- Word count display -->
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
-
+                             
                             <div class="mb-3 row mt-4">
                               <label for="orderReturnRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
                               <select name="orderReturnRefundMethod" id="orderReturnRefundMethod-<%= item.orderID%>">
@@ -199,6 +199,8 @@
                               <!-- Word count display -->
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
+                            <% if (item.paymentStatus !== "Pending") { %>
+
                             <div class="mb-3 row mt-4">
                               <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
                               <select name="orderCancelRefundMethod" id="orderCancelRefundMethod-<%= item.orderID%>">
@@ -206,6 +208,17 @@
                                 <option value="RefundToWallet">Refund to the wallet</option>
                               </select>
                             </div>
+                            <% }else { %>
+
+                              <div class="mb-3 row mt-4 d-none">
+                                <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
+                                <select name="orderCancelRefundMethod" id="orderCancelRefundMethod-<%= item.orderID%>">
+                                  <option value="RefundToBankAccount">Refund to the bank</option>
+                                  <option value="RefundToWallet">Refund to the wallet</option>
+                                </select>
+                              </div>
+
+                              <% } %>
                           </form>
                         </div>
                         <div class="modal-footer">
@@ -261,7 +274,7 @@
     cancelForms.forEach((form) => {
       const orderId = form.dataset.orderId;
       const textarea = document.getElementById(`orderCancel-${orderId}`);
-      const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderCancelRefundMethod}`)
+      const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderCancelRefundMethod}`);
       const wordCountEl = document.getElementById(`wordCount-${orderId}`);
 
       const updateWordCount = () => {
@@ -382,7 +395,7 @@
 
   const cancelTheOrder = async (orderId) => {
     const orderCancel = document.getElementById(`orderCancel-${orderId}`).value;
-    const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderId}`).value;
+    const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderId}`).value ;
 
     try {
       let isCancelValid = checkCancelReason(orderId); // Pass orderId here
