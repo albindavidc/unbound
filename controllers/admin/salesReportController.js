@@ -1,5 +1,5 @@
 const puppeteer = require("puppeteer");
-const excelJS = require("exceljs");
+const excelJs = require("exceljs");
 const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
@@ -16,8 +16,6 @@ module.exports = {
       const locals = {
         title: "Sales Report",
       };
-      const perPage = 50;
-      const page = req.query.page || 1;
       const reportType = req.query.reportType || "daily";
       const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
       const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
@@ -29,12 +27,12 @@ module.exports = {
       console.log(reportType, "this is the report type"); // Debug reportType
 
       switch (reportType) {
-        case "daily":
-          matchCondition.createdAt = {
-            $gte: new Date(new Date(now).setUTCHours(0, 0, 0, 0)), // Clone now
-            $lte: new Date(new Date(now).setUTCHours(23, 59, 59, 999)), // End of the day
-          };
-          break;
+        // case "daily":
+        //   matchCondition.createdAt = {
+        //     $gte: new Date(new Date(now).setUTCHours(0, 0, 0, 0)), // Clone now
+        //     $lte: new Date(new Date(now).setUTCHours(23, 59, 59, 999)), // End of the day
+        //   };
+        //   break;
 
         case "weekly":
           const startOfWeek = new Date(now);
@@ -107,8 +105,6 @@ module.exports = {
           select: "addressLine1 city state postalCode",
         })
         .sort({ createdAt: -1 })
-        .skip(perPage * (page - 1))
-        .limit(perPage)
         .exec();
       console.log(orders, "this is the orders");
 
@@ -131,14 +127,6 @@ module.exports = {
 
       // Pagination details
       const count = await Order.countDocuments(matchCondition);
-      const nextPage = parseInt(page) + 1;
-      const hasNextPage = nextPage <= Math.ceil(count / perPage);
-
-      const breadcrumbs = [
-        { name: "Home", url: "/admin" },
-        { name: "Sales Report", url: "/admin/sales-report" },
-        { name: `Page ${page}`, url: `/admin/sales-report?page=${page}` },
-      ];
 
       // Now you have populated orders with all details, you can create variables to store the data you need:
       const reportData = orders.map((order) => ({
@@ -150,13 +138,13 @@ module.exports = {
         shippingAddress: `${order.shippingAddress.addressLine1}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.postalCode}`,
         products: order.items.map((product) => ({
           name: product.productId.name,
-          price: product.productId.price,
+          price: product.productId.sellingPrice,
           discountPrice: product.productId.offerDiscountPrice,
           categoryDiscount: product.productId.categoryDiscountAmount,
           quantity: product.quantity,
-          totalPrice: product.totalprice,
+          totalPrice: product.totalPrice,
         })),
-        totalAmount: order.totalAmount,
+        totalAmount: order.totalPrice,
         offerAppliedTotalAmount: order.offerAppliedTotalAmount,
         couponDiscount: order.couponDiscount,
         status: order.status,
@@ -167,11 +155,6 @@ module.exports = {
       res.render("admin/salesReport", {
         locals,
         orders: reportData, // Pass the processed data to the view
-        current: page,
-        perPage,
-        pages: Math.ceil(count / perPage),
-        nextPage: hasNextPage ? nextPage : null,
-        breadcrumbs,
         totalOrders,
         overallAmount,
         overallDiscount,
@@ -185,178 +168,140 @@ module.exports = {
     }
   },
 
-  salesReportExcel: async (req, res) => {
+  exportToExcel: async (req, res) => {
     let startDate = req.query.startDate ? new Date(req.query.startDate) : new Date();
     let endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+
+    // Validate dates
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ error: "Invalid date format" });
+    }
+
+    // Set start and end of the day for the date range
     startDate.setUTCHours(0, 0, 0, 0);
     endDate.setUTCHours(23, 59, 59, 999);
 
-    console.log(startDate, endDate);
-    const orders = await Order.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate, $lte: endDate },
-          status: { $nin: ["Cancelled", "Failed"] },
-        },
-      },
-      {
-        $lookup: {
-          from: "addresses",
-          localField: "shippingAddress",
-          foreignField: "_id",
-          as: "shippingAddress",
-        },
-      },
-      { $unwind: { path: "$shippingAddress", preserveNullAndEmptyArrays: true } },
 
-      {
-        $lookup: {
-          from: "users",
-          localField: "customerId",
-          foreignField: "_id",
-          as: "customer",
-        },
-      },
-      { $unwind: { path: "$customer", preserveNullAndEmptyArrays: true } },
+    console.log(startDate, endDate, "these are the startdate and the end date");
 
-      {
-        $lookup: {
-          from: "coupons",
-          localField: "coupon",
-          foreignField: "_id",
-          as: "coupon",
-        },
-      },
-      { $unwind: { path: "$coupon", preserveNullAndEmptyArrays: true } },
+    
+    try {
+      // Fetch orders within the date range
+      const orders = await Order.find({
+        createdAt: { $gte: startDate, $lte: endDate },
+        return: { $ne: true }, // Ensures return: false or undefined
+      })
+        .populate({ path: "customerId", select: "name" })
+        .populate({ path: "items.productId", select: "name price" })
+        .populate({path: "shippingAddress"})
+        .lean();
+  
+        console.log(orders, "this is the orders from backend excel")
+      // Prepare data for Excel
+      const excelData = orders.flatMap((order) =>
+        order.items.map((product) => ({
+          _id: order._id.toString().slice(-7).toUpperCase(), // Formatting Order ID
+          customer: `${order.customerId.name}`,
+          productName: product.productId.name,
+          price: product.price,
+          quantity: product.quantity,
+          itemTotal: product.itemTotal,
+          totalAmount: order.totalPrice,
+          shippingAddress: `${order.shippingAddress.address || ""}, ${order.shippingAddress.city || ""}, ${
+            order.shippingAddress.state || ""
+          }, ${order.shippingAddress.zipcode || ""}, ${order.shippingAddress.country || ""}`,
+          paymentMethod: order.paymentMethod,
+          status: order.status,
+          createdAt: order.createdAt.toISOString().split("T")[0],
+        }))
+      );
 
-      { $unwind: "$items" }, // Ensure 'items' field is array and exists
+      // Workbook and worksheet setup
+      const workBook = new excelJs.Workbook();
+      const worksheet = workBook.addWorksheet("Sales Report");
 
-      {
-        $lookup: {
-          from: "products",
-          localField: "items.productId",
-          foreignField: "_id",
-          as: "items.productDetails",
-        },
-      },
-      { $unwind: { path: "$items.productDetails", preserveNullAndEmptyArrays: true } },
+      worksheet.columns = [
+        { header: "Order ID", key: "_id", width: 15 },
+        { header: "Customer", key: "customer", width: 25 },
+        { header: "Product Name", key: "productName", width: 30 },
+        { header: "Price", key: "price", width: 10 },
+        { header: "Quantity", key: "quantity", width: 10 },
+        { header: "Item Total", key: "itemTotal", width: 15 },
+        { header: "Total Amount", key: "totalAmount", width: 15 },
+        { header: "Payment Method", key: "paymentMethod", width: 15 },
+        { header: "Status", key: "status", width: 15 },
+        { header: "Date", key: "createdAt", width: 15 },
+      ];
 
-      {
-        $lookup: {
-          from: "colors",
-          localField: "items.color",
-          foreignField: "_id",
-          as: "items.color",
-        },
-      },
-      { $unwind: { path: "$items.color", preserveNullAndEmptyArrays: true } },
+      // Adding rows
+      excelData.forEach((row) => {
+        worksheet.addRow(row);
+      });
 
-      {
-        $lookup: {
-          from: "sizes",
-          localField: "items.size",
-          foreignField: "_id",
-          as: "items.size",
-        },
-      },
-      { $unwind: { path: "$items.size", preserveNullAndEmptyArrays: true } },
+      // Styling headers
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "00FF00" } }; // Yellow background
+        cell.font = { bold: true, color: { argb: "000000" } }; // Black text
+        cell.alignment = { horizontal: "center" };
+      });
 
-      {
-        $group: {
-          _id: "$_id",
-          userID: { $first: "$customer" },
-          shippingAddress: { $first: "$shippingAddress" },
-          paymentMethod: { $first: "$paymentMethod" },
-          status: { $first: "$status" },
-          totalAmount: { $first: "$totalPrice" },
-          coupon: { $first: "$coupon" },
-          couponDiscount: { $first: "$couponDiscount" },
-          payable: { $first: "$payable" },
-          categoryDiscount: { $first: "$categoryDiscount" },
-          createdAt: { $first: "$createdAt" },
-          orderedItems: {
-            $push: {
-              productDetails: {
-                product_name: "$items.productDetails.product_name",
-                price: "$items.price",
-              },
-              quantity: "$items.quantity",
-              color: "$items.color.name",
-              size: "$items.size.value",
-              itemTotal: { $multiply: ["$items.price", "$items.quantity"] },
-            },
-          },
-        },
-      },
-    ]);
+      // Optional: Styling rows (alternating colors for better readability)
+      worksheet.eachRow({ includeEmpty: false, skipHeader: true }, (row, rowNumber) => {
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "center" };
+        });
+        // Add alternating row color
+        if (rowNumber % 2 === 0) {
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F2F2F2" } }; // Light grey
+          });
+        }
+      });
 
-    const workBook = new excelJS.Workbook();
-    const worksheet = workBook.addWorksheet("Sales Report");
-
-    worksheet.columns = [
-      { header: "Order ID", key: "_id" },
-      { header: "Customer ID", key: "userID.userId" },
-      { header: "Payment Method", key: "paymentMethod" },
-      { header: "Payment Status", key: "status" },
-      { header: "Shipping Address", key: "shippingAddress.0.address" },
-      { header: "Total Amount", key: "totalAmount" },
-      { header: "Coupon Applied", key: "coupon.0.code" },
-      { header: "Discount Amount", key: "couponDiscount" },
-      { header: "Final Price", key: "payable" },
-      { header: "Category Discount", key: "categoryDiscount" },
-      { header: "Order Date", key: "createdAt" },
-      {
-        header: "Ordered Items",
-        key: "orderedItems",
-        style: {
-          font: { bold: true },
-        },
-      },
-    ];
-
-    orders.forEach((order) => {
-      worksheet.addRow(order);
-    });
-
-    worksheet.getRow(1).eachCell((cell) => {
-      cell.font = { bold: true };
-    });
-
-    res.setHeader("content-Type", "application/vnd.openxmlformats-officedocument.spreadsheatml.sheet");
-    res.setHeader("content-Disposition", "attachment; filename=sales-report_.xlsx");
-
-    return workBook.xlsx.write(res).then(() => {
-      res.status(200);
-    });
+      // Sending the response
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", "attachment; filename=orders.xlsx");
+      await workBook.xlsx.write(res);
+      res.status(200).end();
+    } catch (err) {
+      console.error("Error generating Excel:", err);
+      res.status(500).send("Internal Server Error");
+    }
   },
 
   exportToPdf: async (req, res) => {
     try {
-      // Parse and validate date parameters
-      let startDate = new Date(req.query.startDate);
-      let endDate = new Date(req.query.endDate);
+      let startDate = req.query.startDate ? new Date(req.query.startDate) : new Date();
+      let endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
 
-      // Check if the dates are valid
+      // Validate dates
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        return res.status(400).send("Invalid date range");
+        return res.status(400).json({ error: "Invalid date format" });
       }
 
-      // Set default dates if not provided
-      if (isNaN(startDate.getTime())) startDate = new Date();
-      if (isNaN(endDate.getTime())) endDate = new Date();
-
+      // Set start and end of the day for the date range
       startDate.setUTCHours(0, 0, 0, 0);
       endDate.setUTCHours(23, 59, 59, 999);
 
-      // Fetch orders
+      console.log(startDate, endDate, "these are the startdate and the end date");
+
+      // Fetch orders within the date range
       const orders = await Order.find({
         createdAt: { $gte: startDate, $lte: endDate },
-        return: false,
+        return: { $ne: true }, // Ensures return: false or undefined
       })
-        .populate({ path: "userId", select: "firstName lastName" })
-        .populate({ path: "products._id", select: "productName" })
+        .populate({ path: "customerId", select: "name" })
+        .populate({ path: "items.productId", select: "name" })
         .lean();
 
+      console.log(orders, "these are the pdf orders");
+
+      // Handle empty result or send response
+      if (orders.length === 0) {
+        return res.status(404).json({ message: "No orders found for this date range" });
+      }
+
+      console.log(orders, "these are the pdf orders");
       const doc = new PDFDocument({ margin: 20, size: "A4" });
 
       let filename = "sales_report.pdf";
@@ -465,8 +410,8 @@ module.exports = {
 
         orders.forEach((order) => {
           const orderDate = order.createdAt.toISOString().split("T")[0];
-          const productNames = order.products.map((item) => `${item._id.productName} (Qty: ${item.quantity})`).join(", ");
-          const customerName = order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : "";
+          const productNames = order.items.map((item) => `${item.productId.name} (Qty: ${item.quantity})`).join(", ");
+          const customerName = order.customerId ? `${order.customerId.name}` : "";
 
           // Check if we need to add a new page
           if (yPosition > doc.page.height - margins.top - rowHeight) {
@@ -488,7 +433,7 @@ module.exports = {
 
           // Draw total amount
           doc.text(
-            `₹${order.totalAmount.toFixed(2)}`,
+            `₹${order.totalPrice.toFixed(2)}`,
             margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products,
             yPosition,
             { width: columnWidths.totalAmount, align: "left" }
