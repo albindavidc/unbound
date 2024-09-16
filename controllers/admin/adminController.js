@@ -1,5 +1,6 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
+const Order = require("../../models/orderSchema")
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -50,7 +51,27 @@ const loadDashboard = async (req, res) => {
     try {
       const userCount = await User.find().countDocuments();
       const productCount = await Product.find().countDocuments();
-      res.render("admin/dashboard", {userCount, productCount});
+      const paymentMethods = ['Online', 'Wallet', 'COD'];  // Define all possible payment methods
+
+      const order = await Order.aggregate([
+        {
+          $group: {
+            _id:"$paymentMethod",  // Group by payment method
+            users:{$addToSet:"$customerId"}  // Collect unique users
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            paymentMethod:"$_id",
+            userCount:{$size:"$users"}  // Count unique users per method
+          }
+        }
+      ]);
+      
+      
+      console.log(order, "this is the order from dashboard")
+      res.render("admin/dashboard", {userCount, productCount, order});
     } catch (error) {
       console.log("Dashboard error", error);
 
