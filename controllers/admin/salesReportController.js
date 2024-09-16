@@ -16,77 +16,63 @@ module.exports = {
       const locals = {
         title: "Sales Report",
       };
-      const reportType = req.query.reportType || "daily";
+      const reportType = req.query.reportType || "yearly";
       const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
       const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
-
-      let matchCondition = {}; // Remove the base return: false to avoid unintended filtering
-      const now = new Date();
-      let endOfDay; // To store the end of the time period
-
       console.log(reportType, "this is the report type"); // Debug reportType
 
+      let endOfDay; // To store the end of the time period
+      
+      let matchCondition = {};
+      const now = new Date();
+      
       switch (reportType) {
-        // case "daily":
-        //   matchCondition.createdAt = {
-        //     $gte: new Date(new Date(now).setUTCHours(0, 0, 0, 0)), // Clone now
-        //     $lte: new Date(new Date(now).setUTCHours(23, 59, 59, 999)), // End of the day
-        //   };
-        //   break;
-
-        case "weekly":
-          const startOfWeek = new Date(now);
-          const dayOfWeek = startOfWeek.getUTCDay() === 0 ? 6 : startOfWeek.getUTCDay() - 1; // Monday as the start
-          startOfWeek.setUTCDate(startOfWeek.getUTCDate() - dayOfWeek); // Set to start of week
-          startOfWeek.setUTCHours(0, 0, 0, 0);
-
-          // Set end of the week (Sunday)
-          endOfDay = new Date(startOfWeek);
-          endOfDay.setUTCDate(endOfDay.getUTCDate() + 6);
-          endOfDay.setUTCHours(23, 59, 59, 999);
-
-          matchCondition.createdAt = {
-            $gte: startOfWeek,
-            $lte: endOfDay,
-          };
+        case 'daily':
+          matchCondition.createdAt = { $gte: new Date(now.setHours(0, 0, 0, 0)) };
           break;
-
+      case 'weekly':
+          const startOfWeek = new Date();
+          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+          matchCondition.createdAt = { $gte: startOfWeek };
+          break;
+      
         case "monthly":
-          const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-          endOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)); // Last day of the month
-          endOfDay.setUTCHours(23, 59, 59, 999); // End of the day
-
+          const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)); // First day of the month
+          const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)); // Last day of the month
+          endOfMonth.setUTCHours(23, 59, 59, 999); // Set to end of the day
+      
           matchCondition.createdAt = {
-            $gte: startOfMonth,
-            $lte: endOfDay,
+            $gte: startOfMonth, // Start of the month
+            $lte: endOfMonth,   // End of the month
           };
           break;
-
+      
         case "yearly":
-          const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
-          endOfDay = new Date(Date.UTC(now.getUTCFullYear(), 11, 31)); // End of the year
-          endOfDay.setUTCHours(23, 59, 59, 999);
-
+          const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)); // First day of the year
+          const endOfYear = new Date(Date.UTC(now.getUTCFullYear(), 11, 31)); // Last day of the year
+          endOfYear.setUTCHours(23, 59, 59, 999); // Set to end of the day
+      
           matchCondition.createdAt = {
-            $gte: startOfYear,
-            $lte: endOfDay,
+            $gte: startOfYear, // Start of the year
+            $lte: endOfYear,   // End of the year
           };
           break;
-
+      
         case "custom":
           if (startDate && endDate) {
             matchCondition.createdAt = {
               $gte: new Date(startDate),
-              $lte: new Date(new Date(endDate).setUTCHours(23, 59, 59, 999)), // End of the custom range
+              $lte: new Date(new Date(endDate).setUTCHours(23, 59, 59, 999)), // Set end of the custom range to end of the day
             };
           } else {
             throw new Error("Custom date range is required for custom report type.");
           }
           break;
-
+      
         default:
           throw new Error("Invalid report type.");
       }
+      
 
       console.log(matchCondition, "this is the matchCondition"); // Debug matchCondition
 
@@ -106,21 +92,25 @@ module.exports = {
         })
         .sort({ createdAt: -1 })
         .exec();
-      console.log(orders, "this is the orders");
+
+      // console.log(orders, "this is the orders");
 
       const totalOrders = await Order.countDocuments(matchCondition);
 
       // Calculate the total amount and discount using aggregation
       const totalAmount = await Order.aggregate([
         { $match: matchCondition },
+        { $unwind: "$items" }, // Unwind the 'items' array
         {
           $group: {
             _id: null,
-            totalAmount: { $sum: "$offerAppliedTotalAmount" },
+            totalAmount: { $sum: { $multiply: ["$items.quantity", { $toDouble: "$items.price" }] } },
             totalDiscount: { $sum: "$couponDiscount" },
           },
         },
       ]);
+
+      console.log(totalAmount, "this is the total amount")
 
       const overallAmount = totalAmount.length ? totalAmount[0].totalAmount : 0;
       const overallDiscount = totalAmount.length ? totalAmount[0].totalDiscount : 0;
