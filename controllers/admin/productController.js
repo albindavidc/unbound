@@ -151,17 +151,44 @@ module.exports = {
 
         const productOffer = req.body.offerDiscountRate;
 
-        if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1 - productOffer / 100])) {
-          await Product.updateMany({ category: categoryId }, [
-            {
-              $set: {
-                sellingPrice: {
-                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, { $subtract: [1, productOffer / 100] }] }],
+        const newProductOfferSellingPrice = newProduct.actualPrice * (1 - productOffer / 100);
+        const newCategoryOfferSellingPrice = newProduct.actualPrice * (1 - categoryOffer / 100);
+
+        if (newProductOfferSellingPrice < newCategoryOfferSellingPrice) {
+          await Product.updateOne(
+            { _id: newProduct._id }, // Match all products in the given category
+            [
+              {
+                $set: {
+                  sellingPrice: Math.trunc(newProductOfferSellingPrice),
                 },
               },
-            },
-          ]);
+            ]
+          );
+        } else {
+          await Product.updateOne(
+            { _id: newProduct._id }, // Match all products in the given category
+            [
+              {
+                $set: {
+                  sellingPrice: Math.trunc(newCategoryOfferSellingPrice),
+                },
+              },
+            ]
+          );
         }
+
+        // if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1 - productOffer / 100])) {
+        //   await Product.updateMany({ category: categoryId }, [
+        //     {
+        //       $set: {
+        //         sellingPrice: {
+        //           $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, { $subtract: [1, productOffer / 100] }] }],
+        //         },
+        //       },
+        //     },
+        //   ]);
+        // }
 
         res.json({ isvalid: true });
       } else {
@@ -375,6 +402,7 @@ module.exports = {
         updateProduct, // The update object
         { new: true, upsert: true } // Set upsert: true to insert if not found
       );
+
       //Calculate Offer
       const sellingPrice = req.body.sellingPrice;
       const actualPrice = req.body.actualPrice;
@@ -387,17 +415,45 @@ module.exports = {
 
       console.log("this is an updation", catOffer, categoryOffer, categoryId);
 
-      if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1 - productOffer / 100])) {
-        await Product.updateMany({ category: categoryId }, [
-          {
-            $set: {
-              sellingPrice: {
-                $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, { $subtract: [1, productOffer / 100] }] }],
+      const newProductOfferSellingPrice = product.actualPrice * (1 - productOffer / 100);
+      const newCategoryOfferSellingPrice = product.actualPrice * (1 - categoryOffer / 100);
+
+      console.log(newCategoryOfferSellingPrice, newProductOfferSellingPrice, "these are the new offers")
+      if (Number(newProductOfferSellingPrice) < Number(newCategoryOfferSellingPrice)) {
+        await Product.updateOne(
+          { _id: product._id }, // Match all products in the given category
+          [
+            {
+              $set: {
+                sellingPrice: Math.round(newProductOfferSellingPrice),
               },
             },
-          },
-        ]);
+          ]
+        );
+      } else {
+        await Product.updateOne(
+          { _id: product._id }, // Match all products in the given category
+          [
+            {
+              $set: {
+                sellingPrice: Math.round(newCategoryOfferSellingPrice),
+              },
+            },
+          ]
+        );
       }
+
+      // if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1 - productOffer / 100])) {
+      //   await Product.updateMany({ category: categoryId }, [
+      //     {
+      //       $set: {
+      //         sellingPrice: {
+      //           $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, { $subtract: [1, productOffer / 100] }] }],
+      //         },
+      //       },
+      //     },
+      //   ]);
+      // }
 
       req.flash("success", "Product edited successfully");
 

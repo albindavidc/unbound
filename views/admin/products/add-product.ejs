@@ -745,8 +745,8 @@
 
     if (!isRequired(offerDiscountRate)) {
       showError(offerDiscountRateEl, "Offer discount rate cannot be blank");
-    } else if (parseFloat(offerDiscountRate) <= 0) {
-      showError(offerDiscountRateEl, "Offer discount cannot be zero or less");
+    } else if (parseFloat(offerDiscountRate) < 0) {
+      showError(offerDiscountRateEl, "Offer discount cannot be less than zero");
     } else {
       showSuccess(offerDiscountRateEl);
       isValid = true;

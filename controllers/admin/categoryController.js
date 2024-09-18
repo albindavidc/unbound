@@ -60,18 +60,56 @@ const addCategory = async (req, res) => {
 
     await newCategory.save();
 
-    await Product.updateMany(
-      { category: newCategory._id }, // Match all products in the given category
-      [
-        {
-          $set: {
-            sellingPrice: {
-              $trunc: [{ $multiply: ["$sellingPrice", { $subtract: [1, offer / 100] }] }],
+
+    const products = await Product.find({ category: newCategory._id });
+
+    console.log("this is products in category", products)
+
+    //Product offer and category offer
+    for(let product of products){
+      const productOffer = product.offerDiscountRate;
+      const newProductOfferSellingPrice = product.actualPrice*(1-productOffer/100);
+      const newCategoryOfferSellingPrice = product.actualPrice*(1-offer/100);
+
+      if(newProductOfferSellingPrice<newCategoryOfferSellingPrice){
+        await Product.updateOne(
+          { _id: product._id }, // Match all products in the given category
+          [
+            {
+              $set: {
+                sellingPrice: Math.trunc(newProductOfferSellingPrice)
+              },
             },
-          },
-        },
-      ]
-    );
+          ]
+        );
+
+      }else{
+        await Product.updateOne(
+          { _id: product._id }, // Match all products in the given category
+          [
+            {
+              $set: {
+                sellingPrice: Math.trunc(newCategoryOfferSellingPrice)
+              },
+            },
+          ]
+        );
+      }
+    }
+
+
+    // await Product.updateMany(
+    //   { category: newCategory._id }, // Match all products in the given category
+    //   [
+    //     {
+    //       $set: {
+    //         sellingPrice: {
+    //           $trunc: [{ $multiply: ["$sellingPrice", { $subtract: [1, offer / 100] }] }],
+    //         },
+    //       },
+    //     },
+    //   ]
+    // );
 
     return res.json({ message: "Category added successfully" });
   } catch (error) {
@@ -112,20 +150,37 @@ const editCategory = async (req, res) => {
     const products = await Product.find({ category: category._id });
 
     console.log("this is products in category", products)
-    for(let product of products){
 
+    //Product offer and category offer
+    for(let product of products){
       const productOffer = product.offerDiscountRate;
-      const newSellingPrice = product.actualPrice*(1-offer/100)*(1-productOffer/100);
-      await Product.updateOne(
-        { _id: product._id }, // Match all products in the given category
-        [
-          {
-            $set: {
-              sellingPrice: Math.trunc(newSellingPrice)
+      const newProductOfferSellingPrice = product.actualPrice*(1-productOffer/100);
+      const newCategoryOfferSellingPrice = product.actualPrice*(1-offer/100);
+
+      if(newProductOfferSellingPrice<newCategoryOfferSellingPrice){
+        await Product.updateOne(
+          { _id: product._id }, // Match all products in the given category
+          [
+            {
+              $set: {
+                sellingPrice: Math.trunc(newProductOfferSellingPrice)
+              },
             },
-          },
-        ]
-      );
+          ]
+        );
+
+      }else{
+        await Product.updateOne(
+          { _id: product._id }, // Match all products in the given category
+          [
+            {
+              $set: {
+                sellingPrice: Math.trunc(newCategoryOfferSellingPrice)
+              },
+            },
+          ]
+        );
+      }
     }
 
     res.redirect("/admin/category");
