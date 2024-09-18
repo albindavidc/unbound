@@ -160,7 +160,7 @@ module.exports = {
             [
               {
                 $set: {
-                  sellingPrice: Math.trunc(newProductOfferSellingPrice),
+                  sellingPrice: Math.round(newProductOfferSellingPrice),
                 },
               },
             ]
@@ -171,7 +171,7 @@ module.exports = {
             [
               {
                 $set: {
-                  sellingPrice: Math.trunc(newCategoryOfferSellingPrice),
+                  sellingPrice: Math.round(newCategoryOfferSellingPrice),
                 },
               },
             ]

@@ -77,7 +77,7 @@ const addCategory = async (req, res) => {
           [
             {
               $set: {
-                sellingPrice: Math.trunc(newProductOfferSellingPrice)
+                sellingPrice: Math.round(newProductOfferSellingPrice)
               },
             },
           ]
@@ -89,7 +89,7 @@ const addCategory = async (req, res) => {
           [
             {
               $set: {
-                sellingPrice: Math.trunc(newCategoryOfferSellingPrice)
+                sellingPrice: Math.round(newCategoryOfferSellingPrice)
               },
             },
           ]
@@ -163,7 +163,7 @@ const editCategory = async (req, res) => {
           [
             {
               $set: {
-                sellingPrice: Math.trunc(newProductOfferSellingPrice)
+                sellingPrice: Math.round(newProductOfferSellingPrice)
               },
             },
           ]
@@ -175,7 +175,7 @@ const editCategory = async (req, res) => {
           [
             {
               $set: {
-                sellingPrice: Math.trunc(newCategoryOfferSellingPrice)
+                sellingPrice: Math.round(newCategoryOfferSellingPrice)
               },
             },
           ]
