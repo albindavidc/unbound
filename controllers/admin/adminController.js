@@ -1,6 +1,6 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
-const Order = require("../../models/orderSchema")
+const Order = require("../../models/orderSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -51,33 +51,75 @@ const loadDashboard = async (req, res) => {
     try {
       const userCount = await User.find().countDocuments();
       const productCount = await Product.find().countDocuments();
-      const paymentMethods = ['Online', 'Wallet', 'COD'];  // Define all possible payment methods
+      // const paymentMethods = ["Online", "Wallet", "COD"];
 
       const order = await Order.aggregate([
         {
           $group: {
-            _id:"$paymentMethod",  // Group by payment method
-            users:{$addToSet:"$customerId"}  // Collect unique users
+            _id: "$paymentMethod", // Group by payment method
+            users: { $addToSet: "$customerId" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            paymentMethod: "$_id",
+            userCount: { $size: "$users" },
+          },
+        },
+      ]);
+
+      const orderBar = await Order.aggregate([
+        { $unwind: "$items" },  // Unwind items array
+        {
+          $group: {
+            _id: "$items.productId",  // Group by productId
+            productName: { $first: "$items.productId.name" },  // Get product name
+            totalQuantitySold: { $sum: "$items.quantity" },  // Sum of quantities sold
+            totalRevenueForProduct: { 
+              $sum: { 
+                $multiply: ["$items.quantity", { $toDouble: "$items.price" }]  // Calculate revenue for the product
+              } 
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$totalRevenueForProduct" },  // Total revenue across all products
+            totalDiscount: { $sum: "$couponDiscount" },  // Total discount
+            productSoldCount: { $sum: "$totalQuantitySold" },  // Total number of products sold
+            productsSold: {  // List of products and their respective counts and revenues
+              $push: {
+                productId: "$_id",
+                productName: "$productName",
+                quantitySold: "$totalQuantitySold",
+                revenue: "$totalRevenueForProduct"
+              }
+            }
           }
         },
         {
           $project: {
             _id: 0,
-            paymentMethod:"$_id",
-            userCount:{$size:"$users"}  // Count unique users per method
+            totalRevenue: "$totalAmount",  // Total revenue across all products
+            totalDiscount: 1,
+            productSoldCount: 1,
+            productsSold: 1  // List of products sold with their quantities and revenues
           }
         }
       ]);
       
+      console.log(orderBar, "this is the order from dashboard");
       
-      console.log(order, "this is the order from dashboard")
-      res.render("admin/dashboard", {userCount, productCount, order});
+      console.log(orderBar, "this is the order from dashboard");
+      res.render("admin/dashboard", { userCount, productCount, order, orderBar });
     } catch (error) {
       console.log("Dashboard error", error);
 
       res.redirect("/pageerror");
     }
-  }else {
+  } else {
     res.redirect("/admin/login");
   }
 };

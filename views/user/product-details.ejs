@@ -72,18 +72,14 @@
     display: block; /* Display the zoom result */
   }
 
-
   #productQuantity {
-  width: 80px; /* Adjust width as needed */
-  padding: 8px; /* Add padding for better touch targets */
-  border: 1px solid #ced4da; /* Light border */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 16px; /* Increase font size for better readability */
-  text-align: center; /* Center text inside the input */
-}
-
-
-
+    width: 80px; /* Adjust width as needed */
+    padding: 8px; /* Add padding for better touch targets */
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 16px; /* Increase font size for better readability */
+    text-align: center; /* Center text inside the input */
+  }
 </style>
 
 <!-- Shop Details Section Begin -->
@@ -181,9 +177,10 @@
               <i class="fa fa-star-o"></i>
               <% } %>
             </div>
-            
+
             <!-- Product Price -->
             <h3 id="productPrice"></h3>
+            
 
             <div class="row d-flex align-items-center">
               <div class="product__details__option">
@@ -253,7 +250,7 @@
               <h6>Total number of stocks: <%= variant.stock %></h6>
               <% }) %>
             </div>
-            
+
             <div class="product__details__cart__option">
               <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
               <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >0)
@@ -405,7 +402,11 @@
               <i class="fa fa-star<%= i < product.rating ? '' : '-o' %>"></i>
               <% } %>
             </div>
-            <h5>$<%= product.actualPrice %></h5>
+            <h5>$<%= product.sellingPrice %></h5>
+            <% if (Number(product.sellingPrice) < Number(product.actualPrice)) { %>
+
+            <h6 style="text-decoration: line-through">₹<%= product.actualPrice %>.00</h6>
+            <% } %>
           </div>
         </div>
       </div>
@@ -614,14 +615,18 @@
   function updatePrice(quantity) {
     const priceDisplayElement = document.getElementById("productPrice"); // The element to update price dynamically
 
+    const sellingPrice = `<%= product.sellingPrice %>`;
+    const actualPrice = `<%= product.actualPrice %>`;
     // Check if the quantity exceeds the bundleQuantity to apply bundle price
     if (quantity >= bundleQuantity) {
       // Apply the bundle price
       priceDisplayElement.innerHTML = `
       <h3>₹${bundlePrice} <span style="font-size: 24px; font-weight: bold;">₹<%= product.sellingPrice %>.00</span> <span>₹<%= product.actualPrice %>.00</span></h3>
       `;
-    } else {
+    } else if(sellingPrice < actualPrice) {
       priceDisplayElement.innerHTML = `<h3>₹${sellingPrice} <span>₹<%= product.actualPrice %>.00</span></h3>`;
+    }else {
+      priceDisplayElement.innerHTML = `<h3>₹${sellingPrice} </h3>`;
     }
   }
 
@@ -653,8 +658,7 @@
 
     const quantityPerPerson = `<%- JSON.stringify(product.quantity)%>`;
 
-    console.log(quantityPerPerson)
-    
+    console.log(quantityPerPerson);
 
     if (quantity > Number(quantityPerPerson)) {
       Swal.fire({
