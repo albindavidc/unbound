@@ -135,7 +135,7 @@ module.exports = {
           variants: processedVariants,
           bundlePrice,
           quantity,
-          bundleQuantity:maxBundle,
+          bundleQuantity: maxBundle,
           onOffer: offer,
           offerDiscountPrice,
           offerDiscountRate,
@@ -151,12 +151,12 @@ module.exports = {
 
         const productOffer = req.body.offerDiscountRate;
 
-        if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1- productOffer/100])) {
+        if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1 - productOffer / 100])) {
           await Product.updateMany({ category: categoryId }, [
             {
               $set: {
                 sellingPrice: {
-                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, {$subtract:[1, productOffer/100]}] }],
+                  $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, { $subtract: [1, productOffer / 100] }] }],
                 },
               },
             },
@@ -334,18 +334,25 @@ module.exports = {
 
       console.log("these are the product variatns", variants);
 
+      // First, retrieve the existing product
+      const existingProduct = await Product.findById(productId);
+
       // Process variants (assuming you have Color and Size models)
       const processedVariants = await Promise.all(
         variants.map(async (variant) => {
           const { color, size, stock } = variant;
+
+          // Find an existing variant with the same color and size
+          const existingVariant = existingProduct.variants.find((v) => String(v.color) === String(color) && String(v.size) === String(size));
+
           return {
-            color: await Color.findById(color),
-            size: await Size.findById(size),
+            _id: existingVariant ? existingVariant._id : new mongoose.Types.ObjectId(), // Preserve existing _id or create new one
+            color: await Color.findById(color), // Ensure valid color ObjectId
+            size: await Size.findById(size), // Ensure valid size ObjectId
             stock: parseInt(stock, 10), // Ensure stock is a number
           };
         })
       );
-
 
       const updateProduct = {
         name: req.body.name,
@@ -363,8 +370,11 @@ module.exports = {
         secondaryImages,
       };
 
-      await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
-
+      await Product.findOneAndUpdate(
+        { _id: productId }, // Filter by _id (productId)
+        updateProduct, // The update object
+        { new: true, upsert: true } // Set upsert: true to insert if not found
+      );
       //Calculate Offer
       const sellingPrice = req.body.sellingPrice;
       const actualPrice = req.body.actualPrice;
@@ -377,12 +387,12 @@ module.exports = {
 
       console.log("this is an updation", catOffer, categoryOffer, categoryId);
 
-      if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1-productOffer/100])) {
+      if (Number(sellingPrice) !== Number(actualPrice * [1 - categoryOffer / 100] * [1 - productOffer / 100])) {
         await Product.updateMany({ category: categoryId }, [
           {
             $set: {
               sellingPrice: {
-                $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, {$subtract:[1,productOffer/100]}] }],
+                $trunc: [{ $multiply: ["$actualPrice", { $subtract: [1, categoryOffer / 100] }, { $subtract: [1, productOffer / 100] }] }],
               },
             },
           },

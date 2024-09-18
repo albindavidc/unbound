@@ -30,6 +30,7 @@ const handleCartUpdate = async (req, res, operation) => {
     // Check stock early
     const product = await Product.findById(productId).populate("variants");
     const variant = product.variants.find((v) => v._id.toString() === variantId);
+    console.log(product, variant, variantId, "this is the variant and stock from the backend")
     const stock = variant.stock;
 
     if (isNaN(stock) || stock <= 0) {

@@ -724,6 +724,39 @@
 
       if (result.isConfirmed) {
         try {
+
+          let isNameValid = checkName(),
+        isDesciptionValid = checkDescription(),
+        isActualPriceValid = checkActualPrice(),
+        isBundlePriceValid = checkBundlePrice(),
+        isStockValid = checkVariantStock(),
+        isMaxProduct = checkMaxProduct(),
+        isMaxBundle = checkBundleMaxQuantity(),
+        isColor = checkColor(),
+        isSize = checkSize(),
+        isDiscountRate = checkOfferDiscountRate(),
+        isBrand = checkBrand(),
+        isCategory = checkCategory();
+
+      let isFormValid =
+        isNameValid &&
+        isDesciptionValid &&
+        isActualPriceValid &&
+        isBundlePriceValid &&
+        isStockValid &&
+        isMaxProduct &&
+        isMaxBundle &&
+        isColor &&
+        isSize &&
+        isDiscountRate &&
+        isBrand &&
+        isCategory;
+
+      if (!isFormValid) {
+        throw new Error("Form is not valid");
+      }
+
+
           const response = await fetch(form.action, {
             method: "POST",
             body: formData,

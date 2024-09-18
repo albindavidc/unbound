@@ -24,6 +24,11 @@ const imageSchema = new mongoose.Schema(
 
 
 const variantSchema = new mongoose.Schema({
+  // _id: {
+  //   type: String,
+  //   unique: true,  // Ensures uniqueness
+  //   default: () => new mongoose.Types.ObjectId(),  // Generates a custom ID by default
+  // },
   color: {
     type: mongoose.Schema.Types.ObjectId, // Reference to Color object ID
     ref: "Color", // Reference to the 'Color' model

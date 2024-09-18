@@ -193,11 +193,12 @@
                       <li class="list-inline-item">
                         <label
                           onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
-                          class="btn-colour <%= index === 0 ? 'active' : '' %>"
+                          class="btn-colour <%= index === 0 ? 'active' : '' %> variant_id"
                           for="colour_<%= variant.color.name %>"
                           data-color-hex="<%= variant.color.hex %>"
                           data-color-id="<%= variant.color._id %>"
                           data-size-id="<%= variant.size._id %>"
+                          data-variant-id = "<%=variant._id%>"
                         ></label>
 
                         <input
@@ -605,6 +606,7 @@
     selectedColorId = colorId;
   }
 
+
   const sellingPrice = `<%- JSON.stringify(product.sellingPrice) %>`;
   const bundleQuantity = `<%- JSON.stringify(product.bundleQuantity)%>`;
   const bundlePrice = `<%- JSON.stringify(product.bundlePrice)%>`;
@@ -705,7 +707,16 @@
       });
       return;
     }
-    console.log("this is the total stocks available: ", existingQuantityInCart);
+
+    // Select the element (assuming you are selecting the first element with the class 'variant')
+const variantElement = document.querySelector('.variant_id');
+
+// Get the value of the 'data-variant-id' attribute
+const variantId = variantElement.getAttribute('data-variant-id');
+
+// Log the value
+console.log(variantId);
+    console.log("this is the total stocks available: ", existingQuantityInCart, variantId);
 
     if (selectedColorId && selectedSizeId) {
       fetch("/user/add-to-cart", {
