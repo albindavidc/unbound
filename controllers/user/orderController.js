@@ -186,6 +186,8 @@ module.exports = {
           });
           console.log("this is the ordercanel through wallet in backend", order);
 
+
+          //Pending products don't Refund
           let isPending = false;
           let itemTotal = 0;
 
@@ -195,13 +197,11 @@ module.exports = {
             }
 
             if (item.orderID === orderId) {
-              itemTotal = item.itemTotal; // Only sum the specific item's total
+              itemTotal = item.itemTotal; 
             }
           });
 
-          console.log("this is pending", isPending)
-          // console.log("this is item total in the backend", itemTotal);
-          // console.log(itemTotal, "this is item total from the backend");
+          console.log("this is pending", isPending, itemTotal)
 
           const wallet = await Wallet.findOne({ userId: req.session.user });
           // console.log("Wallet balance", wallet.balance);

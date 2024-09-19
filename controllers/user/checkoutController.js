@@ -181,7 +181,7 @@ module.exports = {
 
 
       const status = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Confirmed" : "Pending";
-      const paymentStatus = paymentMethod === "COD" ? "Pending" : paymentMethod === "Wallet" ? "Paid" : "Paid";
+      const paymentStatus = paymentMethod === "COD" ? "Pending" : paymentMethod === "Wallet" ? "Paid" : "Pending";
 
 
 
@@ -464,10 +464,11 @@ module.exports = {
       const orderID = await Payment.findOne({ paymentId }, { _id: 0, orderId: 1 });
 
       const order_id = orderID.orderId;
-      const updateOrder = await Order.updateOne(
-        { _id: order_id },
-        { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } }
-      );
+      // const updateOrder = 
+      // await Order.updateOne(
+      //   { _id: order_id },
+      //   { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } }
+      // );
       
 
       let couponId = await Order.findOne({ _id: order_id }).populate(
