@@ -177,7 +177,7 @@ module.exports = {
     
     try {
       // Fetch orders within the date range
-      const orders = await Order.find({
+      let orders = await Order.find({
         createdAt: { $gte: startDate, $lte: endDate },
         return: { $ne: true }, // Ensures return: false or undefined
       })
@@ -206,6 +206,7 @@ module.exports = {
         }))
       );
 
+
       // Workbook and worksheet setup
       const workBook = new excelJs.Workbook();
       const worksheet = workBook.addWorksheet("Sales Report");
@@ -227,6 +228,26 @@ module.exports = {
       excelData.forEach((row) => {
         worksheet.addRow(row);
       });
+
+      const totalQuantity = excelData.reduceRight((sum, row) => sum + row.quantity, 0)
+      const totalPrice = excelData.reduce((sum, row) => sum + row.itemTotal,0);
+
+      const totalDiscount = orders[0]?.totalDiscount || 0;
+
+      worksheet.addRow([]);
+      worksheet.addRow({
+        productName: "Total",
+        quantity: totalQuantity,
+        itemTotal: totalPrice,
+      })
+
+      const totalRow = worksheet.lastRow;
+      totalRow.eachCell((cell) => {
+        cell.font = {bold: true};
+        cell.alignment = {horizontal: 'center'};
+      })
+
+
 
       // Styling headers
       worksheet.getRow(1).eachCell((cell) => {
