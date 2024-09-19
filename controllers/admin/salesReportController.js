@@ -22,42 +22,42 @@ module.exports = {
       console.log(reportType, "this is the report type"); // Debug reportType
 
       let endOfDay; // To store the end of the time period
-      
+
       let matchCondition = {};
       const now = new Date();
-      
+
       switch (reportType) {
-        case 'daily':
+        case "daily":
           matchCondition.createdAt = { $gte: new Date(now.setHours(0, 0, 0, 0)) };
           break;
-      case 'weekly':
+        case "weekly":
           const startOfWeek = new Date();
           startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
           matchCondition.createdAt = { $gte: startOfWeek };
           break;
-      
+
         case "monthly":
           const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)); // First day of the month
           const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)); // Last day of the month
           endOfMonth.setUTCHours(23, 59, 59, 999); // Set to end of the day
-      
+
           matchCondition.createdAt = {
             $gte: startOfMonth, // Start of the month
-            $lte: endOfMonth,   // End of the month
+            $lte: endOfMonth, // End of the month
           };
           break;
-      
+
         case "yearly":
           const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)); // First day of the year
           const endOfYear = new Date(Date.UTC(now.getUTCFullYear(), 11, 31)); // Last day of the year
           endOfYear.setUTCHours(23, 59, 59, 999); // Set to end of the day
-      
+
           matchCondition.createdAt = {
             $gte: startOfYear, // Start of the year
-            $lte: endOfYear,   // End of the year
+            $lte: endOfYear, // End of the year
           };
           break;
-      
+
         case "custom":
           if (startDate && endDate) {
             matchCondition.createdAt = {
@@ -68,11 +68,10 @@ module.exports = {
             throw new Error("Custom date range is required for custom report type.");
           }
           break;
-      
+
         default:
           throw new Error("Invalid report type.");
       }
-      
 
       console.log(matchCondition, "this is the matchCondition"); // Debug matchCondition
 
@@ -110,7 +109,7 @@ module.exports = {
         },
       ]);
 
-      console.log(totalAmount, "this is the total amount")
+      console.log(totalAmount, "this is the total amount");
 
       const overallAmount = totalAmount.length ? totalAmount[0].totalAmount : 0;
       const overallDiscount = totalAmount.length ? totalAmount[0].totalDiscount : 0;
@@ -171,10 +170,8 @@ module.exports = {
     startDate.setUTCHours(0, 0, 0, 0);
     endDate.setUTCHours(23, 59, 59, 999);
 
-
     console.log(startDate, endDate, "these are the startdate and the end date");
 
-    
     try {
       // Fetch orders within the date range
       let orders = await Order.find({
@@ -183,10 +180,10 @@ module.exports = {
       })
         .populate({ path: "customerId", select: "name" })
         .populate({ path: "items.productId", select: "name price" })
-        .populate({path: "shippingAddress"})
+        .populate({ path: "shippingAddress" })
         .lean();
-  
-        console.log(orders, "this is the orders from backend excel")
+
+      console.log(orders, "this is the orders from backend excel");
       // Prepare data for Excel
       const excelData = orders.flatMap((order) =>
         order.items.map((product) => ({
@@ -197,15 +194,14 @@ module.exports = {
           quantity: product.quantity,
           itemTotal: product.itemTotal,
           totalAmount: order.totalPrice,
-          shippingAddress: `${order.shippingAddress.address || ""}, ${order.shippingAddress.city || ""}, ${
-            order.shippingAddress.state || ""
-          }, ${order.shippingAddress.zipcode || ""}, ${order.shippingAddress.country || ""}`,
+          shippingAddress: `${order.shippingAddress.address || ""}, ${order.shippingAddress.city || ""}, ${order.shippingAddress.state || ""}, ${
+            order.shippingAddress.zipcode || ""
+          }, ${order.shippingAddress.country || ""}`,
           paymentMethod: order.paymentMethod,
           status: order.status,
           createdAt: order.createdAt.toISOString().split("T")[0],
         }))
       );
-
 
       // Workbook and worksheet setup
       const workBook = new excelJs.Workbook();
@@ -229,8 +225,8 @@ module.exports = {
         worksheet.addRow(row);
       });
 
-      const totalQuantity = excelData.reduceRight((sum, row) => sum + row.quantity, 0)
-      const totalPrice = excelData.reduce((sum, row) => sum + row.itemTotal,0);
+      const totalQuantity = excelData.reduceRight((sum, row) => sum + row.quantity, 0);
+      const totalPrice = excelData.reduce((sum, row) => sum + row.itemTotal, 0);
 
       const totalDiscount = orders[0]?.totalDiscount || 0;
 
@@ -239,15 +235,13 @@ module.exports = {
         productName: "Total",
         quantity: totalQuantity,
         itemTotal: totalPrice,
-      })
+      });
 
       const totalRow = worksheet.lastRow;
       totalRow.eachCell((cell) => {
-        cell.font = {bold: true};
-        cell.alignment = {horizontal: 'center'};
-      })
-
-
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center" };
+      });
 
       // Styling headers
       worksheet.getRow(1).eachCell((cell) => {
@@ -312,6 +306,15 @@ module.exports = {
         return res.status(404).json({ message: "No orders found for this date range" });
       }
 
+      let totalQuantity = 0;
+      let totalPrice = 0;
+
+      orders.forEach((order) => {
+        order.items.forEach((item) => {
+          totalQuantity += item.quantity;
+        });
+        totalPrice += order.totalPrice;
+      });
       console.log(orders, "these are the pdf orders");
       const doc = new PDFDocument({ margin: 20, size: "A4" });
 
@@ -444,7 +447,7 @@ module.exports = {
 
           // Draw total amount
           doc.text(
-            `₹${order.totalPrice.toFixed(2)}`,
+            `${order.totalPrice.toFixed(2)}`,
             margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products,
             yPosition,
             { width: columnWidths.totalAmount, align: "left" }
@@ -498,10 +501,41 @@ module.exports = {
         });
       };
 
+      // Draw footer with total quantity and total price
+      const drawFooter = () => {
+        // Check if we need to add a new page
+        if (yPosition > doc.page.height - margins.top - rowHeight * 2) {
+          doc.addPage();
+          yPosition = margins.top + rowHeight * 2;
+        }
+
+        // Draw a line above the footer
+        doc.strokeColor("black").lineWidth(1);
+        doc
+          .moveTo(margins.left, yPosition)
+          .lineTo(margins.left + Object.values(columnWidths).reduce((acc, width) => acc + width, 0), yPosition)
+          .stroke();
+
+        yPosition += 10;
+
+        // Footer text
+        doc.fontSize(12).font("Helvetica-Bold");
+
+        // Total Quantity
+        doc.text(`Total Quantity: ${totalQuantity}`, margins.left, yPosition, { align: "left" });
+
+        // Total Price
+        doc.text(`Total Price: ${totalPrice.toFixed(2)}`, margins.left + 300, yPosition, { align: "left" });
+
+        yPosition += rowHeight;
+      };
+
       // Draw header and rows
       drawHeader();
       drawRows();
 
+      drawFooter();
+      
       // Sending the PDF
       doc.pipe(res);
       doc.end();
