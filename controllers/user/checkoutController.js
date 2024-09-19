@@ -125,13 +125,20 @@ module.exports = {
 
     const userWallet = await Wallet.find({userId: userId})
 
+    let newWallet;
+    userWallet.forEach(items=> {
+      newWallet = items.balance;
+    })
     console.log(userWallet,"this is user wallet")
-
-    if(totalPrice > userWallet.balance){
-      userWallet.isInsufficient = true;
+    
+    let isInsufficient ;
+    if(totalPrice > newWallet){
+      isInsufficient = true;
     }else{
-      userWallet.isInsufficient = false;
+      isInsufficient = false;
     }
+
+    console.log("this is isInsufficient", totalPrice, newWallet, isInsufficient)
 
     const getPayable = await Cart.findOne({ userId }, {_id:0, payable: 1 });
     const payable = getPayable.payable;
@@ -149,6 +156,7 @@ module.exports = {
       totalPrice,
       payable,
       checkout: true,
+      isInsufficient,
     });
   },
 

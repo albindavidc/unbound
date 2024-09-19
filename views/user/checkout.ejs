@@ -256,16 +256,30 @@
                   <div class="block-header" id="headingTwo" role="tab"><strong><a class="accordion-link collapsed" data-bs-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Online</a></strong></div>
                   <div class="collapse show " id="collapseTwo" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
                     <% wallet.forEach(item => { %>
-                      <div class="block-body pt-5 d-flex align-items-center">
-                        <input <%- wallet.isInsufficient ? 'disabled' : '' %> type="radio" name="paymentMethod" id="payment-method-2" value="Wallet">
-                        <label class="ms-3" for="payment-method-2"><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
-                          <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
-                          <br>
-                          <% if (wallet.isInsufficient) { %>
-                          <span class="text-muted text-danger text-sm">Your wallet has insufficient balance.</span>
-                          <% } %>
-                        </label>
-                      </div>
+                      <% if (isInsufficient == true) { %>
+                       
+                        <div class="block-body pt-5 d-flex align-items-center">
+                          <input  type="radio" name="paymentMethod" id="payment-method-2" value="Wallet" disabled>
+                          <label class="ms-3" for="payment-method-2"><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
+                            <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
+                            <br>
+                            <span class="text-muted text-danger text-sm">Your wallet has insufficient balance.</span>
+                          </label>
+                        </div>
+
+                      <% }else{ %>
+
+                        <div class="block-body pt-5 d-flex align-items-center">
+                          <input  type="radio" name="paymentMethod" id="payment-method-2" value="Wallet">
+                          <label class="ms-3" for="payment-method-2"><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
+                            <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
+                            <br>
+              
+                          </label>
+                        </div>
+
+                        <% } %>
+                      
                       <% }) %>
                     <div class="block-body pt-2 d-flex align-items-center">
                       <input type="radio" name="paymentMethod" id="payment-method-3" value="Online">
