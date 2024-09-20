@@ -45,6 +45,8 @@ const handleCartUpdate = async (req, res, operation) => {
       return res.status(400).json({ success: false, message: "Quantity exceeds product stock" });
     } else if (!incrementOrDecrement && item.quantity <= 1) {
       return res.status(400).json({ success: false, message: "Cannot decrease quantity below 1" });
+    } else if (incrementOrDecrement && item.quantity >= product.quantity){
+      return res.status(400).json({success: false, message: "This is the max order for this order"})
     }
 
     updatedQuantity = incrementOrDecrement ? item.quantity + 1 : item.quantity - 1;

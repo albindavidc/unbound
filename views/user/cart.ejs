@@ -271,19 +271,19 @@
     const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
     let currentQuantity = parseInt(quantityInput.value);
 
-    // Check for increment and maximum quantity
-    if (incrementOrDecrement && currentQuantity >= 10) {
-      Swal.fire({
-        icon: "error",
-        title: "Limited Stock",
-        text: "You cannot add more than 10 items of this product.",
-        showConfirmButton: true,
-      }).then(() => {
-        // Reload the page to ensure correct quantity
-        location.reload();
-      });
-      return;
-    }
+    // // Check for increment and maximum quantity
+    // if (incrementOrDecrement && currentQuantity >= 10) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Limited Stock",
+    //     text: "You cannot add more than 10 items of this product.",
+    //     showConfirmButton: true,
+    //   }).then(() => {
+    //     // Reload the page to ensure correct quantity
+    //     location.reload();
+    //   });
+    //   return;
+    // }
 
     // Check for decrement and minimum quantity
     if (!incrementOrDecrement && currentQuantity <= 1) {
