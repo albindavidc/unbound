@@ -1,7 +1,11 @@
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
 const Wallet = require("../../models/walletSchema");
+const path = require("path");
+const PDFDocument = require("pdfkit");
+
 const { loadProductDetails } = require("./productController");
+
 module.exports = {
   getOrders: async (req, res) => {
     let userId = req.session.user;
@@ -186,7 +190,6 @@ module.exports = {
           });
           console.log("this is the ordercanel through wallet in backend", order);
 
-
           //Pending products don't Refund
           let isPending = false;
           let itemTotal = 0;
@@ -197,11 +200,11 @@ module.exports = {
             }
 
             if (item.orderID === orderId) {
-              itemTotal = item.itemTotal; 
+              itemTotal = item.itemTotal;
             }
           });
 
-          console.log("this is pending", isPending, itemTotal)
+          console.log("this is pending", isPending, itemTotal);
 
           const wallet = await Wallet.findOne({ userId: req.session.user });
           // console.log("Wallet balance", wallet.balance);
@@ -219,40 +222,38 @@ module.exports = {
             });
 
             await wallet.save();
-          
 
-          result = await Order.findOneAndUpdate(
-            {
-              "items.orderID": orderId, // Corrected to search by the orderID inside items array
-            },
-            {
-              $set: {
-                "items.$.status": "Cancelled", // Use $ to update the matched element in the array
-                "items.$.paymentStatus": "Refund",
-                "items.$.cancelReason": cancelReason,
-                "items.$.cancelRefundMethod": "Refund to Wallet",
-                "items.$.cancelledOn": Date.now(),
+            result = await Order.findOneAndUpdate(
+              {
+                "items.orderID": orderId, // Corrected to search by the orderID inside items array
               },
-            },
-            { new: true }
-          );
-        }else{
-          result = await Order.findOneAndUpdate(
-            {
-              "items.orderID": orderId, // Corrected to search by the orderID inside items array
-            },
-            {
-              $set: {
-                "items.$.status": "Cancelled", // Use $ to update the matched element in the array
-                "items.$.paymentStatus": "Refund",
-                "items.$.cancelReason": cancelReason,
-                "items.$.cancelledOn": Date.now(),
+              {
+                $set: {
+                  "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+                  "items.$.paymentStatus": "Refund",
+                  "items.$.cancelReason": cancelReason,
+                  "items.$.cancelRefundMethod": "Refund to Wallet",
+                  "items.$.cancelledOn": Date.now(),
+                },
               },
-            },
-            { new: true }
-          );
-        }
-
+              { new: true }
+            );
+          } else {
+            result = await Order.findOneAndUpdate(
+              {
+                "items.orderID": orderId, // Corrected to search by the orderID inside items array
+              },
+              {
+                $set: {
+                  "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+                  "items.$.paymentStatus": "Refund",
+                  "items.$.cancelReason": cancelReason,
+                  "items.$.cancelledOn": Date.now(),
+                },
+              },
+              { new: true }
+            );
+          }
         }
       }
 
@@ -266,6 +267,116 @@ module.exports = {
       res.status(200).json({ success: true, message: `Order ${action}ed successfully` });
     } catch (error) {
       console.error(error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  },
+
+  getInvoicePdf: async (req, res) => {
+    try {
+      const orderId = req.query.orderId;
+      if (!orderId) {
+        return res.status(400).json({ success: false, message: "Order ID is missing" });
+      }
+
+      // Find the order and populate the product details for each item
+      const order = await Order.findById(orderId).populate("items.productId");
+
+      if (!order) {
+        return res.status(404).json({ success: false, message: "Order not found" });
+      }
+
+      let totalQuantity = 0;
+      let totalPrice = order.totalPrice;
+
+      // Calculate total quantity
+      if (Array.isArray(order.items)) {
+        
+        order.items.forEach((item) => {
+          totalQuantity += item.quantity;
+        });
+      }
+
+      // Create the PDF document
+      const doc = new PDFDocument({ margin: 20, size: "A5" });
+      let filename = "Order_Invoice.pdf";
+      filename = encodeURIComponent(filename);
+      res.setHeader("Content-disposition", `attachment; filename="${filename}"`);
+      res.setHeader("Content-type", "application/pdf");
+
+      // Header
+      doc.fontSize(15).text("Order Invoice", { align: "center" }).moveDown();
+
+      const margin = { left: 20, top: 100, bottom: 100};
+      const columnWidths = {
+        date: 80,
+        products: 150,
+        totalAmount: 100,
+        paymentMethod: 80,
+      };
+      const rowHeight = 30;
+      let yPosition = margin.top;
+
+      // Draw Header
+      const drawHeader = () => {
+        doc.fontSize(12).font("Helvetica-Bold");
+        doc.text("Date", margin.left, yPosition);
+        doc.text("Products", margin.left + columnWidths.date, yPosition);
+        doc.text("Total Amount", margin.left + columnWidths.date + columnWidths.products, yPosition);
+        doc.text("Payment Method", margin.left + columnWidths.date + columnWidths.products + columnWidths.totalAmount, yPosition);
+        yPosition += rowHeight;
+
+        // Line under header
+        doc.moveTo(margin.left, yPosition).lineTo(550, yPosition).stroke();
+        yPosition += 10;
+      };
+
+      drawHeader();
+
+      // Draw Rows
+      order.items.forEach((item) => {
+        const orderDate = new Date(order.createdAt).toISOString().split("T")[0];
+        const productName = item.productId.name;
+
+        // Check if we need to add a new page
+        if (yPosition > doc.page.height - 100) {
+          doc.addPage();
+          yPosition = margin.top;
+          drawHeader();
+        }
+
+        // Order date
+        doc.fontSize(10).font("Helvetica");
+        doc.text(orderDate, margin.left, yPosition);
+
+        // Product names
+        doc.text(productName + ` (Qty: ${item.quantity})`, margin.left + columnWidths.date, yPosition);
+
+        // Total amount
+        doc.text(item.itemTotal.toFixed(2), margin.left + columnWidths.date + columnWidths.products, yPosition);
+
+        // Payment method
+        doc.text(order.paymentMethod, margin.left + columnWidths.date + columnWidths.products + columnWidths.totalAmount, yPosition);
+
+        yPosition += rowHeight;
+      });
+
+      // Footer
+      const drawFooter = () => {
+        yPosition += 200; // Move down
+        doc.fontSize(12).font("Helvetica-Bold");
+        doc.text(`Total Quantity: ${totalQuantity}`, margin.left, yPosition);
+        doc.text(`Total Price: ${totalPrice.toFixed(2)}`, margin.left + 200, yPosition);
+      };
+
+      drawFooter();
+
+      // Pipe the PDF to response
+      doc.pipe(res);
+      doc.end();
+
+      console.log(PDFDocument, "THIS IS PDF DOCUMENT", order)
+    } catch (error) {
+      console.log(error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },

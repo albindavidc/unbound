@@ -139,6 +139,6 @@ exports.loadLogin = (req, res) => {
   res.render("register", { ref });
 };
 
-
+router.get('/downloadInvoicePdf', orderController.getInvoicePdf);
 
 module.exports = router;

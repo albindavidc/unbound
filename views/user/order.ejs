@@ -43,7 +43,7 @@
 <section>
   <!-- Hero-Content -->
   <div class="pb-5 text-center">
-    <div class="card userProfileMain" style="background-color: #000000;">
+    <div class="card userProfileMain" style="background-color: #000000">
       <h1 class="userProfileH1">Orders</h1>
     </div>
   </div>
@@ -56,11 +56,17 @@
         <!-- Iterate over each order -->
         <% order.forEach(singleOrder => { %>
         <!-- Check if the order ID matches the selected orderId -->
-        <% if (singleOrder._id.toString() === orderId.toString()) { %>
-
+        <% if (singleOrder._id.toString() === orderId.toString()) { %> <% singleOrder.items.forEach((item, index) => { %>
         <!-- Order Summary -->
         <div class="order-summary mb-4 p-4 border rounded bg-light shadow">
           <h4 class="mb-3">Order Details</h4>
+          <button
+            class="btn btn-outline-success ms-auto d-flex justify-content-end align-items-center"
+            onclick="downloadPdf('<%= singleOrder._id %>')"
+            id="downloadPdf"
+          >
+            Download Invoice
+          </button>
           <p><strong>Order Number:</strong> <%= singleOrder._id %></p>
 
           <p><strong>Order Date:</strong> <%= new Date(singleOrder.createdAt).toLocaleDateString() %></p>
@@ -70,7 +76,6 @@
         <!-- Items List -->
         <div class="items-list mb-4">
           <h5 class="mb-3">Items in Your Order</h5>
-          <% singleOrder.items.forEach((item, index) => { %>
           <div class="order-item p-3 mb-3 border rounded shadow">
             <div class="row align-items-center">
               <div class="col-md-4">
@@ -92,7 +97,7 @@
                 </p>
 
                 <% if (item.cancelRefundMethod) { %>
-                 <p><strong>Refund method: </strong> <%= item.cancelRefundMethod %></p>
+                <p><strong>Refund method: </strong> <%= item.cancelRefundMethod %></p>
                 <% } %>
 
                 <!-- Delivery & Return Dates -->
@@ -140,7 +145,7 @@
                               <!-- Word count display -->
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
-                             
+
                             <div class="mb-3 row mt-4">
                               <label for="orderReturnRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
                               <select name="orderReturnRefundMethod" id="orderReturnRefundMethod-<%= item.orderID%>">
@@ -148,7 +153,6 @@
                                 <option value="RefundToWallet">Refund to the wallet</option>
                               </select>
                             </div>
-
                           </form>
                         </div>
                         <div class="modal-footer">
@@ -210,15 +214,15 @@
                             </div>
                             <% }else { %>
 
-                              <div class="mb-3 row mt-4 d-none">
-                                <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
-                                <select name="orderCancelRefundMethod" id="orderCancelRefundMethod-<%= item.orderID%>">
-                                  <option value="RefundToBankAccount">Refund to the bank</option>
-                                  <option value="RefundToWallet">Refund to the wallet</option>
-                                </select>
-                              </div>
+                            <div class="mb-3 row mt-4 d-none">
+                              <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
+                              <select name="orderCancelRefundMethod" id="orderCancelRefundMethod-<%= item.orderID%>">
+                                <option value="RefundToBankAccount">Refund to the bank</option>
+                                <option value="RefundToWallet">Refund to the wallet</option>
+                              </select>
+                            </div>
 
-                              <% } %>
+                            <% } %>
                           </form>
                         </div>
                         <div class="modal-footer">
@@ -266,6 +270,43 @@
 </section>
 
 <script>
+  const downloadPdf = async (orderId) => {
+    try {
+      const response = await fetch(`/downloadInvoicePdf?orderId=${orderId}`, {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download the invoice.");
+      }
+
+      const blob = await response.blob(); // Handle the response as a blob (binary data)
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Order_Invoice.pdf"; // You can customize the filename
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "You have successfully downloaded the PDF",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `An error occurred while downloading the invoice. ${error.message}`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
+  };
+
   const MAX_WORDS = 1000;
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -304,7 +345,7 @@
     returnForms.forEach((form) => {
       const orderId = form.dataset.orderId;
       const textarea = document.getElementById(`orderReturn-${orderId}`);
-      const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderReturnRefundMethod}`)
+      const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderReturnRefundMethod}`);
 
       const wordCountEl = document.getElementById(`wordCount-${orderId}`);
 
@@ -328,7 +369,6 @@
       updateWordCount();
     });
   });
-
 
   const confirmAction = (orderId, action) => {
     let actionText, confirmButtonText;
@@ -368,8 +408,6 @@
   const returnTheOrder = async (orderId) => {
     const orderReturn = document.getElementById(`orderReturn-${orderId}`).value;
     const orderReturnRefundMethod = document.getElementById(`orderReturnRefundMethod-${orderId}`).value;
-    
-
 
     try {
       let isReturnValid = checkReturnReason(orderId);
@@ -395,7 +433,7 @@
 
   const cancelTheOrder = async (orderId) => {
     const orderCancel = document.getElementById(`orderCancel-${orderId}`).value;
-    const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderId}`).value ;
+    const orderCancelRefundMethod = document.getElementById(`orderCancelRefundMethod-${orderId}`).value;
 
     try {
       let isCancelValid = checkCancelReason(orderId); // Pass orderId here
