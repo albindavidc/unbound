@@ -72,7 +72,6 @@
   }
 </style>
 
-
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -112,23 +111,22 @@
       </div>
     </div>
 
-      <!-- Total Products Card -->
-      <div class="col-lg-3 col-md-6 col-sm-12">
-        <div class="card card-body mb-4">
-          <article class="icontext">
-            <span class="icon icon-sm rounded-circle">
-              <i class="material-icons md-shopping_bag"></i>
-            </span>
-            <div class="text">
-              <h6 class="mb-1 card-title">Total Categories</h6>
-              <span><%- categoryCount %></span>
-            </div>
-          </article>
-        </div>
+    <!-- Total Products Card -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+      <div class="card card-body mb-4">
+        <article class="icontext">
+          <span class="icon icon-sm rounded-circle">
+            <i class="material-icons md-shopping_bag"></i>
+          </span>
+          <div class="text">
+            <h6 class="mb-1 card-title">Total Categories</h6>
+            <span><%- categoryCount %></span>
+          </div>
+        </article>
       </div>
+    </div>
 
-
-        <!-- Total Products Card -->
+    <!-- Total Products Card -->
     <div class="col-lg-3 col-md-6 col-sm-12">
       <div class="card card-body mb-4">
         <article class="icontext">
@@ -151,7 +149,7 @@
       <div id="piechart" class="col-lg-12 col-md-12 col-sm-12 rounded"></div>
 
       <div class="col-lg-12 col-md-12 col-sm-12 rounded">
-        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+        <canvas id="myChart" style="width: 100%; max-width: 600px"></canvas>
       </div>
     </div>
 
@@ -160,151 +158,240 @@
         <h2>Top Selling List</h2>
       </div>
 
-      <div class="option-buttons pb-4 d-flex justify-content-end">
-        <h3 class="d-flex align-items-center">Filter: </h3>
+      <form action="/admin/dashboard" method="GET">
+        <div class="option-buttons pb-4 d-flex justify-content-end">
+          <h3 class="d-flex align-items-center">Filter:</h3>
       
-        <button class="btn btn-outline-dark btn-sm m-1">Day</button>
-        <button class="btn btn-outline-dark btn-sm m-1">Week</button>
-        <button class="btn btn-outline-dark btn-sm m-1">Month</button>
-        <button class="btn btn-outline-dark btn-sm  m-1">Year</button>
-        <button class="btn btn-outline-dark btn-sm m-1">Custom</button>
+          <button class="btn btn-outline-dark btn-sm m-1" id="daily">Day</button>
+          <button class="btn btn-outline-dark btn-sm m-1" id="weekly">Week</button>
+          <button class="btn btn-outline-dark btn-sm m-1" id="monthly">Month</button>
+          <button class="btn btn-outline-dark btn-sm m-1" id="yearly">Year</button>
+          <button class="btn btn-outline-dark btn-sm m-1" id="custom">Custom</button>
       
-        <button class="btn btn-outline-dark m-1" onclick="removeAll()">Remove All</button>
+          <button class="btn btn-outline-dark m-1" type="button" onclick="removeAll()">Remove All</button>
+        </div>
       
-        <input type="date" name="customFilterStartDate" id="customFilterStartDate" class="btn btn-outline-dark btn-sm m-1" hidden>
-        <input type="date" name="customFilterEndDate" id="customFilterEndDate" class="btn btn-outline-dark btn-sm m-1" hidden>
-      </div>
+        <div id="custom_date_inputs" class="mb-3 d-flex justify-content-end align-items-center">
+          <label for="customFilterStartDate" class="text-dark">Start Date: </label>
+          <input type="date" name="startDate" id="customFilterStartDate" class="btn btn-outline-dark btn-sm m-1" />
       
-
+          <label for="customFilterEndDate" class="text-dark">End Date: </label>
+          <input type="date" name="endDate" id="customFilterEndDate" class="btn btn-outline-dark btn-sm m-1" />
+          <button type="submit" class="btn-sm btn-outline-dark">Filter</button>
+        </div>
+      </form>
+        
       <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
         <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
         <% orderBar.slice(0,10).forEach(item => { %>
-          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h6>
-          <hr>
+        <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h6>
+        <hr />
         <% }) %>
       </div>
 
       <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
         <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
         <% bestSellingCat.slice(0,10).forEach(item => { %>
-          <h6><%= item.categoryName %> (<%= item.categoryQuantitySold %> )</h6>
-          <hr>
+        <h6><%= item.categoryName %> (<%= item.categoryQuantitySold %> )</h6>
+        <hr />
         <% }) %>
       </div>
 
       <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
         <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
         <% bestSellingBrands.slice(0,10).forEach(item => { %>
-          <h6><%= item.brandName %> (<%= item.brandQuantitySold %> )</h6>
-          <hr>
+        <h6><%= item.brandName %> (<%= item.brandQuantitySold %> )</h6>
+        <hr />
         <% }) %>
       </div>
     </div>
   </div>
 </section>
 
-
-
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script>
-    function removeAll() {
-    window.location.href = "/admin/dashboard";  // Navigate to the target page
+  function removeAll() {
+    window.location.href = "/admin/dashboard"; 
   }
-const filter =(dates) =>{
 
+const customDateInputs = document.getElementById("custom_date_inputs");
+customDateInputs.style.display = "block"; // Initially hidden
+
+const dailyButton = document.getElementById("daily");
+const weeklyButton = document.getElementById("weekly");
+const monthlyButton = document.getElementById("monthly");
+const yearlyButton = document.getElementById("yearly");
+const customButton = document.getElementById("custom");
+const startDateInput = document.getElementById("customFilterStartDate");
+const endDateInput = document.getElementById("customFilterEndDate");
+const form = document.querySelector("form");
+
+// List of all buttons
+const buttons = [dailyButton, weeklyButton, monthlyButton, yearlyButton, customButton];
+
+// Global variable to store the selected report type
+let selectedReportType = 'daily'; // Default value can be 'daily'
+
+// Update the selected report type based on button clicks
+function setActive(button, reportType) {
+  // Remove the 'active' class from all buttons
+  buttons.forEach(btn => btn.classList.remove('active'));
+
+  // Add the 'active' class to the clicked button
+  button.classList.add('active');
+
+  // Update the global report type variable
+  selectedReportType = reportType;
+
+  // Handle report type logic (custom date visibility)
+  handleReportType(reportType);
 }
+
+dailyButton.addEventListener("click", () => setActive(dailyButton, "daily"));
+weeklyButton.addEventListener("click", () => setActive(weeklyButton, "weekly"));
+monthlyButton.addEventListener("click", () => setActive(monthlyButton, "monthly"));
+yearlyButton.addEventListener("click", () => setActive(yearlyButton, "yearly"));
+customButton.addEventListener("click", () => setActive(customButton, "custom"));
+
+function handleReportType(reportType) {
+  if (reportType === "custom") {
+    customDateInputs.style.display = "block";  // Show custom date inputs
+  } else {
+    customDateInputs.style.display = "none";   // Hide custom date inputs for other filters
+
+    // Automatically set date ranges for non-custom report types
+    let startDate, endDate;
+    const today = new Date();
+
+    if (reportType === "daily") {
+      startDate = endDate = today.toISOString().split("T")[0];
+    } else if (reportType === "weekly") {
+      const lastWeek = new Date(today);
+      lastWeek.setDate(today.getDate() - 7);
+      startDate = lastWeek.toISOString().split("T")[0];
+      endDate = today.toISOString().split("T")[0];
+    } else if (reportType === "monthly") {
+      const lastMonth = new Date(today);
+      lastMonth.setMonth(today.getMonth() - 1);
+      startDate = lastMonth.toISOString().split("T")[0];
+      endDate = today.toISOString().split("T")[0];
+    } else if (reportType === "yearly") {
+      const lastYear = new Date(today);
+      lastYear.setFullYear(today.getFullYear() - 1);
+      startDate = lastYear.toISOString().split("T")[0];
+      endDate = today.toISOString().split("T")[0];
+    }
+
+    // Set the hidden input values and submit the form automatically for non-custom types
+    startDateInput.value = startDate;
+    endDateInput.value = endDate;
+    form.submit();  // Automatically submit for non-custom filters
+  }
+}
+
+// Handle form submission and custom date validation
+form.addEventListener("submit", (event) => {
+  if (selectedReportType === "custom" && customDateInputs.style.display === 'block') {
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
+
+    // Validate custom date inputs: Check if start and end dates are valid
+    if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
+      event.preventDefault();  // Prevent form submission if validation fails
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Please enter a valid input",
+        showConfirmButton: false,
+        timer: 2000,
+      })
+      return;
+    }
+  }
+});
 </script>
 
-
 <script type="text/javascript">
-    google.charts.load("current", { packages: ["corechart"] });
-    google.charts.setOnLoadCallback(drawChart);
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart);
 
   const paymentMethod = JSON.parse('<%- JSON.stringify(order) %>');
 
-
   function drawChart() {
-    // Initialize the array with headers
-    const chartData = [
-      ["Payment Method", "User Count"]
-    ];
+    const chartData = [["Payment Method", "User Count"]];
 
-    // Loop through payment methods and add each as an array
-    paymentMethod.forEach(method => {
+    paymentMethod.forEach((method) => {
       chartData.push([method.paymentMethod, method.userCount]);
     });
 
-      // Now pass the built chartData to google.visualization.arrayToDataTable
-      var data = google.visualization.arrayToDataTable(chartData);
+    var data = google.visualization.arrayToDataTable(chartData);
 
-      var options = { title: "All payment methods used by users",height: 400 };
+    var options = { title: "All payment methods used by users", height: 400 };
 
-      // Display the chart inside the <div> element with id="piechart"
-      var chart = new google.visualization.PieChart(document.getElementById("piechart"));
-      chart.draw(data, options);
-    }
+    var chart = new google.visualization.PieChart(document.getElementById("piechart"));
+    chart.draw(data, options);
+  }
 </script>
-
 
 <script>
   var xValues = [];
   var yValues = [];
-  var barColors = ["red", 
-    "green", 
-    "blue", 
-    "yellow",  
-    "orange",  
-    "brown", 
-    "gray", 
+  var barColors = [
+    "red",
+    "green",
+    "blue",
+    "yellow",
+    "orange",
+    "brown",
+    "gray",
     "black",
-    "lavender", 
-    "teal", 
-    "turquoise", 
-    "coral", 
-    "blush", 
-    "indigo", 
-    "aqua", 
-    "mint", 
-    "maroon", 
-    "cerulean", 
-    "navy", 
-    "plum", 
-    "periwinkle", 
-    "mauve", 
-    "mustard"];
-  
+    "lavender",
+    "teal",
+    "turquoise",
+    "coral",
+    "blush",
+    "indigo",
+    "aqua",
+    "mint",
+    "maroon",
+    "cerulean",
+    "navy",
+    "plum",
+    "periwinkle",
+    "mauve",
+    "mustard",
+  ];
+
   const paymentMethodBar = JSON.parse('<%- JSON.stringify(orderBar) %>');
-  
-  paymentMethodBar.forEach(item => {
-      console.log(item.productName, "this is the newItem product name");
-      xValues.push(item.totalQuantitySold);  // Switch: Use quantity sold for x-axis
-      yValues.push(item.productName);  // Switch: Use product names for y-axis
+
+  paymentMethodBar.forEach((item) => {
+    console.log(item.productName, "this is the newItem product name");
+    xValues.push(item.totalQuantitySold); // Switch: Use quantity sold for x-axis
+    yValues.push(item.productName); // Switch: Use product names for y-axis
   });
-  
+
   new Chart("myChart", {
     type: "horizontalBar",
     data: {
-      labels: yValues,  // Now yValues represent the product names
-      datasets: [{
-        backgroundColor: barColors,
-        data: xValues  // Now xValues represent the quantities sold
-      }]
+      labels: yValues, // Now yValues represent the product names
+      datasets: [
+        {
+          backgroundColor: barColors,
+          data: xValues, // Now xValues represent the quantities sold
+        },
+      ],
     },
     options: {
-      indexAxis: 'y',  // Makes the bars horizontal
-      legend: {display: false},
+      indexAxis: "y", // Makes the bars horizontal
+      legend: { display: false },
       title: {
         display: true,
-        text: "Products with Quantity Sold"
-      }
-    }
+        text: "Products with Quantity Sold",
+      },
+    },
   });
-  </script>
-  
-
-
-
+</script>
