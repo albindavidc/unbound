@@ -118,10 +118,36 @@
     <!-- Other Cards Here -->
   </div>
 
-  <div class="row">
-    <div id="piechart"></div>
+  <div class="col">
+    <div class="row">
+      <div id="piechart" class="col-lg-6 col-md-6 col-sm-12  rounded"></div>
+
+      <div class="card card-body col-lg-6 col-md-6 col-sm-12 rounded">
+        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
+        <% orderBar.slice(0,10).forEach(item => { %>
+          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
+          <hr>
+        <% }) %>
+      </div>
+
+      <div class="card card-body col-lg-6 col-md-6 col-sm-12 rounded">
+        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
+        <% orderBar.slice(0,10).forEach(item => { %>
+          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
+          <hr>
+        <% }) %>
+      </div>
+      
+      <div class="card card-body col-lg-6 col-md-6 col-sm-12 rounded">
+        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
+        <% orderBar.slice(0,10).forEach(item => { %>
+          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
+          <hr>
+        <% }) %>
+      </div>
+    </div>
     
-    <div>
+    <div class="col-lg-6 col-md-6 col-sm-12  rounded">
       <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
     </div>
     
@@ -157,7 +183,7 @@
       // Now pass the built chartData to google.visualization.arrayToDataTable
       var data = google.visualization.arrayToDataTable(chartData);
 
-      var options = { title: "All payment methods used by users", width: 550, height: 400 };
+      var options = { title: "All payment methods used by users",height: 400 };
 
       // Display the chart inside the <div> element with id="piechart"
       var chart = new google.visualization.PieChart(document.getElementById("piechart"));

@@ -92,9 +92,31 @@ const loadDashboard = async (req, res) => {
             }
           }
         },
+        {
+          $sort: {
+            totalQuantitySold: -1,
+          }
+        }
         // Additional grouping and final project stage...
       ]);
       
+      // const bestSelling = await Order.aggregate([
+      //   {$unwind: "$items"},
+      //   {
+      //     $lookup: {
+      //       from: "products",
+      //       localField: "items.productId",
+      //       foreignField: "_id",
+      //       as: "productInfo",
+      //     }
+      //   },
+      //   {$unwind: "$productInfo"},
+      //   {$group: {
+      //     _id: "$items.productId",
+      //     productName: {$first: "$productInfo.name"}
+      //     totalQuantitySold: 
+      //   }}
+      // ])
       
       console.log(orderBar, "this is the order from dashboard");
       
