@@ -72,9 +72,18 @@ const loadDashboard = async (req, res) => {
       const orderBar = await Order.aggregate([
         { $unwind: "$items" },  // Unwind items array
         {
+          $lookup: {
+            from: "products",  // Assuming 'products' is your product collection
+            localField: "items.productId",
+            foreignField: "_id",
+            as: "productInfo"
+          }
+        },
+        { $unwind: "$productInfo" },  // Unwind productInfo to access fields
+        {
           $group: {
             _id: "$items.productId",  // Group by productId
-            productName: { $first: "$items.productId.name" },  // Get product name
+            productName: { $first: "$productInfo.name" },  // Get product name from populated data
             totalQuantitySold: { $sum: "$items.quantity" },  // Sum of quantities sold
             totalRevenueForProduct: { 
               $sum: { 
@@ -83,32 +92,9 @@ const loadDashboard = async (req, res) => {
             }
           }
         },
-        {
-          $group: {
-            _id: null,
-            totalAmount: { $sum: "$totalRevenueForProduct" },  // Total revenue across all products
-            totalDiscount: { $sum: "$couponDiscount" },  // Total discount
-            productSoldCount: { $sum: "$totalQuantitySold" },  // Total number of products sold
-            productsSold: {  // List of products and their respective counts and revenues
-              $push: {
-                productId: "$_id",
-                productName: "$productName",
-                quantitySold: "$totalQuantitySold",
-                revenue: "$totalRevenueForProduct"
-              }
-            }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            totalRevenue: "$totalAmount",  // Total revenue across all products
-            totalDiscount: 1,
-            productSoldCount: 1,
-            productsSold: 1  // List of products sold with their quantities and revenues
-          }
-        }
+        // Additional grouping and final project stage...
       ]);
+      
       
       console.log(orderBar, "this is the order from dashboard");
       

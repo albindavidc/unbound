@@ -72,8 +72,7 @@
   }
 </style>
 
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
 
 
 <section>
@@ -121,26 +120,29 @@
 
   <div class="row">
     <div id="piechart"></div>
+    
     <div>
-
       <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
     </div>
-
+    
   </div>
+
+
   
 </section>
 
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+
 <script type="text/javascript">
-    // Load google charts
     google.charts.load("current", { packages: ["corechart"] });
     google.charts.setOnLoadCallback(drawChart);
 
-   // Pass the order array from backend as a valid JSON object directly
   const paymentMethod = JSON.parse('<%- JSON.stringify(order) %>');
 
-  console.log("this is frontEnd payment method", paymentMethod);
 
-  // Draw the chart and set the chart values
   function drawChart() {
     // Initialize the array with headers
     const chartData = [
@@ -163,13 +165,44 @@
     }
 </script>
 
+
 <script>
-const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-const yValues = [55, 49, 44, 24, 15];
-const barColors = ["red", "green","blue","orange","brown"];
+var xValues = [];
+var yValues = [];
+var barColors = ["red", 
+  "green", 
+  "blue", 
+  "yellow",  
+  "orange",  
+  "brown", 
+  "gray", 
+  "black",
+  "lavender", 
+  "teal", 
+  "turquoise", 
+  "coral", 
+  "blush", 
+  "indigo", 
+  "aqua", 
+  "mint", 
+  "maroon", 
+  "cerulean", 
+    "navy", 
+  "plum", 
+  "periwinkle", 
+  "mauve", 
+  "mustard"];
 
 const paymentMethodBar = JSON.parse('<%- JSON.stringify(orderBar) %>');
 
+paymentMethodBar.forEach(item => {
+    console.log(item.productName, "this is the newItem product name")
+    xValues.push(item.productName);
+    yValues.push(item.totalQuantitySold);  // Add quantity sold for y-axis
+
+    
+
+});
 
 new Chart("myChart", {
   type: "bar",
@@ -184,10 +217,11 @@ new Chart("myChart", {
     legend: {display: false},
     title: {
       display: true,
-      text: "World Wine Production 2018"
+      text: "Products with Quantity sold"
     }
   }
 });
 </script>
 
-<%- include("../../views/partials/admin/footer") %>
+
+
