@@ -118,40 +118,47 @@
     <!-- Other Cards Here -->
   </div>
 
-  <div class="col">
     <div class="row">
-      <div id="piechart" class="col-lg-6 col-md-6 col-sm-12  rounded"></div>
-
-      <div class="card card-body col-lg-6 col-md-6 col-sm-12 rounded">
-        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
-        <% orderBar.slice(0,10).forEach(item => { %>
-          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
-          <hr>
-        <% }) %>
+      <div class="col">
+        <div id="piechart" class="col-lg-12 col-md-12 col-sm-12  rounded"></div>
+  
+       
+        <div class="col-lg-12 col-md-12 col-sm-12  rounded">
+          <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+        </div>
       </div>
 
-      <div class="card card-body col-lg-6 col-md-6 col-sm-12 rounded">
-        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
-        <% orderBar.slice(0,10).forEach(item => { %>
-          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
-          <hr>
-        <% }) %>
-      </div>
       
-      <div class="card card-body col-lg-6 col-md-6 col-sm-12 rounded">
-        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
-        <% orderBar.slice(0,10).forEach(item => { %>
-          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
-          <hr>
-        <% }) %>
+      <div class="col">
+  
+  
+        <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
+          <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
+          <% orderBar.slice(0,10).forEach(item => { %>
+            <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
+            <hr>
+          <% }) %>
+        </div>
+    
+        <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
+          <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
+          <% bestSellingCat.slice(0,10).forEach(item => { %>
+            <h6><%= item.categoryName %> (<%= item.categoryQuantitySold %> )</h2>
+            <hr>
+          <% }) %>
+        </div>
+        
+        <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
+          <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
+          <% bestSellingBrands.slice(0,10).forEach(item => { %>
+            <h6><%= item.brandName %> (<%= item.brandQuantitySold %> )</h2>
+            <hr>
+          <% }) %>
+        </div>
       </div>
     </div>
     
-    <div class="col-lg-6 col-md-6 col-sm-12  rounded">
-      <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-    </div>
     
-  </div>
 
 
   

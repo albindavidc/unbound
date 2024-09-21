@@ -99,29 +99,89 @@ const loadDashboard = async (req, res) => {
         }
         // Additional grouping and final project stage...
       ]);
+
+      const bestSellingCat = await Order.aggregate([
+        { $unwind: "$items" },  // Unwind items array
+        {
+          $lookup: {
+            from: "products",  // Lookup products collection
+            localField: "items.productId",  // Match productId from items
+            foreignField: "_id",  // Match with _id in products
+            as: "productInfo"
+          }
+        },
+        { $unwind: "$productInfo" },  // Unwind productInfo to access product fields
+        {
+          $lookup: {
+            from: "categories",  // Lookup category collection
+            localField: "productInfo.category",  // Match category field from productInfo
+            foreignField: "_id",  // Match with _id in categories
+            as: "categoryInfo"
+          }
+        },
+        { $unwind: "$categoryInfo" },  // Unwind categoryInfo to access category fields
+        { 
+          $group: {
+            _id: "$categoryInfo._id",  // Group by category ID
+            categoryName: { $first: "$categoryInfo.name" },  // Capture category name
+            categoryQuantitySold: { $sum: "$items.quantity" },  // Sum quantities sold for the category
+            totalRevenueForCategory: { 
+              $sum: { 
+                $multiply: ["$items.quantity", { $toDouble: "$items.price" }]  // Calculate total revenue for the category
+              } 
+            }
+          }
+        },
+        {
+          $sort: {
+            categoryQuantitySold: -1,  // Sort by total quantity sold for each category
+          }
+        }
+      ]);
       
-      // const bestSelling = await Order.aggregate([
-      //   {$unwind: "$items"},
-      //   {
-      //     $lookup: {
-      //       from: "products",
-      //       localField: "items.productId",
-      //       foreignField: "_id",
-      //       as: "productInfo",
-      //     }
-      //   },
-      //   {$unwind: "$productInfo"},
-      //   {$group: {
-      //     _id: "$items.productId",
-      //     productName: {$first: "$productInfo.name"}
-      //     totalQuantitySold: 
-      //   }}
-      // ])
+      const bestSellingBrands = await Order.aggregate([
+        {$unwind: "$items"},
+        {
+          $lookup: {
+            from: "products",
+            localField: "items.productId",
+            foreignField: "_id",
+            as: "productInfo"
+          }
+        },
+        {$unwind: "$productInfo"},
+        {$lookup: {
+          from: "brands",
+          localField: "productInfo.brand",
+          foreignField: "_id",
+          as: "brandInfo"
+        }},
+        {$unwind: "$brandInfo"},
+        {
+          $group: {
+            _id: "$brandInfo._id",
+            brandName: {$first: "$brandInfo.name"},
+            brandQuantitySold: {$sum: "$items.quantity"},
+            totalRevenueForBrand: {
+              $sum: {
+                $multiply: ["$items.quantity", {$toDouble: "$items.price"}]
+              }
+            }
+
+          }
+        },
+        {
+          $sort: {
+            brandQuantitySold: -1,
+          }
+        }
+      ])
       
-      console.log(orderBar, "this is the order from dashboard");
       
-      console.log(orderBar, "this is the order from dashboard");
-      res.render("admin/dashboard", { userCount, productCount, order, orderBar });
+      
+      console.log(bestSellingBrands, "this is the order from dashboard");
+      
+      res.render("admin/dashboard", { userCount, productCount, order, orderBar, bestSellingCat, bestSellingBrands });
     } catch (error) {
       console.log("Dashboard error", error);
 
