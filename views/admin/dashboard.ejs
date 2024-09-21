@@ -73,8 +73,6 @@
 </style>
 
 
-
-
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -82,7 +80,6 @@
     </div>
   </div>
 </section>
-
 <section class="content-main">
   <div class="row">
     <!-- Total Users Card -->
@@ -118,55 +115,77 @@
     <!-- Other Cards Here -->
   </div>
 
-    <div class="row">
-      <div class="col">
-        <div id="piechart" class="col-lg-12 col-md-12 col-sm-12  rounded"></div>
-  
-       
-        <div class="col-lg-12 col-md-12 col-sm-12  rounded">
-          <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
-        </div>
-      </div>
+  <div class="row">
+    <div class="col">
+      <div id="piechart" class="col-lg-12 col-md-12 col-sm-12 rounded"></div>
 
-      
-      <div class="col">
-  
-  
-        <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
-          <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
-          <% orderBar.slice(0,10).forEach(item => { %>
-            <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h2>
-            <hr>
-          <% }) %>
-        </div>
-    
-        <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
-          <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
-          <% bestSellingCat.slice(0,10).forEach(item => { %>
-            <h6><%= item.categoryName %> (<%= item.categoryQuantitySold %> )</h2>
-            <hr>
-          <% }) %>
-        </div>
-        
-        <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
-          <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
-          <% bestSellingBrands.slice(0,10).forEach(item => { %>
-            <h6><%= item.brandName %> (<%= item.brandQuantitySold %> )</h2>
-            <hr>
-          <% }) %>
-        </div>
+      <div class="col-lg-12 col-md-12 col-sm-12 rounded">
+        <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
       </div>
     </div>
-    
-    
 
+    <div class="col">
+      <div class="d-flex justify-content-center mb-4">
+        <h2>Top Selling List</h2>
+      </div>
 
-  
+      <div class="option-buttons pb-4 d-flex justify-content-end">
+        <h3 class="d-flex align-items-center">Filter: </h3>
+        <button onclick="filter('week')" class="btn btn-outline-dark m-2">Week</button>
+        <button onclick="filter('months')" class="btn btn-outline-dark m-2">Month</button>
+        <button onclick="filter('years')" class="btn btn-outline-dark m-2">Year</button>
+        <button onclick="filter('custom')" class="btn btn-outline-dark m-2">Custom</button>
+
+        <button class="btn btn-outline-dark m-2" onclick="removeAll()">Remove All</button>
+
+        <input type="date" name="customFilterStartDate" id="customFilterStartDate" class="btn btn-outline-dark btn-sm" hidden>
+        
+        <input type="date" name="customFilterEndDate" id="customFilterEndDate" class="btn btn-outline-dark btn-sm" hidden>
+        
+      </div>
+
+      <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
+        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
+        <% orderBar.slice(0,10).forEach(item => { %>
+          <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h6>
+          <hr>
+        <% }) %>
+      </div>
+
+      <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
+        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
+        <% bestSellingCat.slice(0,10).forEach(item => { %>
+          <h6><%= item.categoryName %> (<%= item.categoryQuantitySold %> )</h6>
+          <hr>
+        <% }) %>
+      </div>
+
+      <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
+        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
+        <% bestSellingBrands.slice(0,10).forEach(item => { %>
+          <h6><%= item.brandName %> (<%= item.brandQuantitySold %> )</h6>
+          <hr>
+        <% }) %>
+      </div>
+    </div>
+  </div>
 </section>
+
 
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+
+
+<script>
+    function removeAll() {
+    window.location.href = "/admin/dashboard";  // Navigate to the target page
+  }
+const filter =(dates) =>{
+
+}
+</script>
 
 
 <script type="text/javascript">
