@@ -167,61 +167,60 @@
 
 
 <script>
-var xValues = [];
-var yValues = [];
-var barColors = ["red", 
-  "green", 
-  "blue", 
-  "yellow",  
-  "orange",  
-  "brown", 
-  "gray", 
-  "black",
-  "lavender", 
-  "teal", 
-  "turquoise", 
-  "coral", 
-  "blush", 
-  "indigo", 
-  "aqua", 
-  "mint", 
-  "maroon", 
-  "cerulean", 
+  var xValues = [];
+  var yValues = [];
+  var barColors = ["red", 
+    "green", 
+    "blue", 
+    "yellow",  
+    "orange",  
+    "brown", 
+    "gray", 
+    "black",
+    "lavender", 
+    "teal", 
+    "turquoise", 
+    "coral", 
+    "blush", 
+    "indigo", 
+    "aqua", 
+    "mint", 
+    "maroon", 
+    "cerulean", 
     "navy", 
-  "plum", 
-  "periwinkle", 
-  "mauve", 
-  "mustard"];
-
-const paymentMethodBar = JSON.parse('<%- JSON.stringify(orderBar) %>');
-
-paymentMethodBar.forEach(item => {
-    console.log(item.productName, "this is the newItem product name")
-    xValues.push(item.productName);
-    yValues.push(item.totalQuantitySold);  // Add quantity sold for y-axis
-
-    
-
-});
-
-new Chart("myChart", {
-  type: "bar",
-  data: {
-    labels: xValues,
-    datasets: [{
-      backgroundColor: barColors,
-      data: yValues
-    }]
-  },
-  options: {
-    legend: {display: false},
-    title: {
-      display: true,
-      text: "Products with Quantity sold"
+    "plum", 
+    "periwinkle", 
+    "mauve", 
+    "mustard"];
+  
+  const paymentMethodBar = JSON.parse('<%- JSON.stringify(orderBar) %>');
+  
+  paymentMethodBar.forEach(item => {
+      console.log(item.productName, "this is the newItem product name");
+      xValues.push(item.totalQuantitySold);  // Switch: Use quantity sold for x-axis
+      yValues.push(item.productName);  // Switch: Use product names for y-axis
+  });
+  
+  new Chart("myChart", {
+    type: "horizontalBar",
+    data: {
+      labels: yValues,  // Now yValues represent the product names
+      datasets: [{
+        backgroundColor: barColors,
+        data: xValues  // Now xValues represent the quantities sold
+      }]
+    },
+    options: {
+      indexAxis: 'y',  // Makes the bars horizontal
+      legend: {display: false},
+      title: {
+        display: true,
+        text: "Products with Quantity Sold"
+      }
     }
-  }
-});
-</script>
+  });
+  </script>
+  
 
 
 
