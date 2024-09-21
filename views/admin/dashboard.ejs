@@ -162,18 +162,19 @@
 
       <div class="option-buttons pb-4 d-flex justify-content-end">
         <h3 class="d-flex align-items-center">Filter: </h3>
-        <button onclick="filter('week')" class="btn btn-outline-dark m-2">Week</button>
-        <button onclick="filter('months')" class="btn btn-outline-dark m-2">Month</button>
-        <button onclick="filter('years')" class="btn btn-outline-dark m-2">Year</button>
-        <button onclick="filter('custom')" class="btn btn-outline-dark m-2">Custom</button>
-
-        <button class="btn btn-outline-dark m-2" onclick="removeAll()">Remove All</button>
-
-        <input type="date" name="customFilterStartDate" id="customFilterStartDate" class="btn btn-outline-dark btn-sm" hidden>
-        
-        <input type="date" name="customFilterEndDate" id="customFilterEndDate" class="btn btn-outline-dark btn-sm" hidden>
-        
+      
+        <button class="btn btn-outline-dark btn-sm m-1">Day</button>
+        <button class="btn btn-outline-dark btn-sm m-1">Week</button>
+        <button class="btn btn-outline-dark btn-sm m-1">Month</button>
+        <button class="btn btn-outline-dark btn-sm  m-1">Year</button>
+        <button class="btn btn-outline-dark btn-sm m-1">Custom</button>
+      
+        <button class="btn btn-outline-dark m-1" onclick="removeAll()">Remove All</button>
+      
+        <input type="date" name="customFilterStartDate" id="customFilterStartDate" class="btn btn-outline-dark btn-sm m-1" hidden>
+        <input type="date" name="customFilterEndDate" id="customFilterEndDate" class="btn btn-outline-dark btn-sm m-1" hidden>
       </div>
+      
 
       <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
         <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
