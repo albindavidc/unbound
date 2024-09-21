@@ -1,6 +1,8 @@
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
+const Category = require("../../models/categorySchema")
+const Brand = require("../../models/attributes/brandSchema")
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -178,10 +180,12 @@ const loadDashboard = async (req, res) => {
       ])
       
       
+      const categoryCount = await Category.find().countDocuments();
+      const brandCount = await Brand.find().countDocuments();
       
       console.log(bestSellingBrands, "this is the order from dashboard");
       
-      res.render("admin/dashboard", { userCount, productCount, order, orderBar, bestSellingCat, bestSellingBrands });
+      res.render("admin/dashboard", { userCount, productCount, order, orderBar, bestSellingCat, bestSellingBrands, categoryCount, brandCount });
     } catch (error) {
       console.log("Dashboard error", error);
 
