@@ -175,7 +175,7 @@
                     Cancel Order
                   </button>
 
-                  <!-- Modal (Unique for each product) -->
+                  <!-- Cancel Modal (Unique for each product) -->
                   <div
                     class="modal fade"
                     id="orderCancelModal-<%= item.orderID %>"
@@ -203,7 +203,9 @@
                               <!-- Word count display -->
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
-                            <% if (item.paymentStatus !== "Pending") { %>
+
+                            <%= console.log(item) %>
+                            <% if (item.paymentStatus.toString() === "Paid") { %>
 
                             <div class="mb-3 row mt-4">
                               <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
@@ -212,7 +214,7 @@
                                 <option value="RefundToWallet">Refund to the wallet</option>
                               </select>
                             </div>
-                            <% }else { %>
+                            <% }%>
 
                             <div class="mb-3 row mt-4 d-none">
                               <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
@@ -222,7 +224,6 @@
                               </select>
                             </div>
 
-                            <% } %>
                           </form>
                         </div>
                         <div class="modal-footer">

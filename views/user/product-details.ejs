@@ -403,7 +403,7 @@
               <i class="fa fa-star<%= i < product.rating ? '' : '-o' %>"></i>
               <% } %>
             </div>
-            <h5>$<%= product.sellingPrice %></h5>
+            <h5>₹<%= product.sellingPrice %></h5>
             <% if (Number(product.sellingPrice) < Number(product.actualPrice)) { %>
 
             <h6 style="text-decoration: line-through">₹<%= product.actualPrice %>.00</h6>
