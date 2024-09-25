@@ -186,7 +186,25 @@ module.exports = {
       const getTotalPrice = await Cart.findOne({ userId }, { _id: 0, totalPrice: 1 });
       const totalPrices = getTotalPrice.totalPrice;
 
+      
+      const errorStockCart = [];
+      for(const cartItems of cart.items){
+        
+        console.log("this is backend product variant quantity", cartItems.productId.variants)
+        cartItems.productId.variants.forEach( async item =>{
+          
+
+          console.log("this is product quantity", item.stock, cartItems.quantity)
+          if(item.stock < cartItems.quantity){
+            errorStockCart.push(`${cartItems.productId.name} : Stock = ${item.stock}`);
+          }
+        })
+      }
+
+      console.log("this is the error message", errorStockCart)
+
       res.render("user/cart", {
+        errorStockCart,
         totalPriceOfEachProduct,
         cartList: cart.items,
         cartCount: cart.items.length,
