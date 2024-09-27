@@ -78,7 +78,9 @@ router
   .get(orderController.getOrder)
   .put(orderController.updateOrder);
 
-  
+router.post("/continueOrder", orderController.continueOrder)
+
+
   router
   .route("/wallet")
   .get(walletController.getWallet);

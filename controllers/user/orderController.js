@@ -1,6 +1,13 @@
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
 const Wallet = require("../../models/walletSchema");
+const User = require("../../models/userSchema")
+const Payment = require("../../models/paymentSchema")
+
+const Razorpay = require("razorpay")
+const crypto = require("crypto");
+
+
 const path = require("path");
 const PDFDocument = require("pdfkit");
 
@@ -75,16 +82,75 @@ module.exports = {
         console.log("No orders found.");
       }
 
+      const user = await User.findById(userId)
+      const orders = await Order.findById(orderId)
+      const payment = await Payment.find({orderId: order._id})
+
       // Example of accessing the first orderID
       console.log("This is the first item's orderID:", order[0].items[0].orderID);
-
       console.log("this is orderId");
-      res.render("user/order", { order, orderId, user: req.session.user });
+      console.log(payment, "this is backend orders and user")
+      
+      res.render("user/order", { order, orderId, user: req.session.user, user, orders,payment });
     } catch (error) {
       console.error("Error fetching order details:", error);
       res.status(500).send("Server Error");
     }
   },
+
+  continueOrder: async (req, res) => {
+    var instance = new Razorpay({
+      key_id: process.env.RAZ_KEY_ID,
+      key_secret: process.env.RAZ_KEY_SECRET,
+    });
+
+    const createRazorpayOrder = async (order_id, total) => {
+      let options = {
+        amount: total * 100,
+        currency: "INR",
+        receipt: order_id.toString(),
+      };
+      const order = await instance.orders.create(options);
+      return order;
+    };
+
+    const {order} = req.body;
+    const orderId = order._id
+    const userId = req.session.user;
+
+    console.log(order._id, "this is order id of the contienue order" )
+    const user = await User.findById(userId)
+    const orders = await Order.findById(orderId)
+
+    let total = parseInt(orders.totalPrice);
+    // let order_id = createOrder._id;
+
+    const RazorpayOrder = await createRazorpayOrder(orderId, total).then((order) => order);
+
+    const timestamp = RazorpayOrder.created_at;
+    const date = new Date(timestamp * 1000);
+
+    const formattedDate = date.toISOString();
+
+    let payment = new Payment({
+      paymentId: RazorpayOrder.id,
+      amount: parseInt(RazorpayOrder.amount) / 100,
+      currency: RazorpayOrder.currency,
+      orderId: orderId,
+      status: RazorpayOrder.status,
+      createdAt: formattedDate,
+    });
+    await payment.save();
+    console.log(payment,"this is the razorpay payment")
+    return res.json({
+      status: true,
+      order: RazorpayOrder,
+      user,
+    });
+
+  },
+
+
   updateOrder: async (req, res) => {
     const { orderId } = req.params;
     const { action, cancelReason, returnReason, orderCancelRefundMethod, orderReturnRefundMethod } = req.body;

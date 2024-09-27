@@ -112,13 +112,15 @@
 
 
 
-
-                <div class="d-flex d-row align-items-center">
-                  <div class="">
-                    <button class="btn btn-outline-success complete_payment_button mr-4">Complete payment</button>
+                <% if (item.paymentStatus === "Pending") { %>      
+                  <div class="d-flex d-row align-items-center">
+                    <div class="">
+                      <button class="btn btn-outline-success complete_payment_button mr-4" >Complete payment</button>
+                    </div>
+                    <div id="timer"></div>
                   </div>
-                  <div  id="timer"></div>
-                </div>
+                <% } %>
+
 
 
 
@@ -286,14 +288,14 @@
 
   function startCount() {
     const timerId = document.getElementById("timer");
-    const cancelButton = document.querySelector(".cancel-btn")
-    const continueButton = document.querySelector(".complete_payment_button")
+    const cancelButton = document.querySelector(".cancel-btn");
+    const continueButton = document.querySelector(".complete_payment_button");
 
     const countdownIntervel = setInterval(() => {
       let minutes = Math.floor(countTimer / 60);
       let seconds = countTimer % 60;
 
-      minutes = minutes <10 ? "0" + minutes : minutes;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
       seconds = seconds < 10 ? "0" + seconds : seconds;
 
       timerId.textContent = `Make the payment before the time ${minutes}:${seconds}`;
@@ -304,7 +306,6 @@
         cancelButton.style.display = "none";
         continueButton.style.display = "none";
         continueButton.style.margin = "0";
-
       }
 
       countTimer--;
@@ -313,6 +314,112 @@
 
   startCount();
 
+
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const completePayment = document.querySelector(".complete_payment_button");
+    if (completePayment) {
+      const orders = <%- JSON.stringify(orders) %>;
+      const user = <%- JSON.stringify(user) %>;
+      console.log( orders,orders.totalPrice, "this is the order page order and user" )
+
+      completePayment.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+       const response = await fetch("/continueOrder",{
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({order: orders, user: user}),
+       })
+
+       Swal.close();
+
+       const data = await response.json();
+
+       if(data.status){
+         showRazorpay(data.order, data.user);
+       }
+       if(data.success){
+        Swal.fire({
+          icon: "success",
+          title: "Order Successfull",
+          text: data.message,
+        }).then(() =>{
+          location.assign("/orders")
+        })
+       }
+
+      });
+    }
+  });
+
+  const showRazorpay = (order, user) => {
+    console.log(order, user);
+
+    var options = {
+      key: "rzp_test_FGSvpGKo4JrSBW",
+      amount: order.amount,
+      currency: "INR",
+      name: "Unbound",
+      description: "Test Transaction",
+      order_id: order.id, // Corrected 'orderId' to 'order_id' to match Razorpay's API
+      handler: async function (response) {
+        await verifyPayment(response); // Pass correct 'response'
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+        contact: user.phone,
+      },
+      notes: {
+        address: "Razorpay Corporate Office",
+      },
+      theme: {
+        color: "#06373A",
+      },
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    rzp1.open();
+    rzp1.on("payment.failed", function (response) {
+      swal.fire("Failed!", response.error.description, "error").then(() => {
+        location.assign("/");
+      });
+    });
+  };
+
+  const verifyPayment = async (response) => {
+    try {
+      console.log("Verifying payment with response:", response);
+
+      const res = await fetch("/user/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ response }),
+      });
+
+      const data = await res.json();
+      console.log("Verification result:", data);
+
+      if (data.success) {
+        location.assign("/orders");
+      } else {
+        swal.fire("Payment Verification Failed!", "Please try again.", "error").then(() => {
+          location.assign("/");
+        });
+      }
+    } catch (error) {
+      console.error("Payment verification failed", error);
+      swal.fire("Error!", "Payment verification could not be completed.", "error");
+    }
+  };
+</script>
+
+
+<script>
   const downloadPdf = async (orderId) => {
     try {
       const response = await fetch(`/downloadInvoicePdf?orderId=${orderId}`, {

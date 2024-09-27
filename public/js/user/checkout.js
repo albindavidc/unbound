@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   const submitOrder = document.getElementById("submitOrder");
   if (submitOrder) {
