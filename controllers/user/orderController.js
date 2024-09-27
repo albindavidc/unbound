@@ -18,7 +18,7 @@ module.exports = {
     let userId = req.session.user;
     console.log(userId);
 
-    let perPage = 10;
+    let perPage = 50;
     let page = req.query.page || 1;
 
     const count = await Order.countDocuments({ customerId: userId });

@@ -68,16 +68,26 @@
                               alt="<%= item.productId.name %>"
                             />
                           </div>
-                          <div class="col-md-10">
+                          <div class="col-md-12">
                             <p><%= item.productId.name %> (<%= item.quantity %>)</p>
                             <p></p>
                             <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
                             <p>
                               <strong>Price:</strong> ₹<%= order.totalPrice %>
+                              
+                            </p>
+
+                            <p><strong>Delivery: </strong>
                               <span
-                                class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
-                              >
-                                <%= item.status %>
+                              class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                            >
+                             Delivery <%= item.status %>
+                            </span>
+                            </p>
+                            <p>
+                              <strong>Status:</strong>
+                              <span class="badge <%= item.paymentStatus === 'Pending'? 'badge-warning' : 'badge-success' %>">
+                                Payment <%= item.paymentStatus %> (<%= order.paymentMethod %>)
                               </span>
                             </p>
                             <% if (item.status === 'Delivered') { %>
