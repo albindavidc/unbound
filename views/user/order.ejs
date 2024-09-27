@@ -70,7 +70,7 @@
           <p><strong>Order Number:</strong> <%= singleOrder._id %></p>
 
           <p><strong>Order Date:</strong> <%= new Date(singleOrder.createdAt).toLocaleDateString() %></p>
-          <p><strong>Total:</strong> ₹<%= singleOrder.totalPrice %></p>
+          <p><strong>Total(Including delivery charge) : </strong> ₹<%= singleOrder.totalPrice %></p>
         </div>
 
         <!-- Items List -->
@@ -88,7 +88,7 @@
                 <p><strong>Quantity:</strong> <%= item.quantity %></p>
                 <p><strong>Price:</strong> ₹<%= item.itemTotal %></p>
                 <p>
-                  <strong>Status:</strong>
+                  <strong>Delivery Status:</strong>
                   <span
                     class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
                   >
@@ -96,6 +96,10 @@
                   </span>
                 </p>
 
+                <p><strong>PaymentStatus:</strong>
+                  <span class="badge <%= item.paymentStatus === "Pending" ? "badge-warning" : "badge-success" %>">
+                  <%= item.paymentStatus %>
+                </span></p>
                 <% if (item.cancelRefundMethod) { %>
                 <p><strong>Refund method: </strong> <%= item.cancelRefundMethod %></p>
                 <% } %>
@@ -108,22 +112,14 @@
                 <% } else { %>
                 <p><strong>Delivery Date:</strong> --</p>
                 <p><strong>Return By:</strong> --</p>
-                <% } %>
-
-
-
-                <% if (item.paymentStatus === "Pending") { %>      
-                  <div class="d-flex d-row align-items-center">
-                    <div class="">
-                      <button class="btn btn-outline-success complete_payment_button mr-4" >Complete payment</button>
-                    </div>
-                    <div id="timer"></div>
+                <% } %> <% if (item.paymentStatus === "Pending") { %>
+                <div class="d-flex d-row align-items-center">
+                  <div class="">
+                    <button class="btn btn-outline-success complete_payment_button mr-4">Complete payment</button>
                   </div>
+                  <div id="timer"></div>
+                </div>
                 <% } %>
-
-
-
-
 
                 <!-- Actions -->
                 <div class="order-actions mt-3 d-flex">
@@ -313,8 +309,6 @@
   }
 
   startCount();
-
-
 </script>
 
 <script>
@@ -417,7 +411,6 @@
     }
   };
 </script>
-
 
 <script>
   const downloadPdf = async (orderId) => {
