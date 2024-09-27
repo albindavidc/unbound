@@ -110,6 +110,19 @@
                 <p><strong>Return By:</strong> --</p>
                 <% } %>
 
+
+
+
+                <div class="d-flex d-row align-items-center">
+                  <div class="">
+                    <button class="btn btn-outline-success complete_payment_button mr-4">Complete payment</button>
+                  </div>
+                  <div  id="timer"></div>
+                </div>
+
+
+
+
                 <!-- Actions -->
                 <div class="order-actions mt-3 d-flex">
                   <% if (item.status === "Delivered") { %>
@@ -204,8 +217,7 @@
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
 
-                            <%= console.log(item) %>
-                            <% if (item.paymentStatus.toString() === "Paid") { %>
+                            <%= console.log(item) %> <% if (item.paymentStatus.toString() === "Paid") { %>
 
                             <div class="mb-3 row mt-4">
                               <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
@@ -223,7 +235,6 @@
                                 <option value="RefundToWallet">Refund to the wallet</option>
                               </select>
                             </div>
-
                           </form>
                         </div>
                         <div class="modal-footer">
@@ -271,6 +282,37 @@
 </section>
 
 <script>
+  let countTimer = 60;
+
+  function startCount() {
+    const timerId = document.getElementById("timer");
+    const cancelButton = document.querySelector(".cancel-btn")
+    const continueButton = document.querySelector(".complete_payment_button")
+
+    const countdownIntervel = setInterval(() => {
+      let minutes = Math.floor(countTimer / 60);
+      let seconds = countTimer % 60;
+
+      minutes = minutes <10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+      timerId.textContent = `Make the payment before the time ${minutes}:${seconds}`;
+
+      if (countTimer <= 0) {
+        clearInterval(countdownIntervel);
+        timerId.textContent = `Your time is over for making the payments`;
+        cancelButton.style.display = "none";
+        continueButton.style.display = "none";
+        continueButton.style.margin = "0";
+
+      }
+
+      countTimer--;
+    }, 1000);
+  }
+
+  startCount();
+
   const downloadPdf = async (orderId) => {
     try {
       const response = await fetch(`/downloadInvoicePdf?orderId=${orderId}`, {
