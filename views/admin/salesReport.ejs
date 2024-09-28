@@ -275,76 +275,7 @@
     </div>
   </div>
 
-  <!-- Pagination-Advanced -->
-  <% if (orders.length>0 && nextPage || currentPage === totalPages) { %>
-  <nav aria-label="Order Pagination">
-    <ul class="pagination justify-content-center mt-5 p-3 pb-0" style="background-color: white;">
-      <!-- First Page Link -->
-      <% if (currentPage === 1) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">First</a>
-      </li>
-      <% }else{ %>
-      <li class="page-item">
-        <a href="?page=1" class="page-link">First</a>
-      </li>
-      <% } %>
-
-      <!-- Previous Page Link -->
-      <% if (hasPrevPage) { %>
-      <li class="page-item">
-        <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
-      </li>
-      <% }else{ %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">Previous</a>
-      </li>
-      <% } %>
-
-      <!-- skip pages  -->
-      <% var i = (currentPage> 5 ?currentPage - 4 : 1) %> <% if (i !== 1) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">...</a>
-      </li>
-      <% } %> 
-      <% for(; i < Number(currentPage) + 4 && i <= totalPages; i++ ) { %> <% if (i === currentPage) { %>
-      <li class="page-item active">
-        <a href="#" class="page-link"><%= i %></a>
-      </li>
-      <% }else { %>
-      <li class="page-item">
-        <a href="?page=<%= i %>" class="page-link"><%= i %></a>
-      </li>
-      <% } %> <% } %> <% if (i <= totalPages) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">...</a>
-      </li>
-      <% } %>
-
-      <!-- next page link -->
-      <% if (hasNextPage) { %>
-      <li class="page-item">
-        <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a>
-      </li>
-      <% }else { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">Next</a>
-      </li>
-      <% } %>
-
-      <!-- Last Page link -->
-      <% if (currentPage == totalPages) { %>
-      <li class="page-item disabled">
-        <a href="#" class="page-link">...</a>
-      </li>
-      <% }else{ %>
-      <li class="page-item">
-        <a href="/admin/salesReport/?page=<%= totalPages %>" class="page-link">Last</a>
-      </li>
-      <% } %>
-    </ul>
-  </nav>
-  <% } %>
+  <%- include('./pagination') %>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

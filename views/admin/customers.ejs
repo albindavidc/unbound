@@ -29,7 +29,7 @@
     </div>
   </div>
 </section>
-<section>
+<section class="m-4">
   <header class="card-header text-center mb-20">
     <form action="/admin/users/" method="get" class="d-inline">
       <div
@@ -48,6 +48,7 @@
           <table class="table table-hover">
             <thead>
               <tr>
+                <th scope="col"><b>#</b></th>
                 <th scope="col"><b>Name</b></th>
                 <th scope="col"><b>Email</b></th>
                 <th scope="col"><b>Phone No</b></th>
@@ -58,6 +59,7 @@
               <% for(let i = 0; i < data.length; i++ ) { %>
 
               <tr>
+                <td><%= (currentPage -1) * perPage + i + 1 %></td>
                 <td><%= data[i].name %></td>
                 <td><%= data[i].email %></td>
                 <td><%= data[i].phone %></td>
@@ -81,6 +83,10 @@
       </div>
     </div>
   </div>
+  <div class="mb-5">
+    <%- include('./pagination') %> 
+  </div>
 </section>
 
-<%- include('./pagination') %> <%- include("../../views/partials/admin/footer") %>
+
+<%- include("../../views/partials/admin/footer") %>
