@@ -20,7 +20,7 @@ module.exports = {
       }
 
       let page = parseInt(req.query.page) || 1; // Ensure page is an integer
-      const limit = 4;
+      const limit = 15;
 
       // Count documents
       const count = await Product.find({

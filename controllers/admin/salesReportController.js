@@ -16,6 +16,7 @@ module.exports = {
       const locals = {
         title: "Sales Report",
       };
+
       const reportType = req.query.reportType || "yearly";
       const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
       const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
@@ -75,6 +76,10 @@ module.exports = {
 
       console.log(matchCondition, "this is the matchCondition"); // Debug matchCondition
 
+
+      let perpage = 10;
+      let page = parseInt(req.query.page) || 1;
+
       // Fetch orders with pagination and populate required fields
       const orders = await Order.find(matchCondition)
         .populate({
@@ -89,12 +94,20 @@ module.exports = {
           path: "shippingAddress",
           select: "addressLine1 city state postalCode",
         })
+        .skip((page-1) * perpage)
+        .limit(perpage)
         .sort({ createdAt: -1 })
         .exec();
 
-      // console.log(orders, "this is the orders");
 
       const totalOrders = await Order.countDocuments(matchCondition);
+      const nextPage = parseInt(page) + 1;
+      const totalPages = Math.ceil(totalOrders/perpage)
+      // const hasNextPage = nextPage <= Math.ceil(totalOrders/perpage);
+
+      const hasPrevPage = page > 1;
+      const hasNextPage = page < totalPages
+
 
       // Calculate the total amount and discount using aggregation
       const totalAmount = await Order.aggregate([
@@ -114,8 +127,6 @@ module.exports = {
       const overallAmount = totalAmount.length ? totalAmount[0].totalAmount : 0;
       const overallDiscount = totalAmount.length ? totalAmount[0].totalDiscount : 0;
 
-      // Pagination details
-      const count = await Order.countDocuments(matchCondition);
 
       // Now you have populated orders with all details, you can create variables to store the data you need:
       const reportData = orders.map((order) => ({
@@ -141,6 +152,8 @@ module.exports = {
         createdAt: order.createdAt,
       }));
 
+
+
       res.render("admin/salesReport", {
         locals,
         orders: reportData, // Pass the processed data to the view
@@ -150,6 +163,13 @@ module.exports = {
         reportType,
         startDate,
         endDate,
+        currentPage: page,
+        perPage: perpage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        totalPages,
+        // nextPage: hasNextPage ? nextPage : null,
       });
     } catch (error) {
       console.error(error);

@@ -10,7 +10,7 @@ const categoryInfo = async (req, res) => {
     }
 
     let page = parseInt(req.query.page) || 1; // Ensure page is an integer
-    const limit = 4;
+    const limit = 15;
 
     // Fetch category data
     const categoryData = await Category.find({
