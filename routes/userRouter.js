@@ -19,6 +19,7 @@ router.get("/logout", userController.logout);
 //Signup Managment
 router.get("/signup", isLogedOut, userController.loadSignup);
 router.post("/signup", userController.signup);
+router.get("/verify-otp", userController.getVerifyOtp);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 

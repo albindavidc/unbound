@@ -112,7 +112,7 @@ const signup = async (req, res) => {
     req.session.referrals = {referrals};
 
 
-    res.render("user/verify-otp");
+    res.redirect("/verify-otp");
     console.log(`OTP Sent: ${otp}`);
   } catch (error) {
     console.error("Signup error", error);
@@ -186,7 +186,7 @@ const verifyOtp = async (req, res) => {
         {new: true, upsert: true}
       )
 
-      res.json({ success: true, redirectUrl: "/" });
+      res.json({ success: true});
     } else {
       res.status(400).json({
         success: false,
@@ -683,8 +683,14 @@ const newUser = await User.find({user:req.session.user});
   })
 };
 
+const getVerifyOtp = async(req, res) => {
+  res.render("user/verify-otp")
+}
+
 module.exports = {
   pageNotFound,
+
+  getVerifyOtp,
 
   loadHomepage,
 
