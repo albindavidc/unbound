@@ -1,7 +1,6 @@
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 
-// Fetch category data with pagination and search
 const categoryInfo = async (req, res) => {
   try {
     let search = "";
@@ -9,30 +8,37 @@ const categoryInfo = async (req, res) => {
       search = req.query.search;
     }
 
-    let page = parseInt(req.query.page) || 1; // Ensure page is an integer
-    const limit = 15;
+    let perPage = 10;
+    let page = parseInt(req.query.page) || 1;
 
-    // Fetch category data
     const categoryData = await Category.find({
       $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
     })
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .exec();
+    .skip((page - 1) * perPage)
+    .limit(perPage)
+    .sort({createdAt: -1})
+    .exec();
 
-    // Count documents
     const count = await Category.find({
       $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
     }).countDocuments();
 
-    // Calculate total pages
-    const totalPages = Math.ceil(count / limit);
+   const nextPage = parseInt(page) + 1;
+   const totalPages = Math.ceil(count/perPage);
+   const hasPrevPage = page > 1
+   const hasNextPage = page < totalPages
 
     // Render the EJS template with data
     res.render("admin/category", {
       cat: categoryData,
-      totalPages,
+
+      pagination: categoryData,
       currentPage: page,
+      perPage,
+      nextPage,
+      hasPrevPage,
+      hasNextPage,
+      totalPages,
     });
   } catch (error) {
     console.error("Error fetching category data:", error);
