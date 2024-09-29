@@ -10,8 +10,6 @@ const mongoose = require("mongoose");
 
 module.exports = {
   loadProductList: async (req, res) => {
-
-
     const { color, size, price, brand, category, sort } = req.query;
   
     const currentCategoryId = req.query.categoryId;
@@ -75,9 +73,22 @@ module.exports = {
       const colors = await Color.find({ isListed: true });
       const variants = await Variants.find({ });
   
-      const products = await Product.find({ ...query, ...filterQuery }).sort(sortQuery);
+      const perPage = 20;
+      const page = parseInt(req.query.page) || 1;
+
+      const products = await Product.find({ ...query, ...filterQuery })
+      .skip((page -1) * perPage)
+      .limit(perPage)
+      .sort(sortQuery)
+      .exec();
+    
       const productCount = await Product.countDocuments({ ...query, ...filterQuery });
   
+      const nextPage = parseInt(page) + 1;
+      const totalPages = Math.ceil(productCount/perPage)
+      const hasPrevPage = page > 1;
+      const hasNextPage = page < totalPages;
+
       res.render("user/product-list", {
         user: req.session.user,
         product,
@@ -92,7 +103,17 @@ module.exports = {
         currentBrandId,
         currentSizeId,
         variants,
+
+        pagination: product,
+        currentPage: page,
+        perPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        totalPages,
+
       });
+
     } catch (error) {
       console.error(error);
       res.status(500).send("Error loading products");
