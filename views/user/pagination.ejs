@@ -1,0 +1,152 @@
+<style>
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    list-style-type: none;
+  }
+
+  .pagination .page-item {
+    display: inline-block;
+    margin: 0 4px;
+  }
+
+  .pagination .page-link {
+    padding: 8px 16px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #000000;
+    font-weight: 600;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .pagination .page-link:hover,
+  .pagination .page-link:focus {
+    background-color: #000000;
+    color: white;
+    outline: none;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #000000;
+    color: white;
+    border: 1px solid #000000;
+    pointer-events: none;
+    cursor: default; /* Disable hover/click for active page */
+  }
+
+  .pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa;
+    color: #999999;
+    border: 1px solid #e0e0e0;
+    cursor: not-allowed; /* Indicate disabled links */
+  }
+
+  .pagination .page-item.disabled .page-link:hover {
+    background-color: #f8f9fa;
+    color: #999999;
+  }
+
+  .pagination .page-item:first-child .page-link,
+  .pagination .page-item:last-child .page-link {
+    font-weight: bold;
+  }
+
+  .pagination .page-link.prev,
+  .pagination .page-link.next {
+    background-color: #f8f9fa;
+    color: #000000;
+    border: 1px solid #000000;
+  }
+
+  .pagination .page-link.prev:hover,
+  .pagination .page-link.next:hover {
+    background-color: #000000;
+    color: white;
+  }
+
+  .pagination .page-item.disabled .page-link.prev,
+  .pagination .page-item.disabled .page-link.next {
+    background-color: #f8f9fa;
+    color: #999999;
+  }
+
+  .pagination .page-link.current {
+    background-color: #000000;
+    color: white;
+    border: 1px solid #000000;
+    pointer-events: none; /* Disable click for current page */
+  }
+</style>
+
+<!-- Pagination-Advanced -->
+<% if (pagination.length>0 && nextPage || currentPage === totalPages) { %>
+<nav aria-label="Order Pagination">
+  <ul class="pagination justify-content-center mt-5 p-3 pb-0" style="background-color: white">
+    <!-- First Page Link -->
+    <% if (currentPage === 1) { %>
+    <li class="page-item disabled">
+      <a href="#" class="page-link">First</a>
+    </li>
+    <% }else{ %>
+    <li class="page-item">
+      <a href="?page=1" class="page-link">First</a>
+    </li>
+    <% } %>
+
+    <!-- Previous Page Link -->
+    <% if (hasPrevPage) { %>
+    <li class="page-item">
+      <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
+    </li>
+    <% }else{ %>
+    <li class="page-item disabled">
+      <a href="#" class="page-link">Previous</a>
+    </li>
+    <% } %>
+
+    <!-- center pages  -->
+    <% var i = (currentPage> 5 ?currentPage - 4 : 1) %> <% if (i !== 1) { %>
+    <li class="page-item disabled">
+      <a href="#" class="page-link">...</a>
+    </li>
+    <% } %> <% for(; i < Number(currentPage) + 4 && i <= totalPages; i++ ) { %> <% if (i === currentPage) { %>
+    <li class="page-item active">
+      <a href="#" class="page-link"><%= i %></a>
+    </li>
+    <% }else { %>
+    <li class="page-item">
+      <a href="?page=<%= i %>" class="page-link"><%= i %></a>
+    </li>
+    <% } %> <% } %> <% if (i <= totalPages) { %>
+    <li class="page-item disabled">
+      <a href="#" class="page-link">...</a>
+    </li>
+    <% } %>
+
+    <!-- next page link -->
+    <% if (hasNextPage) { %>
+    <li class="page-item">
+      <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a>
+    </li>
+    <% }else { %>
+    <li class="page-item disabled">
+      <a href="#" class="page-link">Next</a>
+    </li>
+    <% } %>
+
+    <!-- Last Page link -->
+    <% if (currentPage == totalPages) { %>
+    <li class="page-item disabled">
+      <a href="#" class="page-link">...</a>
+    </li>
+    <% }else{ %>
+    <li class="page-item">
+      <a href="?page=<%= totalPages %>" class="page-link">Last</a>
+    </li>
+    <% } %>
+  </ul>
+</nav>
+<% } %>

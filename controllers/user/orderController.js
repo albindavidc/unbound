@@ -16,48 +16,42 @@ const { loadProductDetails } = require("./productController");
 module.exports = {
   getOrders: async (req, res) => {
     let userId = req.session.user;
-    console.log(userId);
-
-    let perPage = 50;
-    let page = req.query.page || 1;
-
-    const count = await Order.countDocuments({ customerId: userId });
-    const nextPage = parseInt(page) + 1;
-    const hasNextPage = nextPage <= Math.ceil(count / perPage);
-
-    let order = await Order.find({ customerId: userId })
-      .populate({
-        path: "items.productId",
-        select: "name price primaryImages secondaryImages", // Select the fields you want from the product
-      })
-      .populate("items.color items.size shippingAddress")
-      .sort({ createdAt: -1 })
-      .skip(perPage * page - perPage)
-      .limit(perPage)
-      .exec();
-
-    console.log(order);
     const product = await Product.find({});
 
-    // // Calculate canReturn and canCancel for each order
-    // order = order.map((order) => {
-    //   const isDelivered = order.status === "Delivered";
-    //   const isCancelled = order.status === "Cancelled";
-    //   const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
-    //   const isWithinReturnPeriod = new Date() - new Date(order.deliveredOn) <= oneWeekInMilliseconds;
+    let perPage = 10;
+    let currentPage = parseInt(req.query.page) || 1;
 
-    //   order.canReturn = isDelivered && isWithinReturnPeriod;
-    //   order.canCancel = !isDelivered && !isCancelled;
-    //   return order;
-    // });
+    const order = await Order.find({ customerId: userId })
+    .populate({
+      path: "items.productId",
+      select: "name price primaryImages secondaryImages", // Select the fields you want from the product
+    })
+    .populate("items.color items.size shippingAddress")
+
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage)
+    .sort({ createdAt: -1 })
+    .exec();
+
+    const count = await Order.countDocuments({ customerId: userId });
+    const nextPage = parseInt(currentPage) + 1;
+    const totalPages = Math.ceil(count/perPage);
+    const hasPrevPage = currentPage > 1;
+    const hasNextPage = currentPage < totalPages;
 
     res.render("user/orders", {
       order,
       user: req.session.user,
       product,
-      current: page,
-      pages: Math.ceil(count / perPage),
-      nextPage: hasNextPage ? nextPage : null,
+
+      pagination: order,
+      currentPage,
+      perPage,
+      nextPage, 
+      hasPrevPage,
+      hasNextPage,
+      totalPages,
+
       currentRoute: "/user/orders/",
     });
   },
