@@ -33,9 +33,10 @@ const customerInfo = async (req, res) => {
     
     res.render("admin/customers", {
       data: userData,
-      orders: userData,
+
+      pagination: userData,
       currentPage: page,
-      perPage: perPage,
+      perPage,
       nextPage,
       hasPrevPage,
       hasNextPage,

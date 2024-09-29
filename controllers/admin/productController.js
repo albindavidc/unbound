@@ -19,35 +19,36 @@ module.exports = {
         search = req.query.search;
       }
 
-      let page = parseInt(req.query.page) || 1; // Ensure page is an integer
-      const limit = 15;
+      let perPage = 10;
+      let page = parseInt(req.query.page) || 1;
 
-      // Count documents
+      const product = await Product.find()
+      .populate("category")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 })
+      .exec();
+
       const count = await Product.find({
         $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
       }).countDocuments();
 
-      // Calculate total pages
-      const totalPages = Math.ceil(count / limit);
-
-      const product = await Product.find()
-        .populate("category")
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .exec();
-
-      const breadcrumbs = [
-        { name: "Home", url: "/admin" },
-        { name: "Products", url: "/admin/products" },
-        { name: `Page ${page}`, url: `/admin/products?page=${page}` },
-      ];
+      const nextPage = parseInt(page) + 1;
+      const totalPages = Math.ceil(count/perPage);
+      const hasPrevPage = page > 1;
+      const hasNextPage = page < totalPages;
 
       res.render("admin/products/products", {
         product,
-        breadcrumbs,
-        totalPages,
+
+        pagination: product,
         currentPage: page,
+        perPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        totalPages,
+
       });
     } catch (error) {
       console.error(error);

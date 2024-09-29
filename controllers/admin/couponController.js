@@ -3,9 +3,34 @@ const Coupon = require("../../models/couponSchema");
 module.exports = {
   getCouponList: async (req, res) => {
     try {
-      const couponData = await Coupon.find();
 
-      res.render("admin/coupons", { coup: couponData });
+      let perPage = 10;
+      let page = parseInt(req.query.page) || 1;
+
+      const couponData = await Coupon.find()
+      .skip((page-1) * perPage)
+      .limit(perPage)
+      .sort({createdAt: -1})
+      .exec();
+
+      const count = await Coupon.countDocuments();
+
+      const nextPage = parseInt(page) +1;
+      const totalPages = Math.ceil(count/perPage);
+      const hasPrevPage = page>1;
+      const hasNextPage = page < totalPages;
+
+      res.render("admin/coupons", { 
+        coup: couponData,
+        
+        pagination: couponData,
+        currentPage: page,
+        perPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        totalPages,
+      });
     } catch (error) {
       console.error("Error fetching the coupons from DB", error);
       res.redirect("/pageerror");

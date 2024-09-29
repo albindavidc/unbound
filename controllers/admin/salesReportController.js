@@ -157,6 +157,7 @@ module.exports = {
       res.render("admin/salesReport", {
         locals,
         orders: reportData, // Pass the processed data to the view
+        pagination: reportData,
         totalOrders,
         overallAmount,
         overallDiscount,
