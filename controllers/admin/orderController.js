@@ -8,15 +8,19 @@ module.exports = {
     try {
       const statuses = ["Pending", "Shipped", "Delivered", "Cancelled", "Return"];
 
-      // Fetch and populate order details
+      let perPage = 10;
+      let page = parseInt(req.query.page) || 1;
+
       let orderDetails = await Order.find()
         .populate({ path: "customerId", select: "name email" })
         .populate({ path: "items.productId", select: "name price sellingPrice" })
         .populate({ path: "items.color", select: "name" })
         .populate({ path: "items.size", select: "name" })
-        .sort({ createdAt: -1 });
+        .skip((page -1 ) * perPage)
+        .limit(perPage)
+        .sort({ createdAt: -1 })
+        .exec()
       
-      // Calculate the common status for each order
       orderDetails.forEach((order) => {
         // Extract all statuses for the items in the order
         let itemStatuses = order.items.map(item => item.status);
@@ -33,13 +37,27 @@ module.exports = {
         } else {
           order.commonStatus = "Pending";
         }
-        
         console.log(`Order ID: ${order._id}, Common status: ${order.commonStatus}`);
       });
       
+      const count = await Order.countDocuments();
+      
+      const nextPage = parseInt(page) + 1;
+      const totalPages = Math.ceil(count/perPage);
+      const hasPrevPage = page > 1;
+      const hasNextPage = page < totalPages;
+
       res.render("admin/orderList", {
         orders: orderDetails,
         statuses,
+
+        pagination: orderDetails,
+        currentPage: page,
+        perPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        totalPages,
       });
     } catch (error) {
       console.error("Error loading order details:", error);

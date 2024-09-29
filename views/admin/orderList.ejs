@@ -59,7 +59,7 @@
             <tbody>
               <% orders.forEach((order, index) => { %>
                 <tr>
-                  <td><%- index + 1 %></td>
+                  <td><%= (currentPage-1)*perPage + index + 1 %></td>
                   <td><%= order._id %></td>
                   <td>
                     <strong><%= order.customerId.name %></strong><br>
@@ -140,6 +140,8 @@
       <% } %>
     </div>
   </div>
+
+  <%- include('./pagination') %>
 </section>
 
 
