@@ -164,28 +164,32 @@ const verifyOtp = async (req, res) => {
       const referrer = await User.findOne({referralCode: user.referrals})
       const referralData = req.session.referrals;
       let addReferrals;
-      if(referralData){      
+      const referral = await Referral.find()
+      console.log(referralData,"this is referral data")
+      if(referralData === referral.referralCode){      
         addReferrals = await Referral.findOneAndUpdate(
           { referrer: referrer._id },
           {$set: {referralCode: referrer.referralCode},
            $push: {referredUserDetails: {user: req.session.user, status: "Active"}} }, 
           { new: true, upsert: true } 
         )
-      }else{
-        addReferrals = await Referral.findOneAndUpdate(
-          { referrer: referrer._id },
-          {$set: {referralCode: referrer.referralCode},
-          $push: {referredUserDetails: {user: req.session.user, status: "Active"}} }, 
-          { new: true, upsert: true }  
+
+        await User.findOneAndUpdate(
+          {_id: req.session.user},
+          {$push: {referrals: addReferrals}},
+          {new: true, upsert: true}
         )
       }
+      // else{
+      //   addReferrals = await Referral.findOneAndUpdate(
+      //     { referrer: referrer._id },
+      //     {$set: {referralCode: referrer.referralCode},
+      //     $push: {referredUserDetails: {user: req.session.user, status: "Active"}} }, 
+      //     { new: true, upsert: true }  
+      //   )
+      // }
 
-      await User.findOneAndUpdate(
-        {_id: req.session.user},
-        {$push: {referrals: addReferrals}},
-        {new: true, upsert: true}
-      )
-
+     
       res.json({ success: true});
     } else {
       res.status(400).json({
