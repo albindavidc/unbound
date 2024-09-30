@@ -162,14 +162,23 @@ const verifyOtp = async (req, res) => {
       req.session.user = saveUserData._id;
 
       const referrer = await User.findOne({referralCode: user.referrals})
-      const referralData = req.session.referrals;
-      let addReferrals;
-      const referral = await Referral.find()
-      console.log(referralData,"this is referral data")
-      if(referralData === referral.referralCode){      
-        addReferrals = await Referral.findOneAndUpdate(
-          { referrer: referrer._id },
-          {$set: {referralCode: referrer.referralCode},
+      const referralCode = req.session.referrals;
+      const referrals = await Referral.find();
+      let matchingReferral = null;
+
+      for(let i=0; i<referrals.length;i++){
+        if(referrals[i].referralCode === referralCode.referrals){
+          console.log(referrals[i], "this is referrals")
+          matchingReferral = referrals[i]
+          break;
+        }
+      }
+      console.log(referralCode.referrals,referrals, matchingReferral, "this is matching referral")
+
+      if(matchingReferral !== null){      
+        const addReferrals = await Referral.findOneAndUpdate(
+          { referrer: matchingReferral.referrer._id },
+          {$set: {referralCode: matchingReferral.referralCode},
            $push: {referredUserDetails: {user: req.session.user, status: "Active"}} }, 
           { new: true, upsert: true } 
         )
