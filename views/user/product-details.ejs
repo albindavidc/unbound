@@ -80,6 +80,50 @@
     font-size: 16px; /* Increase font size for better readability */
     text-align: center; /* Center text inside the input */
   }
+
+  /* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%; /* Could be more or less, depending on screen size */
+}
+
+/* Close Button */
+.closeBtn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.closeBtn:hover,
+.closeBtn:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+
+
 </style>
 
 <!-- Shop Details Section Begin -->
@@ -160,8 +204,26 @@
           <div id="myresult" class="img-zoom-result"></div>
         </div>
       </div>
+
+
+      <div>
+        <button id="customizeModalButton" class="btn btn-outline-dark">Customize the <%= product.category.name %></button>
+      </div>
+
+
     </div>
   </div>
+
+
+  <!-- Open customize modal -->
+   <div id="openCustomizeModal" class="modal">
+    <div class="modal-content">
+      <span class="closeBtn">&times;</span>
+      <p>this is a sample modal</p>
+    </div>
+   </div>
+
+
 
   <div class="product__details__content">
     <div class="container">
@@ -424,6 +486,20 @@
 <%- include('../../views/partials/user/footer') %>
 
 <script>
+
+  const customizeModalButton = document.getElementById("customizeModalButton");
+  const modal = document.getElementById("openCustomizeModal");
+  const closeBtn = document.getElementsByClassName("closeBtn")[0];
+
+  customizeModalButton.addEventListener("click", function() {
+    modal.style.display = "block";
+  });
+
+  closeBtn.addEventListener("click", function() {
+    modal.style.display = "none"
+  })
+
+
   async function addWishlist(event, productId, element) {
     event.preventDefault();
 
