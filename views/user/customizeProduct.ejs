@@ -42,12 +42,10 @@
     padding: 10px 20px;
     font-size: 16px;
   }
-  #canvas{
+  #canvas {
     position: relative;
-    z-index: 10;
   }
 </style>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 
@@ -66,117 +64,140 @@
     </div>
     <div class="m-3 pl-5" id="layers-container">
       <h3>Layers</h3>
-      <ul id="layers-list"></ul>
+      <ul id="layers-list" style="list-style-type: none"></ul>
     </div>
   </div>
 </section>
 
-<%- include('../partials/user/footer') %>
-
- 
 <script>
+
   document.getElementById("addCustomImage").addEventListener("click", () => {
     document.getElementById("customImageInput").click();
   });
 
   const product = <%- JSON.stringify(product) %>;
-    console.log(product.primaryImages, "this is product");
-
   const canvas = new fabric.Canvas("canvas");
+  canvas.selection = true;
 
-  fabric.Image.fromURL("/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>", function(img) {
-    img.set({
-      left: 0,
-      top: 0,
-      scaleX: canvas.width / img.width,  
-      scaleY: canvas.height / img.height, 
-    });
-    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas)); // Ensure canvas rerenders
+  fabric.Image.fromURL("/uploads/images/<%= product.primaryImages[0]?.name || product.secondaryImages[0].name %>", function(img) {
+    img.scaleToWidth(canvas.width);
+    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
   });
 
-  
-
-  // Add custom image to the canvas
   document.getElementById("customImageInput").addEventListener("change", function (e) {
     const reader = new FileReader();
     reader.onload = function (event) {
       const imgObj = new Image();
       imgObj.src = event.target.result;
+
       imgObj.onload = function () {
         const img = new fabric.Image(imgObj);
         img.set({
           left: 50,
           top: 50,
-          angle: 0,
-          padding: 10,
-          cornerSize: 10, // Corrected from 'cornersize'
+          hasControls: true,
+          selectable: true,
+          lockScalingFlip: true,
         });
-        img.scaleToWidth(canvas.width / 2); // Scale image relative to canvas width
+        img.scaleToWidth(canvas.width / 2);
         canvas.add(img);
-        updateLayerList();
+        canvas.setActiveObject(img);
+        canvas.renderAll();
       };
     };
     reader.readAsDataURL(e.target.files[0]);
   });
 
-  // Add custom text to the canvas
-  document.getElementById("addCustomText").addEventListener("click", () => {
-    const textValue = document.getElementById("customTextArea").value;
-    if (textValue.trim() !== "") {
-      const text = new fabric.Text(textValue, {
-        left: 100,
-        top: 100,
-        fill: "#000",
-        fontSize: 20,
-      });
-      canvas.add(text);
-      updateLayerList();
-    }
-  });
 
-  // Function to update the layer list display
-  function updateLayerList() {
-    const layerContainer = document.getElementById("layers-list");
-    layerContainer.innerHTML = "";
 
-    canvas.getObjects().forEach((object, index) => {
-      let layerItem = document.createElement("li");
-      layerItem.innerHTML = `Layer ${index + 1}: ${object.type}`;
-
-      let moveUpBtn = document.createElement("button");
-      moveUpBtn.innerText = "Move Up";
-      moveUpBtn.onclick = () => moveLayerUp(index);
-
-      let moveDownBtn = document.createElement("button");
-      moveDownBtn.innerHTML = "Move Down";
-      moveDownBtn.onclick = () => moveLayerDown(index);
-
-      layerItem.appendChild(moveUpBtn);
-      layerItem.appendChild(moveDownBtn);
-      layerContainer.appendChild(layerItem);
+    // Add custom text to the canvas
+    document.getElementById("addCustomText").addEventListener("click", () => {
+      const textValue = document.getElementById("customTextArea").value;
+      if (textValue.trim() !== "") {
+        const text = new fabric.Text(textValue, {
+      left: 100,
+      top: 100,
+      fill: "#000",
+      fontSize: 20,
+      editable: true,  // Enable in-canvas text editing
+      hasControls: true, // Enable controls for resizing and rotation
+      hasBorders: true,  // Show borders while resizing/dragging
+      selectable: true,  // Allow the text to be selectable
+      lockUniScaling: false, // Allow non-proportional scaling
+      lockRotation: false,  // Allow free rotation
+      lockScalingFlip: true, // Prevent flipping during scaling
+      cornerColor: 'blue', // Customizing control colors
+      cornerStyle: 'circle' // Circle corner style for resizing controls
     });
 
-    function moveLayerUp(index) {
-      if (index > 0) {
-        const objects = canvas.getObjects();
-        const obj = objects[index];
-        obj.moveTo(index - 1); // Proper method to change z-index
-        canvas.renderAll();     // Re-render the canvas after moving
-        updateLayerList();
+
+        // Enable resizing and control points for the text
+        text.setControlsVisibility({
+          mt: true, mb: true, ml: true, mr: true, tr: true,
+        });
+
+        text.set({ lockScalingFlip: true });  // Prevent flipping during scaling
+        canvas.add(text);  // Add text to canvas
+        canvas.setActiveObject(text); // Set text as active object
+        updateLayerList();  // Update the layer list
+      }
+    });
+
+    // Function to update the layers list based on canvas objects
+    function updateLayerList() {
+      const layerContainer = document.getElementById("layers-list");
+      layerContainer.innerHTML = "";  // Clear existing layer list
+
+      const objects = canvas.getObjects();  // Get all objects in the canvas
+
+      objects.forEach((object, index) => {
+        let layerItem = document.createElement("li");
+
+        // Move up button
+        let moveUpBtn = document.createElement("button");
+        moveUpBtn.innerText = "▲";
+        moveUpBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
+        moveUpBtn.classList.add("p-1", "m-1");
+        moveUpBtn.onclick = () => moveLayerUp(index, objects);  // Move up functionality
+
+        // Move down button
+        let moveDownBtn = document.createElement("button");
+        moveDownBtn.innerHTML = "▼";
+        moveDownBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
+        moveDownBtn.classList.add("p-1", "m-1");
+        moveDownBtn.onclick = () => moveLayerDown(index, objects);  // Move down functionality
+
+        // Append buttons and layer info
+        layerItem.appendChild(moveUpBtn);
+        layerItem.appendChild(moveDownBtn);
+        layerItem.appendChild(document.createTextNode(`Layer ${index + 1}: ${object.type}`));
+
+        layerContainer.appendChild(layerItem);
+      });
+
+      // Move layer up in the stack
+      function moveLayerUp(index, objects) {
+        if (index > 0) {
+          const obj = objects[index];
+          obj.moveTo(index - 1);  // Move object up in layer stack
+          canvas.renderAll();  // Rerender canvas
+          updateLayerList();  // Update layers list
+        }
+      }
+
+      // Move layer down in the stack
+      function moveLayerDown(index, objects) {
+        if (index < objects.length - 1) {
+          const obj = objects[index];
+          obj.moveTo(index + 1);  // Move object down in layer stack
+          canvas.renderAll();  // Rerender canvas
+          updateLayerList();  // Update layers list
+        }
       }
     }
 
-    function moveLayerDown(index) {
-      const objects = canvas.getObjects();
-      if (index < objects.length - 1) {
-        const obj = objects[index];
-        obj.moveTo(index + 1);  // Proper method to change z-index
-        canvas.renderAll();     // Re-render the canvas after moving
-        updateLayerList();
-      }
-    }
-  }
-
-  canvas.on("object:added", updateLayerList);
-  canvas.on("object:removed", updateLayerList);
+    // Listen for changes to update layer list
+    canvas.on("object:modified", updateLayerList);  // Update when an object is modified
+    canvas.on("object:added", updateLayerList);  // Update when an object is added
+    canvas.on("object:removed", updateLayerList);  // Update when an object is removed
 </script>
