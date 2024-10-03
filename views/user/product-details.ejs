@@ -81,49 +81,6 @@
     text-align: center; /* Center text inside the input */
   }
 
-  /* Modal Styles */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
-}
-
-/* Modal Content */
-.modal-content {
-  background-color: #fff;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 50%; /* Could be more or less, depending on screen size */
-}
-
-/* Close Button */
-.closeBtn {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.closeBtn:hover,
-.closeBtn:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-}
-
-
-
 </style>
 
 <!-- Shop Details Section Begin -->
@@ -195,6 +152,13 @@ button {
               </li>
               <% }); %>
             </ul>
+
+
+            <div class="mt-4">
+              <a href="/customizeProduct/<%=product._id%>" class="btn btn-dark"> Customize the <%= product.category.name %></a>
+            </div>
+
+
           </div>
         </div>
 
@@ -204,26 +168,10 @@ button {
           <div id="myresult" class="img-zoom-result"></div>
         </div>
       </div>
-
-
-      <div>
-        <button id="customizeModalButton" class="btn btn-outline-dark">Customize the <%= product.category.name %></button>
-      </div>
-
-
     </div>
   </div>
 
-
-  <!-- Open customize modal -->
-   <div id="openCustomizeModal" class="modal">
-    <div class="modal-content">
-      <span class="closeBtn">&times;</span>
-      <p>this is a sample modal</p>
-    </div>
-   </div>
-
-
+  
 
   <div class="product__details__content">
     <div class="container">
@@ -242,7 +190,6 @@ button {
 
             <!-- Product Price -->
             <h3 id="productPrice"></h3>
-            
 
             <div class="row d-flex align-items-center">
               <div class="product__details__option">
@@ -260,7 +207,7 @@ button {
                           data-color-hex="<%= variant.color.hex %>"
                           data-color-id="<%= variant.color._id %>"
                           data-size-id="<%= variant.size._id %>"
-                          data-variant-id = "<%=variant._id%>"
+                          data-variant-id="<%=variant._id%>"
                         ></label>
 
                         <input
@@ -486,19 +433,17 @@ button {
 <%- include('../../views/partials/user/footer') %>
 
 <script>
-
   const customizeModalButton = document.getElementById("customizeModalButton");
   const modal = document.getElementById("openCustomizeModal");
   const closeBtn = document.getElementsByClassName("closeBtn")[0];
 
-  customizeModalButton.addEventListener("click", function() {
+  customizeModalButton.addEventListener("click", function () {
     modal.style.display = "block";
   });
 
-  closeBtn.addEventListener("click", function() {
-    modal.style.display = "none"
-  })
-
+  closeBtn.addEventListener("click", function () {
+    modal.style.display = "none";
+  });
 
   async function addWishlist(event, productId, element) {
     event.preventDefault();
@@ -682,7 +627,6 @@ button {
     selectedColorId = colorId;
   }
 
-
   const sellingPrice = `<%- JSON.stringify(product.sellingPrice) %>`;
   const bundleQuantity = `<%- JSON.stringify(product.bundleQuantity)%>`;
   const bundlePrice = `<%- JSON.stringify(product.bundlePrice)%>`;
@@ -701,9 +645,9 @@ button {
       priceDisplayElement.innerHTML = `
       <h3>₹${bundlePrice} <span style="font-size: 24px; font-weight: bold;">₹<%= product.sellingPrice %>.00</span> <span>₹<%= product.actualPrice %>.00</span></h3>
       `;
-    } else if(sellingPrice < actualPrice) {
+    } else if (sellingPrice < actualPrice) {
       priceDisplayElement.innerHTML = `<h3>₹${sellingPrice} <span>₹<%= product.actualPrice %>.00</span></h3>`;
-    }else {
+    } else {
       priceDisplayElement.innerHTML = `<h3>₹${sellingPrice} </h3>`;
     }
   }
@@ -785,13 +729,13 @@ button {
     }
 
     // Select the element (assuming you are selecting the first element with the class 'variant')
-const variantElement = document.querySelector('.variant_id');
+    const variantElement = document.querySelector(".variant_id");
 
-// Get the value of the 'data-variant-id' attribute
-const variantId = variantElement.getAttribute('data-variant-id');
+    // Get the value of the 'data-variant-id' attribute
+    const variantId = variantElement.getAttribute("data-variant-id");
 
-// Log the value
-console.log(variantId);
+    // Log the value
+    console.log(variantId);
     console.log("this is the total stocks available: ", existingQuantityInCart, variantId);
 
     if (selectedColorId && selectedSizeId) {

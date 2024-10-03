@@ -1,0 +1,75 @@
+<%- include('../partials/user/header') %>
+
+<style>
+  /* Modal Styles */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+  }
+
+  /* Modal Content */
+  .modal-content {
+    background-color: #fff;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Could be more or less, depending on screen size */
+  }
+
+  /* Close Button */
+  .closeBtn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .closeBtn:hover,
+  .closeBtn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+</style>
+
+<section class="p-5">
+  <div class="d-flex d-row">
+    <div class="tab-pane active" id="tabs-primary" role="tabpanel">
+      <div class="product__details__pic__item p-0">
+        <img
+          id="main-product-image"
+          class="img-fluid"
+          src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+          alt="<%= product.name %>"
+          style="width: 500px; height: auto"
+        />
+      </div>
+    </div>
+    <div class="m-3">
+      <button class="btn btn-outline-dark mb-5" id="addCustomImage">Add Image</button>
+      <input type="file" id="customImageInput" accept="image/*" style="display: none" />
+      <textarea name="customModalTextArea" id="customModalTextArea" class="form-control mb-2" placeholder="Add Text"></textarea>
+      <button class="btn btn-outline-dark mb-5">Text Area Button</button>
+    </div>
+    <div class="m-3 pl-5">
+        <p>Layers</p>
+
+    </div>
+  </div>
+</section>
+
+<script>
+    
+</script>

@@ -201,4 +201,16 @@ module.exports = {
       res.status(500).send("Internal Server Error");
     }
   },
+
+  loadCustomizeProduct: async (req,res) =>{
+    try {
+      const user = req.session.user
+      const product = await Product.findById(req.params.id)
+      console.log(product, "this is the customization product")
+      res.render("user/customizeProduct",{product, user})
+      
+    } catch (error) {
+      console.error("Error fetching product details: ")
+    }
+  }
 };

@@ -235,7 +235,6 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Order ID</th>
                   <th>Customer</th>
                   <th>Payment Method</th>
                   <th>Status</th>
@@ -250,7 +249,6 @@
 
                 <tr>
                   <td><%= (currentPage - 1) * perPage + index + 1 %></td>
-                  <td><%= order.orderId %></td>
                   <td><%= order.userEmail ? order.userEmail :order.userName %></td>
                   <td><%= order.paymentMethod %></td>
                   <td><%= order.status %></td>

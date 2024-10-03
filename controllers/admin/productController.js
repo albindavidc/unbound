@@ -371,7 +371,7 @@ module.exports = {
           const { color, size, stock } = variant;
 
           // Find an existing variant with the same color and size
-          const existingVariant = existingProduct.variants.find((v) => String(v.color) === String(color) && String(v.size) === String(size));
+          const existingVariant = existingProduct.variants.find((v) => toString(v.color) === toString(color) && toString(v.size) === toString(size));
 
           return {
             _id: existingVariant ? existingVariant._id : new mongoose.Types.ObjectId(), // Preserve existing _id or create new one
