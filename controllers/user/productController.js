@@ -206,7 +206,6 @@ module.exports = {
     try {
       const user = req.session.user
       const product = await Product.findById(req.params.id)
-      console.log(product, "this is the customization product")
       res.render("user/customizeProduct",{product, user})
       
     } catch (error) {

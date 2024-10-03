@@ -42,34 +42,141 @@
     padding: 10px 20px;
     font-size: 16px;
   }
+  #canvas{
+    position: relative;
+    z-index: 10;
+  }
 </style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 
 <section class="p-5">
   <div class="d-flex d-row">
     <div class="tab-pane active" id="tabs-primary" role="tabpanel">
       <div class="product__details__pic__item p-0">
-        <img
-          id="main-product-image"
-          class="img-fluid"
-          src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-          alt="<%= product.name %>"
-          style="width: 500px; height: auto"
-        />
+        <canvas id="canvas" width="500" height="500" style="border: 1px solid #d3d3d3"></canvas>
       </div>
     </div>
     <div class="m-3">
       <button class="btn btn-outline-dark mb-5" id="addCustomImage">Add Image</button>
       <input type="file" id="customImageInput" accept="image/*" style="display: none" />
-      <textarea name="customModalTextArea" id="customModalTextArea" class="form-control mb-2" placeholder="Add Text"></textarea>
-      <button class="btn btn-outline-dark mb-5">Text Area Button</button>
+      <textarea name="customModalTextArea" id="customTextArea" class="form-control mb-2" placeholder="Add Text"></textarea>
+      <button class="btn btn-outline-dark mb-5" id="addCustomText">Text Area Button</button>
     </div>
-    <div class="m-3 pl-5">
-        <p>Layers</p>
-
+    <div class="m-3 pl-5" id="layers-container">
+      <h3>Layers</h3>
+      <ul id="layers-list"></ul>
     </div>
   </div>
 </section>
 
+<%- include('../partials/user/footer') %>
+
+ 
 <script>
-    
+  document.getElementById("addCustomImage").addEventListener("click", () => {
+    document.getElementById("customImageInput").click();
+  });
+
+  const product = <%- JSON.stringify(product) %>;
+    console.log(product.primaryImages, "this is product");
+
+  const canvas = new fabric.Canvas("canvas");
+
+  fabric.Image.fromURL("/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>", function(img) {
+    img.set({
+      left: 0,
+      top: 0,
+      scaleX: canvas.width / img.width,  
+      scaleY: canvas.height / img.height, 
+    });
+    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas)); // Ensure canvas rerenders
+  });
+
+  
+
+  // Add custom image to the canvas
+  document.getElementById("customImageInput").addEventListener("change", function (e) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const imgObj = new Image();
+      imgObj.src = event.target.result;
+      imgObj.onload = function () {
+        const img = new fabric.Image(imgObj);
+        img.set({
+          left: 50,
+          top: 50,
+          angle: 0,
+          padding: 10,
+          cornerSize: 10, // Corrected from 'cornersize'
+        });
+        img.scaleToWidth(canvas.width / 2); // Scale image relative to canvas width
+        canvas.add(img);
+        updateLayerList();
+      };
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  });
+
+  // Add custom text to the canvas
+  document.getElementById("addCustomText").addEventListener("click", () => {
+    const textValue = document.getElementById("customTextArea").value;
+    if (textValue.trim() !== "") {
+      const text = new fabric.Text(textValue, {
+        left: 100,
+        top: 100,
+        fill: "#000",
+        fontSize: 20,
+      });
+      canvas.add(text);
+      updateLayerList();
+    }
+  });
+
+  // Function to update the layer list display
+  function updateLayerList() {
+    const layerContainer = document.getElementById("layers-list");
+    layerContainer.innerHTML = "";
+
+    canvas.getObjects().forEach((object, index) => {
+      let layerItem = document.createElement("li");
+      layerItem.innerHTML = `Layer ${index + 1}: ${object.type}`;
+
+      let moveUpBtn = document.createElement("button");
+      moveUpBtn.innerText = "Move Up";
+      moveUpBtn.onclick = () => moveLayerUp(index);
+
+      let moveDownBtn = document.createElement("button");
+      moveDownBtn.innerHTML = "Move Down";
+      moveDownBtn.onclick = () => moveLayerDown(index);
+
+      layerItem.appendChild(moveUpBtn);
+      layerItem.appendChild(moveDownBtn);
+      layerContainer.appendChild(layerItem);
+    });
+
+    function moveLayerUp(index) {
+      if (index > 0) {
+        const objects = canvas.getObjects();
+        const obj = objects[index];
+        obj.moveTo(index - 1); // Proper method to change z-index
+        canvas.renderAll();     // Re-render the canvas after moving
+        updateLayerList();
+      }
+    }
+
+    function moveLayerDown(index) {
+      const objects = canvas.getObjects();
+      if (index < objects.length - 1) {
+        const obj = objects[index];
+        obj.moveTo(index + 1);  // Proper method to change z-index
+        canvas.renderAll();     // Re-render the canvas after moving
+        updateLayerList();
+      }
+    }
+  }
+
+  canvas.on("object:added", updateLayerList);
+  canvas.on("object:removed", updateLayerList);
 </script>
