@@ -61,6 +61,10 @@
       <input type="file" id="customImageInput" accept="image/*" style="display: none" />
       <textarea name="customModalTextArea" id="customTextArea" class="form-control mb-2" placeholder="Add Text"></textarea>
       <button class="btn btn-outline-dark mb-5" id="addCustomText">Text Area Button</button>
+      <div>
+
+        <button class="btn btn-outline-danger mb-5" id="deleteButton">Delete Layers</button>
+      </div>
     </div>
     <div class="m-3 pl-5" id="layers-container">
       <h3>Layers</h3>
@@ -76,6 +80,7 @@
   });
 
   const product = <%- JSON.stringify(product) %>;
+
   const canvas = new fabric.Canvas("canvas");
   canvas.selection = true;
 
@@ -109,7 +114,6 @@
   });
 
 
-
     // Add custom text to the canvas
     document.getElementById("addCustomText").addEventListener("click", () => {
       const textValue = document.getElementById("customTextArea").value;
@@ -119,55 +123,70 @@
       top: 100,
       fill: "#000",
       fontSize: 20,
-      editable: true,  // Enable in-canvas text editing
-      hasControls: true, // Enable controls for resizing and rotation
-      hasBorders: true,  // Show borders while resizing/dragging
-      selectable: true,  // Allow the text to be selectable
-      lockUniScaling: false, // Allow non-proportional scaling
-      lockRotation: false,  // Allow free rotation
-      lockScalingFlip: true, // Prevent flipping during scaling
-      cornerColor: 'blue', // Customizing control colors
-      cornerStyle: 'circle' // Circle corner style for resizing controls
+      editable: true,  
+      hasControls: true, 
+      hasBorders: true, 
+      selectable: true,  
+      lockUniScaling: false, 
+      lockRotation: false, 
+      lockScalingFlip: true, 
+      cornerColor: 'blue', 
+      cornerStyle: 'circle'
     });
 
 
-        // Enable resizing and control points for the text
         text.setControlsVisibility({
           mt: true, mb: true, ml: true, mr: true, tr: true,
         });
 
-        text.set({ lockScalingFlip: true });  // Prevent flipping during scaling
-        canvas.add(text);  // Add text to canvas
-        canvas.setActiveObject(text); // Set text as active object
-        updateLayerList();  // Update the layer list
+        text.set({ lockScalingFlip: true }); 
+        canvas.add(text);  
+        canvas.setActiveObject(text);
+        updateLayerList();  
       }
     });
 
-    // Function to update the layers list based on canvas objects
+    //Delete the selected Layers
+    const deleteButton = document.getElementById("deleteButton");
+
+    canvas.on('selected:created', function(){
+      deleteButton.style.display = "block";
+    })
+
+    canvas.on('selected:cleared', function() {
+      deleteButton.style.display = "none";
+    })
+
+    deleteButton.addEventListener('click', function() {
+      const activeObject = canvas.getActiveObject();
+      if(activeObject){
+        canvas.remove(activeObject);
+        canvas.discardActiveObject();
+        canvas.renderAll();
+      }
+    })
+
     function updateLayerList() {
       const layerContainer = document.getElementById("layers-list");
-      layerContainer.innerHTML = "";  // Clear existing layer list
+      layerContainer.innerHTML = "";  
 
-      const objects = canvas.getObjects();  // Get all objects in the canvas
+      const objects = canvas.getObjects();  
 
       objects.forEach((object, index) => {
         let layerItem = document.createElement("li");
 
-        // Move up button
         let moveUpBtn = document.createElement("button");
         moveUpBtn.innerText = "▲";
         moveUpBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
         moveUpBtn.classList.add("p-1", "m-1");
-        moveUpBtn.onclick = () => moveLayerUp(index, objects);  // Move up functionality
+        moveUpBtn.onclick = () => moveLayerUp(index, objects); 
 
-        // Move down button
         let moveDownBtn = document.createElement("button");
         moveDownBtn.innerHTML = "▼";
         moveDownBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
         moveDownBtn.classList.add("p-1", "m-1");
-        moveDownBtn.onclick = () => moveLayerDown(index, objects);  // Move down functionality
+        moveDownBtn.onclick = () => moveLayerDown(index, objects);  
 
-        // Append buttons and layer info
         layerItem.appendChild(moveUpBtn);
         layerItem.appendChild(moveDownBtn);
         layerItem.appendChild(document.createTextNode(`Layer ${index + 1}: ${object.type}`));
@@ -175,13 +194,12 @@
         layerContainer.appendChild(layerItem);
       });
 
-      // Move layer up in the stack
       function moveLayerUp(index, objects) {
         if (index > 0) {
           const obj = objects[index];
-          obj.moveTo(index - 1);  // Move object up in layer stack
-          canvas.renderAll();  // Rerender canvas
-          updateLayerList();  // Update layers list
+          obj.moveTo(index - 1); 
+          canvas.renderAll();  
+          updateLayerList();  
         }
       }
 
@@ -189,9 +207,9 @@
       function moveLayerDown(index, objects) {
         if (index < objects.length - 1) {
           const obj = objects[index];
-          obj.moveTo(index + 1);  // Move object down in layer stack
-          canvas.renderAll();  // Rerender canvas
-          updateLayerList();  // Update layers list
+          obj.moveTo(index + 1);  
+          canvas.renderAll();  
+          updateLayerList();  
         }
       }
     }
