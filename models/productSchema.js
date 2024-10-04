@@ -77,6 +77,24 @@ const ProductSchema = new mongoose.Schema(
     },
     primaryImages: { type: [imageSchema] },
     secondaryImages: { type: [imageSchema] },
+    canvasData: {
+      front: {
+        type: mongoose.Schema.Types.Mixed,
+      },
+      back: {
+        type: mongoose.Schema.Types.Mixed,
+      },
+      left: {
+        type: mongoose.Schema.Types.Mixed,
+      },
+      right: {
+        type: mongoose.Schema.Types.Mixed,
+      }
+    },
+    customizedProduct:{
+      type: Boolean,
+      default: false,
+    },
     isActive: {
       type: Boolean,
       default: true,

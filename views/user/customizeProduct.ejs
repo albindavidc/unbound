@@ -357,4 +357,33 @@
       canvas.on("object:modified", updateLayerList);  // Update when an object is modified
       canvas.on("object:added", updateLayerList);  // Update when an object is added
       canvas.on("object:removed", updateLayerList);  // Update when an object is removed
+
+
+      function saveCanvasToBackend() {
+        const canvasJSON = canvas.toJSON();
+        const productId = "<%=product._id%>"
+
+        fetch('/save-canvas',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            productId: productId,
+            canvasData:canvasJSON,
+          }),
+        })
+        .then(Response => response.json())
+        .then(data =>{
+          console.log('Canvas saved successfully:', data);
+        })
+        .catch(error =>{
+          console.log('Error saving canvas:', error)
+        })
+
+
+      }
+
+
+
 </script>

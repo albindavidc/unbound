@@ -56,6 +56,7 @@ router.post("/forgot-password-cpassword", userController.passwordChange);
 router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
 router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
 router.get("/customizeProduct/:id", userAuth,checkUserStatus, productController.loadCustomizeProduct)
+router.post("/save-canvas", productController.saveCustomizedImage)
 
 
 // User-Profile

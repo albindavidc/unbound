@@ -211,5 +211,8 @@ module.exports = {
     } catch (error) {
       console.error("Error fetching product details: ")
     }
+  },
+  saveCustomizedImage: async (req,res) =>{
+    
   }
 };
