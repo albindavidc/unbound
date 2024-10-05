@@ -109,7 +109,10 @@
         async function setupIndexedDB() {
           return idb.openDB("CanvasStatesDB", 1, {
             upgrade(db) {
-              db.createObjectStore("canvasStates", { keyPath: "side" });
+              if(!db.objectStoreNames.contains("canvasStates")){
+                const store = db.createObjectStore("canvasStates", { keyPath: ["productId", "side"] });
+
+              }
             },
           });
         }
@@ -117,23 +120,23 @@
         let dbPromise = setupIndexedDB();
 
         // Save data to IndexedDB with Debug Logs
-        async function saveToIndexedDB(side, content, backgroundImage) {
+        async function saveToIndexedDB(productId, side, content, backgroundImage) {
           const db = await dbPromise;
-          await db.put("canvasStates", { side, content, backgroundImage });
+          await db.put("canvasStates", {productId, side, content, backgroundImage });
         }
 
         // Load data from IndexedDB with Debug Logs
-        async function loadFromIndexedDB(side) {
+        async function loadFromIndexedDB(productId, side) {
           const db = await dbPromise;
-          const state = await db.get("canvasStates", side);
+          const state = await db.get("canvasStates", [productId, side]);
           return state;
         }
 
-        function saveState() {
+        function saveState(productId) {
           console.log(`Saving current state for side: ${currentSide}`);
           const content = canvas.toJSON();
           const backgroundImage = canvas.backgroundImage ? canvas.backgroundImage.src : null;
-          saveToIndexedDB(currentSide, content, backgroundImage);
+          saveToIndexedDB(productId, currentSide, content, backgroundImage);
         }
 
         function clearCanvas() {
@@ -144,7 +147,7 @@
         async function loadState(side) {
           clearCanvas();
 
-          const state = await loadFromIndexedDB(side);
+          const state = await loadFromIndexedDB(productId, side);
           if (state && state.content) {
             console.log(`Found background image for side: ${side}`);
             canvas.loadFromJSON(state.content, canvas.renderAll.bind(canvas));
@@ -164,66 +167,75 @@
         }
 
         // Function to load new image for the current side if no state is saved
-        function loadNewImage(side, imageUrl) {
+        function loadNewImage(productId, side, imageUrl) {
           fabric.Image.fromURL(imageUrl, function (img) {
             img.scaleToWidth(canvas.width);
             canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-            saveToIndexedDB(side, canvas.toJSON(), img.src);
+            saveToIndexedDB(productId, side, canvas.toJSON(), img.src);
           });
         }
 
         window.onload = async function () {
+          const productId = "<%= product._id%>"
           currentSide = "front";
-          const state = await loadFromIndexedDB("front");
+          const state = await loadFromIndexedDB(productId, "front");
           if (!state) {
-            loadNewImage("front", "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
+            loadNewImage(productId, "front", "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
           } else {
-            loadState("front");
+            loadState(productId, "front");
           }
         };
 
         // Set up event listeners for button clicks (Front, Back, Left, Right)
         frontImage.addEventListener("click", async () => {
+          const productId = "<%= product._id%>"
+
           saveState();
           currentSide = "front";
-          const state = await loadFromIndexedDB("front");
+          const state = await loadFromIndexedDB(productId, "front");
           if (!state) {
-            loadNewImage("front", "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
+            loadNewImage(productId, "front", "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
           } else {
-            loadState("front");
+            loadState(productId, "front");
           }
         });
 
         backImage.addEventListener("click", async () => {
+          const productId = "<%= product._id%>"
+
           saveState();
           currentSide = "back";
-          const state = await loadFromIndexedDB("back");
+          const state = await loadFromIndexedDB(productId, "back");
           if (!state) {
-            loadNewImage("back", "/uploads/images/<%= product.secondaryImages[1]?.name || product.primaryImages[0]?.name %>");
+            loadNewImage(productId, "back", "/uploads/images/<%= product.secondaryImages[1]?.name || product.primaryImages[0]?.name %>");
           } else {
-            loadState("back");
+            loadState(productId, "back");
           }
         });
 
         leftImage.addEventListener("click", async () => {
+          const productId = "<%= product._id%>"
+
           saveState();
           currentSide = "left";
-          const state = await loadFromIndexedDB("left");
+          const state = await loadFromIndexedDB(productId, "left");
           if (!state) {
-            loadNewImage("left", "/uploads/images/<%= product.secondaryImages[2]?.name || product.primaryImages[0]?.name %>");
+            loadNewImage(productId, "left", "/uploads/images/<%= product.secondaryImages[2]?.name || product.primaryImages[0]?.name %>");
           } else {
-            loadState("left");
+            loadState(productId, "left");
           }
         });
 
         rightImage.addEventListener("click", async () => {
+          const productId = "<%= product._id%>"
+
           saveState();
           currentSide = "right";
-          const state = await loadFromIndexedDB("right");
+          const state = await loadFromIndexedDB(productId, "right");
           if (!state) {
-            loadNewImage("right", "/uploads/images/<%= product.secondaryImages[3]?.name || product.primaryImages[0]?.name %>");
+            loadNewImage(productId, "right", "/uploads/images/<%= product.secondaryImages[3]?.name || product.primaryImages[0]?.name %>");
           } else {
-            loadState("right");
+            loadState(productId, "right");
           }
         });
 

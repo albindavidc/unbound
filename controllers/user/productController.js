@@ -217,7 +217,11 @@ module.exports = {
   loadCustomizeProduct: async (req, res) => {
     try {
       const user = req.session.user;
-      const product = await Product.findById(req.params.id);
+      const productId = req.params.id
+
+      console.log(productId, "this is product id")
+      const product = await Product.findById(productId);
+      console.log(product, "this is product")
       res.render("user/customizeProduct", { product, user });
     } catch (error) {
       console.error("Error fetching product details: ");
