@@ -56,8 +56,8 @@ app.use("/public", express.static("public")); // Static files for uploaded image
 
 //Middlewares
 app.use(logger("dev"));
-app.use(express.urlencoded({ extended: true })); // For URL-encoded data
-app.use(express.json());
+app.use(express.urlencoded({ limit: '10mb',  extended: true })); // For URL-encoded data
+app.use(express.json({limit: '10mb'}));
 app.use(methodOverride("_method"));
 app.use(cookieParser());
 

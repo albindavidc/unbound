@@ -67,8 +67,13 @@
       <input type="file" id="customImageInput" accept="image/*" style="display: none" />
       <textarea name="customModalTextArea" id="customTextArea" class="form-control mb-2" placeholder="Add Text"></textarea>
       <button class="btn btn-outline-dark mb-5" id="addCustomText">Text Area Button</button>
-      <div>
-        <button class="btn btn-outline-danger mb-5" id="deleteButton">Delete Layers</button>
+      <div class="row">
+        <div>
+          <button class="btn btn-outline-danger mb-5" id="deleteButton">Delete Layers</button>
+        </div>
+        <div>
+          <button class="btn btn-success mb-5" id="saveCustomized">Save</button>
+        </div>
       </div>
     </div>
     <div class="m-3 pl-5" id="layers-container">
@@ -79,311 +84,334 @@
 </section>
 
 <script src="https://unpkg.com/idb@5.0.8/build/iife/index-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <script>
-
-  document.getElementById("addCustomImage").addEventListener("click", () => {
-    document.getElementById("customImageInput").click();
-  });
-
-  const product = <%- JSON.stringify(product) %>;
-
-  const canvas = new fabric.Canvas("canvas");
-  canvas.selection = true;
-
-
-  //Front, Back, Left, Right Side Swap.
-  const frontImage = document.getElementById("frontImage")
-  const backImage = document.getElementById("backImage");
-  const leftImage = document.getElementById("leftImage");
-  const rightImage = document.getElementById("rightImage");
-
-  let currentSide = 'front';
-
-  // Set up IndexedDB with Debug Logs
-  async function setupIndexedDB() {
-    return idb.openDB('CanvasStatesDB', 1, {
-      upgrade(db) {
-        db.createObjectStore('canvasStates', { keyPath: 'side' });
-      }
-    });
-  }
-
-  let dbPromise = setupIndexedDB();
-
-  // Save data to IndexedDB with Debug Logs
-  async function saveToIndexedDB(side, content, backgroundImage) {
-    const db = await dbPromise;
-    await db.put('canvasStates', { side, content, backgroundImage });
-  }
-
-  // Load data from IndexedDB with Debug Logs
-  async function loadFromIndexedDB(side) {
-    const db = await dbPromise;
-    const state = await db.get('canvasStates', side);
-    return state;
-  }
-
-  function saveState() {
-    console.log(`Saving current state for side: ${currentSide}`);
-    const content = canvas.toJSON();
-    const backgroundImage = canvas.backgroundImage ? canvas.backgroundImage.src : null;
-    saveToIndexedDB(currentSide, content, backgroundImage);
-  }
-
-  function clearCanvas() {
-    canvas.clear();
-    canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-  }
-
-  async function loadState(side) {
-    clearCanvas();
-
-    const state = await loadFromIndexedDB(side);
-    if (state && state.content) {
-      console.log(`Found background image for side: ${side}`);
-      canvas.loadFromJSON(state.content, canvas.renderAll.bind(canvas));
-
-    } else {
-      console.log(`No content found for side: ${side}`);
-    }
-
-    if (state && state.backgroundImage) {
-      console.log(`Found background image for side: ${side}`);
-      fabric.Image.fromURL(state.backgroundImage, function (img) {
-        img.scaleToWidth(canvas.width);
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-      });
-    } else {
-      console.log(`No background image found for side: ${side}`);
-    }
-  }
-
-  // Function to load new image for the current side if no state is saved
-  function loadNewImage(side, imageUrl) {
-      fabric.Image.fromURL(imageUrl, function(img) {
-        img.scaleToWidth(canvas.width);
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-        saveToIndexedDB(side, canvas.toJSON(), img.src); // Save new image to IndexedDB
-      });
-  }
-
-  window.onload = async function() {
-    currentSide = 'front';
-    const state = await loadFromIndexedDB('front');
-    if(!state){
-      loadNewImage('front',"/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>")
-    }else{
-      loadState('front');
-    }
-  }
-
-
-   // Set up event listeners for button clicks (Front, Back, Left, Right)
-    frontImage.addEventListener('click', async () => {
-      saveState(); // Save current side state
-      currentSide = 'front'; // Switch to front side
-      const state = await loadFromIndexedDB('front');
-      if (!state) {
-        loadNewImage('front', "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
-      } else {
-        loadState('front'); // Load saved state
-      }
-    });
-
-
-
-    backImage.addEventListener('click', async () => {
-      saveState(); // Save current side state
-      currentSide = 'back'; // Switch to back side
-      const state = await loadFromIndexedDB('back');
-      if (!state) {
-        loadNewImage('back', "/uploads/images/<%= product.secondaryImages[1]?.name || product.primaryImages[0]?.name %>");
-      } else {
-        loadState('back'); // Load saved state
-      }
-    });
-
-    leftImage.addEventListener('click', async () => {
-      saveState(); // Save current side state
-      currentSide = 'left'; // Switch to left side
-      const state = await loadFromIndexedDB('left');
-      if (!state) {
-        loadNewImage('left', "/uploads/images/<%= product.secondaryImages[2]?.name || product.primaryImages[0]?.name %>");
-      } else {
-        loadState('left'); // Load saved state
-      }
-    });
-
-    rightImage.addEventListener('click', async () => {
-      saveState(); // Save current side state
-      currentSide = 'right'; // Switch to right side
-      const state = await loadFromIndexedDB('right');
-      if (!state) {
-        loadNewImage('right', "/uploads/images/<%= product.secondaryImages[3]?.name || product.primaryImages[0]?.name %>");
-      } else {
-        loadState('right'); // Load saved state
-      }
-    });
-
-
-
-    document.getElementById("customImageInput").addEventListener("change", function (e) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const imgObj = new Image();
-        imgObj.src = event.target.result;
-
-        imgObj.onload = function () {
-          const img = new fabric.Image(imgObj);
-          img.set({
-            left: 50,
-            top: 50,
-            hasControls: true,
-            selectable: true,
-            lockScalingFlip: true,
-          });
-          img.scaleToWidth(canvas.width / 2);
-          canvas.add(img);
-          canvas.setActiveObject(img);
-          canvas.renderAll();
-        };
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    });
-
-
-      // Add custom text to the canvas
-      document.getElementById("addCustomText").addEventListener("click", () => {
-        const textValue = document.getElementById("customTextArea").value;
-        if (textValue.trim() !== "") {
-          const text = new fabric.Text(textValue, {
-        left: 100,
-        top: 100,
-        fill: "#000",
-        fontSize: 20,
-        editable: true,
-        hasControls: true,
-        hasBorders: true,
-        selectable: true,
-        lockUniScaling: false,
-        lockRotation: false,
-        lockScalingFlip: true,
-        cornerColor: 'blue',
-        cornerStyle: 'circle'
-      });
-
-
-          text.setControlsVisibility({
-            mt: true, mb: true, ml: true, mr: true, tr: true,
-          });
-
-          text.set({ lockScalingFlip: true });
-          canvas.add(text);
-          canvas.setActiveObject(text);
-          updateLayerList();
-        }
-      });
-
-      //Delete the selected Layers
-      const deleteButton = document.getElementById("deleteButton");
-
-      canvas.on('selected:created', function(){
-        deleteButton.style.display = "block";
-      })
-
-      canvas.on('selected:cleared', function() {
-        deleteButton.style.display = "none";
-      })
-
-      deleteButton.addEventListener('click', function() {
-        const activeObject = canvas.getActiveObject();
-        if(activeObject){
-          canvas.remove(activeObject);
-          canvas.discardActiveObject();
-          canvas.renderAll();
-        }
-      })
-
-      function updateLayerList() {
-        const layerContainer = document.getElementById("layers-list");
-        layerContainer.innerHTML = "";
-
-        const objects = canvas.getObjects();
-
-        objects.forEach((object, index) => {
-          let layerItem = document.createElement("li");
-
-          let moveUpBtn = document.createElement("button");
-          moveUpBtn.innerText = "▲";
-          moveUpBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
-          moveUpBtn.classList.add("p-1", "m-1");
-          moveUpBtn.onclick = () => moveLayerUp(index, objects);
-
-          let moveDownBtn = document.createElement("button");
-          moveDownBtn.innerHTML = "▼";
-          moveDownBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
-          moveDownBtn.classList.add("p-1", "m-1");
-          moveDownBtn.onclick = () => moveLayerDown(index, objects);
-
-          layerItem.appendChild(moveUpBtn);
-          layerItem.appendChild(moveDownBtn);
-          layerItem.appendChild(document.createTextNode(`Layer ${index + 1}: ${object.type}`));
-
-          layerContainer.appendChild(layerItem);
+        document.getElementById("addCustomImage").addEventListener("click", () => {
+          document.getElementById("customImageInput").click();
         });
 
-        function moveLayerUp(index, objects) {
-          if (index > 0) {
-            const obj = objects[index];
-            obj.moveTo(index - 1);
-            canvas.renderAll();
-            updateLayerList();
+        const product = <%- JSON.stringify(product) %>;
+
+        const canvas = new fabric.Canvas("canvas");
+        canvas.selection = true;
+
+        //Front, Back, Left, Right Side Swap.
+        const frontImage = document.getElementById("frontImage");
+        const backImage = document.getElementById("backImage");
+        const leftImage = document.getElementById("leftImage");
+        const rightImage = document.getElementById("rightImage");
+
+        let currentSide = "front";
+
+        // Set up IndexedDB with Debug Logs
+        async function setupIndexedDB() {
+          return idb.openDB("CanvasStatesDB", 1, {
+            upgrade(db) {
+              db.createObjectStore("canvasStates", { keyPath: "side" });
+            },
+          });
+        }
+
+        let dbPromise = setupIndexedDB();
+
+        // Save data to IndexedDB with Debug Logs
+        async function saveToIndexedDB(side, content, backgroundImage) {
+          const db = await dbPromise;
+          await db.put("canvasStates", { side, content, backgroundImage });
+        }
+
+        // Load data from IndexedDB with Debug Logs
+        async function loadFromIndexedDB(side) {
+          const db = await dbPromise;
+          const state = await db.get("canvasStates", side);
+          return state;
+        }
+
+        function saveState() {
+          console.log(`Saving current state for side: ${currentSide}`);
+          const content = canvas.toJSON();
+          const backgroundImage = canvas.backgroundImage ? canvas.backgroundImage.src : null;
+          saveToIndexedDB(currentSide, content, backgroundImage);
+        }
+
+        function clearCanvas() {
+          canvas.clear();
+          canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+        }
+
+        async function loadState(side) {
+          clearCanvas();
+
+          const state = await loadFromIndexedDB(side);
+          if (state && state.content) {
+            console.log(`Found background image for side: ${side}`);
+            canvas.loadFromJSON(state.content, canvas.renderAll.bind(canvas));
+          } else {
+            console.log(`No content found for side: ${side}`);
+          }
+
+          if (state && state.backgroundImage) {
+            console.log(`Found background image for side: ${side}`);
+            fabric.Image.fromURL(state.backgroundImage, function (img) {
+              img.scaleToWidth(canvas.width);
+              canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+            });
+          } else {
+            console.log(`No background image found for side: ${side}`);
           }
         }
 
-        // Move layer down in the stack
-        function moveLayerDown(index, objects) {
-          if (index < objects.length - 1) {
-            const obj = objects[index];
-            obj.moveTo(index + 1);
-            canvas.renderAll();
+        // Function to load new image for the current side if no state is saved
+        function loadNewImage(side, imageUrl) {
+          fabric.Image.fromURL(imageUrl, function (img) {
+            img.scaleToWidth(canvas.width);
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+            saveToIndexedDB(side, canvas.toJSON(), img.src);
+          });
+        }
+
+        window.onload = async function () {
+          currentSide = "front";
+          const state = await loadFromIndexedDB("front");
+          if (!state) {
+            loadNewImage("front", "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
+          } else {
+            loadState("front");
+          }
+        };
+
+        // Set up event listeners for button clicks (Front, Back, Left, Right)
+        frontImage.addEventListener("click", async () => {
+          saveState();
+          currentSide = "front";
+          const state = await loadFromIndexedDB("front");
+          if (!state) {
+            loadNewImage("front", "/uploads/images/<%= product.secondaryImages[0]?.name || product.primaryImages[0]?.name %>");
+          } else {
+            loadState("front");
+          }
+        });
+
+        backImage.addEventListener("click", async () => {
+          saveState();
+          currentSide = "back";
+          const state = await loadFromIndexedDB("back");
+          if (!state) {
+            loadNewImage("back", "/uploads/images/<%= product.secondaryImages[1]?.name || product.primaryImages[0]?.name %>");
+          } else {
+            loadState("back");
+          }
+        });
+
+        leftImage.addEventListener("click", async () => {
+          saveState();
+          currentSide = "left";
+          const state = await loadFromIndexedDB("left");
+          if (!state) {
+            loadNewImage("left", "/uploads/images/<%= product.secondaryImages[2]?.name || product.primaryImages[0]?.name %>");
+          } else {
+            loadState("left");
+          }
+        });
+
+        rightImage.addEventListener("click", async () => {
+          saveState();
+          currentSide = "right";
+          const state = await loadFromIndexedDB("right");
+          if (!state) {
+            loadNewImage("right", "/uploads/images/<%= product.secondaryImages[3]?.name || product.primaryImages[0]?.name %>");
+          } else {
+            loadState("right");
+          }
+        });
+
+        document.getElementById("customImageInput").addEventListener("change", function (e) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            const imgObj = new Image();
+            imgObj.src = event.target.result;
+
+            imgObj.onload = function () {
+              const img = new fabric.Image(imgObj);
+              img.set({
+                left: 50,
+                top: 50,
+                hasControls: true,
+                selectable: true,
+                lockScalingFlip: true,
+              });
+              img.scaleToWidth(canvas.width / 2);
+              canvas.add(img);
+              canvas.setActiveObject(img);
+              canvas.renderAll();
+            };
+          };
+          reader.readAsDataURL(e.target.files[0]);
+        });
+
+        // Add custom text to the canvas
+        document.getElementById("addCustomText").addEventListener("click", () => {
+          const textValue = document.getElementById("customTextArea").value;
+          if (textValue.trim() !== "") {
+            const text = new fabric.Text(textValue, {
+              left: 100,
+              top: 100,
+              fill: "#000",
+              fontSize: 20,
+              editable: true,
+              hasControls: true,
+              hasBorders: true,
+              selectable: true,
+              lockUniScaling: false,
+              lockRotation: false,
+              lockScalingFlip: true,
+              cornerColor: "blue",
+              cornerStyle: "circle",
+            });
+
+            text.setControlsVisibility({
+              mt: true,
+              mb: true,
+              ml: true,
+              mr: true,
+              tr: true,
+            });
+
+            text.set({ lockScalingFlip: true });
+            canvas.add(text);
+            canvas.setActiveObject(text);
             updateLayerList();
           }
+        });
+
+        //Delete the selected Layers
+        const deleteButton = document.getElementById("deleteButton");
+
+        canvas.on("selected:created", function () {
+          deleteButton.style.display = "block";
+        });
+
+        canvas.on("selected:cleared", function () {
+          deleteButton.style.display = "none";
+        });
+
+        deleteButton.addEventListener("click", function () {
+          const activeObject = canvas.getActiveObject();
+          if (activeObject) {
+            canvas.remove(activeObject);
+            canvas.discardActiveObject();
+            canvas.renderAll();
+          }
+        });
+
+        function updateLayerList() {
+          const layerContainer = document.getElementById("layers-list");
+          layerContainer.innerHTML = "";
+
+          const objects = canvas.getObjects();
+
+          objects.forEach((object, index) => {
+            let layerItem = document.createElement("li");
+
+            let moveUpBtn = document.createElement("button");
+            moveUpBtn.innerText = "▲";
+            moveUpBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
+            moveUpBtn.classList.add("p-1", "m-1");
+            moveUpBtn.onclick = () => moveLayerUp(index, objects);
+
+            let moveDownBtn = document.createElement("button");
+            moveDownBtn.innerHTML = "▼";
+            moveDownBtn.style.cssText = "border: .5px solid; border-radius: 4px; background-color: white;";
+            moveDownBtn.classList.add("p-1", "m-1");
+            moveDownBtn.onclick = () => moveLayerDown(index, objects);
+
+            layerItem.appendChild(moveUpBtn);
+            layerItem.appendChild(moveDownBtn);
+            layerItem.appendChild(document.createTextNode(`Layer ${index + 1}: ${object.type}`));
+
+            layerContainer.appendChild(layerItem);
+          });
+
+          function moveLayerUp(index, objects) {
+            if (index > 0) {
+              const obj = objects[index];
+              obj.moveTo(index - 1);
+              canvas.renderAll();
+              updateLayerList();
+            }
+          }
+
+          // Move layer down in the stack
+          function moveLayerDown(index, objects) {
+            if (index < objects.length - 1) {
+              const obj = objects[index];
+              obj.moveTo(index + 1);
+              canvas.renderAll();
+              updateLayerList();
+            }
+          }
         }
-      }
 
-      // Listen for changes to update layer list
-      canvas.on("object:modified", updateLayerList);  // Update when an object is modified
-      canvas.on("object:added", updateLayerList);  // Update when an object is added
-      canvas.on("object:removed", updateLayerList);  // Update when an object is removed
+        // Listen for changes to update layer list
+        canvas.on("object:modified", updateLayerList); // Update when an object is modified
+        canvas.on("object:added", updateLayerList); // Update when an object is added
+        canvas.on("object:removed", updateLayerList); // Update when an object is removed
 
 
-      function saveCanvasToBackend() {
-        const canvasJSON = canvas.toJSON();
-        const productId = "<%=product._id%>"
+        async function gatherAllCanvasData() {
+          const sides = ['front', 'back', 'left', 'right']
+          const  allData = {};
 
-        fetch('/save-canvas',{
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            productId: productId,
-            canvasData:canvasJSON,
-          }),
+          for(const side of sides) {
+            const state = await loadFromIndexedDB(side);
+            if(state){
+              allData[side] = {
+                content: state.content,
+                backgroundImage: state.backgroundImage
+              }
+            }else{
+              allData[side] ={
+                content: null,
+                backgroundImage: null,
+              }
+            }
+          }
+          return allData
+        }
+
+        async function sendCanvasDataToBackend() {
+          const allCanvasData = await gatherAllCanvasData();
+          const productId = '<%-product._id%>';
+
+          const response = await fetch('/save-canvas',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({allCanvasData,productId})
+          })
+          
+          if(response.ok){
+            Swal.fire({
+              icon: 'success', 
+              title: "Success",
+              text: "You have successfully added custom design to your product",
+              showConfirmButton: false,
+              timer: 1000,
+          
+            })
+          .then(() => {window.location.href= `/user/product-list/${productId}`})
+
+            console.log('Canvas data successfully sent to the backend.')
+          }else{
+            console.error('Failed to send canvas data to the backend.')
+          }
+        }
+
+        document.getElementById('saveCustomized').addEventListener('click', () =>{
+          sendCanvasDataToBackend();
         })
-        .then(Response => response.json())
-        .then(data =>{
-          console.log('Canvas saved successfully:', data);
-        })
-        .catch(error =>{
-          console.log('Error saving canvas:', error)
-        })
-
-
-      }
-
-
 
 </script>
