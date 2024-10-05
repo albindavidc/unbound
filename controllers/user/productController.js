@@ -5,6 +5,7 @@ const Brand = require("../../models/attributes/brandSchema");
 const Size = require("../../models/attributes/sizeSchema");
 const Variants = require("../../models/attributes/variantSchema");
 const Cart = require("../../models/cartSchema");
+const Customize = require("../../models/customizedProduct");
 
 const mongoose = require("mongoose");
 
@@ -206,24 +207,51 @@ module.exports = {
   },
 
   saveCustomizedImage: async (req, res) => {
-    const {allCanvasData, productId} = req.body;
+    const { allCanvasData, productId } = req.body;
+    const userId = req.session.user;
 
     if (!allCanvasData) {
       return res.status(400).json({ error: "Product ID and canvas data are required." });
-
     }
     try {
-      const product = await Product.findByIdAndUpdate(
-        productId,
-        {canvasData: allCanvasData},
-        // { $set: update }, 
-        { new: true });
-      if (!product) {
-        return res.status(500).json({ error: "Error saving canvas data" });
-      }
-      
+      const customize = await Customize.findOne({ userId: userId });
 
-      res.json({ success: true, message: "Canvas saved successfully", product });
-    } catch (error) {}
+      productId, { userId: userId, "products.productId": productId, canvasData: allCanvasData }, { upsert: true }, { new: true };
+
+      if (!customize) {
+        const newCustomize = new Customize({
+          userId: userId,
+          products: [
+            {
+              productId: productId,
+              canvasData: allCanvasData,
+              customizedProductOption: true,
+            },
+          ],
+        });
+        await newCustomize.save();
+        return res.json({ success: true, message: "Canvas saved successfully", customize: newCustomize });
+      }
+
+      const existingProductIndex = customize.products.findIndex((product) => product.productId === productId);
+
+      if (existingProductIndex > -1) {
+        customize.products[existingProductIndex].canvasData = allCanvasData;
+        customize.products[existingProductIndex].customizedProductOption = true;
+      } else {
+        customize.products.push({
+          productId: productId,
+          canvasData: allCanvasData,
+          customizedProductOption: true,
+        });
+      }
+
+      await customize.save();
+
+      res.json({ success: true, message: "Canvas saved successfully", customize });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({error: "Error saving canvas data"})
+    }
   },
 };

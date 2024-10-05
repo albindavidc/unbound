@@ -22,21 +22,19 @@ const imageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 const variantSchema = new mongoose.Schema({
   // _id: {
   //   type: String,
-  //   unique: true,  // Ensures uniqueness
-  //   default: () => new mongoose.Types.ObjectId(),  // Generates a custom ID by default
-  // },
+  //   unique: true,  
+  //   default: () => new mongoose.Types.ObjectId(),  
   color: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to Color object ID
-    ref: "Color", // Reference to the 'Color' model
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Color",
     // required: true,
   },
   size: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to Size object ID
-    ref: "Size", // Reference to the 'Size' model
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Size", 
     // required: true,
   },
   stock: {
@@ -57,9 +55,9 @@ const ProductSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    wishlist:{
-      type:Boolean,
-      default:false,
+    wishlist: {
+      type: Boolean,
+      default: false,
     },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
@@ -73,25 +71,15 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     quantity: {
-      type: Number,   //Max product per person
+      type: Number, //Max product per person
     },
     primaryImages: { type: [imageSchema] },
     secondaryImages: { type: [imageSchema] },
     canvasData: {
-      front: {
-        type: mongoose.Schema.Types.Mixed,
-      },
-      back: {
-        type: mongoose.Schema.Types.Mixed,
-      },
-      left: {
-        type: mongoose.Schema.Types.Mixed,
-      },
-      right: {
-        type: mongoose.Schema.Types.Mixed,
-      }
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Customize",
     },
-    customizedProduct:{
+    customizedProduct: {
       type: Boolean,
       default: false,
     },
