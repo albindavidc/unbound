@@ -80,7 +80,6 @@
     font-size: 16px; /* Increase font size for better readability */
     text-align: center; /* Center text inside the input */
   }
-
 </style>
 
 <!-- Shop Details Section Begin -->
@@ -153,12 +152,19 @@
               <% }); %>
             </ul>
 
-
             <div class="mt-4">
-              <a href="/customizeProduct/<%=product._id%>" class="btn btn-dark"> Customize the <%= product.category.name %></a>
+              <a href="/customizeProduct/<%=product._id%>" class="btn btn-dark mb-4"> Customize the <%= product.category.name %></a>
+
+              <% if (customProduct === false) { %>
+                <button class="btn btn-outline-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
+                  Use Custom Design
+                </button>
+              <% }else{ %>
+                <button class="btn btn-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
+                  Using Custom Design
+                </button>
+                <% } %>
             </div>
-
-
           </div>
         </div>
 
@@ -170,8 +176,6 @@
       </div>
     </div>
   </div>
-
-  
 
   <div class="product__details__content">
     <div class="container">
@@ -433,6 +437,51 @@
 <%- include('../../views/partials/user/footer') %>
 
 <script>
+
+  async function customizeProductConfirm() {
+    const customDesignConfirm = document.getElementById("customDesignConfirm");
+    const productId = "<%= product._id %>"; 
+
+    let status = false;
+    if (customDesignConfirm.classList.contains('btn-outline-success')) {
+        customDesignConfirm.classList.remove('btn-outline-success');
+        customDesignConfirm.classList.add('btn-success');
+        customDesignConfirm.innerHTML = "Using Custom Design";
+        status = true;
+    } else {
+        customDesignConfirm.classList.remove('btn-success');
+        customDesignConfirm.classList.add('btn-outline-success');
+        customDesignConfirm.innerHTML = "Use Custom Design";
+        status = false;
+    }
+
+    try {
+        const response = await fetch("/product-details-customization", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"  
+            },
+            body: JSON.stringify({
+                productId: productId,  
+                status: status
+            })
+        });
+
+        if (response.ok) {
+            window.location.reload();  
+        } else {
+            console.error("Failed to update customization status.");
+        }
+    } catch (error) {
+        console.error("Error occurred while sending data to backend:", error);
+    }
+}
+
+document.getElementById("customDesignConfirm").addEventListener('click', () => {
+    customizeProductConfirm();
+});
+
+
   const customizeModalButton = document.getElementById("customizeModalButton");
   const modal = document.getElementById("openCustomizeModal");
   const closeBtn = document.getElementsByClassName("closeBtn")[0];

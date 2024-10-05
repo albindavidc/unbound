@@ -57,6 +57,7 @@ router.get("/user/product-list",userAuth,checkUserStatus, productController.load
 router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
 router.get("/customizeProduct/:id", userAuth,checkUserStatus, productController.loadCustomizeProduct)
 router.post("/save-canvas", productController.saveCustomizedImage)
+router.post("/product-details-customization", productController.productDetailsCustomConfirm)
 
 
 // User-Profile

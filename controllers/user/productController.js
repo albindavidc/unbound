@@ -179,6 +179,23 @@ module.exports = {
 
       console.log("this is product wishlist", productId);
 
+
+      const userId = req.session.user
+      // const customProduct = await Customize.find(
+      //   { userId: req.session.user, "products.productId": productId },
+      //   // { products: { $elemMatch: { productId: productId, } } }
+      // ).populate("products")
+
+      const customize = await Customize.findOne({ userId: userId });
+
+      let status ;
+      customize.products.forEach(item => {
+        if(item.productId.toString() === productId.toString()){
+          status = item.customizedProductOption
+        }
+      })
+
+      console.log( customize, status, "this is custom product");
       res.render("user/product-details", {
         productWishlist,
         productId,
@@ -189,6 +206,7 @@ module.exports = {
         cart,
         stocks,
         existingQuantity,
+        customProduct: status,
       });
     } catch (error) {
       console.error("Error fetching product details:", error);
@@ -225,7 +243,6 @@ module.exports = {
             {
               productId: productId,
               canvasData: allCanvasData,
-              customizedProductOption: true,
             },
           ],
         });
@@ -242,7 +259,6 @@ module.exports = {
         customize.products.push({
           productId: productId,
           canvasData: allCanvasData,
-          customizedProductOption: true,
         });
       }
 
@@ -251,7 +267,36 @@ module.exports = {
       res.json({ success: true, message: "Canvas saved successfully", customize });
     } catch (error) {
       console.error(error);
-      res.status(500).json({error: "Error saving canvas data"})
+      res.status(500).json({ error: "Error saving canvas data" });
+    }
+  },
+
+  productDetailsCustomConfirm: async (req, res) => {
+    try {
+      const { productId, status } = req.body;
+      const userId = req.session.user;
+
+      const customize = await Customize.findOne({ userId: userId });
+      let foundProduct = false;
+
+      console.log(productId, status, customize, userId, foundProduct, "this is hte message from the backend");
+
+      customize.products.forEach((item) => {
+        if (item.productId.toString() === productId.toString()) {
+          item.customizedProductOption = status;
+          foundProduct = true;
+        }
+      });
+
+      console.log(foundProduct, "the product has found");
+      if (foundProduct) {
+        await customize.save();
+        res.json({ message: "Customized product seleted" });
+      } else {
+        res.json({ message: "Your product is not customized" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Interal server error" });
     }
   },
 };
