@@ -13,9 +13,13 @@ const orderSchema = new Schema(
     },
     orderId: {
       type: String,
-      default: () => uuidv4(), // Generates a unique ID each time a new order is created
-      unique: true, // Ensures the orderId is unique in the database
+      default: () => uuidv4(), 
+      unique: true, 
       required: true,
+    },
+    customized:{
+      type: Boolean,
+      default: false,
     },
     items: [
       {
@@ -26,7 +30,7 @@ const orderSchema = new Schema(
         },
         variant: {
           type: ObjectId,
-          ref: "Variants", // Corrected ref path
+          ref: "Variants",
           // required: true,
         },
         color: {

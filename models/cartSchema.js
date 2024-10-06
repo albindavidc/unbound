@@ -9,6 +9,10 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    customized:{
+      type: Boolean,
+      default: false,
+    },
     items: [
       {
         productId: {
