@@ -3,7 +3,7 @@ const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
 const Cart = require("../../models/cartSchema");
 const User = require("../../models/userSchema");
-const Customize = require("../../models/customizedProduct")
+const Customize = require("../../models/customizedProduct");
 
 const handleCartUpdate = async (req, res, operation) => {
   try {
@@ -31,7 +31,7 @@ const handleCartUpdate = async (req, res, operation) => {
     // Check stock early
     const product = await Product.findById(productId).populate("variants");
     const variant = product.variants.find((v) => v._id.toString() === variantId);
-    console.log(product, variant, variantId, "this is the variant and stock from the backend")
+    console.log(product, variant, variantId, "this is the variant and stock from the backend");
     const stock = variant.stock;
 
     if (isNaN(stock) || stock <= 0) {
@@ -46,8 +46,8 @@ const handleCartUpdate = async (req, res, operation) => {
       return res.status(400).json({ success: false, message: "Quantity exceeds product stock" });
     } else if (!incrementOrDecrement && item.quantity <= 1) {
       return res.status(400).json({ success: false, message: "Cannot decrease quantity below 1" });
-    } else if (incrementOrDecrement && item.quantity >= product.quantity){
-      return res.status(400).json({success: false, message: "This is the max order for this order"})
+    } else if (incrementOrDecrement && item.quantity >= product.quantity) {
+      return res.status(400).json({ success: false, message: "This is the max order for this order" });
     }
 
     updatedQuantity = incrementOrDecrement ? item.quantity + 1 : item.quantity - 1;
@@ -90,26 +90,25 @@ module.exports = {
       let sellingPrice;
       let bundlePrice;
       let cartQuantity;
-      
-      cart.items.forEach(item => {
-        const product = item.productId;  // Assuming productId is an object, not an array.
-      
+
+      cart.items.forEach((item) => {
+        const product = item.productId; // Assuming productId is an object, not an array.
+
         cartQuantity = item.quantity;
-        if (product) {  // Ensure product exists
+        if (product) {
+          // Ensure product exists
           bundleQuantity = product.bundleQuantity;
           sellingPrice = product.sellingPrice;
           bundlePrice = product.bundlePrice;
         }
       });
-      
 
-      console.log("this s bundleQuantity", bundleQuantity, sellingPrice, cartQuantity, bundlePrice, cart.quantity)
+      console.log("this s bundleQuantity", bundleQuantity, sellingPrice, cartQuantity, bundlePrice, cart.quantity);
 
-
-      if(cartQuantity >= bundleQuantity){
-        sellingPrice = bundlePrice ;
+      if (cartQuantity >= bundleQuantity) {
+        sellingPrice = bundlePrice;
       }
-      
+
       let totalPriceOfEachProduct = 0;
       let errors = [];
       let totalPrice = 0;
@@ -121,7 +120,7 @@ module.exports = {
         totalPrice = 0;
       } else {
         for (const prod of cart.items) {
-          prod.price = prod.productId.bundleQuantity > prod.quantity ?  prod.productId.sellingPrice :prod.productId.bundlePrice ;
+          prod.price = prod.productId.bundleQuantity > prod.quantity ? prod.productId.sellingPrice : prod.productId.bundlePrice;
 
           const itemTotal = prod.price * prod.quantity;
           prod.itemTotal = itemTotal;
@@ -131,7 +130,7 @@ module.exports = {
         cart.totalPrice = totalPrice;
         cart.payable = totalPrice;
 
-        console.log("this is the total price", totalPriceOfEachProduct)
+        console.log("this is the total price", totalPriceOfEachProduct);
         // if category offer is active or product offer is active
 
         for (const item of cart.items) {
@@ -187,22 +186,18 @@ module.exports = {
       const getTotalPrice = await Cart.findOne({ userId }, { _id: 0, totalPrice: 1 });
       const totalPrices = getTotalPrice.totalPrice;
 
-      
       const errorStockCart = [];
-      for(const cartItems of cart.items){
-        
-        console.log("this is backend product variant quantity", cartItems.productId.variants)
-        cartItems.productId.variants.forEach( async item =>{
-          
-
-          console.log("this is product quantity", item.stock, cartItems.quantity)
-          if(item.stock < cartItems.quantity){
+      for (const cartItems of cart.items) {
+        console.log("this is backend product variant quantity", cartItems.productId.variants);
+        cartItems.productId.variants.forEach(async (item) => {
+          console.log("this is product quantity", item.stock, cartItems.quantity);
+          if (item.stock < cartItems.quantity) {
             errorStockCart.push(`${cartItems.productId.name} : Stock = ${item.stock}`);
           }
-        })
+        });
       }
 
-      console.log("this is the error message", errorStockCart)
+      console.log("this is the error message", errorStockCart);
 
       res.render("user/cart", {
         errorStockCart,
@@ -226,9 +221,6 @@ module.exports = {
     try {
       const { productId, colorId, sizeId, quantity, price } = req.body;
 
-
-      console.log("we have reached backend from wishlist", req.body)
-      // Find the user's cart (or create a new one if it doesn't exist)
       let cart = await Cart.findOne({ userId: req.session.user });
 
       if (!cart) {
@@ -254,7 +246,6 @@ module.exports = {
       );
 
       console.log(existingCartItem);
-
 
       // //Cart Quantity validation with product stock and cart added stock
       // const currentCartQuantity = existingCartItem ? existingCartItem.quantity : 0;
@@ -286,6 +277,20 @@ module.exports = {
       }
 
       await cart.save();
+
+      //Customized Product To Cart
+      const userId = req.session.user;
+      const customizedProduct = await Customize.findOne({ userId });
+
+      const products = customizedProduct.products.find((item) => item.productId.toString() === productId.toString());
+
+      if (customizedProduct && customizedProduct.products.length > 0) {
+        const product = customizedProduct.products.find((item) => item.productId.toString() === productId.toString());
+
+        if (product.customizedProductOption === true) {
+          await Cart.updateOne({ userId }, { $set: { customized: true } });
+        }
+      }
 
       res.json({ message: "Product added to cart", count: cart.items.length });
     } catch (error) {
