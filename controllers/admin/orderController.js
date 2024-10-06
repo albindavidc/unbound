@@ -23,10 +23,10 @@ module.exports = {
         .exec();
 
       orderDetails.forEach((order) => {
-        // Extract all statuses for the items in the order
+
+
         let itemStatuses = order.items.map((item) => item.status);
 
-        // Determine the common status based on the item statuses
         if (itemStatuses.includes("Return")) {
           order.commonStatus = "Return";
         } else if (itemStatuses.every((status) => status === "Shipped")) {
@@ -117,7 +117,7 @@ module.exports = {
     const orderId = req.params.id;
     const order = await Order.findById(orderId);
     const userId = order.customerId;
-    const customDesign = await Customize.findOne({ userId: userId });
+    let  customDesign = await Customize.findOne({ userId: userId });
 
     const checkProductId = customDesign.products.find((customItem) => {
       return order.items.some((orderItem) => customItem.productId.toString() === orderItem.productId.toString());
@@ -128,8 +128,9 @@ module.exports = {
     }
     
     const products = await Product.findOne({_id: checkProductId.productId})
-    console.log(checkProductId,products, "this is product id")
+    console.log(checkProductId, "this is product id")
     
+    customDesign = checkProductId
     res.render("admin/productCustomizeDownload", {
       order,
       customDesign,
