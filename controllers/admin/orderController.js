@@ -2,6 +2,7 @@ const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
 const Color = require("../../models/attributes/colorSchema");
 const Size = require("../../models/attributes/sizeSchema");
+const Customize = require("../../models/customizedProduct");
 
 module.exports = {
   getOrderList: async (req, res) => {
@@ -16,34 +17,34 @@ module.exports = {
         .populate({ path: "items.productId", select: "name price sellingPrice" })
         .populate({ path: "items.color", select: "name" })
         .populate({ path: "items.size", select: "name" })
-        .skip((page -1 ) * perPage)
+        .skip((page - 1) * perPage)
         .limit(perPage)
         .sort({ createdAt: -1 })
-        .exec()
-      
+        .exec();
+
       orderDetails.forEach((order) => {
         // Extract all statuses for the items in the order
-        let itemStatuses = order.items.map(item => item.status);
-        
+        let itemStatuses = order.items.map((item) => item.status);
+
         // Determine the common status based on the item statuses
         if (itemStatuses.includes("Return")) {
           order.commonStatus = "Return";
-        } else if (itemStatuses.every(status => status === "Shipped")) {
+        } else if (itemStatuses.every((status) => status === "Shipped")) {
           order.commonStatus = "Shipped";
-        } else if (itemStatuses.every(status => status === "Delivered")) {
+        } else if (itemStatuses.every((status) => status === "Delivered")) {
           order.commonStatus = "Delivered";
-        } else if (itemStatuses.every(status => status === "Cancelled")) {
+        } else if (itemStatuses.every((status) => status === "Cancelled")) {
           order.commonStatus = "Cancelled";
         } else {
           order.commonStatus = "Pending";
         }
         console.log(`Order ID: ${order._id}, Common status: ${order.commonStatus}`);
       });
-      
+
       const count = await Order.countDocuments();
-      
+
       const nextPage = parseInt(page) + 1;
-      const totalPages = Math.ceil(count/perPage);
+      const totalPages = Math.ceil(count / perPage);
       const hasPrevPage = page > 1;
       const hasNextPage = page < totalPages;
 
@@ -67,7 +68,7 @@ module.exports = {
 
   updateDeliveryStatus: async (req, res) => {
     try {
-      const {orderId} = req.params
+      const { orderId } = req.params;
       const { itemIndex, status } = req.body;
 
       // Update the status of all items in the order
@@ -76,7 +77,7 @@ module.exports = {
       const order = await Order.findById(orderId);
       order.items[itemIndex].status = status;
 
-      console.log("this is order", order)
+      console.log("this is order", order);
 
       switch (status) {
         case "Shipped":
@@ -105,8 +106,7 @@ module.exports = {
       }
 
       await order.save();
-      res.json({success: true, message: "Order updated successfully" });
-
+      res.json({ success: true, message: "Order updated successfully" });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -114,24 +114,23 @@ module.exports = {
   },
 
   productCustomized: async (req, res) => {
-
     const orderId = req.params.id;
-    const order = await Order.findById(orderId)
-    const customDesign = await Customize.findById(userId)
-    const checkProductId = customDesign.products.forEach(customItem =>{
-      order.items.forEach(orderItem => {
-        if(customItem.productId.toString() === orderItem.productId.toString()){
-          return true;
-        }
-      })
-    })
+    const order = await Order.findById(orderId);
+    const userId = order.customerId;
+    const customDesign = await Customize.findOne({ userId: userId });
 
-    // if(checkProductId === true){
-    //   if(customDesign.)
-    // }
+    const checkProductId = customDesign.products.find((customItem) => {
+      return order.items.some((orderItem) => customItem.productId.toString() === orderItem.productId.toString());
+    });
+
+    if (!checkProductId) {
+      return res.status(404).send("No matching custom design for this product.");
+    }
 
     res.render("admin/productCustomizeDownload", {
-      order
-    })
-  }
+      order,
+      customDesign,
+      checkProductId,
+    });
+  },
 };

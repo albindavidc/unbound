@@ -101,11 +101,13 @@
                         <% }) %>
                     </td>
                     <td>
-                      <% if (order.customized === true) { %>
-                        <a href="/admin/customize-download/<%= order._id %>" class="btn btn-dark">Download</a>
+                      <% order.items.forEach((item, itemIndex)=> { %>
+                      <% if (item.customized === true) { %>
+                        <a href="/admin/customize-download/<%= order._id %>" class="d-flex align-items-center justify-content-center btn btn-dark mb-2">Download</a>
                       <% }else { %>
                         <p class="d-flex align-items-center justify-content-center">No</p>
-                      <% } %> 
+                      <% } %>
+                      <% }) %>
                     </td>
                     <td>
                       <% order.items.forEach((item, itemIndex)=> { %>

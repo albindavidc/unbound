@@ -1,30 +1,124 @@
 <%- include('../partials/admin/header') %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 
+<style>
+  .image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* To center the button below the image */
+  }
+  
+  .download-btn {
+    margin-top: 10px; /* Adds some spacing between the image and the button */
+  }
+</style>
 
 <section>
+  <div class="p-2">
     <table class="table">
-        <thead class="table">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Front Image</th>
-                <th scope="col">Back Image</th>
-                <th scope="col">Left Image</th>
-                <th scope="col">Right Image</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% order.forEach((order, index)) => { %>
-                <tr>
-                    <td>
-                         
-                    </td>
-                    <td>
-                        
-                    </td>
-                </tr>
-
-            <% } %>
-
-        </tbody>
+      <thead class="table">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Front Image</th>
+          <th scope="col">Back Image</th>
+          <th scope="col">Left Image</th>
+          <th scope="col">Right Image</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if ( customDesign.productId = checkProductId) { %> <% customDesign.products.forEach(item => { %>
+        <tr>
+          <td><%= item.productId %></td>
+          <td class="col">
+            <div class="image-container">
+              <img id="frontImage" src="<%= item.canvasData.front.backgroundImage %>" width="250" />
+              <button class="btn btn-dark download-btn" onclick="downloadCanvas('front')">Download Front</button>
+            </div>
+          </td>
+          
+          <td>
+            <div class="image-wrapper">
+              <img id="backImage" src="<%= item.canvasData.back.backgroundImage %>" width="250" />
+              <div class="button-wrapper">
+                <button class="btn btn-dark" onclick="downloadCanvas('back')">Download Back</button>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="image-wrapper">
+              <img id="leftImage" src="<%= item.canvasData.left.backgroundImage %>" width="250" />
+              <div class="button-wrapper">
+                <button class="btn btn-dark" onclick="downloadCanvas('left')">Download Left</button>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="image-wrapper">
+              <img id="rightImage" src="<%= item.canvasData.right.backgroundImage %>" width="250" />
+              <div class="button-wrapper">
+                <button class="btn btn-dark" onclick="downloadCanvas('right')">Download Right</button>
+              </div>
+            </div>
+          </td>
+          
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="5">No custom design found for this product.</td>
+        </tr>
+        <% } %>
+      </tbody>
     </table>
+  </div>
 </section>
+
+<%- include('../partials/admin/footer') %>
+<script src="https://unpkg.com/idb@5.0.8/build/iife/index-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function downloadCanvas(side) {
+    const canvasElement = document.createElement("canvas");
+    const canvasData = <%- JSON.stringify(customDesign.products[0].canvasData) %>; // Ensure products array has data
+
+    const ctx = canvasElement.getContext("2d");
+
+    const backgroundImageUrl = canvasData[side].backgroundImage;
+
+    // Load the image using fabric.util.loadImage and set the canvas size to match the image
+    fabric.util.loadImage(backgroundImageUrl, function (img) {
+      const image = new fabric.Image(img);
+
+      // Adjust the canvas size to match the image dimensions
+      canvasElement.width = image.width;
+      canvasElement.height = image.height;
+
+      // Create a new Fabric.js canvas
+      const canvas = new fabric.Canvas(canvasElement);
+
+      // Set the background image and scale it to fit the canvas dimensions
+      canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
+        scaleX: canvasElement.width / image.width,
+        scaleY: canvasElement.height / image.height,
+      });
+
+      // Load the canvas content from canvasData and fit it to the canvas
+      canvas.loadFromJSON(canvasData[side].content, () => {
+        // Ensure the canvas is rendered with proper dimensions and scaling
+        canvas.renderAll();
+
+        // Convert the canvas to an image and trigger the download
+        const imageUrl = canvas.toDataURL({
+          format: "png",
+          multiplier: 2, // Adjust multiplier if you need higher resolution
+        });
+
+        // Create a download link
+        const link = document.createElement("a");
+        link.href = imageUrl;
+        link.download = `${side}-custom-design.png`;
+        link.click();
+      });
+    });
+  }
+</script>
