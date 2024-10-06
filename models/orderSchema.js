@@ -28,6 +28,10 @@ const orderSchema = new Schema(
           ref: "Product",
           required: true,
         },
+        customized:{
+          type: Boolean,
+          default: false,
+        },
         variant: {
           type: ObjectId,
           ref: "Variants",

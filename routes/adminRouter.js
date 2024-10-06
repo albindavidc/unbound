@@ -139,6 +139,7 @@ router
   .get(orderController.getOrderList);
 
 router.put('/orderList/updateOrder/:orderId', orderController.updateDeliveryStatus);
+router.get("/customize-download/:id", orderController.productCustomized)
 
 
 /**

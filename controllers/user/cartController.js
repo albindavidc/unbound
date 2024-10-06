@@ -282,16 +282,13 @@ module.exports = {
       const userId = req.session.user;
       const customizedProduct = await Customize.findOne({ userId });
 
-      const products = customizedProduct.products.find((item) => item.productId.toString() === productId.toString());
-
       if (customizedProduct && customizedProduct.products.length > 0) {
         const product = customizedProduct.products.find((item) => item.productId.toString() === productId.toString());
 
-        if (product.customizedProductOption === true) {
-          await Cart.updateOne({ userId }, { $set: { customized: true } });
+        if (product && product.customizedProductOption === true) {
+          await Cart.updateOne({ userId, "items.productId": productId }, { $set: { "items.$.customized": true } });
         }
       }
-
       res.json({ message: "Product added to cart", count: cart.items.length });
     } catch (error) {
       console.error(error);

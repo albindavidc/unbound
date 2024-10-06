@@ -20,6 +20,10 @@ const cartSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
+        customized:{
+          type: Boolean,
+          default: false,
+        },
         variantId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Variant",

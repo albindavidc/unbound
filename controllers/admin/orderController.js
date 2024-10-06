@@ -112,4 +112,26 @@ module.exports = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+
+  productCustomized: async (req, res) => {
+
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId)
+    const customDesign = await Customize.findById(userId)
+    const checkProductId = customDesign.products.forEach(customItem =>{
+      order.items.forEach(orderItem => {
+        if(customItem.productId.toString() === orderItem.productId.toString()){
+          return true;
+        }
+      })
+    })
+
+    // if(checkProductId === true){
+    //   if(customDesign.)
+    // }
+
+    res.render("admin/productCustomizeDownload", {
+      order
+    })
+  }
 };
