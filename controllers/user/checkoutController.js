@@ -5,7 +5,8 @@ const Address = require("../../models/addressSchema");
 const Product = require("../../models/productSchema");
 const Payment = require("../../models/paymentSchema");
 const Coupon = require("../../models/couponSchema");
-const Wallet = require("../../models/walletSchema")
+const Wallet = require("../../models/walletSchema");
+const Customize = require("../../models/customizedProduct");
 
 const mongoose = require("mongoose");
 
@@ -51,7 +52,9 @@ module.exports = {
   getCheckout: async (req, res) => {
     const userId = req.session.user;
 
-    const userCart = await Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity");
+    const userCart = await Cart.findOne({ userId: userId }).populate(
+      "items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity"
+    );
 
     let user = await User.findById(userId);
 
@@ -77,16 +80,14 @@ module.exports = {
     let totalPrice = 0;
     let totalPriceBeforeOffer = 0;
 
-
     for (const prod of userCart.items) {
-      prod.price = prod.productId.bundleQuantity > prod.quantity ?  prod.productId.sellingPrice :prod.productId.bundlePrice ;
+      prod.price = prod.productId.bundleQuantity > prod.quantity ? prod.productId.sellingPrice : prod.productId.bundlePrice;
 
       const itemTotal = prod.price * prod.quantity;
       prod.itemTotal = itemTotal;
       totalPrice += itemTotal;
       totalPriceBeforeOffer += prod.price;
     }
-
 
     // Apply coupon discount if applicable
     let couponDiscount = 0;
@@ -96,8 +97,7 @@ module.exports = {
         couponDiscount = totalPrice * (coupon.rateOfDiscount / 100);
         totalPrice -= couponDiscount;
 
-        await Cart.findOneAndUpdate({_id: userCart._id}, {$set: {totalPrice:totalPrice, couponDiscount: couponDiscount}})
-
+        await Cart.findOneAndUpdate({ _id: userCart._id }, { $set: { totalPrice: totalPrice, couponDiscount: couponDiscount } });
       } else {
         // If the total is less than the minimum purchase amount, remove the coupon
         userCart.coupon = undefined;
@@ -123,24 +123,24 @@ module.exports = {
       isCOD = false;
     }
 
-    const userWallet = await Wallet.find({userId: userId})
+    const userWallet = await Wallet.find({ userId: userId });
 
     let newWallet;
-    userWallet.forEach(items=> {
+    userWallet.forEach((items) => {
       newWallet = items.balance;
-    })
-    console.log(userWallet,"this is user wallet")
-    
-    let isInsufficient ;
-    if(totalPrice > newWallet){
+    });
+    console.log(userWallet, "this is user wallet");
+
+    let isInsufficient;
+    if (totalPrice > newWallet) {
       isInsufficient = true;
-    }else{
+    } else {
       isInsufficient = false;
     }
 
-    console.log("this is isInsufficient", totalPrice, newWallet, isInsufficient)
+    console.log("this is isInsufficient", totalPrice, newWallet, isInsufficient);
 
-    const getPayable = await Cart.findOne({ userId }, {_id:0, payable: 1 });
+    const getPayable = await Cart.findOne({ userId }, { _id: 0, payable: 1 });
     const payable = getPayable.payable;
 
     res.render("user/checkout", {
@@ -187,11 +187,8 @@ module.exports = {
 
       let userCart = await Cart.findOne({ userId: userId });
 
-
       const status = paymentMethod == "COD" || paymentMethod == "Wallet" ? "Confirmed" : "Pending";
       const paymentStatus = paymentMethod === "COD" ? "Pending" : paymentMethod === "Wallet" ? "Paid" : "Pending";
-
-
 
       let order;
 
@@ -225,7 +222,13 @@ module.exports = {
         });
       }
 
-      console.log("these are the orders:", order);
+
+      const cartUpdate = await Cart.findOne({ userId });
+      if (cartUpdate && cartUpdate.customized === true) {
+        order.customized  = true;
+        console.log(cartUpdate.customized, "this is cartUpdate")
+      }
+
 
       order.items.forEach((item) => {
         item.status = status;
@@ -239,14 +242,13 @@ module.exports = {
         case "COD":
           // Save the order
           const orderPlaced = await order.save();
-          req.session.orderDetails = orderPlaced; // Store order details in session
+          req.session.orderDetails = orderPlaced;
 
           if (orderPlaced) {
             if (order.coupon) {
               await Coupon.findOneAndUpdate({ _id: userCart.coupon }, { $push: { usedBy: { userId: req.session.user } } });
             }
 
-            // // reduce stock of the variant
             for (const item of userCart.items) {
               const product = await Product.findById(item.productId);
 
@@ -262,23 +264,21 @@ module.exports = {
                 return res.status(404).json({ error: "Variant not found" });
               }
 
-              // Check if there's enough stock
               if (variant.stock < item.quantity) {
                 return res.status(400).json({ error: "Insufficient stock" });
               }
 
-              console.log("this is product", product);
-              console.log("this is variant", variant);
-              console.log("this is stock", variant.stock);
-              console.log("this is the quantity", item.quantity);
-              // Reduce the stock by the quantity in the cart
+              // console.log("this is product", product);
+              // console.log("this is variant", variant);
+              // console.log("this is stock", variant.stock);
+              // console.log("this is the quantity", item.quantity);
+
               variant.stock -= item.quantity;
 
-              // Attach product details to the order item
               item.productDetail = {
                 name: product.name,
-                color: variant.color.name, // Assuming color is an object with a `name` property
-                size: variant.size.value, // Assuming size is an object with a `value` property
+                color: variant.color.name,
+                size: variant.size.value,
                 price: product.price,
               };
 
@@ -337,85 +337,70 @@ module.exports = {
           break;
 
         case "Wallet":
+          const orderCreate = await Order.create(order);
 
-        const orderCreate = await Order.create(order);
+          if (orderCreate) {
+            let wallet = await Wallet.findOne({ userId: req.session.user });
 
-        if(orderCreate){
-          let wallet = await Wallet.findOne({ userId: req.session.user });
-          
-          wallet.balance = parseInt(wallet.balance) - parseInt(orderCreate.totalPrice);
-          
-          wallet.transactions.push({
-            date: new Date(),
-            amount: parseInt(orderCreate.totalPrice),
-            message: "Order placed successfully",
-            type: "Debit",
-          })
+            wallet.balance = parseInt(wallet.balance) - parseInt(orderCreate.totalPrice);
 
-          await wallet.save();
+            wallet.transactions.push({
+              date: new Date(),
+              amount: parseInt(orderCreate.totalPrice),
+              message: "Order placed successfully",
+              type: "Debit",
+            });
 
-          // reduce stock of the variant
-          for (const item of userCart.items) {
-            const product = await Product.findById(item.productId).catch(
-              (error) => {
+            await wallet.save();
+
+            // reduce stock of the variant
+            for (const item of userCart.items) {
+              const product = await Product.findById(item.productId).catch((error) => {
                 console.error(error);
-                return res
-                  .status(500)
-                  .json({ error: "Failed to find product" });
+                return res.status(500).json({ error: "Failed to find product" });
+              });
+
+              if (!product) {
+                return res.status(404).json({ error: "Product not found" });
               }
-            );
 
-            if (!product) {
-              return res.status(404).json({ error: "Product not found" });
+              const variantIndex = product.variants.findIndex((variant) => variant._id.toString() === item.variantId.toString());
+
+              if (variantIndex === -1) {
+                return res.status(404).json({ error: "Variant not found" });
+              }
+
+              console.log(product.variants[variantIndex]);
+
+              product.variants[variantIndex].stock -= item.quantity;
+
+              await product.save().catch((error) => {
+                console.error(error);
+                return res.status(500).json({ error: "Failed to update product stock" });
+              });
             }
 
-            const variantIndex = product.variants.findIndex(
-              (variant) => variant._id.toString() === item.variantId.toString()
-            );
+            await Cart.clearCart(req.session.user);
 
-            if (variantIndex === -1) {
-              return res.status(404).json({ error: "Variant not found" });
+            orderCreate.status = "Confirmed";
+            orderCreate.items.forEach((item) => {
+              item.status = "Confirmed";
+            });
+
+            await orderCreate.save();
+
+            // coupon is used
+            if (order.coupon) {
+              await Coupon.findOneAndUpdate({ _id: userCart.coupon }, { $push: { usedBy: { userId: req.session.user } } });
             }
 
-            console.log(product.variants[variantIndex]);
-
-            product.variants[variantIndex].stock -= item.quantity;
-
-            await product.save().catch((error) => {
-              console.error(error);
-              return res
-                .status(500)
-                .json({ error: "Failed to update product stock" });
+            return res.status(200).json({
+              success: true,
+              message: "Order has been placed successfully.",
             });
           }
 
-          await Cart.clearCart(req.session.user);
-
-          orderCreate.status = "Confirmed";
-          orderCreate.items.forEach((item) => {
-            item.status = "Confirmed";
-          });
-
-          await orderCreate.save();
-
-          // coupon is used
-          if (order.coupon) {
-            await Coupon.findOneAndUpdate(
-              { _id: userCart.coupon },
-              { $push: { usedBy: { userId: req.session.user } } }
-            );
-          }
-
-
-          return res.status(200).json({
-            success: true,
-            message: "Order has been placed successfully.",
-          });
-        }
-
-        break;
-
-
+          break;
 
         default:
           return res.status(400).json({ error: "Invalid payment method" });
@@ -472,16 +457,12 @@ module.exports = {
       const orderID = await Payment.findOne({ paymentId }, { _id: 0, orderId: 1 });
 
       const order_id = orderID.orderId;
-      const updateOrder = 
-      await Order.updateOne(
+      const updateOrder = await Order.updateOne(
         { _id: order_id },
         { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } }
       );
-      
 
-      let couponId = await Order.findOne({ _id: order_id }).populate(
-        "coupon"
-      );
+      let couponId = await Order.findOne({ _id: order_id }).populate("coupon");
 
       console.log(couponId);
       if (couponId.coupon) {
@@ -490,11 +471,11 @@ module.exports = {
           let updateCoupon = await Coupon.findByIdAndUpdate(
             { _id: couponId },
             {
-              $push: { usedBy: {userId: customerId} },
+              $push: { usedBy: { userId: customerId } },
             },
             {
               new: true,
-              upsert:true,
+              upsert: true,
             }
           );
         }

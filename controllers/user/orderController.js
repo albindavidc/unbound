@@ -149,8 +149,6 @@ module.exports = {
     const { orderId } = req.params;
     const { action, cancelReason, returnReason, orderCancelRefundMethod, orderReturnRefundMethod } = req.body;
 
-    console.log("Received orderId:", orderId, action); // Debugging the received orderId
-
     try {
       let result;
 
@@ -158,11 +156,11 @@ module.exports = {
         if (orderReturnRefundMethod === "RefundToBankAccount") {
           result = await Order.findOneAndUpdate(
             {
-              "items.orderID": orderId, // Corrected to search by the orderID inside items array
+              "items.orderID": orderId, 
             },
             {
               $set: {
-                "items.$.status": "Return", // Use $ to update the matched element in the array
+                "items.$.status": "Return", 
                 "items.$.paymentStatus": "Refund",
                 "items.$.returnReason": returnReason,
                 "items.$.returnRefundMethod": "Refund to Bank Account",
