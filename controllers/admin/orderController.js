@@ -126,11 +126,15 @@ module.exports = {
     if (!checkProductId) {
       return res.status(404).send("No matching custom design for this product.");
     }
-
+    
+    const products = await Product.findOne({_id: checkProductId.productId})
+    console.log(checkProductId,products, "this is product id")
+    
     res.render("admin/productCustomizeDownload", {
       order,
       customDesign,
       checkProductId,
+      products
     });
   },
 };
