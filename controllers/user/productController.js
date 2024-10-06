@@ -188,7 +188,7 @@ module.exports = {
 
       const customize = await Customize.findOne({ userId: userId });
 
-      let status ;
+      let status = false ;
       customize.products.forEach(item => {
         if(item.productId.toString() === productId.toString()){
           status = item.customizedProductOption
