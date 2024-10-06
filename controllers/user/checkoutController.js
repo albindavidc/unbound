@@ -223,11 +223,11 @@ module.exports = {
       }
 
 
-      const cartUpdate = await Cart.findOne({ userId });
-      if (cartUpdate && cartUpdate.customized === true) {
-        order.customized  = true;
-        console.log(cartUpdate.customized, "this is cartUpdate")
-      }
+      // const cartUpdate = await Cart.findOne({ userId });
+      // if (cartUpdate && cartUpdate.customized === true) {
+      //   order.customized  = true;
+      //   console.log(cartUpdate.customized, "this is cartUpdate")
+      // }
 
 
       order.items.forEach((item) => {
