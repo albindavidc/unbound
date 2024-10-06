@@ -62,33 +62,32 @@
       <tbody>
         <% if ( customDesign.productId = checkProductId) { %>
         <tr>
-          <td ><%= products.name %></td>
+          <td style="vertical-align:middle;">
+            <div class="d-flex justify-content-center align-items-center flex-column">
+              <div class="mb-4"><%= products.name %></div>
+              <div>
+                <button class="btn btn-dark" onclick="downloadAllDesigns()">Download All Designs</button>
+              </div>
+            </div>
+          </td>
           <td class="col">
             <div class="image-container">
               <img id="frontImage" width="250" />
-
-              <button class="btn btn-dark download-btn" onclick="downloadCanvas('front')">Download Front</button>
             </div>
           </td>
           <td class="col">
             <div class="image-container">
               <img id="backImage" width="250" />
-
-              <button class="btn btn-dark download-btn" onclick="downloadCanvas('back')">Download Front</button>
             </div>
           </td>
           <td class="col">
             <div class="image-container">
               <img id="leftImage" width="250" />
-
-              <button class="btn btn-dark download-btn" onclick="downloadCanvas('left')">Download Front</button>
             </div>
           </td>
           <td class="col">
             <div class="image-container">
               <img id="rightImage" width="250" />
-
-              <button class="btn btn-dark download-btn" onclick="downloadCanvas('right')">Download Front</button>
             </div>
           </td>
         </tr>
@@ -107,6 +106,9 @@
 <script src="https://unpkg.com/idb@5.0.8/build/iife/index-min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
+
 <script>
   let frontImage = document.getElementById("frontImage");
   let backImage = document.getElementById("backImage");
@@ -124,30 +126,24 @@
     fabric.util.loadImage(backgroundImageUrl, function (img) {
       const image = new fabric.Image(img);
 
-      // Adjust the canvas size to match the image dimensions
       canvasElement.width = image.width;
       canvasElement.height = image.height;
 
-      // Create a new Fabric.js canvas
       const canvas = new fabric.Canvas(canvasElement);
 
-      // Set the background image and scale it to fit the canvas dimensions
       canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
         scaleX: canvasElement.width / image.width,
         scaleY: canvasElement.height / image.height,
       });
 
-      // Load the canvas content from canvasData and fit it to the canvas
       canvas.loadFromJSON(canvasData[item].content, () => {
         canvas.renderAll();
 
-        // Convert the canvas to an image
         const imageUrl = canvas.toDataURL({
           format: "png",
           multiplier: 2,
         });
 
-        // Assign the image to the appropriate img tag
         if (item === 'front') {
           frontImage.src = imageUrl;
         } else if (item === 'back') {
@@ -161,49 +157,62 @@
     });
   });
 
+  function downloadAllDesigns() {
+    const sides = ['front', 'back', 'left', 'right'];
+    const zip = new JSZip();
 
-      function downloadCanvas(side) {
+    let promises = sides.map((side) => {
+      return new Promise((resolve, reject) => {
         const canvasElement = document.createElement("canvas");
-        const canvasData = <%- JSON.stringify(customDesign.products[0].canvasData) %>; // Ensure products array has data
-
         const ctx = canvasElement.getContext("2d");
 
         const backgroundImageUrl = canvasData[side].backgroundImage;
 
-        // Load the image using fabric.util.loadImage and set the canvas size to match the image
         fabric.util.loadImage(backgroundImageUrl, function (img) {
           const image = new fabric.Image(img);
 
-          // Adjust the canvas size to match the image dimensions
           canvasElement.width = image.width;
           canvasElement.height = image.height;
 
-          // Create a new Fabric.js canvas
           const canvas = new fabric.Canvas(canvasElement);
 
-          // Set the background image and scale it to fit the canvas dimensions
           canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
             scaleX: canvasElement.width / image.width,
             scaleY: canvasElement.height / image.height,
           });
 
-          // Load the canvas content from canvasData and fit it to the canvas
           canvas.loadFromJSON(canvasData[side].content, () => {
-            // Ensure the canvas is rendered with proper dimensions and scaling
             canvas.renderAll();
 
-            // Convert the canvas to an image and trigger the download
             const imageUrl = canvas.toDataURL({
               format: "png",
-              multiplier: 2, // Adjust multiplier if you need higher resolution
+              multiplier: 2, 
             });
 
-            // Create a download link
-            const link = document.createElement("a");
-            link.href = imageUrl;
-            link.download = `${side}-custom-design.png`;
-            link.click();
+            fetch(imageUrl)
+              .then(res => res.blob())
+              .then(blob => {
+                zip.file(`${side}-custom-design.png`, blob);
+                resolve();
+              })
+              .catch(err => reject(err));
           });
         });
-      }
+      });
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        zip.generateAsync({ type: 'blob' })
+          .then((content) => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(content);
+            link.download = 'custom-designs.zip';
+            link.click();
+          });
+      })
+      .catch(err => {
+        console.error("Error generating zip file:", err);
+      });
+  }
 </script>
