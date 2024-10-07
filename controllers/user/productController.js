@@ -6,6 +6,7 @@ const Size = require("../../models/attributes/sizeSchema");
 const Variants = require("../../models/attributes/variantSchema");
 const Cart = require("../../models/cartSchema");
 const Customize = require("../../models/customizedProduct");
+const Order = require("../../models/orderSchema")
 
 const mongoose = require("mongoose");
 
@@ -131,7 +132,8 @@ module.exports = {
         .populate("brand")
         .populate("variants.stock")
         .populate("wishlist")
-        .populate("bundlePrice bundleQuantity quantity");
+        .populate("bundlePrice bundleQuantity quantity")
+        .populate("ratings")
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });

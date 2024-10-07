@@ -156,14 +156,12 @@
               <a href="/customizeProduct/<%=product._id%>" class="btn btn-dark mb-4"> Customize the <%= product.category.name %></a>
 
               <% if (customProduct === false) { %>
-                <button class="btn btn-outline-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
-                  Use Custom Design
-                </button>
+              <button class="btn btn-outline-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
+                Use Custom Design
+              </button>
               <% }else{ %>
-                <button class="btn btn-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
-                  Using Custom Design
-                </button>
-                <% } %>
+              <button class="btn btn-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">Using Custom Design</button>
+              <% } %>
             </div>
           </div>
         </div>
@@ -339,7 +337,20 @@
             <div class="comments-area">
               <div class="row">
                 <div class="col-lg-8">
-                  <h4 class="mb-30">Customer questions & answers</h4>
+                  
+                  <% product.ratings.forEach(rating => { %> 
+
+
+                  <div class="rating mt-4" id="starRating" data-product-id="" data-order-id="">
+                    <%=rating.user.name%>
+                    <% for( let i = 1; i <= 5; i++ ) { %>
+                    <strong> <i class="fa fa-star <%= i <= rating.rating ? 'text-warning': 'disabled' %>" data-value="<%= i %>"></i></strong> 
+                    <% } %>
+                  </div>
+
+                  <p class="">Review: <%= rating.review %></p>
+                  <%})%>
+
                   <div class="comment-list"></div>
                 </div>
               </div>
@@ -418,50 +429,48 @@
 <%- include('../../views/partials/user/footer') %>
 
 <script>
-
   async function customizeProductConfirm() {
     const customDesignConfirm = document.getElementById("customDesignConfirm");
-    const productId = "<%= product._id %>"; 
+    const productId = "<%= product._id %>";
 
     let status = false;
-    if (customDesignConfirm.classList.contains('btn-outline-success')) {
-        customDesignConfirm.classList.remove('btn-outline-success');
-        customDesignConfirm.classList.add('btn-success');
-        customDesignConfirm.innerHTML = "Using Custom Design";
-        status = true;
+    if (customDesignConfirm.classList.contains("btn-outline-success")) {
+      customDesignConfirm.classList.remove("btn-outline-success");
+      customDesignConfirm.classList.add("btn-success");
+      customDesignConfirm.innerHTML = "Using Custom Design";
+      status = true;
     } else {
-        customDesignConfirm.classList.remove('btn-success');
-        customDesignConfirm.classList.add('btn-outline-success');
-        customDesignConfirm.innerHTML = "Use Custom Design";
-        status = false;
+      customDesignConfirm.classList.remove("btn-success");
+      customDesignConfirm.classList.add("btn-outline-success");
+      customDesignConfirm.innerHTML = "Use Custom Design";
+      status = false;
     }
 
     try {
-        const response = await fetch("/product-details-customization", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"  
-            },
-            body: JSON.stringify({
-                productId: productId,  
-                status: status
-            })
-        });
+      const response = await fetch("/product-details-customization", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: productId,
+          status: status,
+        }),
+      });
 
-        if (response.ok) {
-            window.location.reload();  
-        } else {
-            console.error("Failed to update customization status.");
-        }
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        console.error("Failed to update customization status.");
+      }
     } catch (error) {
-        console.error("Error occurred while sending data to backend:", error);
+      console.error("Error occurred while sending data to backend:", error);
     }
-}
+  }
 
-document.getElementById("customDesignConfirm").addEventListener('click', () => {
+  document.getElementById("customDesignConfirm").addEventListener("click", () => {
     customizeProductConfirm();
-});
-
+  });
 
   const customizeModalButton = document.getElementById("customizeModalButton");
   const modal = document.getElementById("openCustomizeModal");
