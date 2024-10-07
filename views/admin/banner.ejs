@@ -3,7 +3,7 @@
 <style>
   body {
     background-color: rgb(0, 0, 0);
-  } 
+  }
   .userProfileMain {
     width: 100%;
     height: 30%;
@@ -19,8 +19,18 @@
     font-size: 6vw;
   }
 
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
+  /* Add Banner */
+  .error {
+    color: rgb(255, 0, 0);
+  }
+
+  .crop-banner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    width: 30rem;
   }
 </style>
 
@@ -33,26 +43,127 @@
 </section>
 
 <section>
+  <div class="container d-flex flex-wrap flex-md-nowrap pt-3 pb-2 mb-3">
+    <div class="btn-toolbar mb-2 mb-md-0 ms-auto d-flex justify-content-end align-items-end">
+      <a href="#addBanner" data-bs-toggle="modal">
+        <button type="button" class="btn btn-sm btn-outline-success">Add Banner</button>
+      </a>
+    </div>
+  </div>
+
   <div class="card" style="margin: 50px">
     <div class="card-body">
       <table class="table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Place</th>
-            <th>Current Image</th>
-            <th>Change</th>
+            <th scope="col">#</th>
+            <th scope="col">Image</th>
+            <th scope="col">Name</th>
+            <th scope="col">Reference</th>
+            <th scope="col">Status</th>
+            <th scope="col">Delete/Edit</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><%= %></td>
-            <td><%= %></td>
-            <td><%= %></td>
-            <td><%= %></td>
+          <% if (banners !== 'undefined' && banners.length > 0) { %> <% banners.forEach((banner,index) => { %>
+          <tr class="align-middle text-center">
+            <td><%= index +1 %></td>
+            <td><img width="290rem" class="mx-auto d-block img-fluid img-thumbnail" src="/upload/banners/<%= banner.image.filename %>" alt="" /></td>
+            <td><%= banner.name %></td>
+            <td><a href="<%= banner.reference %>"></a></td>
+            <% if (banner.isActive) { %>
+            <td class="text-success">Listed</td>
+            <% }else{ %>
+            <td class="text-danger">Unlisted</td>
+            <% } %>
+
+            <td>
+              <div class="btn-group mx-2" role="group" aria-label="Delete/Edit Button">
+                <div class="d-flex align-items-center">
+                  <a href="/admin/banner/edit-banner/<%= banner._id %>" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button type="button" onclick="deleteBanner('<%= banner._id %>', '<% banner.image.filename %>')" class="btn btn-sm btn-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </td>
           </tr>
+
+          <% }) %> <% }else{ %>
+          <tr>
+            <td colspan="6" class="text-center text-danger table-danger">No banners found</td>
+          </tr>
+
+          <% } %>
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- Banner ADD -->
+  <div class="modal fade"  id="addBanner" tabindex="-1" aria-labelledby="addBannerLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 90%; width: 100%;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Add New Banner</h3>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card container py-5 w mb-5 col-lg-6">
+            <form class="card-body rounded-3 bg-body-tertiary" id="new-banner">
+              <div class="err mb-3 text-danger"></div>
+              <div class="row mb-3">
+                <div class="form-group my-3">
+                  <label class="form-label" for="">Banner Name</label>
+                  <input type="text" class="form-control" name="banner_name" />
+                </div>
+                <div class="form-group my-3">
+                  <label class="form-label" for="">Banner Description</label>
+                  <textarea name="description" id="banner_description" cols="30" rows="10" class="form-control"></textarea>
+                </div>
+                <div class="form-group my-3">
+                  <label class="form-label" for="">Reference Link</label>
+                  <input type="text" id="start_date" class="form-control" name="reference" />
+                </div>
+                <div class="form-group my-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <label class="form-label" for="">Banner Image</label>
+                    <div class="d-flex align-items-center justify-content-center">
+                      <img id="banner_prev" class="border my-1 rounded img-fluid img-thumbnail" src="" alt="" />
+                    </div>
+                  </div>
+                  <input
+                    id="banner_image"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp,.svg,.avif"
+                    class="form-control FilUploader"
+                    class="mb-3"
+                    required
+                  />
+                  <input id="cropped_banner" type="hidden" name="" value="" />
+                </div>
+              </div>
+              <div class="button-grp">
+                <button type="submit" class="btn btn-sm btn-primary px-3">Submit</button>
+                <button type="reset" class="btn btn-sm btn-warning px-3">Clear</button>
+              </div>
+            </form>
+            <div style="display: none" class="crop-banner card container p-2 shadow" id="banner-crp-container">
+              <div class="d-flex flex-column">
+                <img src="" id="bannerIMG" style="object-fit: cover" class="img-fluid" />
+                <button id="cropImageBtn" class="btn btn-primary mt-3">Crop Image</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
+<%- include('../partials/admin/footer') %>

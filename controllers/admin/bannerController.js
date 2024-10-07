@@ -3,7 +3,8 @@ const Banner = require("../../models/bannerSchema");
 module.exports = {
   getAllBanner: async (req, res) => {
     try {
-      res.render("admin/banner");
+        const banners = await Banner.find();
+      res.render("admin/banner",{banners});
     } catch (error) {}
   },
 
