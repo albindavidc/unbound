@@ -2,31 +2,30 @@ const mongoose = require("mongoose");
 const {Schema} = mongoose;
 
 const bannerSchema = new Schema({
-
-    image: {
-        type: String,
-        required: true,
-    },
-    title: {
+    name: {
         type: String,
         required: true,
     },
     description: {
         type: String,
-        required: true,
+        default: ' '
     },
-    link: {
+    image: {
+        filename: String,
+        originalName: String,
+        path: String,
+    },
+    reference: {
         type: String,
-    },
-    startDate: {
-        type: Date,
         required: true,
     },
-    endDate: {
-        type: Date,
+    isActive: {
+        type: Boolean,
         required: true,
+        default: true,
     }
-
+},{
+    timestamps: true,
 })
 
 const Banner = mongoose.model("Banner", bannerSchema);

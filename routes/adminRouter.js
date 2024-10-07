@@ -5,7 +5,7 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const { userAuth, adminAuth } = require("../middlewares/auth");
-const { productUpload } = require("../middlewares/multer"); // Adjust path accordingly
+const { productUpload, bannerUpload } = require("../middlewares/multer"); // Adjust path accordingly
 const attributeController = require("../controllers/admin/attributeController")
 const orderController = require("../controllers/admin/orderController");
 const couponController = require("../controllers/admin/couponController")
@@ -56,11 +56,7 @@ router
 
 router.post("/product/action", productController.listOrUnlistProduct);
 router.delete("/product/deleteProduct", productController.deleteProduct);
-router.get(
-  "/products/deleteProduct/:id",
-  adminAuth,
-  productController.deleteProduct
-);
+router.get("/products/deleteProduct/:id",adminAuth,productController.deleteProduct);
 
 
 const editUpload = productUpload.fields([
@@ -161,6 +157,13 @@ router.get('/sales-report/export/excel', salesReportController.exportToExcel);
 router.get('/sales-report/export/pdf', salesReportController.exportToPdf);
 
 
-router.get('/banner', bannerController.getBanner)
+
+/**
+ * Banner Managment
+ */
+router.get('/banner', bannerController.getAllBanner)
+router.post("/banner/add-banner",bannerUpload.fields([{name: "banner_image"}]),bannerController.addBanner)
+router.post("/banner/edit-banner", bannerUpload.fields([{name: "banner_image"}]), bannerController.editBanner)
+router.get("/banner/delete-banner", bannerController.deleteBanner)
 
 module.exports = router;
