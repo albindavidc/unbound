@@ -280,36 +280,46 @@
 </section>
 
 <script>
-  let countTimer = 60;
+  const orders = <%- JSON.stringify(orders) %>;
 
-  function startCount() {
-    const timerId = document.getElementById("timer");
-    const cancelButton = document.querySelector(".cancel-btn");
-    const continueButton = document.querySelector(".complete_payment_button");
+  if (orders.paymentMethod !== 'COD') {
+    let countTimer = 600;
 
-    const countdownIntervel = setInterval(() => {
-      let minutes = Math.floor(countTimer / 60);
-      let seconds = countTimer % 60;
+    function startCount() {
+      const timerId = document.getElementById("timer");
+      const cancelButton = document.querySelector(".cancel-btn");
+      const continueButton = document.querySelector(".complete_payment_button");
+      
+      const createdAtTime = new Date(orders.createdAt).getTime();  // Store the order created time
+      const deadlineTime = createdAtTime + (countTimer * 1000);  // Add the countTimer in milliseconds
 
-      minutes = minutes < 10 ? "0" + minutes : minutes;
-      seconds = seconds < 10 ? "0" + seconds : seconds;
+      const countdownInterval = setInterval(() => {
+        const currentTime = Date.now();
+        const timeLeft = Math.floor((deadlineTime - currentTime) / 1000);  // Time remaining in seconds
 
-      timerId.textContent = `Make the payment before the time ${minutes}:${seconds}`;
+        if (timeLeft > 0) {
+          let minutes = Math.floor(timeLeft / 60);
+          let seconds = timeLeft % 60;
 
-      if (countTimer <= 0) {
-        clearInterval(countdownIntervel);
-        timerId.textContent = `Your time is over for making the payments`;
-        cancelButton.style.display = "none";
-        continueButton.style.display = "none";
-        continueButton.style.margin = "0";
-      }
+          minutes = minutes < 10 ? "0" + minutes : minutes;
+          seconds = seconds < 10 ? "0" + seconds : seconds;
 
-      countTimer--;
-    }, 1000);
+          timerId.textContent = `Make the payment before the time ${minutes}:${seconds}`;
+        } else {
+          // Time is up
+          clearInterval(countdownInterval);
+          timerId.textContent = "Your time is over for making the payments";
+          cancelButton.style.display = "none";
+          continueButton.style.display = "none";
+          continueButton.style.margin = "0";
+        }
+      }, 1000);
+    }
+
+    startCount();
   }
-
-  startCount();
 </script>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
