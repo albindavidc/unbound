@@ -10,6 +10,7 @@ const attributeController = require("../controllers/admin/attributeController")
 const orderController = require("../controllers/admin/orderController");
 const couponController = require("../controllers/admin/couponController")
 const salesReportController = require("../controllers/admin/salesReportController")
+const bannerController = require("../controllers/admin/bannerController")
 
 // Error page
 router.get("/pageerror", adminController.pageerror);
@@ -159,5 +160,7 @@ router
 router.get('/sales-report/export/excel', salesReportController.exportToExcel);
 router.get('/sales-report/export/pdf', salesReportController.exportToPdf);
 
+
+router.get('/banner', bannerController.getBanner)
 
 module.exports = router;
