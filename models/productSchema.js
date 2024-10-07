@@ -4,6 +4,7 @@ const ratingSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
     rating: { type: Number, required: true }, 
+    orderId: {type: String, require: true},
     review: { type: String },
   },
   { timestamps: true }

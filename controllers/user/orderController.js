@@ -65,10 +65,19 @@ module.exports = {
       let order = await Order.find({ customerId: userId })
         .populate({
           path: "items.productId",
-          select: "name price primaryImages secondaryImages", // Select specific fields if needed
+          select: "name price primaryImages secondaryImages", 
         })
         .populate("items.color items.size shippingAddress _id items.orderID")
-        .populate("items.productId.primaryImages");
+        .populate("items.productId.primaryImages")
+        .populate({
+          path: 'items.productId', 
+          populate: {
+            path: 'ratings' 
+          }
+        })
+        .populate('customerId'); 
+        
+
 
       if (order.length > 0) {
         console.log("This is the first order ID on this page:", order[0]._id);
@@ -438,4 +447,38 @@ module.exports = {
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
+
+  submitReview: async (req, res) =>{
+
+    try {
+      const {productId, orderId} = req.params;
+      const {rating, review} = req.body;
+
+      if(!rating || !review){
+        return res.status(400).json({success: false, message: 'Rating and review are required'})
+      }
+      
+      const product = await Product.findById(productId);
+
+      if(!product){
+        return res.status(404).json({success: false, message: "Product not found"})
+      }
+
+      product.ratings.push({
+        rating: parseInt(rating),
+        review:review,
+        user: req.session.user,
+        orderId: orderId,
+      })
+      await product.save();
+
+      res.json({success: true, message: 'Review added successfully!'})
+    } catch (error) {
+      console.error("Error submitting review:", error)
+      res.status(500).json({success: false, message: "Server error. Please try again later"})
+    }
+
+  },
+
+
 };

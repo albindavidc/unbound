@@ -80,6 +80,7 @@ router
   .put(orderController.updateOrder);
 
 router.post("/continueOrder", orderController.continueOrder)
+router.post("/submit-review/:productId/:orderId", orderController.submitReview);
 
 
   router

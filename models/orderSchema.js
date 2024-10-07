@@ -34,7 +34,7 @@ const orderSchema = new Schema(
         },
         review:{
           type: ObjectId,
-          ref:"Product"
+          ref:"Product",
         },
         variant: {
           type: ObjectId,
