@@ -34,6 +34,8 @@
   }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -65,31 +67,40 @@
           </tr>
         </thead>
         <tbody>
-          <% if (banners !== 'undefined' && banners.length > 0) { %> <% banners.forEach((banner,index) => { %>
+          <% if (banners !== 'undefined' && banners.length > 0) { %> <% banners.forEach((banner,index) => { %> 
+
           <tr class="align-middle text-center">
             <td><%= index +1 %></td>
-            <td><img width="290rem" class="mx-auto d-block img-fluid img-thumbnail" src="/upload/banners/<%= banner.image.filename %>" alt="" /></td>
+
+            
+            <td>
+                <% banner.images.forEach(image => { %>
+                
+                <img width="70rem" class="mx-auto d-block img-fluid img-thumbnail" src="/uploads/banners/<%= image.folderName %>/<%= image.filename %>" alt="" />
+            
+            
+                <% }) %>
+            </td>
+
             <td><%= banner.name %></td>
-            <td><a href="<%= banner.reference %>"></a></td>
+            <td><%= banner.reference %></td>
             <% if (banner.isActive) { %>
             <td class="text-success">Listed</td>
             <% }else{ %>
             <td class="text-danger">Unlisted</td>
-            <% } %>
+            <% } %> 
 
             <td>
               <div class="btn-group mx-2" role="group" aria-label="Delete/Edit Button">
                 <div class="d-flex align-items-center">
-                  <a href="/admin/banner/edit-banner/<%= banner._id %>" class="btn btn-sm btn-warning">
-                    <i class="bi bi-pencil"></i>
-                  </a>
-                  <button type="button" onclick="deleteBanner('<%= banner._id %>', '<% banner.image.filename %>')" class="btn btn-sm btn-danger">
-                    <i class="bi bi-trash"></i>
+                  <button type="button" onclick="deleteBanner('<%= banner._id %>', '<% banner.images %>')" class="btn btn-sm btn-danger">
+                    Delete
                   </button>
                 </div>
               </div>
             </td>
           </tr>
+
 
           <% }) %> <% }else{ %>
           <tr>
@@ -103,8 +114,8 @@
   </div>
 
   <!-- Banner ADD -->
-  <div class="modal fade"  id="addBanner" tabindex="-1" aria-labelledby="addBannerLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 90%; width: 100%;">
+  <div class="modal fade" id="addBanner" tabindex="-1" aria-labelledby="addBannerLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 90%; width: 100%">
       <div class="modal-content">
         <div class="modal-header">
           <h3>Add New Banner</h3>
@@ -112,7 +123,7 @@
         </div>
         <div class="modal-body">
           <div class="card container py-5 w mb-5 col-lg-6">
-            <form class="card-body rounded-3 bg-body-tertiary" id="new-banner">
+            <form class="card-body rounded-3 bg-body-tertiary" id="new-banner" enctype="multipart/form-data">
               <div class="err mb-3 text-danger"></div>
               <div class="row mb-3">
                 <div class="form-group my-3">
@@ -136,11 +147,13 @@
                   </div>
                   <input
                     id="banner_image"
+                    name="banner_images"
                     type="file"
-                    accept=".jpg,.jpeg,.png,.webp,.svg,.avif"
+                    accept=".jpg,.jpeg,.png,.webp,.svg,.avif,.gif"
                     class="form-control FilUploader"
                     class="mb-3"
                     required
+                    multiple
                   />
                   <input id="cropped_banner" type="hidden" name="" value="" />
                 </div>
@@ -167,3 +180,94 @@
 </section>
 
 <%- include('../partials/admin/footer') %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css " />
+
+<script>
+  const modal = document.getElementById("addBanner");
+  const bannerForm = document.getElementById("new-banner");
+  const bannerImageInput = document.getElementById("banner_image");
+  const bannerPrevImg = document.getElementById("banner_prev");
+
+  let imageFiles = [];
+
+  document.querySelector('a[href="#addBanner"]').addEventListener("click", function () {
+    modal.style.display = "block";
+  });
+
+  modal.addEventListener("click", function (event) {
+    if (event.target === modal || event.target.classList.contains("close-modal")) {
+      modal.style.display = "none";
+      resetForm();
+    }
+  });
+
+  // Handle image preview on file change
+  bannerImageInput.addEventListener("change", function (e) {
+    const files = e.target.files;
+
+    if (files && files.length > 0) {
+      [...files].forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          if (index === 0) {
+            bannerPrevImg.src = e.target.result;
+            bannerPrevImg.style.display = "block";
+          }
+        };
+        reader.readAsDataURL(file);
+        imageFiles.push(file);
+      });
+    }
+  });
+
+  // Handle form submission
+  bannerForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(bannerForm);
+
+    // Append each image file to the FormData
+    imageFiles.forEach((file) => {
+      formData.append("banner_images", file);
+    });
+
+    try {
+      const response = await fetch("/admin/banner/add-banner", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.message);
+
+        Swal.fire({
+          icon: "success",
+          title: "Banner Uploaded",
+          text: result.message || "Your banner has been uploaded successfully!",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.reload();
+          resetForm();
+        });
+      } else {
+        throw new Error("Failed to upload images");
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Upload Failed",
+        text: error.message,
+        confirmButtonText: "OK",
+      });
+    }
+  });
+
+  // Reset form and clear previews
+  function resetForm() {
+    bannerForm.reset();
+    imageFiles = [];
+    bannerPrevImg.style.display = "none";
+  }
+</script>

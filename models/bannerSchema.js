@@ -10,11 +10,12 @@ const bannerSchema = new Schema({
         type: String,
         default: ' '
     },
-    image: {
+    images: [{
         filename: String,
         originalName: String,
         path: String,
-    },
+        folderName: String,
+    }],
     reference: {
         type: String,
         required: true,

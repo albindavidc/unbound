@@ -162,8 +162,8 @@ router.get('/sales-report/export/pdf', salesReportController.exportToPdf);
  * Banner Managment
  */
 router.get('/banner', bannerController.getAllBanner)
-router.post("/banner/add-banner",bannerUpload.fields([{name: "banner_image"}]),bannerController.addBanner)
-router.post("/banner/edit-banner", bannerUpload.fields([{name: "banner_image"}]), bannerController.editBanner)
+router.post("/banner/add-banner",bannerUpload.fields([{name: "banner_images", maxCount:5}]),bannerController.addBanner)
+router.post("/banner/edit-banner", bannerUpload.fields([{name: "banner_images"}]), bannerController.editBanner)
 router.get("/banner/delete-banner", bannerController.deleteBanner)
 
 module.exports = router;
