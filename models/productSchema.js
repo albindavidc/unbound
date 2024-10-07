@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const ratingSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Reference to the user who submitted the rating
-    rating: { type: Number, required: true }, // Rating value (e.g., 1-5 stars)
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
+    rating: { type: Number, required: true }, 
     review: { type: String },
   },
   { timestamps: true }
