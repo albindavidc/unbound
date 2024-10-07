@@ -100,15 +100,18 @@
                         </ul>
                         <% }) %>
                     </td>
+
                     <td>
-                      <% order.items.forEach((item, itemIndex)=> { %>
+                      <% order.items.forEach(item => { %>
                       <% if (item.customized === true) { %>
-                        <a href="/admin/customize-download/<%= order._id %>" class="d-flex align-items-center justify-content-center btn btn-dark mb-2">Download</a>
+                        <a href="/admin/customize-download/<%= order._id %>/<%= item.productId._id %>" class="d-flex align-items-center justify-content-center btn btn-dark mb-2">Download <%= item.name %></a>
                       <% }else { %>
                         <p class="d-flex align-items-center justify-content-center">No</p>
                       <% } %>
                       <% }) %>
                     </td>
+
+
                     <td>
                       <% order.items.forEach((item, itemIndex)=> { %>
                         <div class="p-2">

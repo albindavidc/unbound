@@ -114,13 +114,14 @@ module.exports = {
   },
 
   productCustomized: async (req, res) => {
-    const orderId = req.params.id;
+    const orderId = req.params.orderId;
+    const productId = req.params.itemId
     const order = await Order.findById(orderId);
     const userId = order.customerId;
     let  customDesign = await Customize.findOne({ userId: userId });
 
     const checkProductId = customDesign.products.find((customItem) => {
-      return order.items.some((orderItem) => customItem.productId.toString() === orderItem.productId.toString());
+      return order.items.some((orderItem) => customItem.productId.toString() === productId.toString());
     });
 
     if (!checkProductId) {
