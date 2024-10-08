@@ -181,10 +181,6 @@ module.exports = {
 
 
       const userId = req.session.user
-      // const customProduct = await Customize.find(
-      //   { userId: req.session.user, "products.productId": productId },
-      //   // { products: { $elemMatch: { productId: productId, } } }
-      // ).populate("products")
 
       const customize = await Customize.findOne({ userId: userId });
 
