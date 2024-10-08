@@ -189,11 +189,13 @@ module.exports = {
       const customize = await Customize.findOne({ userId: userId });
 
       let status = false ;
-      customize.products.forEach(item => {
-        if(item.productId.toString() === productId.toString()){
-          status = item.customizedProductOption
-        }
-      })
+      if(customize){
+        customize.products.forEach(item => {
+          if(item.productId.toString() === productId.toString()){
+            status = item.customizedProductOption
+          }
+        })
+      }
 
       console.log( customize, status, "this is custom product");
       res.render("user/product-details", {
