@@ -60,7 +60,7 @@ router.post("/forgot-password-cpassword", userController.passwordChange);
 
 // Product-Managment  
 router.get("/user/product-list",userAuth,checkUserStatus, productController.loadProductList);
-router.get("/user/product-list/:id",userAuth,checkUserStatus, productController.loadProductDetails);
+router.get("/user/product-details/:id",userAuth,checkUserStatus, productController.loadProductDetails);
 router.get("/customizeProduct/:id", userAuth,checkUserStatus, productController.loadCustomizeProduct)
 router.post("/save-canvas", productController.saveCustomizedImage)
 router.post("/product-details-customization", productController.productDetailsCustomConfirm)
