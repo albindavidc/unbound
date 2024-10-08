@@ -147,15 +147,13 @@ module.exports = {
 
       console.log("this is stock", stocks);
 
-      // Check variant stock and calculate offer price if applicable
       product.variants.forEach((variant) => {
         variant.isOutOfStock = variant.stock <= 0;
       });
 
-      // Fetch related products based on the category
       const relatedProducts = await Product.find({
         category: product.category._id,
-        _id: { $ne: productId }, // Exclude the current product
+        _id: { $ne: productId }, 
         isActive: true,
       }).limit(4);
 

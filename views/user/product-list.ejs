@@ -558,7 +558,7 @@
       async function fetchProducts() {
         try {
           console.log("Fetching products...");
-          const response = await fetch("/user/product-list/:id");
+          const response = await fetch("/user/product-details/:id");
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
