@@ -26,10 +26,13 @@ router.get("/verify-otp", userController.getVerifyOtp);
 router.post("/auth/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 
+
 router.get(
   "/auth/google", isLogedOut,
   passport.authenticate("google",  {  scope: ["profile", "email"] })
 );
+
+
 router.get(
   "/auth/google/callback", isLogedOut,
   passport.authenticate("google",  { failureRedirect: "/signup" }),
