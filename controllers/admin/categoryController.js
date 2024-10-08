@@ -47,7 +47,9 @@ const categoryInfo = async (req, res) => {
 };
 
 const addCategory = async (req, res) => {
-  const { name, description, offer } = req.body;
+  let { name, description, offer } = req.body;
+  
+  offer = parseInt(offer);
 
   console.log(req.body);
   try {
@@ -56,7 +58,6 @@ const addCategory = async (req, res) => {
       return res.status(400).json({ error: "Category already exists" });
     }
 
-    const offer = parseFloat(offer);
 
     const newCategory = new Category({
       name,
