@@ -362,7 +362,7 @@
 
             $.ajax({
               type: "POST",
-              url: "/verify-otp",
+              url: "/auth/verify-otp",
               data: { otp: otpInput },
               success: function(response) {
                 if (response.success) {

@@ -17,10 +17,13 @@ router.get("/pageNotFound", userController.pageNotFound);
 router.get("/logout", userController.logout);
 
 //Signup Managment
-router.get("/signup", isLogedOut, userController.loadSignup);
-router.post("/signup", userController.signup);
+router
+.route("/signup")
+.get(isLogedOut, userController.loadSignup)
+.post(userController.signup);
+
 router.get("/verify-otp", userController.getVerifyOtp);
-router.post("/verify-otp", userController.verifyOtp);
+router.post("/auth/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 
 router.get(
