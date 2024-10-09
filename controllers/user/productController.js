@@ -75,7 +75,7 @@ module.exports = {
       const colors = await Color.find({ isListed: true });
       const variants = await Variants.find({});
 
-      const perPage = 20;
+      const perPage = 7;
       const page = parseInt(req.query.page) || 1;
 
       const products = await Product.find({ ...query, ...filterQuery })
