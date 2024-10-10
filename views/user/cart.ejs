@@ -289,20 +289,6 @@
     const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
     let currentQuantity = parseInt(quantityInput.value);
 
-    // // Check for increment and maximum quantity
-    // if (incrementOrDecrement && currentQuantity >= 10) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Limited Stock",
-    //     text: "You cannot add more than 10 items of this product.",
-    //     showConfirmButton: true,
-    //   }).then(() => {
-    //     // Reload the page to ensure correct quantity
-    //     location.reload();
-    //   });
-    //   return;
-    // }
-
     // Check for decrement and minimum quantity
     if (!incrementOrDecrement && currentQuantity <= 1) {
       Swal.fire({
@@ -357,10 +343,16 @@
       // const cartTotal = document.getElementById('cartTotal')
       // cartTotal.textContent = `$${data.cart.payable}`
 
-      $(document).ready(function() {
-        $('#reload1').load('/cart')
-        $('#reload2').load('/cart')
-      })
+    // Update product subtotal
+    const subtotalElement = document.getElementById(`itemTotal-${productId}-${variantId}`);
+      subtotalElement.textContent = `₹${data.cart.item.itemTotal}`;
+
+      // Update grand total (or other cart totals if applicable)
+      const totalPriceElement = document.getElementById('grandTotal');
+      totalPriceElement.textContent = `₹${parseFloat(data.cart.totalPrice)}`;
+
+      const cartTotalElement = document.getElementById('cartTotal');
+      cartTotalElement.textContent = `₹${parseInt(data.cart.cartTotal)}`;
 
 
       })
