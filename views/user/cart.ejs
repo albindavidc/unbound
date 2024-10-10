@@ -284,78 +284,100 @@
   };
 
   function updateCartQuantity(productId, variantId, incrementOrDecrement) {
-  const operation = incrementOrDecrement ? "increment" : "decrement";
+    const operation = incrementOrDecrement ? "increment" : "decrement";
 
-  const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
-  let currentQuantity = parseInt(quantityInput.value);
+    const quantityInput = document.getElementById(`quantityInput-${productId}-${variantId}`);
+    let currentQuantity = parseInt(quantityInput.value);
 
-  // Check for decrement and minimum quantity
-  if (!incrementOrDecrement && currentQuantity <= 1) {
-    Swal.fire({
-      icon: "error",
-      title: "Minimum Quantity",
-      text: "You must order at least one item of this product.",
-      showConfirmButton: true,
-    });
-    return;
-  }
+    // // Check for increment and maximum quantity
+    // if (incrementOrDecrement && currentQuantity >= 10) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Limited Stock",
+    //     text: "You cannot add more than 10 items of this product.",
+    //     showConfirmButton: true,
+    //   }).then(() => {
+    //     // Reload the page to ensure correct quantity
+    //     location.reload();
+    //   });
+    //   return;
+    // }
 
-  // Proceed with the fetch operation to update the cart
-  fetch(`/cart/${productId}/${variantId}/${operation}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ operation }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (!data.success) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: data.message,
-          showConfirmButton: true,
-        });
-        return;
-      }
-
-      // Update the quantity input with the new value from the server
-      quantityInput.value = data.cart.quantity;
-
-      const totalStock = data.stock;
-
-      // Check if the new quantity exceeds the available stock (again)
-      if (quantityInput.value > totalStock) {
-        Swal.fire({
-          icon: "error",
-          title: "Limited Stock",
-          text: `This product has only ${totalStock} items left.`,
-          showConfirmButton: true,
-        });
-        return;
-      }
-
-      // Update the total price dynamically without reloading
-      const totalPriceElement = document.getElementById('totalPrice');
-      totalPriceElement.textContent = `$${data.cart.totalPrice.toFixed(2)}`; // Update total price
-
-    })
-    .catch((error) => {
-      console.error("Error updating cart:", error);
+    // Check for decrement and minimum quantity
+    if (!incrementOrDecrement && currentQuantity <= 1) {
       Swal.fire({
         icon: "error",
-        title: "Update Failed",
-        text: "There was an error updating your cart. Please try again.",
+        title: "Minimum Quantity",
+        text: "You must order at least one item of this product.",
         showConfirmButton: true,
+      }).then(() => {
+        // Reload the page to ensure correct quantity
+        location.reload();
       });
-    });
-}
+      return;
+    }
 
-function increaseCartQuantity(productId, variantId) {
-  updateCartQuantity(productId, variantId, true);
-}
+    // Proceed with the fetch operation to update the cart
+    fetch(`/cart/${productId}/${variantId}/${operation}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operation }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.success) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message,
+            showConfirmButton: true,
+          })
+          return;
+        }
 
-function decreaseCartQuantity(productId, variantId) {
-  updateCartQuantity(productId, variantId, false);
-}
+        // Update the quantity input with the new value from the server
+        quantityInput.value = data.cart.quantity;
 
+        const totalStock = data.stock;
+
+        // Check if the new quantity exceeds the available stock (again)
+        if (quantityInput.value > totalStock) {
+          Swal.fire({
+            icon: "error",
+            title: "Limited Stock",
+            text: `This product has only ${totalStock} items left.`,
+            showConfirmButton: true,
+          })
+          return;
+        }
+        // Update the total price dynamically without reloading
+      const totalPriceElement = document.getElementById('grandTotal');
+      totalPriceElement.textContent = `$${data.cart.totalPrice.toFixed(2)}`; // Update total price
+
+      const cartTotal = document.getElementById('cartTotal')
+      cartTotal.textContent = `$${data.cart.payable.toFixed(2)}`
+
+
+      })
+      .catch((error) => {
+        console.error("Error updating cart:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: "There was an error updating your cart. Please try again.",
+          showConfirmButton: true,
+        }).then(() => {
+          // Reload the page in case of an error
+          location.reload();
+        });
+      });
+  }
+
+  function increaseCartQuantity(productId, variantId) {
+    updateCartQuantity(productId, variantId, true);
+  }
+
+  function decreaseCartQuantity(productId, variantId) {
+    updateCartQuantity(productId, variantId, false);
+  }
 </script>
