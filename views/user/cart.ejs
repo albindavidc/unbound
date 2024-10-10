@@ -163,15 +163,9 @@
               <ul class="order-summary mb-0 list-unstyled">
                 <li class="order-summary-item"><span>Order Subtotal </span><span id="cartTotal">₹<%= payable %></span></li>
                 <li class="order-summary-item">
-                  <% if (payable <1000) { %>
-                   
-                    <span>Shipping and handling <span class="text-muted"></span></span
-                    ><span>₹ <%= shipmentFee %></span>
-                  <% }else{ %>
-                    <span>Shipping and handling <span class="text-muted">(free)</span></span>
-                    <span style="text-decoration-line: line-through;">₹ <%= shipmentFee %></span>
-
-                    <% } %>
+                  <span id="shipping_text">Shipping and handling <span class="text-muted"></span></span>
+                  <span id="shipping_fee"></span>
+                 
                 </li>
                 <!-- <li class="order-summary-item"><span>Tax</span><span>₹0.00</span></li> -->
                 <li class="order-summary-item border-0">
@@ -350,8 +344,18 @@
       const totalPriceElement = document.getElementById('grandTotal');
       totalPriceElement.textContent = `₹${parseFloat(data.carts.totalPrice)}`;
 
+      const shipping_test = document.getElementById('shipping_text');
+      const shipping_fee = document.getElementById('shipping_fee')
       const cartTotalElement = document.getElementById('cartTotal');
-      cartTotalElement.textContent = `₹${parseFloat(data.carts.totalPrice)}`;
+      
+      if(parseFloat(data.carts.totalPrice > 100)){
+        cartTotalElement.textContent = `₹${parseFloat(data.carts.totalPrice)}`;
+        shipping_fee.textContent = `₹${parseFloat(data.carts.shipmentFee)}`;
+      }else{
+        shipping_test.textContent = `₹${parseFloat(data.carts.shipping_fee)}`;
+        shipping_fee.style.textDecoration = 'line-through'
+        cartTotalElement.textContent = `₹${parseFloat(data.carts.totalPrice + 50)}`;
+      }
 
 
       })
