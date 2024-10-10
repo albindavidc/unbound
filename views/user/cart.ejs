@@ -346,11 +346,11 @@
 
       const shipping_test = document.getElementById('shipping_text');
       const shipping_fee = document.getElementById('shipping_fee')
+      shipping_fee.textContent = `₹${parseFloat(data.carts.shipmentFee)}`
       const totalPriceElement = document.getElementById('grandTotal');
 
       if(parseFloat(data.carts.totalPrice) > 1000){
         totalPriceElement.textContent = `₹${parseFloat(data.carts.totalPrice)}`;
-        shipping_fee.textContent = `₹${parseFloat(data.carts.shipmentFee)}`;
       }else{
         shipping_test.textContent = `₹${parseFloat(data.carts.shipmentFee)}`;
         shipping_fee.style.textDecoration = 'line-through'
