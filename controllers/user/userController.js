@@ -250,7 +250,7 @@ const resendOtp = async (req, res) => {
 //Load Login - Redirect Login
 const loadLogin = async (req, res) => {
   try {
-    const referrals = req.query.ref || '';
+    let referrals = req.query.ref || '';
     const referrer = req.query.referrer;
 
     console.log("this is a referrer", referrer)
