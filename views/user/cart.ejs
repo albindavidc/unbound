@@ -347,10 +347,7 @@
             title: "Limited Stock",
             text: `This product has only ${totalStock} items left.`,
             showConfirmButton: true,
-          }).then(() => {
-            // Reload the page to adjust the quantity correctly
-            location.reload();
-          });
+          })
           return;
         }
 
