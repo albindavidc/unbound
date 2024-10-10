@@ -348,10 +348,10 @@
 
       // Update grand total (or other cart totals if applicable)
       const totalPriceElement = document.getElementById('grandTotal');
-      totalPriceElement.textContent = `₹${parseFloat(data.cart.totalPrice)}`;
+      totalPriceElement.textContent = `₹${parseFloat(data.carts.totalPrice)}`;
 
       const cartTotalElement = document.getElementById('cartTotal');
-      cartTotalElement.textContent = `₹${parseInt(data.cart.payable)}`;
+      cartTotalElement.textContent = `₹${parseInt(data.carts.payable)}`;
 
 
       })
