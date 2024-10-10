@@ -37,7 +37,7 @@
                 </div>
               </div>
             </div>
-            <div class="cart-body">
+            <div class="cart-body" id="reload1">
               <!-- Product-->
               <% cartList.forEach(item => { %>
               <div class="cart-item">
@@ -153,7 +153,7 @@
               <% } %>
           </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-4" id="reload2">
           <div class="block mb-5">
             <div class="block-header">
               <h6 class="text-uppercase mb-0">Order Summary</h6>
@@ -350,12 +350,17 @@
           })
           return;
         }
-        // Update the total price dynamically without reloading
-      const totalPriceElement = document.getElementById('grandTotal');
-      totalPriceElement.textContent = `$${data.cart.totalPrice}`; // Update total price
+      //   // Update the total price dynamically without reloading
+      // const totalPriceElement = document.getElementById('grandTotal');
+      // totalPriceElement.textContent = `$${data.cart.totalPrice}`; // Update total price
 
-      const cartTotal = document.getElementById('cartTotal')
-      cartTotal.textContent = `$${data.cart.payable}`
+      // const cartTotal = document.getElementById('cartTotal')
+      // cartTotal.textContent = `$${data.cart.payable}`
+
+      $(document).ready(function() {
+        $('#reload1').load('/cart')
+        $('/#reload2').load('/cart')
+      })
 
 
       })
