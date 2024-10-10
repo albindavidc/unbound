@@ -109,7 +109,7 @@
                       <div class="col-md-3">
                         <div class="row">
                           <div class="col-6 d-md-none text-muted">Total price</div>
-                          <div class="col-6 col-md-12 text-end text-md-center" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
+                          <div class="col-6 col-md-12 text-end text-md-center item-total-cart" id="itemTotal-<%- item.productId._id %>-<%- item.variant %>">
                             ₹<%= item.itemTotal %>
                           </div>
                         </div>
@@ -345,7 +345,7 @@
       // cartTotal.textContent = `$${data.cart.payable}`
 
     // Update product subtotal
-    const subtotalElement = document.getElementById(`itemTotal-${productId}-${variantId}`);
+    const subtotalElement = document.querySelector('.item-total-cart');
     subtotalElement.textContent = `₹${parseFloat(data.cart.itemTotal)}`
 
       // Update grand total (or other cart totals if applicable)
