@@ -346,6 +346,7 @@
 
     // Update product subtotal
     const subtotalElement = document.getElementById(`itemTotal-${productId}-${variantId}`);
+    subtotalElement.textContent = `₹${parseFloat(data.cart.itemTotal)}`
 
       // Update grand total (or other cart totals if applicable)
       const cartTotalElement = document.getElementById('cartTotal');
