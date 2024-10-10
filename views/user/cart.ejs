@@ -352,10 +352,10 @@
         }
         // Update the total price dynamically without reloading
       const totalPriceElement = document.getElementById('grandTotal');
-      totalPriceElement.textContent = `$${data.cart.totalPrice.toFixed(2)}`; // Update total price
+      totalPriceElement.textContent = `$${data.cart.totalPrice}`; // Update total price
 
       const cartTotal = document.getElementById('cartTotal')
-      cartTotal.textContent = `$${data.cart.payable.toFixed(2)}`
+      cartTotal.textContent = `$${data.cart.payable}`
 
 
       })
@@ -366,10 +366,7 @@
           title: "Update Failed",
           text: "There was an error updating your cart. Please try again.",
           showConfirmButton: true,
-        }).then(() => {
-          // Reload the page in case of an error
-          location.reload();
-        });
+        })
       });
   }
 
