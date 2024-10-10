@@ -72,7 +72,7 @@ const handleCartUpdate = async (req, res, operation) => {
 
     await cart.save();
 
-    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice });
+    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice, cart });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: "Server error", error: error.message });
