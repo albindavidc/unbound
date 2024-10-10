@@ -361,6 +361,8 @@
         shipping_text.textContent = `(free)`
         shipping_fee.style.textDecoration = 'line-through'
       }else{
+        shipping_text.textContent = '';
+        shipping_fee.style.textDecoration = ''
         shipping_text.textContent = `₹${parseFloat(data.carts.shipmentFee)}`;
         totalPriceElement.textContent = `₹${parseFloat(data.carts.totalPrice + 50)}`;
       }
