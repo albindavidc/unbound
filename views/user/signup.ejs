@@ -60,9 +60,8 @@
       </div>
 
       <div class="elementsField">
-        <input type="text" name="referrals" id="referrals" value="<%= referrals %>" placeholder="Referrals(Optional)"/>
+        <input type="text" name="referrals" id="referrals" value="<%= referrals || '' %>" placeholder="Referrals(Optional)"/>
         <div id="error6" class="error-message"></div>
-
       </div>
 
       <%if(locals.message && message.length>0){%>

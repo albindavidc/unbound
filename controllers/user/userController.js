@@ -276,8 +276,6 @@ const login = async (req, res) => {
       });
     }
 
-   
-
     const passwordMatch = await bcrypt.compare(password, findUser.password);
 
     if (!passwordMatch) {
