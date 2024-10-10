@@ -238,12 +238,6 @@
               <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-item" data-category-id="<%= product.category._id %>">
                 <div class="product__item">
                   <div class="product__item__pic set-bg">
-                    <a href="/user/product-list/<%= product._id %>">
-                      <img
-                        src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                        alt="<%= product.productName %>"
-                      />
-                    </a>
                     <ul class="product__hover">
 
                       <% if (product.wishlist === true) { %>
@@ -278,24 +272,16 @@
                         </li>
 
                         <% } %>
-
-                     
-
-
-                      <li>
-                        <a href="#">
-                          <img src="../../public/img/icon/compare.png" alt="" />
-                          <span>Compare</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <img src="../../public/img/icon/search.png" alt="" />
-                        </a>
-                      </li>
+                      
                     </ul>
+                    <a href="/user/product-list/<%= product._id %>">
+                      <img
+                        src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                        alt="<%= product.productName %>"
+                      />
+                    
                   </div>
-                  <div class="product__item__text">
+                  <div class="">
                     <h6><%= product.name %></h6>
                     <% product.variants.forEach(variant => { %>
                     <p>Total Number of stock: <%=variant.stock %></p>
@@ -312,25 +298,17 @@
                      
                       <h6 style="text-decoration: line-through;">₹<%= product.actualPrice %>.00</h6>
                     <% } %>
-                    <div class="product__color__select">
-                      <label for="pc-7">
-                        <input type="radio" id="pc-7" />
-                      </label>
-                      <label class="active black" for="pc-8">
-                        <input type="radio" id="pc-8" />
-                      </label>
-                      <label class="grey" for="pc-9">
-                        <input type="radio" id="pc-9" />
-                      </label>
-                    </div>
+                   
 
                     <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock +=variant.stock; %> <% }); %> <% if
                     (totalStock > 0) { %>
-                    <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
+
                     <% } else { %>
                     <a href="#" class="out-of-stock">Out of Stock</a>
                     <% } %>
                   </div>
+                </a>
+
                 </div>
                 <div class="product-action-1 show"></div>
               </div>
