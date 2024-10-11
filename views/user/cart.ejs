@@ -345,8 +345,15 @@
       // cartTotal.textContent = `$${data.cart.payable}`
 
     // Update product subtotal
-    const subtotalElement = document.querySelector('.item-total-cart');
-    subtotalElement.textContent = `₹${parseFloat(data.cart.itemTotal)}`
+    const subtotalElement = document.querySelectorAll('.item-total-cart');
+    subtotalElement.forEach((item, index) => {
+      data.carts.items.forEach(item =>{
+
+        item.textContent = `₹${item.itemTotal}`
+      })
+
+    })
+    
 
       // Update grand total (or other cart totals if applicable)
       const cartTotalElement = document.getElementById('cartTotal');
