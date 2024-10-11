@@ -41,16 +41,22 @@ const handleCartUpdate = async (req, res, operation) => {
     const incrementOrDecrement = operation === "increment";
     let updatedQuantity;
 
+    if(stock >= item.quantity){
+      updatedQuantity = incrementOrDecrement ? item.quantity + 1 : item.quantity - 1;
+    }else{
+      updatedQuantity = stock
+    }
+    
     // Handle quantity limits
     if (incrementOrDecrement && item.quantity >= stock) {
-      return res.status(400).json({ success: false, message: "Quantity exceeds product stock" });
+      return res.status(400).json({ success: false, message: `Quantity exceeds product stock. their only ${stock} stocks left`, stock });
     } else if (!incrementOrDecrement && item.quantity <= 1) {
       return res.status(400).json({ success: false, message: "Cannot decrease quantity below 1" });
     } else if (incrementOrDecrement && item.quantity >= product.quantity) {
       return res.status(400).json({ success: false, message: "This is the max order for this order" });
     }
 
-    updatedQuantity = incrementOrDecrement ? item.quantity + 1 : item.quantity - 1;
+   
 
     // Ensure price is treated as a number
     const price = Number(item.price);
@@ -72,7 +78,7 @@ const handleCartUpdate = async (req, res, operation) => {
 
     await cart.save();
 
-    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice, carts:cart });
+    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice, carts:cart, stock });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: "Server error", error: error.message });
@@ -83,7 +89,6 @@ module.exports = {
   getCart: async (req, res) => {
     try {
       const userId = req.session.user;
-      console.log(req.session.user);
       let cart = await Cart.findOne({ userId }).populate("items.productId items.colorId items.sizeId items.productId.bundleQuantity");
 
       let bundleQuantity;
@@ -103,7 +108,18 @@ module.exports = {
         }
       });
 
-      console.log("this s bundleQuantity", bundleQuantity, sellingPrice, cartQuantity, bundlePrice, cart.quantity);
+      for (const cartItems of cart.items) {
+        cartItems.productId.variants.forEach(async (item) => {
+          if (item.stock < cartItems.quantity) {
+            cartItems.quantity = item.stock
+            await cart.save()
+          }
+        });
+      }
+
+
+
+      
 
       if (cartQuantity >= bundleQuantity) {
         sellingPrice = bundlePrice;
@@ -186,21 +202,10 @@ module.exports = {
       const getTotalPrice = await Cart.findOne({ userId }, { _id: 0, totalPrice: 1 });
       const totalPrices = getTotalPrice.totalPrice;
 
-      const errorStockCart = [];
-      for (const cartItems of cart.items) {
-        console.log("this is backend product variant quantity", cartItems.productId.variants);
-        cartItems.productId.variants.forEach(async (item) => {
-          console.log("this is product quantity", item.stock, cartItems.quantity);
-          if (item.stock < cartItems.quantity) {
-            errorStockCart.push(`${cartItems.productId.name} : Stock = ${item.stock}`);
-          }
-        });
-      }
 
-      console.log("this is the error message", errorStockCart);
+
 
       res.render("user/cart", {
-        errorStockCart,
         totalPriceOfEachProduct,
         cartList: cart.items,
         cartCount: cart.items.length,
