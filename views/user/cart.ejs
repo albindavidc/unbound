@@ -1,5 +1,6 @@
-<%- include("../partials/user/header") %>
+<!-- cart.ejs -->
 
+<%- include("../partials/user/header") %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
@@ -24,8 +25,7 @@
 </style>
 
 <section>
-
-  <div class="pb-5 text-center ">
+  <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
       <h1 class="userProfileH1">Cart</h1>
     </div>
@@ -34,8 +34,8 @@
 
 <section>
   <% if (cartCount && cartCount > 0 && cartList !== 'undefined') { %>
-  <!-- Shopping Cart Section-->
 
+  <!-- Shopping Cart Section-->
   <section>
     <div class="container">
       <div class="row mb-5">
@@ -212,7 +212,6 @@
   </section>
 
   <%- include("../partials/user/footer") %>
-
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
@@ -278,7 +277,6 @@
             text: "Product has been deleted.",
             icon: "success",
             showConfirmButton: true,
-            // timer: 1500,
           }).then(() => {
             location.reload();
           });
@@ -297,13 +295,13 @@
           text: "There is an error in the server side",
           icon: "error",
           showConfirmButton: true,
-          // timer: 1500,
         }).then(() => {
           location.reload();
         });
       }
     };
 
+    // Udate the quantity of the cart items
     function updateCartQuantity(productId, variantId, incrementOrDecrement) {
       const operation = incrementOrDecrement ? "increment" : "decrement";
 
@@ -318,13 +316,11 @@
           text: "You must order at least one item of this product.",
           showConfirmButton: true,
         }).then(() => {
-          // Reload the page to ensure correct quantity
           location.reload();
         });
         return;
       }
 
-      // Proceed with the fetch operation to update the cart
       fetch(`/cart/${productId}/${variantId}/${operation}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -347,7 +343,6 @@
             return;
           }
 
-          // Update the quantity input with the new value from the server
           quantityInput.value = data.cart.quantity;
 
           const totalStock = data.stock;

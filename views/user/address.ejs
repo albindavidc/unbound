@@ -1,3 +1,5 @@
+<!-- address.ejs -->
+
 <%- include("../partials/user/header") %>
 
 <style>
@@ -185,7 +187,6 @@
                       <i class="bi bi-pencil fs-6"></i>
                     </button>
                   </div>
-                  <!-- <a class="btn btn-sm btn-info" href="/user/address/edit-address/<%- item._id %>" data-bs-toggle="tooltip" title="Edit"><i class="bi bi-pencil fs-6"></i></a> -->
                   <button
                     class="btn btn-sm btn-danger"
                     onclick="deleteAddress('<%- item._id %>')"
@@ -195,8 +196,6 @@
                   >
                     <i class="bi bi-trash fs-6"></i>
                   </button>
-                  <!-- <form id="deleteAddress" action="/user/address/delete-address/<%- item._id %>?_method=DELETE" method="POST">
-                  </form> -->
                 </td>
               </tr>
               <% }) %>
@@ -209,7 +208,6 @@
       </section>
     </div>
   </div>
-  
 
   <!-- Edit Address Modal -->
   <div class="modal fade" id="edit-address-modal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
@@ -347,7 +345,6 @@
 
       const response = await fetch(`/address/edit-address/${addressId}`);
       if (!response.ok) {
-        // If the response is not okay, throw an error
         throw new Error("Network response was not ok");
       }
 
@@ -378,7 +375,6 @@
       editAddressForm.action = `/address/edit-address/${addressId}`;
       return;
     } catch (error) {
-      // Use SweetAlert to display the error message
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -387,6 +383,7 @@
     }
   });
 
+  // Delete address
   async function deleteAddress(addressId) {
     Swal.fire({
       title: "Are you sure?",
@@ -408,7 +405,6 @@
           }
 
           Swal.fire("Deleted!", "Your address has been deleted.", "success").then(() => location.reload());
-          // Optionally, refresh the page or remove the address from the DOM here
         } catch (error) {
           Swal.fire({
             icon: "error",
@@ -688,11 +684,9 @@
   const debounce = (fn, delay = 500) => {
     let timeoutId;
     return (...args) => {
-      // cancel the previous timer
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-      // setup a new timer
       timeoutId = setTimeout(() => {
         fn.apply(null, args);
       }, delay);
@@ -703,40 +697,39 @@
     "input",
     debounce(function (e) {
       switch (e.target.id) {
-        case "address-fn": // Assuming this is the full name field
+        case "address-fn":
           checkName();
           break;
-        case "address-ln": // Assuming this is the phone number field
+        case "address-ln":
           checkPhone();
           break;
-        case "address-house-name": // Assuming this is the house name field
+        case "address-house-name":
           checkHouseName();
           break;
-        case "address-area": // Assuming this is the area/street field
+        case "address-area":
           checkAreaStreet();
           break;
-        case "address-locality": // Assuming this is the locality field
+        case "address-locality":
           checkLocality();
           break;
-        case "address-town": // Assuming this is the town field
+        case "address-town":
           checkTown();
           break;
-        case "address-state": // Assuming this is the state field
+        case "address-state":
           checkState();
           break;
-        case "address-zip": // Assuming this is the ZIP code field
+        case "address-zip":
           checkZipcode();
           break;
-        case "address-landmark": // Assuming this is the landmark field
+        case "address-landmark":
           checkLandmark();
           break;
-        case "alternate-phone": // Assuming this is the alternate phone number field
+        case "alternate-phone":
           checkAlternatePhone();
           break;
-        case "address_type": // Assuming this is the address type field
+        case "address_type":
           checkAddressType();
           break;
-        // Add more cases as needed for other fields in your form
       }
     })
   );
@@ -909,14 +902,13 @@
   // Show modal event to fetch and populate address data
   editAddressModal.addEventListener("show.bs.modal", async (e) => {
     try {
-      const editButton = e.relatedTarget; // Button that triggered the modal
-      const addressId = editButton.getAttribute("data-address-id"); // Extract address ID
+      const editButton = e.relatedTarget;
+      const addressId = editButton.getAttribute("data-address-id");
 
-      console.log("this is addressId", addressId)
-      // Fetch address data from the server
+      console.log("this is addressId", addressId);
+
       const response = await fetch(`/address/edit-address/${addressId}`);
       if (!response.ok) {
-        // If response is not ok, throw an error
         throw new Error("Network response was not ok");
       }
 
@@ -949,7 +941,6 @@
       // Set the form action to include the address ID
       editAddressForm.action = `/address/edit-address/${addressId}`;
     } catch (error) {
-      // Display error using SweetAlert
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -962,7 +953,6 @@
   editAddressForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Validate the form fields
     const isFormValid =
       checkEditName() &&
       checkEditPhone() &&
@@ -978,7 +968,6 @@
 
     if (isFormValid) {
       try {
-        // Use the action attribute of the form, which already contains the correct addressId
         const response = await fetch(editAddressForm.action, {
           method: "POST",
           headers: {
@@ -996,7 +985,6 @@
             landmark: document.querySelector("#edit-address-landmark").value,
             alternativePhone: document.querySelector("#edit-alternate-phone").value,
             addressType: document.querySelector('input[name="addressType"]:checked').value,
-            // customerId: document.querySelector("#edit-customerId").value, // Assuming this exists in your form
           }),
         });
 
@@ -1007,7 +995,7 @@
             icon: "success",
             title: "Success",
             text: "Address updated successfully!",
-          }).then(() => location.reload()); // Reload the page on success
+          }).then(() => location.reload());
         } else {
           Swal.fire({
             icon: "error",
@@ -1029,38 +1017,37 @@
     "input",
     debounce((e) => {
       switch (e.target.id) {
-        case "edit-address-fn": // Full name
+        case "edit-address-fn":
           checkEditName();
           break;
-        case "edit-address-ln": // Phone
+        case "edit-address-ln":
           checkEditPhone();
           break;
-        case "edit-address-house-name": // House Name
+        case "edit-address-house-name":
           checkEditHouseName();
           break;
-        case "edit-address-area": // Area/Street
+        case "edit-address-area":
           checkEditAreaStreet();
           break;
-        case "edit-address-locality": // Locality
+        case "edit-address-locality":
           checkEditLocality();
           break;
-        case "edit-address-town": // Town
+        case "edit-address-town":
           checkEditTown();
           break;
-        case "edit-address-state": // State
+        case "edit-address-state":
           checkEditState();
           break;
-        case "edit-address-zip": // ZIP code
+        case "edit-address-zip":
           checkEditZipcode();
           break;
-        case "edit-address-landmark": // Landmark
+        case "edit-address-landmark":
           checkEditLandmark();
           break;
-        case "edit-alternate-phone": // Alternate Phone
+        case "edit-alternate-phone":
           checkEditAlternatePhone();
           break;
-        // Assuming there's a function to check the address type, if needed
-        case "edit-form-check": // Address Type
+        case "edit-form-check":
           checkAddressType();
           break;
       }
