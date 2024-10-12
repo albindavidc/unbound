@@ -1,69 +1,98 @@
+<!-- checkout.ejs -->
+
 <%- include('../partials/user/header') %>
 
 <style>
-    .userProfileMain {
-      width: 80%;
-      height: 30%;
-      margin: 0 auto;
-      background-color: rgb(0, 0, 0);
-    }
-  
-    .userProfileH1 {
-      width: 50%;
-      margin: auto;
-      font-family: "Baloo", cursive;
-      color: white;
-      font-size: 7vw;
-    }
-  
-    .breadcrumbCls {
-      background-color: aliceblue;
-    }
-  </style>
+  .userProfileMain {
+    width: 90%;
+    height: auto;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #000000;
+    border-radius: 10px;
+  }
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  .userProfileH1 {
+    width: 60%;
+    margin: auto;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
 
-  
-  <section>  
-    <div class="pb-5 text-center">
-      <div class="card userProfileMain">
-        <h1 class="userProfileH1">Checkout</h1>
-      </div>
+  .list-group-item {
+    padding: 20px;
+  }
+
+  .list-group-item h6 {
+    font-size: 1.2em;
+  }
+
+  .accordion-button {
+    background-color: #f1f1f1;
+    color: green;
+  }
+
+  .table .btn-group button {
+    margin-right: 5px;
+  }
+
+  .coupon-card {
+    padding: 10px;
+    background-color: #e7f1e7;
+    border: 1px solid #c3d9c3;
+    margin-bottom: 5px;
+  }
+
+  .coupon-card h4 {
+    color: #005500;
+    margin-bottom: 5px;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+  crossorigin="anonymous"
+></script>
+
+<!-- Checkout Header -->
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain">
+      <h1 class="userProfileH1">Checkout</h1>
     </div>
-  </section>
+  </div>
+</section>
 
-
-  <!-- Checkout Section-->
-  <section>
-    <div class="container mb-7">
-      <div class="row g-5">
-        <div class="col-md-5 col-lg-4 order-md-last">
-          <h4 class="block-header bg-secondary-light d-flex justify-content-between align-items-center mb-3">
-            <span class="">Your cart</span>
-            <span class="badge bg-secondary rounded-pill"><%- cartCount %></span>
-          </h4>
-          <ul class="list-group mb-3 text-capitalize">
-            <% cartList.forEach(item => { %>
-            <li class="list-group-item d-flex justify-content-between lh-sm">
-              <div class="fs-5">
-                <h6 class="my-0"><%- item.productId.name %></h6>
-                <small class="text-body-secondary">Size: <%- item.sizeId.value %></small> <br>
-                <small class="text-body-secondary">Color: <%- item.colorId.name %></small> <br>
-                <small class="text-body-secondary">Quantity: <%- item.quantity %></small>
-              </div>
-              <div class="d-flex flex-column align-items-end lead fs-6">
-                <span class="fw-semibold text-body-secondary">Price per item: <span class="text-muted">₹<%- item.price %></span></span>
-                <span class="text-body-secondary fw-semibold">Total: ₹<%- item.itemTotal %></span>
-              </div>
-            </li>
-            <% }) %>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Grand Total (INR)</span>
-              <strong>₹<span id="grandTotal"><%- payable %></span></strong>
-            </li>
-
+<!-- Checkout Section-->
+<section>
+  <div class="container mb-7">
+    <div class="row g-5">
+      <div class="col-md-5 col-lg-4 order-md-last">
+        <h4 class="block-header bg-secondary-light d-flex justify-content-between align-items-center mb-3">
+          <span class="">Your cart</span>
+          <span class="badge bg-secondary rounded-pill"><%- cartCount %></span>
+        </h4>
+        <ul class="list-group mb-3 text-capitalize">
+          <% cartList.forEach(item => { %>
+          <li class="list-group-item d-flex justify-content-between lh-sm">
+            <div class="fs-5">
+              <h6 class="my-0"><%- item.productId.name %></h6>
+              <small class="text-body-secondary">Size: <%- item.sizeId.value %></small> <br />
+              <small class="text-body-secondary">Color: <%- item.colorId.name %></small> <br />
+              <small class="text-body-secondary">Quantity: <%- item.quantity %></small>
+            </div>
+            <div class="d-flex flex-column align-items-end lead fs-6">
+              <span class="fw-semibold text-body-secondary">Price per item: <span class="text-muted">₹<%- item.price %></span></span>
+              <span class="text-body-secondary fw-semibold">Total: ₹<%- item.itemTotal %></span>
+            </div>
+          </li>
+          <% }) %>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Grand Total (INR)</span>
+            <strong>₹<span id="grandTotal"><%- payable %></span></strong>
+          </li>
 
           <!-- Applied Coupon Section -->
           <li class="list-group-item d-flex justify-content-between bg-body-tertiary d-none" id="appliedCoupon">
@@ -75,13 +104,13 @@
           </li>
 
           <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %>
-            <li class="list-group-item d-flex justify-content-between bg-body-tertiary" id="appliedCoupon">
-              <div class="text-success">
-                <h6 class="my-0">Coupon code</h6>
-                <small class="text-uppercase" id="coupon"><%- userCart.coupon.code %></small>
-              </div>
-              <span class="text-success" id="discountAmount">−₹<%- userCart.couponDiscount.toFixed(2) %></span>
-            </li>
+          <li class="list-group-item d-flex justify-content-between bg-body-tertiary" id="appliedCoupon">
+            <div class="text-success">
+              <h6 class="my-0">Coupon code</h6>
+              <small class="text-uppercase" id="coupon"><%- userCart.coupon.code %></small>
+            </div>
+            <span class="text-success" id="discountAmount">−₹<%- userCart.couponDiscount.toFixed(2) %></span>
+          </li>
           <% } %>
 
           <!-- Apply Coupon Form -->
@@ -89,26 +118,17 @@
             <label class="form-label text-dark" for="couponCode">Apply Coupon Code</label>
             <fieldset>
               <div class="input-group">
-                <input 
-                  <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> 
-                    disabled="disabled" 
-                  <% } %> 
-                  id="couponCode" name="code" type="text" class="form-control text-uppercase" placeholder="Coupon code" 
-                  <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> 
-                    value="<%- userCart.coupon.code %>" 
-                  <% } %>>
-                
-                <button 
-                  <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> 
-                    disabled="disabled" 
-                  <% } %> 
-                  type="submit" class="btn btn-outline-primary <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? 'd-none' : '' %>">
-                  Apply
+                <input <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> disabled="disabled" <% } %> id="couponCode" name="code"
+                type="text" class="form-control text-uppercase" placeholder="Coupon code" 
+                <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> value="<%- userCart.coupon.code %>" <% } %>> <button 
+                <% if (typeof userCart.coupon !== 'undefined' && userCart.coupon) { %> disabled="disabled" <% } %> 
+                type="submit" class="btn btn-outline-primary <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? 'd-none' : '' %>"> Apply
 
-                <button 
-                  onclick="removeCoupon()" 
-                  type="button" 
-                  class="btn btn-outline-warning <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? '' : 'd-none' %>">
+                <button
+                  onclick="removeCoupon()"
+                  type="button"
+                  class="btn btn-outline-warning <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? '' : 'd-none' %>"
+                >
                   Remove Coupon
                 </button>
               </div>
@@ -119,201 +139,225 @@
           <div id="couponsAccordion" class="text-capitalize accordion mt-4">
             <h6 class="mb-3 fs-5">Available Coupons</h6>
 
-            <% if (typeof coupons !== 'undefined' && coupons.length > 0) { %>
-              <% coupons.forEach(function(coupon, index) { %>
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="heading<%= index %>">
-                    <button class="accordion-button collapsed text-uppercase text-success" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<%= index %>" aria-expanded="false" aria-controls="collapse<%= index %>">
-                      <%= coupon.code %>
-                    </button>
-                  </h2>
-                  <div id="collapse<%= index %>" class="accordion-collapse collapse" aria-labelledby="heading<%= index %>" data-bs-parent="#couponsAccordion">
-                    <div class="accordion-body">
-                      <!-- Coupon Card -->
-                      <div class="coupon-card">
-                        <h4 class="coupon-title"><%= coupon.Description %></h4>
-                        <p>Discount: <%= coupon.rateOfDiscount + '%' %></p>
-                        <p>Min Order Amount: <%= coupon.minPurchaseAmount %></p>
-                        <p>Expiry Date: <%= coupon.expiringDate.toDateString() %></p>
-                        <button type="button" onclick="copyCode('<%= coupon.code %>')" class="btn btn-primary btn-sm">Copy Code</button>
-                      </div>
-                    </div>
+            <% if (typeof coupons !== 'undefined' && coupons.length > 0) { %> <% coupons.forEach(function(coupon, index) { %>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading<%= index %>">
+                <button
+                  class="accordion-button collapsed text-uppercase text-success"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapse<%= index %>"
+                  aria-expanded="false"
+                  aria-controls="collapse<%= index %>"
+                >
+                  <%= coupon.code %>
+                </button>
+              </h2>
+              <div
+                id="collapse<%= index %>"
+                class="accordion-collapse collapse"
+                aria-labelledby="heading<%= index %>"
+                data-bs-parent="#couponsAccordion"
+              >
+                <div class="accordion-body">
+                  <!-- Coupon Card -->
+                  <div class="coupon-card">
+                    <h4 class="coupon-title"><%= coupon.Description %></h4>
+                    <p>Discount: <%= coupon.rateOfDiscount + '%' %></p>
+                    <p>Min Order Amount: <%= coupon.minPurchaseAmount %></p>
+                    <p>Expiry Date: <%= coupon.expiringDate.toDateString() %></p>
+                    <button type="button" onclick="copyCode('<%= coupon.code %>')" class="btn btn-primary btn-sm">Copy Code</button>
                   </div>
                 </div>
-              <% }); %>
-            <% } else { %>
-              <p class="lead text-warning">No Coupons Available</p>
+              </div>
+            </div>
+            <% }); %> <% } else { %>
+            <p class="lead text-warning">No Coupons Available</p>
             <% } %>
           </div>
 
-
-
-
-
-
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Grand Total (INR)</span>
-              <strong>₹<span id="grandTotal"><%- totalPrice %></span></strong>
-            </li>
-          </ul>
-  
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Grand Total (INR)</span>
+            <strong>₹<span id="grandTotal"><%- totalPrice %></span></strong>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-7 col-lg-8">
+        <div class="row">
+          <div class="col-12">
+            <div class="block-header bg-secondary-light"><strong class="text-uppercase">Billing & Shipping Address</strong></div>
+            <br />
+          </div>
         </div>
-        <div class="col-md-7 col-lg-8">
-  
+        <form class="needs-validation" id="orderForm">
+          <div class="row g-3">
+            <section class="col-lg-12">
+              <% if (address.length > 0) { %>
+              <!-- Toolbar-->
+              <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-3">
+                <h6 class="fs-base fs-5 mb-0">Select Billing Address:</h6>
+              </div>
+
+              <!-- Addresses list-->
+              <div class="table table-responsive table-striped mt-0">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr class="align-middle fs-5">
+                      <th>Address</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% address.forEach((item,index) => { %>
+                    <tr class="align-middle fs-5">
+                      <td class="py-3 align-middle text-capitalize">
+                        <div class="d-flex align-items-center">
+                          <input autocomplete="false" required class="mx-2" type="radio" <% if (index === 0) { %> checked <% } %> id="address-<%=
+                          index %>" name="address" value="<%= item._id %>">
+                          <label class="" for="address-<%= index %>">
+                            <%- item.name.toLowerCase() + ', ' + item.houseName + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + 
+                            ',PH:' + item.phone %>
+                          </label>
+                        </div>
+                      </td>
+                      <td class="py-3 btn-group align-middle align-items-center">
+                        <div class="">
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-warning"
+                            id="edit-button"
+                            data-address-id="<%- item._id %>"
+                            href="#edit-address-modal"
+                            data-bs-toggle="modal"
+                          >
+                            <i class="bi bi-pencil fs-6"></i>
+                          </button>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-danger"
+                          id="deleteAddressButton"
+                          data-bs-toggle="tooltip"
+                          title="Remove"
+                          onclick="deleteAddress('<%- item._id %>')"
+                        >
+                          <i class="bi bi-trash fs-6"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+              <% } else { %>
+              <!-- Toolbar-->
+              <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-3">
+                <h6 class="fs-base mb-0">Add Address</h6>
+              </div>
+              <% } %>
+
+              <div class="text-sm-start pt-4">
+                <a class="btn btn-outline-success" href="#add-address" data-bs-toggle="modal"> Add new address </a>
+              </div>
+            </section>
+          </div>
+
+          <hr class="my-4" />
+
           <div class="row">
             <div class="col-12">
-              <div class="block-header bg-secondary-light"><strong class="text-uppercase">Billing & Shipping Address</strong></div>
-              <br>
+              <div class="block-header bg-secondary-light"><strong class="text-uppercase">Payment</strong></div>
+              <br />
             </div>
           </div>
-          <form class="needs-validation" id="orderForm">
-            <div class="row g-3">
-  
-              <section class="col-lg-12">
-                <% if (address.length > 0) { %>
-                <!-- Toolbar-->
-                <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-3">
-                  <h6 class="fs-base fs-5  mb-0">Select Billing Address:</h6>
-                </div>
-  
-                <!-- Addresses list-->
-                <div class="table table-responsive table-striped mt-0">
-                  <table class="table table-hover mb-0">
-                    <thead>
-                      <tr class="align-middle fs-5">
-                        <th>Address</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <% address.forEach((item,index) => { %>
-                      <tr class="align-middle fs-5">
-  
-                        <td class="py-3 align-middle text-capitalize">
-                          <div class="d-flex align-items-center">
-                            <input autocomplete="false" required class="mx-2" type="radio" <% if (index === 0) { %> checked <% } %> id="address-<%= index %>" name="address" value="<%= item._id %>">
-                            <label class="" for="address-<%= index %>">
-                              <%- item.name.toLowerCase() + ', ' + item.houseName + ', ' + item.town + ', ' + item.state + ', PIN: ' + item.zipcode + ', PH:' + item.phone %>
-                            </label>
-                          </div>
-                        </td>
-                        <td class="py-3 btn-group align-middle align-items-center">
-                          <div class="">
-                            <button type="button" class="btn btn-sm btn-outline-warning" id="edit-button" data-address-id="<%- item._id %>" href="#edit-address-modal" data-bs-toggle="modal">
-                              <i class="bi bi-pencil fs-6"></i>
-                            </button>
-                          </div>
-                          <button type="button" class="btn btn-sm btn-danger" id="deleteAddressButton" data-bs-toggle="tooltip" title="Remove" onclick="deleteAddress('<%- item._id %>')">
-                            <i class="bi bi-trash fs-6"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      <% }) %>
-                    </tbody>
-                  </table>
-                </div>
-                <% } else { %>
-                <!-- Toolbar-->
-                <div class="d-none d-lg-flex justify-content-between align-items-center pt-lg-3 pb-3">
-                  <h6 class="fs-base  mb-0">Add Address</h6>
-                </div>
-                <% } %>
-  
-                <div class="text-sm-start pt-4">
-                  <a class="btn btn-outline-success" href="#add-address" data-bs-toggle="modal">
-                    Add new address
-                  </a>
-                </div>
-              </section>
-            </div>
 
-            <hr class="my-4">
-  
-            <div class="row">
-              <div class="col-12">
-                <div class="block-header bg-secondary-light"><strong class="text-uppercase">Payment</strong></div>
-                <br>
-              </div>
-            </div>
-  
-            <div class="mb-5">
-              <div id="accordion" role="tablist">
-  
-                <div class="block mb-3">
-                  <div class="block-header" id="headingThree" role="tab"><strong><a class="accordion-link collapsed" data-bs-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Offline</a></strong></div>
-                  <div class="collapse show" id="collapseThree" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
-                    <div class="block-body py-5 d-flex align-items-center">
-                      <input type="radio" name="paymentMethod" id="payment-method-1" value="COD" <% if (isCOD) { %> checked <% } else { %> disabled <% } %>>
-                      <label class="ms-3" for="payment-method-1">
-                        <strong class="d-block text-uppercase mb-2"> Pay on delivery</strong>
-                        <!-- <span class="text-muted text-sm">Pay on delivery is available for orders above ₹1000 only.    </span>
-                        <br> -->
-                        <% if (!isCOD) { %>
-                        <span class="text-muted text-danger text-sm">Pay on delivery is not available for orders above ₹1000.</span>
-                        <% } %>
-                      </label>
-                    </div>
+          <div class="mb-5">
+            <div id="accordion" role="tablist">
+              <div class="block mb-3">
+                <div class="block-header" id="headingThree" role="tab">
+                  <strong
+                    ><a
+                      class="accordion-link collapsed"
+                      data-bs-toggle="collapse"
+                      href="#collapseThree"
+                      aria-expanded="false"
+                      aria-controls="collapseThree"
+                      >Offline</a
+                    ></strong
+                  >
+                </div>
+                <div class="collapse show" id="collapseThree" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                  <div class="block-body py-5 d-flex align-items-center">
+                    <input type="radio" name="paymentMethod" id="payment-method-1" value="COD" <% if (isCOD) { %> checked <% } else { %> disabled <%
+                    } %>>
+                    <label class="ms-3" for="payment-method-1">
+                      <strong class="d-block text-uppercase mb-2"> Pay on delivery</strong>
+                      <% if (!isCOD) { %>
+                      <span class="text-muted text-danger text-sm">Pay on delivery is not available for orders above ₹1000.</span>
+                      <% } %>
+                    </label>
                   </div>
                 </div>
-          
-                <div class="block mb-3">
-                  <div class="block-header" id="headingTwo" role="tab"><strong><a class="accordion-link collapsed" data-bs-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Online</a></strong></div>
-                  <div class="collapse show " id="collapseTwo" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
-                    <% wallet.forEach(item => { %>
-                      <% if (isInsufficient == true) { %>
-                       
-                        <div class="block-body pt-5 d-flex align-items-center">
-                          <input  type="radio" name="paymentMethod" id="payment-method-2" value="Wallet" disabled>
-                          <label class="ms-3" for="payment-method-2"><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
-                            <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
-                            <br>
-                            <span class="text-muted text-danger text-sm">Your wallet has insufficient balance.</span>
-                          </label>
-                        </div>
-
-                      <% }else{ %>
-
-                        <div class="block-body pt-5 d-flex align-items-center">
-                          <input  type="radio" name="paymentMethod" id="payment-method-2" value="Wallet">
-                          <label class="ms-3" for="payment-method-2"><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
-                            <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
-                            <br>
-              
-                          </label>
-                        </div>
-
-                        <% } %>
-                      
-                      <% }) %>
-                    <div class="block-body pt-2 d-flex align-items-center">
-                      <input type="radio" name="paymentMethod" id="payment-method-3" value="Online">
-                      <label class="ms-3" for="payment-method-3">
-                        <strong class="d-block text-uppercase mb-1"> Pay with Razorpay</strong>
-                        <span class="text-muted text-sm">Pay upto 2 lakh using Razorpay</span>
-                        <br>
-                        <span class="text-muted text-warning text-sm">Will reduce your wallet balance.</span>
-                      </label>
-                    </div>
-                   
-
-                  </div>
-                   
+              </div>
+              <div class="block mb-3">
+                <div class="block-header" id="headingTwo" role="tab">
+                  <strong
+                    ><a
+                      class="accordion-link collapsed"
+                      data-bs-toggle="collapse"
+                      href="#collapseTwo"
+                      aria-expanded="false"
+                      aria-controls="collapseTwo"
+                      >Online</a
+                    ></strong
+                  >
                 </div>
-                
-               
+                <div class="collapse show" id="collapseTwo" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+                  <% wallet.forEach(item => { %> <% if (isInsufficient == true) { %>
+
+                  <div class="block-body pt-5 d-flex align-items-center">
+                    <input type="radio" name="paymentMethod" id="payment-method-2" value="Wallet" disabled />
+                    <label class="ms-3" for="payment-method-2"
+                      ><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
+                      <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span
+                      ><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
+                      <br />
+                      <span class="text-muted text-danger text-sm">Your wallet has insufficient balance.</span>
+                    </label>
+                  </div>
+                  <% }else{ %>
+                  <div class="block-body pt-5 d-flex align-items-center">
+                    <input type="radio" name="paymentMethod" id="payment-method-2" value="Wallet" />
+                    <label class="ms-3" for="payment-method-2"
+                      ><strong class="d-block text-uppercase mb-2"> Pay using Wallet</strong>
+                      <span class="text-muted fw-semibold text-sm">Your Wallet Balance: </span
+                      ><span class="text-muted text-success fw-semibold text-sm">₹<%= item.balance %> </span>
+                      <br />
+                    </label>
+                  </div>
+                  <% } %> <% }) %>
+                  <div class="block-body pt-2 d-flex align-items-center">
+                    <input type="radio" name="paymentMethod" id="payment-method-3" value="Online" />
+                    <label class="ms-3" for="payment-method-3">
+                      <strong class="d-block text-uppercase mb-1"> Pay with Razorpay</strong>
+                      <span class="text-muted text-sm">Pay upto 2 lakh using Razorpay</span>
+                      <br />
+                      <span class="text-muted text-warning text-sm">Will reduce your wallet balance.</span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
-  
-            <button id="submitOrder" class=" btn btn-primary btn-lg" type="submit">Place Order</button>
-            <!-- <div class="row">
-            </div> -->
-          </form>
-        </div>
+          </div>
+
+          <button id="submitOrder" class="btn btn-primary btn-lg" type="submit">Place Order</button>
+        </form>
       </div>
     </div>
-  </section>
-  <section>
+  </div>
+</section>
 
+<section>
   <!-- Add New Address Modal-->
   <form class="needs-validation modal fade" action="/address/add-address" method="POST" id="add-address" tabindex="-1" novalidate>
     <div class="modal-dialog modal-lg">
@@ -434,7 +478,7 @@
       </div>
     </div>
   </form>
-  
+
   <!-- Edit Address Modal -->
   <div class="modal fade" id="edit-address-modal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -552,50 +596,45 @@
             <button type="submit" class="btn btn-primary">Save changes</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</section>
 
-  
-</section>        
 <%- include('../../views/partials/user/footer') %>
-<script defer src="/public/js/user/checkout.js" ></script>
-
-
+<script defer src="/public/js/user/checkout.js"></script>
 
 <script>
   const copyCode = async (code) => {
     await navigator.clipboard.writeText(code);
     Swal.fire({
-      icon: 'success',
-      title: 'Coupon Code Copied!',
-    })
-  }
+      icon: "success",
+      title: "Coupon Code Copied!",
+    });
+  };
 
+  const couponCodeVal = document.getElementById("couponCode").value;
+  document.querySelector("#applyCoupon").addEventListener("submit", function (event) {
+    event.preventDefault(); 
 
-  const couponCodeVal = document.getElementById('couponCode').value;
-  document.querySelector('#applyCoupon').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting normally
+    const couponCodeInput = document.getElementById("couponCode");
+    const couponCodeVal = document.getElementById("couponCode").value;
 
-    // Get the coupon code from the input field
-    const couponCodeInput = document.getElementById('couponCode');
-    const couponCodeVal = document.getElementById('couponCode').value;
-
-    // Display a SweetAlert confirmation dialog
     Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: "Do you want to apply this coupon? " + couponCodeVal.toUpperCase(),
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, apply it!'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, apply it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // If confirmed, send a POST request to the server
         try {
-          // should add a loading using sweetalert while the coupon is being applied
           Swal.fire({
-            icon: 'info',
-            title: 'Applying Coupon',
-            html: 'Please wait while we verify and apply the coupon...',
+            icon: "info",
+            title: "Applying Coupon",
+            html: "Please wait while we verify and apply the coupon...",
             allowOutsideClick: false,
             didOpen: () => {
               Swal.showLoading();
@@ -603,13 +642,13 @@
             timer: 4200,
           });
 
-          const response = await fetch('/checkout/verify-coupon', {
-            method: 'POST',
+          const response = await fetch("/checkout/verify-coupon", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              code: couponCodeVal.toLowerCase()
+              code: couponCodeVal.toLowerCase(),
             }),
           });
 
@@ -618,78 +657,58 @@
           if (response.ok) {
             const data = await response.json();
 
-            // If the response is successful, disable the input field
-            const coupon = document.getElementById('appliedCoupon');
-            const couponCode = document.getElementById('coupon');
-            const discountAmount = document.getElementById('discountAmount');
-            let grandTotal = document.getElementById('grandTotal').innerHTML;
+            const coupon = document.getElementById("appliedCoupon");
+            const couponCode = document.getElementById("coupon");
+            const discountAmount = document.getElementById("discountAmount");
+            let grandTotal = document.getElementById("grandTotal").innerHTML;
 
-            coupon.classList.remove('d-none');
+            coupon.classList.remove("d-none");
             couponCode.innerText = `${data.coupon.code}`;
             discountAmount.innerText = `-$${data.discountAmount}`;
 
             couponCodeInput.disabled = true;
-            couponCodeInput.value = '';
-            Swal.fire(
-              'Applied!',
-              data.message,
-              'success'
-            ).then(() => {
-              location.reload()
+            couponCodeInput.value = "";
+            Swal.fire("Applied!", data.message, "success").then(() => {
+              location.reload();
             });
           } else {
-            // Handle errors
             const errorData = await response.json();
-            Swal.fire(
-              'Error!',
-              errorData.message || 'There was an error applying the coupon.',
-              'error'
-            );
+            Swal.fire("Error!", errorData.message || "There was an error applying the coupon.", "error");
           }
         } catch (error) {
-          console.error('Error:', error);
-          Swal.fire(
-            'Error!',
-            'There was an error applying the coupon.',
-            'error'
-          );
+          console.error("Error:", error);
+          Swal.fire("Error!", "There was an error applying the coupon.", "error");
         }
       }
     });
-
   });
-
-
 
   const removeCoupon = async () => {
     Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: "Do you want to remove this coupon? " + couponCodeVal.toUpperCase(),
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, remove it!'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // If confirmed, send a POST request to the server
         try {
-
-          // should add a loading using sweetalert while the coupon is being removed
           Swal.fire({
-            icon: 'info',
-            title: 'Removing Coupon',
-            html: 'Please wait while we remove the coupon...',
+            icon: "info",
+            title: "Removing Coupon",
+            html: "Please wait while we remove the coupon...",
             allowOutsideClick: false,
             didOpen: () => {
               Swal.showLoading();
-            }
-          })
+            },
+          });
 
-          const response = await fetch('/checkout/remove-coupon', {
-            method: 'POST',
+          const response = await fetch("/checkout/remove-coupon", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -698,42 +717,23 @@
           if (response.ok) {
             const data = await response.json();
 
-            Swal.fire(
-              'Removed!',
-              data.message,
-              'success'
-            ).then(() => {
-              location.reload()
+            Swal.fire("Removed!", data.message, "success").then(() => {
+              location.reload();
             });
           } else {
-            // Handle errors
             const errorData = await response.json();
-            Swal.fire(
-              'Error!',
-              errorData.message || 'There was an error removing the coupon.',
-              'error'
-            ).then(() => {
-              location.reload()
+            Swal.fire("Error!", errorData.message || "There was an error removing the coupon.", "error").then(() => {
+              location.reload();
             });
           }
         } catch (error) {
-          console.error('Error:', error);
-          Swal.fire(
-            'Error!',
-            'There was an error removing the coupon.',
-            'error'
-          );
+          console.error("Error:", error);
+          Swal.fire("Error!", "There was an error removing the coupon.", "error");
         }
       }
     });
-  }
+  };
 </script>
-
-
-
-
-
-
 
 <script>
   const editAddress = document.querySelector("#edit-address-modal");
@@ -747,7 +747,6 @@
 
       const response = await fetch(`/address/edit-address/${addressId}`);
       if (!response.ok) {
-        // If the response is not okay, throw an error
         throw new Error("Network response was not ok");
       }
 
@@ -778,7 +777,6 @@
       editAddressForm.action = `/address/edit-address/${addressId}`;
       return;
     } catch (error) {
-      // Use SweetAlert to display the error message
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -808,7 +806,6 @@
           }
 
           Swal.fire("Deleted!", "Your address has been deleted.", "success").then(() => location.reload());
-          // Optionally, refresh the page or remove the address from the DOM here
         } catch (error) {
           Swal.fire({
             icon: "error",
@@ -1038,7 +1035,6 @@
       isAlternatePhoneValid &&
       isAddressTypeValid;
 
-
     const customerId = document.querySelector("#customerId").value;
 
     if (isFormValid) {
@@ -1091,11 +1087,9 @@
   const debounce = (fn, delay = 500) => {
     let timeoutId;
     return (...args) => {
-      // cancel the previous timer
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-      // setup a new timer
       timeoutId = setTimeout(() => {
         fn.apply(null, args);
       }, delay);
@@ -1106,40 +1100,39 @@
     "input",
     debounce(function (e) {
       switch (e.target.id) {
-        case "address-fn": // Assuming this is the full name field
+        case "address-fn": 
           checkName();
           break;
-        case "address-ln": // Assuming this is the phone number field
+        case "address-ln": 
           checkPhone();
           break;
-        case "address-house-name": // Assuming this is the house name field
+        case "address-house-name": 
           checkHouseName();
           break;
-        case "address-area": // Assuming this is the area/street field
+        case "address-area": 
           checkAreaStreet();
           break;
-        case "address-locality": // Assuming this is the locality field
+        case "address-locality": 
           checkLocality();
           break;
-        case "address-town": // Assuming this is the town field
+        case "address-town": 
           checkTown();
           break;
-        case "address-state": // Assuming this is the state field
+        case "address-state": 
           checkState();
           break;
-        case "address-zip": // Assuming this is the ZIP code field
+        case "address-zip": 
           checkZipcode();
           break;
-        case "address-landmark": // Assuming this is the landmark field
+        case "address-landmark": 
           checkLandmark();
           break;
-        case "alternate-phone": // Assuming this is the alternate phone number field
+        case "alternate-phone": 
           checkAlternatePhone();
           break;
-        case "address_type": // Assuming this is the address type field
+        case "address_type": 
           checkAddressType();
           break;
-        // Add more cases as needed for other fields in your form
       }
     })
   );
@@ -1312,14 +1305,12 @@
   // Show modal event to fetch and populate address data
   editAddressModal.addEventListener("show.bs.modal", async (e) => {
     try {
-      const editButton = e.relatedTarget; // Button that triggered the modal
-      const addressId = editButton.getAttribute("data-address-id"); // Extract address ID
+      const editButton = e.relatedTarget; 
+      const addressId = editButton.getAttribute("data-address-id"); 
 
-      console.log("this is addressId", addressId)
-      // Fetch address data from the server
+      console.log("this is addressId", addressId);
       const response = await fetch(`/address/edit-address/${addressId}`);
       if (!response.ok) {
-        // If response is not ok, throw an error
         throw new Error("Network response was not ok");
       }
 
@@ -1338,7 +1329,6 @@
       document.getElementById("edit-address-landmark").value = address.landmark;
       document.getElementById("edit-alternate-phone").value = address.alternativePhone;
 
-      // Set the appropriate radio button for address type
       const addressTypeHome = document.getElementById("edit-flexRadioDefault1");
       const addressTypeWork = document.getElementById("edit-flexRadioDefault2");
       if (address.addressType === "HOME") {
@@ -1349,10 +1339,8 @@
         addressTypeWork.checked = true;
       }
 
-      // Set the form action to include the address ID
       editAddressForm.action = `/address/edit-address/${addressId}`;
     } catch (error) {
-      // Display error using SweetAlert
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -1361,11 +1349,9 @@
     }
   });
 
-  // Form submission event to handle edit
   editAddressForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Validate the form fields
     const isFormValid =
       checkEditName() &&
       checkEditPhone() &&
@@ -1381,7 +1367,6 @@
 
     if (isFormValid) {
       try {
-        // Use the action attribute of the form, which already contains the correct addressId
         const response = await fetch(editAddressForm.action, {
           method: "POST",
           headers: {
@@ -1399,7 +1384,6 @@
             landmark: document.querySelector("#edit-address-landmark").value,
             alternativePhone: document.querySelector("#edit-alternate-phone").value,
             addressType: document.querySelector('input[name="addressType"]:checked').value,
-            // customerId: document.querySelector("#edit-customerId").value, // Assuming this exists in your form
           }),
         });
 
@@ -1410,7 +1394,7 @@
             icon: "success",
             title: "Success",
             text: "Address updated successfully!",
-          }).then(() => location.reload()); // Reload the page on success
+          }).then(() => location.reload()); 
         } else {
           Swal.fire({
             icon: "error",
@@ -1432,43 +1416,40 @@
     "input",
     debounce((e) => {
       switch (e.target.id) {
-        case "edit-address-fn": // Full name
+        case "edit-address-fn": 
           checkEditName();
           break;
-        case "edit-address-ln": // Phone
+        case "edit-address-ln":
           checkEditPhone();
           break;
-        case "edit-address-house-name": // House Name
+        case "edit-address-house-name": 
           checkEditHouseName();
           break;
-        case "edit-address-area": // Area/Street
+        case "edit-address-area": 
           checkEditAreaStreet();
           break;
-        case "edit-address-locality": // Locality
+        case "edit-address-locality": 
           checkEditLocality();
           break;
-        case "edit-address-town": // Town
+        case "edit-address-town": 
           checkEditTown();
           break;
-        case "edit-address-state": // State
+        case "edit-address-state": 
           checkEditState();
           break;
-        case "edit-address-zip": // ZIP code
+        case "edit-address-zip": 
           checkEditZipcode();
           break;
-        case "edit-address-landmark": // Landmark
+        case "edit-address-landmark": 
           checkEditLandmark();
           break;
-        case "edit-alternate-phone": // Alternate Phone
+        case "edit-alternate-phone": 
           checkEditAlternatePhone();
           break;
-        // Assuming there's a function to check the address type, if needed
-        case "edit-form-check": // Address Type
+        case "edit-form-check": 
           checkAddressType();
           break;
       }
     })
   );
 </script>
-
-
