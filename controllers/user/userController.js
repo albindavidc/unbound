@@ -5,6 +5,7 @@ const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
 const Referral = require("../../models/referralSchema")
 const Wallet = require("../../models/walletSchema")
+const Cart = require("../../models/cartSchema")
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -28,6 +29,12 @@ const loadHomepage = async (req, res) => {
       });
     } else {
       res.render("user/signup");
+    }
+
+    const userId = req.session.user;
+    const cart = new Cart.findOne({userId});
+    if(!cart){
+      await cart.save();
     }
 
   } catch (error) {
