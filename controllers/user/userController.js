@@ -24,8 +24,9 @@ const loadHomepage = async (req, res) => {
 
   try {
     const userId = req.session.user;
-    const cart = new Cart.findOne({userId});
+    let cart = await Cart.findOne({userId});
     if(!cart){
+      cart = new Cart({userId})
       await cart.save();
     }
     
