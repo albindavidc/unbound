@@ -78,13 +78,6 @@ module.exports = {
         .populate('customerId'); 
         
 
-
-      if (order.length > 0) {
-        console.log("This is the first order ID on this page:", order[0]._id);
-      } else {
-        console.log("No orders found.");
-      }
-
       const user = await User.findById(userId)
       const orders = await Order.findById(orderId)
       const payment = await Payment.find({orderId: order._id})

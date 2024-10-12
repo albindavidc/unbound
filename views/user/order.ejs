@@ -273,12 +273,13 @@
               </div>
               <hr class="mt-4 ml-3"style="width: 700px;">
 
-              
+
               <div class="ml-2">
+                <%= console.log(item, "this is rating") %>
 
                 <% item.productId.ratings.forEach(rating => { %>
-                 
-                  <% if (rating.orderId == item._id) { %>
+                  <% if (rating.orderId === item._id) { %>
+                    
                     <h3>Reviews & Rating</h3>
   
                     <div class="rating mt-4" id="starRating" data-product-id="" data-order-id="">
@@ -309,8 +310,8 @@
                        </div>
                       <% } %>
                     <% }) %>
-
               </div>
+              
             </div>
           </div>
           <% }) %>
