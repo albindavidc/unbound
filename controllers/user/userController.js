@@ -4,6 +4,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Address = require("../../models/addressSchema");
 const Referral = require("../../models/referralSchema")
+const Wallet = require("../../models/walletSchema")
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -464,10 +465,28 @@ const logout = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.session.user;
+    const wallet = await Wallet.findOne({ userId });
 
     if (!userId) {
       req.flash("error", "User not found in session");
       return res.redirect("/login");
+    }
+
+
+    if (!wallet) {
+      const newWallet = new Wallet({
+        userId: userId,
+        balance: 10,
+        transactions: [
+          {
+            message: "Sign in bonus",
+            amount: 10,
+            type: "Credit", 
+          },
+        ],
+      });
+      await newWallet.save();
+
     }
 
     const user = await User.findOne({ _id: userId, isBlocked: false });
