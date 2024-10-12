@@ -13,12 +13,16 @@ const wishlistController = require("../controllers/user/wishlistController");
 const couponController = require("../controllers/user/couponController");
 const walletController = require("../controllers/user/walletController");
 
-//Home page - Page not found
+/**
+ * Home page - Page not found
+ */
 router.get("/", checkUserStatus, userAuth, userController.loadHomepage);
 router.get("/pageNotFound", userController.pageNotFound);
 router.get("/logout", userController.logout);
 
-//Signup Managment
+/**
+ * Signup Management
+ */
 router.route("/signup").get(isLogedOut, userController.loadSignup).post(userController.signup);
 
 router.get("/verify-otp", userController.getVerifyOtp);
@@ -32,7 +36,9 @@ router.get("/auth/google/callback", isLogedOut, passport.authenticate("google", 
   res.redirect("/");
 });
 
-//Signin Managment
+/**
+ * Signin Management
+ */
 router.get("/login", isLogedOut, userController.loadLogin);
 router.post("/login", userController.login);
 
@@ -45,20 +51,24 @@ router.post("/forgotPassVerifyOtp", userController.forgotPassVerifyOtp);
 router.get("/forgot-password-cpassword", userController.passwordReset);
 router.post("/forgot-password-cpassword", userController.passwordChange);
 
-// Product-Managment
+/**
+ * Product Management
+ */
 router.get("/user/product-list", userAuth, checkUserStatus, productController.loadProductList);
 router.get("/user/product-list/:id", productController.loadProductDetails);
 router.get("/customizeProduct/:id", userAuth, checkUserStatus, productController.loadCustomizeProduct);
 router.post("/save-canvas", productController.saveCustomizedImage);
 router.post("/product-details-customization", productController.productDetailsCustomConfirm);
 
-// User-Profile
+
+/**
+ * User-Profile Management
+ */
 router.route("/profile")
 .all(userAuth, checkUserStatus)
 .get(userController.getUserProfile)
 .post(userController.editProfile);
 
-// router.get("/product", productController.getCategory);
 router.post("/reset-password", userController.resetPassword);
 
 router.route("/orders")
@@ -80,7 +90,9 @@ router.route("/wishlist").get(wishlistController.getWishlist);
 router.delete("/wishlist/:productId", wishlistController.deleteWishlist);
 router.post("/wishlist/:productId", wishlistController.addWishlist);
 
-//User-Address
+/**
+ * User-Address
+ */
 router.get("/address", userController.getAddress);
 router.post("/address/add-address", userController.addAddress);
 
@@ -91,7 +103,9 @@ router.route("/address/edit-address/:id")
 router.route("/address/delete-address/:id")
 .delete(userController.deleteAddress);
 
-//Cart
+/**
+ * Cart Management
+ */
 router.get("/cart", userAuth, cartController.getCart);
 router.post("/user/add-to-cart", cartController.addToCart);
 router.delete("/cart/remove/:productId/:variantId", cartController.removeCartItem);
