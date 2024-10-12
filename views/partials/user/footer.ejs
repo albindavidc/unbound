@@ -1,3 +1,5 @@
+<!-- footer.ejs -->
+
 <!-- Footer Section Begin -->
 <footer class="footer">
   <div class="container">
@@ -17,21 +19,19 @@
         <div class="footer__widget">
           <h6>Shopping</h6>
           <ul>
-            <li><a href="#">Clothing Store</a></li>
-            <li><a href="#">Trending Shoes</a></li>
-            <li><a href="#">Accessories</a></li>
-            <li><a href="#">Sale</a></li>
+            <li><a href="user/product-list">Shopping Store</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
           </ul>
         </div>
       </div>
       <div class="col-lg-2 col-md-3 col-sm-6">
         <div class="footer__widget">
-          <h6>Shopping</h6>
+          <h6>About Us</h6>
           <ul>
             <li><a href="#">Contact Us</a></li>
             <li><a href="#">Payment Methods</a></li>
             <li><a href="#">Delivery</a></li>
-            <li><a href="#">Return & Exchanges</a></li>
+            <li><a href="/orders">Return & Exchanges</a></li>
           </ul>
         </div>
       </div>
@@ -39,10 +39,16 @@
         <div class="footer__widget">
           <h6>Newsletter</h6>
           <div class="footer__newsletter">
-            <p>Be the first to know about new arrivals, look books, sales & promos!</p>
+            <p style="color: #b7b7b7">Be the first to know about new arrivals, look books, sales & promos!</p>
             <form action="#">
-              <input type="text" placeholder="Your email" />
-              <button type="submit"><span class="icon_mail_alt"></span></button>
+              <div class="d-flex flex-row">
+                <div class="mr-3">
+                  <input type="text" placeholder="Your email" class="form-control" />
+                </div>
+                <div>
+                  <button type="submit" class="btn btn-light"><span class="icon_mail_alt"></span></button>
+                </div>
+              </div>
             </form>
           </div>
         </div>
@@ -77,34 +83,30 @@
 <script src="../../../public/js/owl.carousel.min.js"></script>
 <script src="../../../public/js/main.js"></script>
 
+<!-- Razorpay -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- JavaScript files-->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-     <!-- Razorpay -->
-     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-     <!-- JavaScript files-->
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- jQuery-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/jquery/jquery.min.js"></script>
+<!-- Bootstrap JavaScript Bundle (Popper.js included)-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Owl Carousel-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/owl.carousel/owl.carousel.js"></script>
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.min.js"></script>
+<!-- NoUI Slider (price slider)-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/nouislider/nouislider.min.js"></script>
+<!-- Smooth scrolling-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/smooth-scroll/smooth-scroll.polyfills.min.js"></script>
+<!-- Lightbox gallery-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/glightbox/js/glightbox.min.js"></script>
+<!-- Object Fit Images - Fallback for browsers that don't support object-fit-->
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/object-fit-images/ofi.min.js"></script>
+<script>
+  var basePath = "";
+</script>
+<script defer src="https://demo.bootstrapious.com/sell/2-0-1/js/theme.30e7c8f9.js"></script>
+<script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/jquery.cookie/jquery.cookie.js"></script>
 
-     <!-- jQuery-->
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/jquery/jquery.min.js"></script>
-     <!-- Bootstrap JavaScript Bundle (Popper.js included)-->
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-     <!-- Owl Carousel-->
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/owl.carousel/owl.carousel.js"></script>
-     <script
-         src="https://demo.bootstrapious.com/sell/2-0-1/vendor/owl.carousel2.thumbs/owl.carousel2.thumbs.min.js">
-     </script>
-     <!-- NoUI Slider (price slider)-->
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/nouislider/nouislider.min.js"></script>
-     <!-- Smooth scrolling-->
-     <script
-         src="https://demo.bootstrapious.com/sell/2-0-1/vendor/smooth-scroll/smooth-scroll.polyfills.min.js"></script>
-     <!-- Lightbox gallery-->
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/glightbox/js/glightbox.min.js"></script>
-     <!-- Object Fit Images - Fallback for browsers that don't support object-fit-->
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/object-fit-images/ofi.min.js"></script>
-     <script>
-         var basePath = "";
-     </script>
-     <script defer src="https://demo.bootstrapious.com/sell/2-0-1/js/theme.30e7c8f9.js"></script>
-     <script src="https://demo.bootstrapious.com/sell/2-0-1/vendor/jquery.cookie/jquery.cookie.js"></script>
-
-     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
