@@ -23,6 +23,12 @@ const loadHomepage = async (req, res) => {
   console.log(req.session.user);
 
   try {
+    const userId = req.session.user;
+    const cart = new Cart.findOne({userId});
+    if(!cart){
+      await cart.save();
+    }
+    
     if (req.session.user) {
       return res.render("user/home", {
         user: req.session.user,
@@ -31,11 +37,7 @@ const loadHomepage = async (req, res) => {
       res.render("user/signup");
     }
 
-    const userId = req.session.user;
-    const cart = new Cart.findOne({userId});
-    if(!cart){
-      await cart.save();
-    }
+    
 
   } catch (error) {
     console.log(`Home page is not available`);
