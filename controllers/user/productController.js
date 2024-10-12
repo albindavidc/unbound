@@ -41,7 +41,7 @@ module.exports = {
     }
 
     let sortQuery = {};
-    let filterQuery = {}; // Initialize filter query
+    let filterQuery = {}; 
 
     switch (sort) {
       case "low-to-high":
@@ -75,7 +75,7 @@ module.exports = {
       const colors = await Color.find({ isListed: true });
       const variants = await Variants.find({});
 
-      const perPage = 7;
+      const perPage = 9;
       const page = parseInt(req.query.page) || 1;
 
       const products = await Product.find({ ...query, ...filterQuery })

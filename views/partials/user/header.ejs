@@ -1,3 +1,4 @@
+<!-- header.ejs -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,20 +13,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Baloo&display=swap" rel="stylesheet" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/vendor/nouislider/nouislider.css">
-    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/fonts/hkgrotesk/stylesheet.2e9c9834.css">
-    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/vendor/owl.carousel/assets/owl.carousel.css">
-    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/vendor/glightbox/css/glightbox.min.css">
-    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/css/style.default.7acfaf01.css" id="theme-stylesheet">
-    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/css/custom.0a822280.css">
-    <link rel="shortcut icon" href="https://demo.bootstrapious.com/sell/2-0-1/img/favicon.png">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/vendor/nouislider/nouislider.css" />
+    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/fonts/hkgrotesk/stylesheet.2e9c9834.css" />
+    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/vendor/owl.carousel/assets/owl.carousel.css" />
+    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/vendor/glightbox/css/glightbox.min.css" />
+    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/css/style.default.7acfaf01.css" id="theme-stylesheet" />
+    <link rel="stylesheet" href="https://demo.bootstrapious.com/sell/2-0-1/css/custom.0a822280.css" />
+    <link rel="shortcut icon" href="https://demo.bootstrapious.com/sell/2-0-1/img/favicon.png" />
 
-
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    
     <!-- CSS Styles -->
     <link rel="stylesheet" href="../../../public/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="../../../public/css/font-awesome.min.css" type="text/css" />
@@ -43,27 +51,27 @@
         padding: 12px 25px;
         margin: 0 10px;
         border: none;
-        background: linear-gradient(45deg, #000000, #000000); /* Gradient background */
+        background: linear-gradient(45deg, #000000, #000000);
         color: #fff;
         text-align: center;
         text-decoration: none;
         font-size: 16px;
         font-weight: 700;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
       .sign-in-link:hover {
-        background: linear-gradient(45deg, #000000, #000000); /* Reverse gradient on hover */
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Darker shadow on hover */
-        transform: translateY(-2px); /* Slight lift effect */
+        background: linear-gradient(45deg, #000000, #000000);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px);
         color: grey;
       }
 
       .sign-in-link:active {
-        background: linear-gradient(45deg, #000000, #000000); /* Same as hover on click */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Less shadow on click */
-        transform: translateY(0); /* Reset lift effect */
+        background: linear-gradient(45deg, #000000, #000000);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transform: translateY(0);
       }
 
       .dropdown {
@@ -145,23 +153,13 @@
               <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/user/product-list">Shop</a></li>
+                <li><a href="/cart" style="display: flex; align-items: center; padding-top: 15px"> Cart </a></li>
                 <!-- <li>
-                  <a href="#">Pages</a>
-                  <ul class="dropdown">
-                    <li><a href="./about.html">About Us</a></li>
-                    <li><a href="/user/product-details">Shop Details</a></li>
-                    <li><a href="/cart">Shopping Cart</a></li>
-                    <li><a href="./checkout.html">Check Out</a></li>
-                    <li><a href="./blog.html">Blog</a></li>
-                    <li><a href="./blog-details.html">Blog Details</a></li>
-                  </ul>
-                </li> -->
-                <li><a href="./contact.html">Contacts</a></li>
-                <li>
                   <a href="#" class="search-switch">
                     <img src="../../../public/img/icon/search.png" alt="Search" />
                   </a>
-                </li>
+                </li> -->
+                <li><a href="/wishlist" style="display: flex; align-items: center; padding-top: 15px"> Wishlist </a></li>
               </ul>
             </nav>
           </div>
@@ -171,18 +169,6 @@
               <div class="dropdown">
                 <a href="#" class="sign-in-link rounded">More</a>
                 <div class="dropdown-content rounded">
-                  <a href="#" style="display: flex; align-items: center; padding-top: 15px">
-                    <div>
-                      <img src="/img/heart.svg" alt="Favorites" style="width: 24px; height: 24px; margin-right: 8px" />
-                    </div>
-                    Favorites
-                  </a>
-                  <a href="/cart" style="display: flex; align-items: center; padding-top: 15px">
-                    <div>
-                      <img src="/img/shopping-cart.svg" alt="Cart" style="width: 24px; height: 24px; margin-right: 8px" />
-                    </div>
-                    Cart
-                  </a>
                   <a href="/profile" style="display: flex; align-items: center; padding-top: 15px">
                     <div>
                       <img src="/img/profile-user.png" alt="Profile" style="width: 24px; height: 24px; margin-right: 8px" />
@@ -208,6 +194,5 @@
         </div>
       </div>
     </header>
-    <!-- Header Section End -->
   </body>
 </html>
