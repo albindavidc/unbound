@@ -169,8 +169,8 @@
                       <div class="col-6 detail-option mb-3">
                         <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
                         <ul class="list-inline mb-0 colours-wrapper">
-                          <% let renderedColors = {}; %> <% product.variants.forEach((variant, index) => { %> <% if (variant.color &&
-                          !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
+                          <% let renderedColors = {}; %> <% product.variants.forEach((variant, index) => { %> 
+                          <% if (variant.color && !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
                           <li class="list-inline-item">
                             <label
                               class="btn-colour <%= index === 0 ? 'active' : '' %> variant_id"
@@ -197,8 +197,8 @@
                       <div class="col-6 detail-option mb-3">
                         <h6 class="detail-option-heading">Size <span>(required)</span></h6>
                         <ul class="list-inline mb-0 sizes-wrapper">
-                          <% let renderedSizes = {}; %> <% product.variants.forEach((variant, index) => { %> <% if (variant.size &&
-                          !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
+                          <% let renderedSizes = {}; %> <% product.variants.forEach((variant, index) => { %> 
+                          <% if (variant.size && !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
                           <li class="list-inline-item">
                             <label
                               onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
@@ -238,8 +238,8 @@
                 </div>
 
                 <div class="product__details__cart__option">
-                  <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if
-                  (totalStock>0){ %>
+                  <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
+                  <% if(totalStock>0){ %>
                   <div class="d-flex d-row justify-content-center">
                     <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
 
