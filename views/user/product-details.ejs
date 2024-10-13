@@ -181,6 +181,7 @@
                           <% if (variant.color && !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
                           <li class="list-inline-item">
                             <label
+                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
                               class="btn-colour <%= index === 0 ? 'active' : '' %> variant_id"
                               for="colour_<%= variant.color.name %>"
                               data-color-hex="<%= variant.color.hex %>"
@@ -190,8 +191,6 @@
                             ></label>
 
                             <input
-                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
-                              class="input-invisible"
                               type="radio"
                               name="colour"
                               value="<%= variant.color._id %>"
