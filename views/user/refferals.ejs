@@ -1,36 +1,29 @@
+<!-- refferals.ejs -->
+
 <%- include('../partials/user/header') %>
 
 <style>
-  /* Main Container */
   .userProfileMain {
     width: 80%;
     height: auto;
     margin: 0 auto;
-    background-color: #000000; /* Dark background */
+    background-color: #000000;
     border-radius: 10px;
     box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
     padding: 20px;
     color: white;
   }
 
-  /* Header Style */
   .userProfileH1 {
     width: 50%;
     margin: auto;
     font-family: "Baloo", cursive;
-    color: #f8f9fa; /* Light white */
-    font-size: 4vw; /* Scalable font size */
+    color: #f8f9fa;
+    font-size: 4vw;
     text-align: center;
     padding-bottom: 20px;
   }
 
-  /* Breadcrumbs */
-  .breadcrumbCls {
-    background-color: #f1f1f1;
-    border-radius: 5px;
-  }
-
-  /* Accordion Section */
   .accordion-link {
     font-size: 1.2rem;
     color: #007bff;
@@ -50,17 +43,16 @@
   .btn-outline-primary {
     margin-right: 10px;
     margin-top: 10px;
-    border-radius: 50px; /* Rounded buttons */
+    border-radius: 50px;
     transition: all 0.3s ease;
   }
 
   .btn-outline-dark:hover,
   .btn-outline-primary:hover {
-    background-color: #007bff; /* Blue on hover */
+    background-color: #007bff;
     color: white;
   }
 
-  /* Table Styling */
   table {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -73,10 +65,9 @@
   }
 
   table tbody tr:hover {
-    background-color: #e9ecef; /* Light hover effect */
+    background-color: #e9ecef;
   }
 
-  /* Copy Link and Code Buttons */
   #copyCode,
   #copyLink {
     background-color: #000000;
@@ -115,7 +106,7 @@
             aria-expanded="false"
             aria-controls="refferalCollapse"
           >
-            <div class="d-flex justify-content-between align-items-center block-header black rounded " id="refferalDetails" role="tab">
+            <div class="d-flex justify-content-between align-items-center block-header black rounded" id="refferalDetails" role="tab">
               <div>
                 <strong>Your Referral Details</strong>
               </div>
@@ -167,8 +158,8 @@
             </tr>
           </thead>
           <tbody>
-            <% if (successfullRefferals && successfullRefferals.length !== 0) { %> <% successfullRefferals.forEach((element) => { %> <%
-            element.referredUserDetails.forEach(userDetails => { %>
+            <% if (successfullRefferals && successfullRefferals.length !== 0) { %> <% successfullRefferals.forEach((element) => { %>
+            <%element.referredUserDetails.forEach(userDetails => { %>
             <tr class="align-middle">
               <td><%= userDetails.user.name %></td>
               <td><%= userDetails.status %></td>
@@ -189,7 +180,7 @@
 <%- include('../partials/user/footer') %>
 
 <script defer>
-  // Copy referral code
+  // Copy referral Code & Link
   const copyCode = document.getElementById("copyCode");
   const copyLink = document.getElementById("copyLink");
 

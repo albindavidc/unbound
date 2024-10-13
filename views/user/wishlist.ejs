@@ -1,3 +1,5 @@
+<!-- wishlist.ejs -->
+
 <%- include('../partials/user/header') %>
 
 <style>
@@ -17,8 +19,8 @@
   }
 </style>
 
+<!-- Wallet Header -->
 <section>
-  <!-- Hero-Content -->
   <div class="pb-5 text-center">
     <div class="card userProfileMain">
       <h1 class="userProfileH1">Wishlist</h1>
@@ -26,6 +28,7 @@
   </div>
 </section>
 
+<!-- Wishlist -->
 <section class="container mt-5 p-6">
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
     <% wishlist.forEach(item => { %> <% item.products.forEach(product => { %> <% if (product.wishlist === true) { %>
@@ -43,7 +46,7 @@
             <h4 class="card-title text-center"><%= product.productId.name %></h4>
           </div>
 
-          <div class="d-flex flex-colmn justify-content-center ">
+          <div class="d-flex flex-colmn justify-content-center">
             <div class="d-flex justify-content-center align-items-center pb-3">
               <h5 class="card-title text-center mr-2">₹<span id="productPrice"><%= product.productId.sellingPrice %></span></h5>
               <h6 class="card-title text-center" style="text-decoration: line-through">₹<%= product.productId.actualPrice %>.00</h6>
@@ -94,8 +97,8 @@
                 <div class="col-12 detail-option mb-3">
                   <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
                   <ul class="list-inline mb-0 colours-wrapper">
-                    <% let renderedColors = {}; %> <% product.productId.variants.forEach((variant, index) => { %> <% if (variant.color &&
-                    !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
+                    <% let renderedColors = {}; %> <% product.productId.variants.forEach((variant, index) => { %>
+                    <% if (variant.color && !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
                     <li class="list-inline-item">
                       <label
                         onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
@@ -121,8 +124,8 @@
                 <div class="col-12 detail-option mb-3">
                   <h6 class="detail-option-heading">Size <span>(required)</span></h6>
                   <ul class="list-inline mb-0 sizes-wrapper">
-                    <% let renderedSizes = {}; %> <% product.productId.variants.forEach((variant, index) => { %> <% if (variant.size &&
-                    !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
+                    <% let renderedSizes = {}; %> <% product.productId.variants.forEach((variant, index) => { %> 
+                      <% if (variant.size && !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
                     <li class="list-inline-item">
                       <label
                         onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
@@ -152,8 +155,8 @@
         </div>
 
         <div class="product__details__cart__option d-flex justify-content-center">
-          <% let totalStock = 0; %> <% product.productId.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if
-          (totalStock > 0) { %>
+          <% let totalStock = 0; %> <% product.productId.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
+          <% if(totalStock > 0) { %>
           <button class="btn btn-dark btn-sm" onclick="addToCart('<%= product.productId._id %>', document.querySelector('#productQuantity').value)">
             <i class="bi bi-cart me-2"></i>
             Add to Cart
@@ -172,6 +175,7 @@
 <%- include('../partials/user/footer') %>
 
 <script>
+  // Add Wishlist
   async function addWishlist(event, productId, element) {
     event.preventDefault();
 
@@ -182,24 +186,21 @@
         headers: {
           "Content-Type": "application/json",
         },
-        // You can include productId in the body if needed
         body: JSON.stringify({ productId }),
       });
 
-      // Check if the response is OK (status 200-299)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Ensure the response is JSON
       const result = await response.json();
       if (result.success) {
         Swal.fire({
           icon: "success",
           title: "Success",
           text: "You have successfully added this product to wishlist",
-          timer: 3000, // 3-second timer
-          showConfirmButton: false, // Optionally hide the confirm button
+          timer: 3000,
+          showConfirmButton: false,
         }).then(() => {
           location.reload();
         });
@@ -214,6 +215,7 @@
     }
   }
 
+  // Delete Wishlist
   async function deleteWishlist(event, productId, element) {
     event.preventDefault();
 
@@ -225,24 +227,21 @@
         headers: {
           "Content-Type": "application/json",
         },
-        // You can include productId in the body if needed
         body: JSON.stringify({ productId }),
       });
 
-      // Check if the response is OK (status 200-299)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Ensure the response is JSON
       const result = await response.json();
       if (result.success) {
         Swal.fire({
           icon: "success",
           title: "Success",
           text: "You have successfully removed this product from the wishlist",
-          timer: 3000, // 3-second timer
-          showConfirmButton: false, // Optionally hide the confirm button
+          timer: 3000,
+          showConfirmButton: false,
         }).then(() => {
           location.reload();
         });
@@ -259,6 +258,7 @@
 </script>
 
 <script defer>
+  // Add to cart
   document.addEventListener("DOMContentLoaded", function () {
     const buttons = document.querySelectorAll(".btn-colour");
     buttons.forEach((btn) => {
@@ -360,7 +360,7 @@
           // variantId: variantId,
           colorId: selectedColorId,
           sizeId: selectedSizeId,
-          quantity, // Send the quantity
+          quantity,
           price,
         }),
       })
@@ -381,7 +381,6 @@
             cancelButtonText: "Continue Shopping",
           }).then((result) => {
             if (result.isConfirmed) {
-              // Redirect to the cart page
               window.location.href = "/cart";
             }
           });
@@ -395,9 +394,6 @@
             text: "Something went wrong!",
           });
         });
-    } else {
-      // Handle case where no variant is selected
-      // alert("Please select a color and size.");
     }
   }
 </script>

@@ -1,18 +1,14 @@
+<!-- signup.ejs -->
+
 <link rel="stylesheet" href="/css/user/login.css" />
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
 <div class="container" id="container">
   <div class="form-container sign-up-container">
     <form id="signform" method="post" action="/signup">
       <h1>Create Account</h1>
       <div class="social-container">
-        <!-- <a href="#" class="social"><i class="fab fa-facebook-f"></i></a> -->
-        <a href="/auth/google" class="social"
-          ><i class="fab fa-google-plus-g"></i
-        ></a>
+        <a href="/auth/google" class="social"><i class="fab fa-google-plus-g"></i></a>
       </div>
       <span>or use your email for registration</span>
 
@@ -21,46 +17,32 @@
         <div id="error1" class="error-message"></div>
       </div>
       <div class="elementsField">
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="Email Address"
-        />
+        <input type="email" id="email" name="email" placeholder="Email Address" />
         <div id="error2" class="error-message"></div>
       </div>
       <div class="elementsField">
-        <input
-          type="phone"
-          id="phone"
-          name="phone"
-          placeholder="Phone Number"
-        />
+        <input type="phone" id="phone" name="phone" placeholder="Phone Number" />
         <div id="error3" class="error-message"></div>
       </div>
 
       <div class="elementsField">
-        <input
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Password"
-        />
+        <input type="password" id="password" name="password" placeholder="Password" />
         <div id="error4" class="error-message"></div>
       </div>
 
       <div class="elementsField">
-        <input
-          type="password"
-          id="confirm-password"
-          name="cPassword"
-          placeholder="Confirm Password"
-        />
+        <input type="password" id="confirm-password" name="cPassword" placeholder="Confirm Password" />
         <div id="error5" class="error-message"></div>
       </div>
 
       <div class="elementsField">
-        <input type="text" name="referrals" id="referrals" value="<%= typeof referrals !== undefined ? referrals : '' %>" placeholder="Referrals(Optional)"/>
+        <input
+          type="text"
+          name="referrals"
+          id="referrals"
+          value="<%= typeof referrals !== undefined ? referrals : '' %>"
+          placeholder="Referrals(Optional)"
+        />
         <div id="error6" class="error-message"></div>
       </div>
 
@@ -72,8 +54,6 @@
     </form>
   </div>
 
-
-
   <div class="form-container sign-in-container">
     <form id="loginform" method="post" action="/login">
       <h1 style="padding: 2rem">Sign in</h1>
@@ -81,23 +61,11 @@
       <span>or use your account</span>
 
       <div class="elementsField">
-        <input
-          type="email"
-          class="form-control"
-          name="email"
-          id="email"
-          placeholder="Enter email"
-        />
+        <input type="email" class="form-control" name="email" id="email" placeholder="Enter email" />
         <div id="error1" class="error-message"></div>
       </div>
       <div class="elementsField">
-        <input
-          type="password"
-          class="form-control"
-          name="password"
-          id="password"
-          placeholder="Password"
-        />
+        <input type="password" class="form-control" name="password" id="password" placeholder="Password" />
         <div id="error2" class="error-message"></div>
       </div>
 
@@ -127,6 +95,7 @@
 </div>
 
 <script>
+  // Signup
   document.addEventListener("DOMContentLoaded", function () {
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");
@@ -232,33 +201,13 @@
       phoneValidateChecking();
       passValidateChecking();
 
-      if (
-        !nameId ||
-        !emailId ||
-        !phoneId ||
-        !passId ||
-        !cPassId ||
-        !error1 ||
-        !error2 ||
-        !error3 ||
-        !error4 ||
-        !error5 ||
-        !signForm
-      ) {
+      if (!nameId || !emailId || !phoneId || !passId || !cPassId || !error1 || !error2 || !error3 || !error4 || !error5 || !signForm) {
         console.error("One or more elements not found");
       }
 
-      if (
-        error1.innerHTML ||
-        error2.innerHTML ||
-        error3.innerHTML ||
-        error4.innerHTML ||
-        error5.innerHTML
-      ) {
+      if (error1.innerHTML || error2.innerHTML || error3.innerHTML || error4.innerHTML || error5.innerHTML) {
         e.preventDefault();
       }
     });
-
-
   });
 </script>

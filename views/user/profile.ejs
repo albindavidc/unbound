@@ -1,3 +1,5 @@
+<!-- profile.ejs -->
+
 <%- include('../../views/partials/user/header') %>
 <style>
   .userProfileMain {
@@ -108,7 +110,10 @@
 </section>
 
 <%- include('../../views/partials/user/footer') %>
+
+
 <script>
+  // Update profile
   const updateForm = document.querySelector("#update-form");
 
   const checkFullName = () => {
@@ -175,6 +180,7 @@
 </script>
 
 <script>
+  // Reset the password
   document.addEventListener("DOMContentLoaded", function () {
     const resetPass = document.getElementById("reset-password-form");
     const oldPasswordEl = document.getElementById("oldPassword");
@@ -190,7 +196,7 @@
 
     const checkOldPassword = () => {
       const password = oldPasswordEl.value.trim();
-      return isRequireded(password); // Check if old password is valid
+      return isRequireded(password); 
     };
 
     const checkPassword = () => {
@@ -222,7 +228,7 @@
         }).then(async (result) => {
           if (result.isConfirmed) {
             const formData = new FormData(resetPass);
-            console.log("Form Data:", Object.fromEntries(formData.entries())); // Log form data
+            console.log("Form Data:", Object.fromEntries(formData.entries())); 
 
             const response = await fetch("/reset-password", {
               method: "POST",
@@ -237,7 +243,7 @@
                 window.location.href = "/profile";
               });
             } else {
-              const errorData = await response.json(); // Capture error response
+              const errorData = await response.json(); 
               Swal.fire("Error!", errorData.message || "Failed to reset password.", "error");
             }
           }

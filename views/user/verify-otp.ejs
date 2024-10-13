@@ -1,17 +1,13 @@
+<!-- verify-otp.ejs -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>OTP Form</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
 
     <style>
       body {
@@ -130,16 +126,9 @@
       <div class="container">
         <header class="mb-8">
           <h1 class="text-2xl font-bold mb-1">Email Verification</h1>
-          <p class="text-sm text-slate-500 mt-2">
-            Please enter the 6-digit OTP sent to your email.
-          </p>
+          <p class="text-sm text-slate-500 mt-2">Please enter the 6-digit OTP sent to your email.</p>
         </header>
-        <form
-          id="otp-form"
-          action="/verify-otp"
-          method="post"
-          onsubmit="return validateOTPForm()"
-        >
+        <form id="otp-form" action="/verify-otp" method="post" onsubmit="return validateOTPForm()">
           <div class="flex items-center justify-center gap-3">
             <input type="text" class="otp-input" maxlength="1" />
             <input type="text" class="otp-input" maxlength="1" />
@@ -148,9 +137,7 @@
             <input type="text" class="otp-input" maxlength="1" />
             <input type="text" class="otp-input" maxlength="1" />
           </div>
-          <div id="timer" class="text-sm text-slate-500 mt-4">
-            Time remaining: <span id="countdown">01:00</span>
-          </div>
+          <div id="timer" class="text-sm text-slate-500 mt-4">Time remaining: <span id="countdown">01:00</span></div>
           <div class="mt-4">
             <button type="submit" class="submit-button">Verify Account</button>
           </div>
@@ -161,11 +148,7 @@
 
           <div class="text-sm text-slate-500 mt-4">
             Didn't receive code?
-            <a
-              id="resend-otp"
-              class="font-medium text-indigo-500 hover:text-indigo-600"
-              >Resend</a
-            >
+            <a id="resend-otp" class="font-medium text-indigo-500 hover:text-indigo-600">Resend</a>
           </div>
         </form>
 
@@ -190,7 +173,6 @@
 
           const resendOTPButton = document.getElementById("resend-otp");
 
-          // Disable resend button initially
           resendOTPButton.classList.add("resend-disabled");
           resendOTPButton.classList.remove("resend-active");
           resendOTPButton.disabled = true;
@@ -198,10 +180,7 @@
           const updateCountdown = () => {
             const minutes = Math.floor(remainingSeconds / 60);
             const seconds = remainingSeconds % 60;
-            countdownElement.textContent = `${String(minutes).padStart(
-              2,
-              "0"
-            )}:${String(seconds).padStart(2, "0")}`;
+            countdownElement.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
             remainingSeconds -= 1;
 
             if (remainingSeconds < 0) {
@@ -215,7 +194,7 @@
           };
 
           const startTimer = () => {
-            clearInterval(timerInterval); // Clear any existing interval
+            clearInterval(timerInterval);
             remainingSeconds = totalSeconds;
             countdownElement.textContent = "01:00";
             submit.disabled = false;
@@ -227,17 +206,8 @@
 
           startTimer();
 
-          // Manage the behaviour of the OTP input form.
-          // Handles backspace, delete, and tab in the input field.
-
           const handleKeyDown = (e) => {
-            if (
-              !/^[0-9]{1}$/.test(e.key) &&
-              e.key !== "Backspace" &&
-              e.key !== "Delete" &&
-              e.key !== "Tab" &&
-              !e.metaKey
-            ) {
+            if (!/^[0-9]{1}$/.test(e.key) && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "Tab" && !e.metaKey) {
               e.preventDefault();
             }
 
@@ -344,16 +314,12 @@
             });
           }
 
-          document
-            .getElementById("resend-otp")
-            .addEventListener("click", (e) => {
-              e.preventDefault();
-              resendOTP();
-            });
+          document.getElementById("resend-otp").addEventListener("click", (e) => {
+            e.preventDefault();
+            resendOTP();
+          });
 
           // Validate OTP Form
-          //Using Ajax
-
           function validateOTPForm() {
             const otpInputs = document.querySelectorAll("input[type=text]");
             const otpInput = Array.from(otpInputs)
@@ -364,7 +330,7 @@
               type: "POST",
               url: "/auth/verify-otp",
               data: { otp: otpInput },
-              success: function(response) {
+              success: function (response) {
                 if (response.success) {
                   Swal.fire({
                     icon: "success",
@@ -378,9 +344,7 @@
                   Swal.fire({
                     icon: "error",
                     title: "Error: Otp is not verified",
-                    text:
-                      response.message ||
-                      "An error occurred while verifying the OTP.",
+                    text: response.message || "An error occurred while verifying the OTP.",
                   });
                 }
               },
