@@ -144,7 +144,7 @@
           </div>
 
           <!-- Zoom Lens and Result Container -->
-          <div class="img-zoom-container">
+          <div class="img-zoom-container" style="z-index: 10;">
             <div class="img-zoom-lens"></div>
             <div id="myresult" class="img-zoom-result"></div>
           </div>
@@ -797,3 +797,13 @@
     }
   }
 </script>
+
+<!-- <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.btn-colour');
+    buttons.forEach(btn => {
+      const hex = btn.getAttribute('data-color-hex');
+      btn.style.backgroundColor = hex;
+    });
+  });
+</script> -->
