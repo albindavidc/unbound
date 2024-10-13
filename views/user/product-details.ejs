@@ -144,7 +144,7 @@
           </div>
 
           <!-- Zoom Lens and Result Container -->
-          <div class="img-zoom-container" style="z-index: 10;">
+          <div class="img-zoom-container" style="z-index: 10">
             <div class="img-zoom-lens"></div>
             <div id="myresult" class="img-zoom-result"></div>
           </div>
@@ -169,11 +169,10 @@
                       <div class="col-6 detail-option mb-3">
                         <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
                         <ul class="list-inline mb-0 colours-wrapper">
-                          <% let renderedColors = {}; %> <% product.variants.forEach((variant, index) => { %> 
-                          <% if (variant.color && !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
+                          <% let renderedColors = {}; %> <% product.variants.forEach((variant, index) => { %> <% if (variant.color &&
+                          !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
                           <li class="list-inline-item">
                             <label
-                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
                               class="btn-colour <%= index === 0 ? 'active' : '' %> variant_id"
                               for="colour_<%= variant.color.name %>"
                               data-color-hex="<%= variant.color.hex %>"
@@ -183,8 +182,8 @@
                             ></label>
 
                             <input
+                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
                               class="input-invisible"
-                              type="radio"
                               name="colour"
                               value="<%= variant.color._id %>"
                               id="colour_<%= variant.color.name %>"
@@ -197,12 +196,12 @@
                       <div class="col-6 detail-option mb-3">
                         <h6 class="detail-option-heading">Size <span>(required)</span></h6>
                         <ul class="list-inline mb-0 sizes-wrapper">
-                          <% let renderedSizes = {}; %> <% product.variants.forEach((variant, index) => { %> 
-                            <% if (variant.size && !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
+                          <% let renderedSizes = {}; %> <% product.variants.forEach((variant, index) => { %> <% if (variant.size &&
+                          !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
                           <li class="list-inline-item">
                             <label
                               onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
-                              class="btn btn-sm btn-outline-secondary detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
+                              class="btn btn-sm btn-outline-dark detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
                               for="size_<%= variant.size.value %>"
                               data-size-value="<%= variant.size.value %>"
                               data-size-id="<%= variant.size._id %>"
@@ -226,20 +225,24 @@
                   </div>
                 </div>
 
-                <div class="pb-3">
+                <div class="pb-3 d-flex flex-row justify-content-center">
                   <% product.variants.forEach(variant => { %>
 
-                  <h6>Total number of stocks: <%= variant.stock %></h6>
+                  <h6 class="mr-3">Total number of stocks: <%= variant.stock %></h6>
+                  <div style="border-left: 2px solid black; height: 20px" class="mr-3"></div>
+
+                  <h6>Category: <%= product.category.name %></h6>
+
                   <% }) %>
                 </div>
 
                 <div class="product__details__cart__option">
-                  <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
-                  <% if (totalStock>0){ %>
+                  <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if
+                  (totalStock>0){ %>
                   <div class="d-flex d-row justify-content-center">
                     <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
 
-                    <div class="" style="margin-top: auto; margin-bottom: auto;">
+                    <div class="" style="margin-top: auto; margin-bottom: auto">
                       <button
                         class="btn primary-btn btn-outline-secondary btn-md"
                         onclick="addToCart('<%= product._id %>')"
@@ -288,12 +291,6 @@
                 <div class="product__details__last__option">
                   <h5><span>Guaranteed Safe Checkout</span></h5>
                   <img src="../../public/img/shop-details/details-payment.png" alt="" />
-                  <ul>
-                    <li>
-                      <span>Categories:</span>
-                      <%= product.category.name %>
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>
@@ -383,8 +380,8 @@
           </div>
           <div class="product__item__text">
             <h6><%= product.name %></h6>
-            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
-            <% if (totalStock > 0){%>
+            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >
+            0){%>
             <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
             <% } else { %>
             <a href="#" class="out-of-stock">Out of Stock</a>
@@ -493,8 +490,8 @@
           icon: "success",
           title: "Success",
           text: "You have successfully added this product to wishlist",
-          timer: 3000, 
-          showConfirmButton: false, 
+          timer: 3000,
+          showConfirmButton: false,
         }).then(() => {
           location.reload();
         });
@@ -534,7 +531,7 @@
           title: "Success",
           text: "You have successfully removed this product from the wishlist",
           timer: 3000,
-          showConfirmButton: false, 
+          showConfirmButton: false,
         }).then(() => {
           location.reload();
         });
@@ -654,7 +651,7 @@
 
   // Function to update price dynamically
   function updatePrice(quantity) {
-    const priceDisplayElement = document.getElementById("productPrice"); 
+    const priceDisplayElement = document.getElementById("productPrice");
 
     const sellingPrice = `<%= product.sellingPrice %>`;
     const actualPrice = `<%= product.actualPrice %>`;
@@ -669,13 +666,12 @@
     }
   }
 
-  
   // Attach an event listener to the quantity input field to update price dynamically
   const quantityInput = document.getElementById("productQuantity");
   quantityInput.addEventListener("input", function () {
-    const quantity = parseInt(this.value, 10); 
+    const quantity = parseInt(this.value, 10);
     console.log("this is quantity", quantity);
-    updatePrice(quantity); 
+    updatePrice(quantity);
   });
 
   // Initial price setting for the default quantity
@@ -760,7 +756,7 @@
           // variantId: variantId,
           colorId: selectedColorId,
           sizeId: selectedSizeId,
-          quantity, 
+          quantity,
           price,
         }),
       })
