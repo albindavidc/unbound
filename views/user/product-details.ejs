@@ -1,84 +1,76 @@
+<!-- product-details.ejs -->
+
 <%- include('../../views/partials/user/header') %>
 
 <style>
-  /* Container for the main product image */
   .product__details__pic__item {
-    max-width: 500px; /* Set maximum width for the image container */
-    height: auto; /* Fixed height for the container */
-    overflow: hidden; /* Hide any overflow */
+    max-width: 500px;
+    height: auto;
+    overflow: hidden;
     display: flex;
-    align-items: center; /* Center image vertically */
-    justify-content: center; /* Center image horizontally */
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Main product image styling */
   .product__details__pic__item img {
-    width: 100%; /* Image takes up full width of the container */
-    height: auto; /* Maintain the aspect ratio */
-    max-height: 100%; /* Ensure image does not exceed container height */
-    object-fit: cover; /* Cover the container without distorting the image */
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: cover;
   }
 
-  /* Thumbnail images styling */
   .imgSize {
-    width: 10%; /* Set width for thumbnails */
+    width: 10%;
   }
 
-  /* Apply border-box sizing to all elements */
   * {
     box-sizing: border-box;
   }
 
-  /* Container for the zoom functionality */
   .img-zoom-container {
-    position: relative; /* Position relative for absolute children */
+    position: relative;
   }
 
-  /* Styling for the zoom lens */
   .img-zoom-lens {
-    display: none; /* Initially hide the zoom lens */
-    position: absolute; /* Position within the container */
-    border: 2px dotted rgba(0, 0, 0, 0.8); /* Dotted border for the lens */
-    width: 160px; /* Set lens width */
-    height: 160px; /* Set lens height */
-    pointer-events: none; /* Prevent the lens from interfering with mouse events */
+    display: none;
+    position: absolute;
+    border: 2px dotted rgba(0, 0, 0, 0.8);
+    width: 160px;
+    height: 160px;
+    pointer-events: none;
     background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.8) 0, rgba(0, 0, 0, 0.8) 1px, transparent 0, transparent 20px);
-    background-size: 10px 10px; /* Size of the dots */
+    background-size: 10px 10px;
   }
 
-  /* Change cursor to zoom-in when hovering over the image */
   .img-zoom-container:hover img {
-    cursor: zoom-in; /* Display a plus sign cursor */
+    cursor: zoom-in;
   }
 
-  /* Show the zoom lens on hover */
   .img-zoom-container:hover .img-zoom-lens {
-    display: block; /* Make the lens visible */
+    display: block;
   }
 
-  /* Styling for the zoom result */
   .img-zoom-result {
-    display: none; /* Initially hide the zoom result */
-    position: absolute; /* Position relative to the container */
-    top: 0; /* Align to the top of the container */
-    margin-left: -100px; /* Adjust horizontal positioning */
-    width: 700px; /* Set width of the zoomed area */
-    height: 500px; /* Set height of the zoomed area */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for better visibility */
+    display: none;
+    position: absolute;
+    top: 0;
+    margin-left: -100px;
+    width: 700px;
+    height: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
-  /* Show the zoom result when hovering over the image */
   .img-zoom-container:hover .img-zoom-result {
-    display: block; /* Display the zoom result */
+    display: block;
   }
 
   #productQuantity {
-    width: 80px; /* Adjust width as needed */
-    padding: 8px; /* Add padding for better touch targets */
-    border: 1px solid #ced4da; /* Light border */
-    border-radius: 4px; /* Rounded corners */
-    font-size: 16px; /* Increase font size for better readability */
-    text-align: center; /* Center text inside the input */
+    width: 80px;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 16px;
+    text-align: center;
   }
 </style>
 
@@ -86,90 +78,226 @@
 <section class="shop-details">
   <div class="product__details__pic">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="product__details__breadcrumb">
-            <a href="/">Home</a>
-            <a href="/shop">Shop</a>
-            <span>Product Details</span>
-          </div>
-        </div>
-      </div>
-
       <div class="d-flex flex-row">
-        <div class="row">
-          <!-- Main Image and Thumbnails Column -->
-          <div class="col-lg-9 col-md-9">
-            <div class="tab-content img-zoom-container">
-              <!-- Main Image Container -->
-              <div class="tab-pane active" id="tabs-primary" role="tabpanel">
-                <div class="product__details__pic__item p-0">
-                  <img
-                    id="main-product-image"
-                    class="img-fluid"
-                    src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                    alt="<%= product.name %>"
-                  />
+        <div class="d-flex flex-col">
+          <div class="row">
+            <div class="col-lg-9 col-md-9">
+              <div class="tab-content img-zoom-container">
+                <div class="tab-pane active" id="tabs-primary" role="tabpanel">
+                  <div class="product__details__pic__item p-0">
+                    <img
+                      id="main-product-image"
+                      class="img-fluid"
+                      src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                      alt="<%= product.name %>"
+                    />
+                  </div>
                 </div>
-              </div>
-              <% product.secondaryImages.forEach((image, index) => { %>
-              <div class="tab-pane" id="tabs-<%= index + 1 %>" role="tabpanel">
-                <div class="product__details__pic__item">
-                  <img
-                    id="secondary-product-image-<%= index %>"
-                    class="img-fluid"
-                    src="/uploads/images/<%= image.name %>"
-                    alt="<%= product.name %>"
-                  />
+                <% product.secondaryImages.forEach((image, index) => { %>
+                <div class="tab-pane" id="tabs-<%= index + 1 %>" role="tabpanel">
+                  <div class="product__details__pic__item">
+                    <img
+                      id="secondary-product-image-<%= index %>"
+                      class="img-fluid"
+                      src="/uploads/images/<%= image.name %>"
+                      alt="<%= product.name %>"
+                    />
+                  </div>
                 </div>
+                <% }); %>
               </div>
-              <% }); %>
-            </div>
 
-            <ul class="nav nav-tabs justify-content-center flex-row mt-3" role="tablist">
-              <!-- Primary Images -->
-              <% product.primaryImages.forEach((image, index) => { %>
-              <li class="nav-item pt-2">
-                <a
-                  class="nav-link <%= index === 0 ? 'active' : '' %>"
-                  data-toggle="tab"
-                  href="#tabs-primary"
-                  role="tab"
-                  data-image-url="/uploads/images/<%= image.name %>"
-                >
-                  <img class="img-thumbnail" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" style="width: 60px; height: 60px" />
-                </a>
-              </li>
-              <% }); %>
+              <ul class="nav nav-tabs justify-content-center flex-row mt-3" role="tablist">
+                <% product.primaryImages.forEach((image, index) => { %>
+                <li class="nav-item pt-2">
+                  <a
+                    class="nav-link <%= index === 0 ? 'active' : '' %>"
+                    data-toggle="tab"
+                    href="#tabs-primary"
+                    role="tab"
+                    data-image-url="/uploads/images/<%= image.name %>"
+                  >
+                    <img class="img-thumbnail" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" style="width: 60px; height: 60px" />
+                  </a>
+                </li>
+                <% }); %> <% product.secondaryImages.forEach((image, index) => { %>
+                <li class="nav-item p-2">
+                  <a class="nav-link" data-toggle="tab" href="#tabs-<%= index + 1 %>" role="tab" data-image-url="/uploads/images/<%= image.name %>">
+                    <img class="img-thumbnail" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" style="width: 60px; height: 60px" />
+                  </a>
+                </li>
+                <% }); %>
+              </ul>
 
-              <!-- Secondary Images -->
-              <% product.secondaryImages.forEach((image, index) => { %>
-              <li class="nav-item p-2">
-                <a class="nav-link" data-toggle="tab" href="#tabs-<%= index + 1 %>" role="tab" data-image-url="/uploads/images/<%= image.name %>">
-                  <img class="img-thumbnail" src="/uploads/images/<%= image.name %>" alt="<%= product.name %>" style="width: 60px; height: 60px" />
-                </a>
-              </li>
-              <% }); %>
-            </ul>
+              <div class="mt-4">
+                <a href="/customizeProduct/<%=product._id%>" class="btn btn-dark mb-4"> Customize the <%= product.category.name %></a>
 
-            <div class="mt-4">
-              <a href="/customizeProduct/<%=product._id%>" class="btn btn-dark mb-4"> Customize the <%= product.category.name %></a>
-
-              <% if (customProduct === false) { %>
-              <button class="btn btn-outline-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
-                Use Custom Design
-              </button>
-              <% }else{ %>
-              <button class="btn btn-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">Using Custom Design</button>
-              <% } %>
+                <% if (customProduct === false) { %>
+                <button class="btn btn-outline-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">
+                  Use Custom Design
+                </button>
+                <% }else{ %>
+                <button class="btn btn-success d-felx align-items-center" style="margin: auto" id="customDesignConfirm">Using Custom Design</button>
+                <% } %>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Zoom Lens and Result Container -->
-        <div class="img-zoom-container">
-          <div class="img-zoom-lens"></div>
-          <div id="myresult" class="img-zoom-result"></div>
+          <!-- Zoom Lens and Result Container -->
+          <div class="img-zoom-container">
+            <div class="img-zoom-lens"></div>
+            <div id="myresult" class="img-zoom-result"></div>
+          </div>
+
+          <div class="row m-0" style="margin: 0">
+            <div class="col-lg-12">
+              <div class="product__details__text">
+                <h4><%= product.name %></h4>
+
+                <div class="rating">
+                  <% for (let i = 0; i < product.rating; i++) { %>
+                  <i class="fa fa-star"></i>
+                  <% } %> <% for (let i = product.rating; i < 5; i++) { %>
+                  <i class="fa fa-star-o"></i>
+                  <% } %>
+                </div>
+
+                <h3 id="productPrice"></h3>
+                <div class="row d-flex align-items-center">
+                  <div class="product__details__option">
+                    <div class="mt-3 d-flex d-col">
+                      <div class="col-6 detail-option mb-3">
+                        <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
+                        <ul class="list-inline mb-0 colours-wrapper">
+                          <% let renderedColors = {}; %> <% product.variants.forEach((variant, index) => { %> 
+                          <% if (variant.color && !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
+                          <li class="list-inline-item">
+                            <label
+                              onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
+                              class="btn-colour <%= index === 0 ? 'active' : '' %> variant_id"
+                              for="colour_<%= variant.color.name %>"
+                              data-color-hex="<%= variant.color.hex %>"
+                              data-color-id="<%= variant.color._id %>"
+                              data-size-id="<%= variant.size._id %>"
+                              data-variant-id="<%=variant._id%>"
+                            ></label>
+
+                            <input
+                              class="input-invisible"
+                              type="radio"
+                              name="colour"
+                              value="<%= variant.color._id %>"
+                              id="colour_<%= variant.color.name %>"
+                              required
+                            />
+                          </li>
+                          <% } %> <% }); %>
+                        </ul>
+                      </div>
+                      <div class="col-6 detail-option mb-3">
+                        <h6 class="detail-option-heading">Size <span>(required)</span></h6>
+                        <ul class="list-inline mb-0 sizes-wrapper">
+                          <% let renderedSizes = {}; %> <% product.variants.forEach((variant, index) => { %> 
+                            <% if (variant.size && !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
+                          <li class="list-inline-item">
+                            <label
+                              onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
+                              class="btn btn-sm btn-outline-secondary detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
+                              for="size_<%= variant.size.value %>"
+                              data-size-value="<%= variant.size.value %>"
+                              data-size-id="<%= variant.size._id %>"
+                              data-color-id="<%= variant.color._id %>"
+                            >
+                              <%= variant.size.value %>
+                              <input
+                                class="input-invisible"
+                                type="radio"
+                                name="size"
+                                value="<%= variant.size._id %>"
+                                id="size_<%= variant.size.value %>"
+                                required
+                              />
+                            </label>
+                          </li>
+                          <% } %> <% }); %>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pb-3">
+                  <% product.variants.forEach(variant => { %>
+
+                  <h6>Total number of stocks: <%= variant.stock %></h6>
+                  <% }) %>
+                </div>
+
+                <div class="product__details__cart__option">
+                  <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
+                  <% if (totalStock>0){ %>
+                  <div class="d-flex d-row justify-content-center">
+                    <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
+
+                    <div class="" style="margin-top: auto; margin-bottom: auto;">
+                      <button
+                        class="btn primary-btn btn-outline-secondary btn-md"
+                        onclick="addToCart('<%= product._id %>')"
+                        style="padding: 0% 5%; height: 50px; width: 200px"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                  <% } else { %>
+                  <a href="#" class="btn btn-danger">Out of Stock</a>
+                  <% } %>
+                </div>
+
+                <div class="col product__details__btns__option">
+                  <% if (product.wishlist === true) { %>
+
+                  <a
+                    href="javascript:void(0);"
+                    onclick="deleteWishlist(event, '<%= product._id %>',this)"
+                    id="wishlist_delete"
+                    aria-label="Add to Wishlist"
+                  >
+                    <button class="btn btn-outline-danger">
+                      <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
+                    </button>
+                  </a>
+                  <% }else{ %>
+
+                  <a
+                    href="javascript:void(0);"
+                    onclick="addWishlist(event, '<%= product._id %>',this)"
+                    id="wishlist_add"
+                    aria-label="Add to Wishlist"
+                  >
+                    <button class="btn btn-outline-secondary">
+                      <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
+                    </button>
+                  </a>
+
+                  <% } %>
+
+                  <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
+                </div>
+
+                <div class="product__details__last__option">
+                  <h5><span>Guaranteed Safe Checkout</span></h5>
+                  <img src="../../public/img/shop-details/details-payment.png" alt="" />
+                  <ul>
+                    <li>
+                      <span>Categories:</span>
+                      <%= product.category.name %>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -177,145 +305,6 @@
 
   <div class="product__details__content">
     <div class="container">
-      <div class="row d-flex justify-content-center">
-        <div class="col-lg-8">
-          <div class="product__details__text">
-            <h4><%= product.name %></h4>
-
-            <div class="rating">
-              <% for (let i = 0; i < product.rating; i++) { %>
-              <i class="fa fa-star"></i>
-              <% } %> <% for (let i = product.rating; i < 5; i++) { %>
-              <i class="fa fa-star-o"></i>
-              <% } %>
-            </div>
-
-            <!-- Product Price -->
-            <h3 id="productPrice"></h3>
-
-            <div class="row d-flex align-items-center">
-              <div class="product__details__option">
-                <div class="mt-3">
-                  <div class="col-12 detail-option mb-3">
-                    <h6 class="detail-option-heading">Colour <span>(required)</span></h6>
-                    <ul class="list-inline mb-0 colours-wrapper">
-                      <% let renderedColors = {}; %> <% product.variants.forEach((variant, index) => { %> <% if (variant.color &&
-                      !renderedColors[variant.color.hex]) { %> <% renderedColors[variant.color.hex] = true; %>
-                      <li class="list-inline-item">
-                        <label
-                          onclick="selectColor('<%= variant.color.hex %>', '<%= variant.color._id %>', '<%= variant.size._id %>')"
-                          class="btn-colour <%= index === 0 ? 'active' : '' %> variant_id"
-                          for="colour_<%= variant.color.name %>"
-                          data-color-hex="<%= variant.color.hex %>"
-                          data-color-id="<%= variant.color._id %>"
-                          data-size-id="<%= variant.size._id %>"
-                          data-variant-id="<%=variant._id%>"
-                        ></label>
-
-                        <input
-                          class="input-invisible"
-                          type="radio"
-                          name="colour"
-                          value="<%= variant.color._id %>"
-                          id="colour_<%= variant.color.name %>"
-                          required
-                        />
-                      </li>
-                      <% } %> <% }); %>
-                    </ul>
-                  </div>
-                  <div class="col-12 detail-option mb-3">
-                    <h6 class="detail-option-heading">Size <span>(required)</span></h6>
-                    <ul class="list-inline mb-0 sizes-wrapper">
-                      <% let renderedSizes = {}; %> <% product.variants.forEach((variant, index) => { %> <% if (variant.size &&
-                      !renderedSizes[variant.size.value]) { %> <% renderedSizes[variant.size.value] = true; %>
-                      <li class="list-inline-item">
-                        <label
-                          onclick="selectSize('<%= variant.size.value %>', '<%= variant.size._id %>', '<%= variant.color._id %>')"
-                          class="btn btn-sm btn-outline-secondary detail-option-btn-label size-option <%= index === 0 ? 'active' : '' %>"
-                          for="size_<%= variant.size.value %>"
-                          data-size-value="<%= variant.size.value %>"
-                          data-size-id="<%= variant.size._id %>"
-                          data-color-id="<%= variant.color._id %>"
-                        >
-                          <%= variant.size.value %>
-                          <input
-                            class="input-invisible"
-                            type="radio"
-                            name="size"
-                            value="<%= variant.size._id %>"
-                            id="size_<%= variant.size.value %>"
-                            required
-                          />
-                        </label>
-                      </li>
-                      <% } %> <% }); %>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="pb-3">
-              <% product.variants.forEach(variant => { %>
-
-              <h6>Total number of stocks: <%= variant.stock %></h6>
-              <% }) %>
-            </div>
-
-            <div class="product__details__cart__option">
-              <input class="m-3" name="quantity" type="number" id="productQuantity" value="1" data-stock="<% stocks %>" autocomplete="off" />
-              <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >0)
-              { %>
-              <button class="btn primary-btn btn-outline-secondary" onclick="addToCart('<%= product._id %>')">
-                <i class="bi bi-cart me-2"></i>
-                Add to Cart
-              </button>
-              <% } else { %>
-              <a href="#" class="btn btn-danger">Out of Stock</a>
-              <% } %>
-            </div>
-
-            <div class="col product__details__btns__option">
-              <% if (product.wishlist === true) { %>
-
-              <a
-                href="javascript:void(0);"
-                onclick="deleteWishlist(event, '<%= product._id %>',this)"
-                id="wishlist_delete"
-                aria-label="Add to Wishlist"
-              >
-                <button class="btn btn-outline-danger">
-                  <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
-                </button>
-              </a>
-              <% }else{ %>
-
-              <a href="javascript:void(0);" onclick="addWishlist(event, '<%= product._id %>',this)" id="wishlist_add" aria-label="Add to Wishlist">
-                <button class="btn btn-outline-secondary">
-                  <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
-                </button>
-              </a>
-
-              <% } %>
-
-              <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
-            </div>
-
-            <div class="product__details__last__option">
-              <h5><span>Guaranteed Safe Checkout</span></h5>
-              <img src="../../public/img/shop-details/details-payment.png" alt="" />
-              <ul>
-                <li>
-                  <span>Categories:</span>
-                  <%= product.category.name %>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="tab-style3">
         <ul class="nav nav-tabs text-uppercase">
           <li class="nav-item">
@@ -337,14 +326,11 @@
             <div class="comments-area">
               <div class="row">
                 <div class="col-lg-8">
-                  
-                  <% product.ratings.forEach(rating => { %> 
-
+                  <% product.ratings.forEach(rating => { %>
 
                   <div class="rating mt-4" id="starRating" data-product-id="" data-order-id="">
-                    <%=rating.user.name%>
-                    <% for( let i = 1; i <= 5; i++ ) { %>
-                    <strong> <i class="fa fa-star <%= i <= rating.rating ? 'text-warning': 'disabled' %>" data-value="<%= i %>"></i></strong> 
+                    <%=rating.user.name%> <% for( let i = 1; i <= 5; i++ ) { %>
+                    <strong> <i class="fa fa-star <%= i <= rating.rating ? 'text-warning': 'disabled' %>" data-value="<%= i %>"></i></strong>
                     <% } %>
                   </div>
 
@@ -397,8 +383,8 @@
           </div>
           <div class="product__item__text">
             <h6><%= product.name %></h6>
-            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock > 0)
-            { %>
+            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
+            <% if (totalStock > 0){%>
             <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
             <% } else { %>
             <a href="#" class="out-of-stock">Out of Stock</a>
@@ -494,24 +480,21 @@
         headers: {
           "Content-Type": "application/json",
         },
-        // You can include productId in the body if needed
         body: JSON.stringify({ productId }),
       });
 
-      // Check if the response is OK (status 200-299)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Ensure the response is JSON
       const result = await response.json();
       if (result.success) {
         Swal.fire({
           icon: "success",
           title: "Success",
           text: "You have successfully added this product to wishlist",
-          timer: 3000, // 3-second timer
-          showConfirmButton: false, // Optionally hide the confirm button
+          timer: 3000, 
+          showConfirmButton: false, 
         }).then(() => {
           location.reload();
         });
@@ -537,24 +520,21 @@
         headers: {
           "Content-Type": "application/json",
         },
-        // You can include productId in the body if needed
         body: JSON.stringify({ productId }),
       });
 
-      // Check if the response is OK (status 200-299)
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Ensure the response is JSON
       const result = await response.json();
       if (result.success) {
         Swal.fire({
           icon: "success",
           title: "Success",
           text: "You have successfully removed this product from the wishlist",
-          timer: 3000, // 3-second timer
-          showConfirmButton: false, // Optionally hide the confirm button
+          timer: 3000,
+          showConfirmButton: false, 
         }).then(() => {
           location.reload();
         });
@@ -674,13 +654,11 @@
 
   // Function to update price dynamically
   function updatePrice(quantity) {
-    const priceDisplayElement = document.getElementById("productPrice"); // The element to update price dynamically
+    const priceDisplayElement = document.getElementById("productPrice"); 
 
     const sellingPrice = `<%= product.sellingPrice %>`;
     const actualPrice = `<%= product.actualPrice %>`;
-    // Check if the quantity exceeds the bundleQuantity to apply bundle price
     if (quantity >= bundleQuantity) {
-      // Apply the bundle price
       priceDisplayElement.innerHTML = `
       <h3>₹${bundlePrice} <span style="font-size: 24px; font-weight: bold;">₹<%= product.sellingPrice %>.00</span> <span>₹<%= product.actualPrice %>.00</span></h3>
       `;
@@ -691,12 +669,13 @@
     }
   }
 
+  
   // Attach an event listener to the quantity input field to update price dynamically
   const quantityInput = document.getElementById("productQuantity");
   quantityInput.addEventListener("input", function () {
-    const quantity = parseInt(this.value, 10); // Get the current quantity from the input field
+    const quantity = parseInt(this.value, 10); 
     console.log("this is quantity", quantity);
-    updatePrice(quantity); // Call the updatePrice function with the new quantity
+    updatePrice(quantity); 
   });
 
   // Initial price setting for the default quantity
@@ -767,15 +746,8 @@
       return;
     }
 
-    // Select the element (assuming you are selecting the first element with the class 'variant')
     const variantElement = document.querySelector(".variant_id");
-
-    // Get the value of the 'data-variant-id' attribute
     const variantId = variantElement.getAttribute("data-variant-id");
-
-    // Log the value
-    console.log(variantId);
-    console.log("this is the total stocks available: ", existingQuantityInCart, variantId);
 
     if (selectedColorId && selectedSizeId) {
       fetch("/user/add-to-cart", {
@@ -788,7 +760,7 @@
           // variantId: variantId,
           colorId: selectedColorId,
           sizeId: selectedSizeId,
-          quantity, // Send the quantity
+          quantity, 
           price,
         }),
       })
@@ -809,7 +781,6 @@
             cancelButtonText: "Continue Shopping",
           }).then((result) => {
             if (result.isConfirmed) {
-              // Redirect to the cart page
               window.location.href = "/cart";
             }
           });
@@ -823,19 +794,6 @@
             text: "Something went wrong!",
           });
         });
-    } else {
-      // Handle case where no variant is selected
-      // alert("Please select a color and size.");
     }
   }
 </script>
-
-<!-- <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const buttons = document.querySelectorAll('.btn-colour');
-    buttons.forEach(btn => {
-      const hex = btn.getAttribute('data-color-hex');
-      btn.style.backgroundColor = hex;
-    });
-  });
-</script> -->

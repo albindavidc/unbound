@@ -1,6 +1,7 @@
+<!-- product-list.ejs -->
+
 <%- include('../../views/partials/user/header') %>
 <style>
-  /* Ensure these styles are applied */
   .category-filter,
   .brand-filter {
     cursor: pointer;
@@ -9,306 +10,256 @@
 
 <style>
   .active {
-    color: rgb(255, 0, 0); /* Example: Change color to indicate active */
+    color: rgb(255, 0, 0);
     font-weight: bold;
     font-size: 10px;
   }
 </style>
-<body>
-  <!-- Breadcrumb Section Begin -->
-  <section class="breadcrumb-option">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="breadcrumb__text">
-            <h4>Shop</h4>
-            <div class="breadcrumb__links">
-              <a href="/">Home</a>
-              <span>Shop</span>
+
+<!-- Shop Section Begin -->
+<section class="shop spad">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3">
+        <div class="shop__sidebar">
+          <div class="shop__sidebar__search">
+            <form action="#">
+              <input id="myInput" type="text" onkeyup="myFunction()" placeholder="Search..." />
+              <button type="submit"><span class="icon_search"></span></button>
+            </form>
+          </div>
+          <div class="shop__sidebar__accordion">
+            <div class="accordion" id="accordionExample">
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                </div>
+
+                <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__categories">
+                      <ul class="nice-scroll">
+                        <li>
+                          <a
+                            href="#"
+                            class="category-filter <%= !currentCategoryId || currentCategoryId === 'all' ? '' : 'active' %>"
+                            data-category="all"
+                            >All</a
+                          >
+                        </li>
+
+                        <% categories.forEach(category => { %>
+                        <li>
+                          <a
+                            href="#"
+                            class="category-filter <%= category._id == currentCategoryId ? 'active' : '' %>"
+                            data-category="<%= category._id %>"
+                            ><%= category.name %></a
+                          >
+
+                          <% }); %>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
+                </div>
+                <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__categories">
+                      <ul class="nice-scroll">
+                        <li>
+                          <a href="#" class="brand-filter <%= !currentBrandId || currentBrandId === 'all' ? '' : 'active' %>" data-brand="all">All</a>
+                        </li>
+
+                        <% brand.forEach(brand => { %>
+                        <li>
+                          <a href="#" class="brand-filter" data-brand="<%= brand._id %>"><%= brand.name %></a>
+                        </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                </div>
+                <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__price">
+                      <ul>
+                        <li>
+                          <a href="#" class="price-filter" data-price="0-1000000">All</a>
+                        </li>
+                        <li><a href="#" class="price-filter" data-price="0-500">₹0.00 - ₹500</a></li>
+                        <li><a href="#" class="price-filter" data-price="500-1000">₹500 - ₹1000</a></li>
+                        <li><a href="#" class="price-filter" data-price="1000-2000">₹1000 - ₹2000</a></li>
+                        <li><a href="#" class="price-filter" data-price="2000-3000">₹2000 - ₹3000</a></li>
+                        <li><a href="#" class="price-filter" data-price="3000-4000">₹3000 - ₹4000</a></li>
+                        <li><a href="#" class="price-filter" data-price="4000-999999">₹4000 +</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseFour">Size</a>
+                </div>
+                <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__categories">
+                      <ul class="nice-scroll">
+                        <li>
+                          <a href="#" class="size-filter <%= !currentSizeId || currentSizeId === 'all' ? '' : 'active' %>" data-size="all">All</a>
+                        </li>
+                        <% size.forEach(size => { %>
+                        <li>
+                          <a href="#" class="size-filter" data-size="<%= size._id %>"> <%= size.value %> </a>
+                        </li>
+                        <% }) %>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
+                </div>
+                <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__color">
+                      <% colors.forEach(color => { %>
+                      <label
+                        class="color-filter"
+                        data-color="<%= color._id %>"
+                        style="background-color: <%= color.hex %>"
+                        for="color_<%= color._id %>"
+                      >
+                        <input
+                          class="color-filter"
+                          data-color="<%= color._id %>"
+                          type="radio"
+                          id="color_<%= color._id %>"
+                          name="color"
+                          value="<%= color._id %>"
+                        />
+                      </label>
+                      <% }); %>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-  <!-- Breadcrumb Section End -->
-
-  <!-- Shop Section Begin -->
-  <section class="shop spad">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-3">
-          <div class="shop__sidebar">
-            <div class="shop__sidebar__search">
-              <form action="#">
-                <input id="myInput" type="text" onkeyup="myFunction()" placeholder="Search..." />
-                <button type="submit"><span class="icon_search"></span></button>
-              </form>
+      <div class="col-lg-9">
+        <div class="shop__product__option">
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <div class="shop__product__option__left">
+                <p>Showing 1–<%= products.length %> of <%= productCount %> results</p>
+              </div>
             </div>
-            <div class="shop__sidebar__accordion">
-              <div class="accordion" id="accordionExample">
-                <div class="card">
-                  <div class="card-heading">
-                    <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
-                  </div>
 
-                  <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="shop__sidebar__categories">
-                        <ul class="nice-scroll">
-                          <li>
-                            <a
-                              href="#"
-                              class="category-filter <%= !currentCategoryId || currentCategoryId === 'all' ? '' : 'active' %>"
-                              data-category="all"
-                              >All</a
-                            >
-                          </li>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <div class="shop__product__option__right d-flex flex-row justify-content-end">
+                <p p-2>Sort :&nbsp;&nbsp;</p>
 
-                          <% categories.forEach(category => { %>
-                          <li>
-                            <a
-                              href="#"
-                              class="category-filter <%= category._id == currentCategoryId ? 'active' : '' %>"
-                              data-category="<%= category._id %>"
-                              ><%= category.name %></a
-                            >
-
-                            <% }); %>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-heading">
-                    <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
-                  </div>
-                  <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="shop__sidebar__categories">
-                        <ul class="nice-scroll">
-                          <li>
-                            <a href="#" class="brand-filter <%= !currentBrandId || currentBrandId === 'all' ? '' : 'active' %>" data-brand="all"
-                              >All</a
-                            >
-                          </li>
-
-                          <% brand.forEach(brand => { %>
-                          <li>
-                            <a href="#" class="brand-filter" data-brand="<%= brand._id %>"><%= brand.name %></a>
-                          </li>
-                          <% }) %>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-heading">
-                    <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
-                  </div>
-                  <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="shop__sidebar__price">
-                        <ul>
-                          <li>
-                            <a href="#" class="price-filter" data-price="0-1000000">All</a>
-                          </li>
-                          <li><a href="#" class="price-filter" data-price="0-500">₹0.00 - ₹500</a></li>
-                          <li><a href="#" class="price-filter" data-price="500-1000">₹500 - ₹1000</a></li>
-                          <li><a href="#" class="price-filter" data-price="1000-2000">₹1000 - ₹2000</a></li>
-                          <li><a href="#" class="price-filter" data-price="2000-3000">₹2000 - ₹3000</a></li>
-                          <li><a href="#" class="price-filter" data-price="3000-4000">₹3000 - ₹4000</a></li>
-                          <li><a href="#" class="price-filter" data-price="4000-999999">₹4000 +</a></li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="card">
-                  <div class="card-heading">
-                    <a data-toggle="collapse" data-target="#collapseFour">Size</a>
-                  </div>
-                  <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="shop__sidebar__categories">
-                        <ul class="nice-scroll">
-                          <li>
-                            <a href="#" class="size-filter <%= !currentSizeId || currentSizeId === 'all' ? '' : 'active' %>" data-size="all">All</a>
-                          </li>
-                          <% size.forEach(size => { %>
-                          <li>
-                            <a href="#" class="size-filter" data-size="<%= size._id %>"> <%= size.value %> </a>
-                          </li>
-                          <% }) %>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="card">
-                  <div class="card-heading">
-                    <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
-                  </div>
-                  <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="shop__sidebar__color">
-                        <% colors.forEach(color => { %>
-                        <label
-                          class="color-filter"
-                          data-color="<%= color._id %>"
-                          style="background-color: <%= color.hex %>"
-                          for="color_<%= color._id %>"
-                        >
-                          <input
-                            class="color-filter"
-                            data-color="<%= color._id %>"
-                            type="radio"
-                            id="color_<%= color._id %>"
-                            name="color"
-                            value="<%= color._id %>"
-                          />
-                        </label>
-                        <% }); %>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- <div class="card">
-                  <div class="card-heading">
-                    <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
-                  </div>
-                  <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
-                    <div class="card-body">
-                      <div class="shop__sidebar__tags">
-                        <a href="#">Product</a>
-                        <a href="#">Bags</a>
-                        <a href="#">Shoes</a>
-                        <a href="#">Fashio</a>
-                        <a href="#">Clothing</a>
-                        <a href="#">Hats</a>
-                        <a href="#">Accessories</a>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
+                <form action="" method="get" id="sortForm">
+                  <input type="hidden" name="category" value="<%= req.category || '' %>" />
+                  <select name="sort" onchange="this.form.submit()">
+                    <option value="">Select Sort Order</option>
+                    <option value="low-to-high">Price: Low To High</option>
+                    <option value="high-to-low">Price: High To Low</option>
+                    <option value="a-z">A - Z</option>
+                    <option value="z-a">Z - A</option>
+                    <option value="new_arrival">New Arrival</option>
+                    <option value="in_stock">In Stock</option>
+                  </select>
+                </form>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-9">
-          <div class="shop__product__option">
-            <div class="row">
-              <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="shop__product__option__left">
-                  <p>Showing 1–<%= products.length %> of <%= productCount %> results</p>
-                </div>
-              </div>
 
-              <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="shop__product__option__right d-flex flex-row justify-content-end">
-                  <p p-2>Sort :&nbsp;&nbsp;</p>
+        <!-- This is product -->
 
-                  <form action="" method="get" id="sortForm">
-                    <input type="hidden" name="category" value="<%= req.category || '' %>" />
-                    <select name="sort" onchange="this.form.submit()">
-                      <option value="">Select Sort Order</option>
-                      <option value="low-to-high">Price: Low To High</option>
-                      <option value="high-to-low">Price: High To Low</option>
-                      <option value="a-z">A - Z</option>
-                      <option value="z-a">Z - A</option>
-                      <option value="new_arrival">New Arrival</option>
-                      <option value="in_stock">In Stock</option>
-                    </select>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="container">
+          <div class="row" id="myUL">
+            <% products.filter(product => product.isActive).forEach((product, index) => { %>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-item" data-category-id="<%= product.category._id %>">
+              <div class="product__item">
+                <div class="product__item__pic set-bg">
+                  <ul class="product__hover">
+                    <% if (product.wishlist === true) { %>
+                    <li>
+                      <div style="background-color: rgb(255, 255, 255)">
+                        <a
+                          href="javascript:void(0);"
+                          onclick="deleteWishlist(event, '<%= product._id %>',this)"
+                          id="wishlist_delete"
+                          aria-label="Add to Wishlist"
+                        >
+                          <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
+                        </a>
+                      </div>
+                    </li>
+                    <% }else{ %>
+                    <li>
+                      <div style="background-color: rgb(255, 255, 255)">
+                        <a
+                          href="javascript:void(0);"
+                          onclick="addWishlist(event, '<%= product._id %>',this)"
+                          id="wishlist_add"
+                          aria-label="Add to Wishlist"
+                        >
+                          <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
+                        </a>
+                      </div>
+                    </li>
 
-          <!-- This is product -->
+                    <% } %>
+                  </ul>
+                  <a href="/user/product-list/<%= product._id %>">
+                    <img
+                      src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
+                      alt="<%= product.productName %>"
+                    />
 
-          <div class="container">
-            <div class="row" id="myUL">
-              <% products.filter(product => product.isActive).forEach((product, index) => { %>
-              <div class="col-lg-4 col-md-6 col-sm-12 mb-4 product-item" data-category-id="<%= product.category._id %>">
-                <div class="product__item">
-                  <div class="product__item__pic set-bg">
-                    <ul class="product__hover">
-
-                      <% if (product.wishlist === true) { %>
-                        <li>
-                          <div style="background-color: rgb(255, 255, 255);">
-  
-                            <a
-                              href="javascript:void(0);"
-                              onclick="deleteWishlist(event, '<%= product._id %>',this)"
-                              id="wishlist_delete"
-                              aria-label="Add to Wishlist"
-                            >
-                            <img src="../../public/img/red_heart.svg" id="wishlist_img_filled" alt="" />
-
-                            </a>
-                          </div>
-                        </li>
-                      <% }else{ %>
-                        <li>
-                          <div style="background-color: rgb(255, 255, 255);">
-  
-                            <a
-                              href="javascript:void(0);"
-                              onclick="addWishlist(event, '<%= product._id %>',this)"
-                              id="wishlist_add"
-                              aria-label="Add to Wishlist"
-                            >
-                            <img src="../../public/img/icon/heart.png" id="wishlist_img_notfilled" alt="" />
-
-                            </a>
-                          </div>
-                        </li>
-
-                        <% } %>
-                      
-                    </ul>
-                    <a href="/user/product-list/<%= product._id %>">
-                      <img
-                        src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                        alt="<%= product.productName %>"
-                      />
-                    
-                  </div>
-                  <div class="">
-                    <h6><%= product.name %></h6>
-                    <% product.variants.forEach(variant => { %>
-                    <p>Total Number of stock: <%=variant.stock %></p>
-                    <% }) %>
-                    <div class="rating">
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star"></i>
-                      <i class="fa fa-star-o"></i>
                     </div>
-                    <h5>₹<%= product.sellingPrice %>.00</h5>
-                    <% if (Number(product.sellingPrice) < Number(product.actualPrice)) { %>
-                     
-                      <h6 style="text-decoration: line-through;">₹<%= product.actualPrice %>.00</h6>
-                    <% } %>
-                   
+                    <div class="">
+                      <h6><%= product.name %></h6>
+                      <% product.variants.forEach(variant => { %>
+                      <p>Total Number of stock: <%=variant.stock %></p>
+                      <% }) %>
+                      <div class="rating" style="color: black;">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star-o"></i>
+                      </div>
+                      <h5>₹<%= product.sellingPrice %>.00</h5>
+                      <% if (Number(product.sellingPrice) < Number(product.actualPrice)) { %>
 
-                    <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock +=variant.stock; %> <% }); %> <% if
-                    (totalStock > 0) { %>
-
-                    <% } else { %>
-                    <a href="#" class="out-of-stock">Out of Stock</a>
-                    <% } %>
-                  </div>
-                </a>
-
+                      <h6 style="text-decoration: line-through">₹<%= product.actualPrice %>.00</h6>
+                      <% } %> <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock +=variant.stock; %> <% }); %> 
+                      <% if(totalStock > 0) { %> <% } else { %>
+                      <a href="#" class="out-of-stock" style="color: red;">Out of Stock</a>
+                      <% } %>
+                    </div>
+                  </a>
                 </div>
                 <div class="product-action-1 show"></div>
               </div>
@@ -320,286 +271,278 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <%- include('./pagination') %>
-  </section>
+  <%- include('./pagination') %>
+</section>
 
-  <!-- Shop Section End -->
+<!-- Shop Section End -->
 
-  <script>
-    async function addWishlist(event, productId, element) {
-      event.preventDefault();
+<script>
+  async function addWishlist(event, productId, element) {
+    event.preventDefault();
 
-      try {
-        const response = await fetch(`/wishlist/${productId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // You can include productId in the body if needed
-          body: JSON.stringify({ productId }),
-        });
+    try {
+      const response = await fetch(`/wishlist/${productId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId }),
+      });
 
-        // Check if the response is OK (status 200-299)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Ensure the response is JSON
-        const result = await response.json();
-        if (result.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "You have successfully added this product to wishlist",
-            timer: 3000, // 3-second timer
-            showConfirmButton: false, // Optionally hide the confirm button
-          }).then(() => {
-            location.reload();
-          });
-        } else {
-          Swal.fire("Error", result.message || "Failed to add product to wishlist", "error").then(() => {
-            location.reload();
-          });
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        Swal.fire("Error", "An error occurred while adding the product to the wishlist", "error");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    }
 
-    async function deleteWishlist(event, productId, element) {
-      event.preventDefault();
-
-      try {
-        const response = await fetch(`/wishlist/${productId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // You can include productId in the body if needed
-          body: JSON.stringify({ productId }),
+      const result = await response.json();
+      if (result.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "You have successfully added this product to wishlist",
+          timer: 3000,
+          showConfirmButton: false,
+        }).then(() => {
+          location.reload();
         });
-
-        // Check if the response is OK (status 200-299)
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Ensure the response is JSON
-        const result = await response.json();
-        if (result.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "You have successfully removed this product from the wishlist",
-            timer: 3000, // 3-second timer
-            showConfirmButton: false, // Optionally hide the confirm button
-          }).then(() => {
-            location.reload();
-          });
-        } else {
-          Swal.fire("Error", result.message || "Failed to remove product from the wishlist", "error").then(() => {
-            location.reload();
-          });
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        Swal.fire("Error", "An error occurred while removing the product from the wishlist", "error");
+      } else {
+        Swal.fire("Error", result.message || "Failed to add product to wishlist", "error").then(() => {
+          location.reload();
+        });
       }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire("Error", "An error occurred while adding the product to the wishlist", "error");
     }
+  }
 
+  async function deleteWishlist(event, productId, element) {
+    event.preventDefault();
 
-    document.addEventListener("DOMContentLoaded", function () {
-      // Combine event listeners for category, brand, and price filters
-      document.querySelectorAll(".category-filter, .brand-filter, .price-filter, .size-filter,.color-filter").forEach(function (element) {
-        element.addEventListener("click", function (e) {
-          e.preventDefault();
+    try {
+      const response = await fetch(`/wishlist/${productId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productId }),
+      });
 
-          let currentUrl = new URL(window.location.href);
-          let params = new URLSearchParams(currentUrl.search);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-          // Handle category filter
-          if (this.classList.contains("category-filter")) {
-            // Set the category parameter in the URL
-            params.set("category", this.getAttribute("data-category"));
-
-            // Add 'active' class to the clicked category
-            document.querySelectorAll(".category-filter").forEach((el) => el.classList.remove("active"));
-            this.classList.add("active");
-          }
-
-          // Handle brand filter
-          if (this.classList.contains("brand-filter")) {
-            // Set the brand parameter in the URL
-            params.set("brand", this.getAttribute("data-brand"));
-
-            // Add 'active' class to the clicked brand
-            document.querySelectorAll(".brand-filter").forEach((el) => el.classList.remove("active"));
-            this.classList.add("active");
-          }
-
-          // Handle price filter
-          if (this.classList.contains("price-filter")) {
-            // Set the price parameter in the URL
-            params.set("price", this.getAttribute("data-price"));
-
-            // Add 'active' class to the clicked price range
-            document.querySelectorAll(".price-filter").forEach((el) => el.classList.remove("active"));
-            this.classList.add("active");
-          }
-
-          if (this.classList.contains("size-filter")) {
-            params.set("size", this.getAttribute("data-size"));
-
-            document.querySelectorAll(".size-filter").forEach((el) => el.classList.remove("active"));
-            this.classList.add("active");
-          }
-
-          if (this.classList.contains("color-filter")) {
-            // Set the brand parameter in the URL
-            params.set("color", this.getAttribute("data-color"));
-
-            // Add 'active' class to the clicked brand
-            document.querySelectorAll(".color-filter").forEach((el) => el.classList.remove("active"));
-            this.classList.add("active");
-          }
-
-          // Always keep the sort parameter
-          let sortSelect = document.querySelector('#sortForm select[name="sort"]');
-          if (sortSelect) {
-            params.set("sort", sortSelect.value);
-          }
-
-          // Construct the new URL and navigate
-          currentUrl.search = params.toString();
-          window.location.href = currentUrl.toString();
+      const result = await response.json();
+      if (result.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "You have successfully removed this product from the wishlist",
+          timer: 3000,
+          showConfirmButton: false,
+        }).then(() => {
+          location.reload();
         });
+      } else {
+        Swal.fire("Error", result.message || "Failed to remove product from the wishlist", "error").then(() => {
+          location.reload();
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire("Error", "An error occurred while removing the product from the wishlist", "error");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Combine event listeners for category, brand, and price filters
+    document.querySelectorAll(".category-filter, .brand-filter, .price-filter, .size-filter,.color-filter").forEach(function (element) {
+      element.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        let currentUrl = new URL(window.location.href);
+        let params = new URLSearchParams(currentUrl.search);
+
+        // Handle category filter
+        if (this.classList.contains("category-filter")) {
+          // Set the category parameter in the URL
+          params.set("category", this.getAttribute("data-category"));
+
+          // Add 'active' class to the clicked category
+          document.querySelectorAll(".category-filter").forEach((el) => el.classList.remove("active"));
+          this.classList.add("active");
+        }
+
+        // Handle brand filter
+        if (this.classList.contains("brand-filter")) {
+          // Set the brand parameter in the URL
+          params.set("brand", this.getAttribute("data-brand"));
+
+          // Add 'active' class to the clicked brand
+          document.querySelectorAll(".brand-filter").forEach((el) => el.classList.remove("active"));
+          this.classList.add("active");
+        }
+
+        // Handle price filter
+        if (this.classList.contains("price-filter")) {
+          // Set the price parameter in the URL
+          params.set("price", this.getAttribute("data-price"));
+
+          // Add 'active' class to the clicked price range
+          document.querySelectorAll(".price-filter").forEach((el) => el.classList.remove("active"));
+          this.classList.add("active");
+        }
+
+        if (this.classList.contains("size-filter")) {
+          params.set("size", this.getAttribute("data-size"));
+
+          document.querySelectorAll(".size-filter").forEach((el) => el.classList.remove("active"));
+          this.classList.add("active");
+        }
+
+        if (this.classList.contains("color-filter")) {
+          // Set the brand parameter in the URL
+          params.set("color", this.getAttribute("data-color"));
+
+          // Add 'active' class to the clicked brand
+          document.querySelectorAll(".color-filter").forEach((el) => el.classList.remove("active"));
+          this.classList.add("active");
+        }
+
+        // Always keep the sort parameter
+        let sortSelect = document.querySelector('#sortForm select[name="sort"]');
+        if (sortSelect) {
+          params.set("sort", sortSelect.value);
+        }
+
+        // Construct the new URL and navigate
+        currentUrl.search = params.toString();
+        window.location.href = currentUrl.toString();
       });
     });
-  </script>
+  });
+</script>
 
-  <script>
-    document.getElementById("sortForm").addEventListener("change", function (e) {
-      e.preventDefault(); // Prevent form submission
+<script>
+  document.getElementById("sortForm").addEventListener("change", function (e) {
+    e.preventDefault(); // Prevent form submission
 
-      let currentUrl = new URL(window.location.href);
-      let params = new URLSearchParams(currentUrl.search);
+    let currentUrl = new URL(window.location.href);
+    let params = new URLSearchParams(currentUrl.search);
 
-      // Update sort parameter
-      params.set("sort", this.querySelector('select[name="sort"]').value);
+    // Update sort parameter
+    params.set("sort", this.querySelector('select[name="sort"]').value);
 
-      // Keep category and brand parameters if they exist
-      if (params.has("category")) {
-        // Do nothing, keep the existing category parameter
-      }
-      if (params.has("brand")) {
-        // Do nothing, keep the existing brand parameter
-      }
-      if (params.has("price")) {
-        // Do nothing, keep the existing price parameter
-      }
-      if (params.has("size")) {
-        // Do nothing, keep the existing size parameter
-      }
+    // Keep category and brand parameters if they exist
+    if (params.has("category")) {
+      // Do nothing, keep the existing category parameter
+    }
+    if (params.has("brand")) {
+      // Do nothing, keep the existing brand parameter
+    }
+    if (params.has("price")) {
+      // Do nothing, keep the existing price parameter
+    }
+    if (params.has("size")) {
+      // Do nothing, keep the existing size parameter
+    }
 
-      // Construct the new URL and navigate
-      currentUrl.search = params.toString();
-      window.location.href = currentUrl.toString();
-    });
-  </script>
+    // Construct the new URL and navigate
+    currentUrl.search = params.toString();
+    window.location.href = currentUrl.toString();
+  });
+</script>
 
-  //
-  <script>
-    function myFunction() {
-      var input, filter, ul, li, h6, i, txtValue;
-      input = document.getElementById("myInput");
-      filter = input.value.toUpperCase();
-      ul = document.getElementById("myUL");
-      li = ul.getElementsByClassName("product-item");
+<script>
+  function myFunction() {
+    var input, filter, ul, li, h6, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("myUL");
+    li = ul.getElementsByClassName("product-item");
 
-      for (i = 0; i < li.length; i++) {
-        h6 = li[i].getElementsByTagName("h6")[0];
-        txtValue = h6.textContent || h6.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          li[i].style.display = "";
-        } else {
-          li[i].style.display = "none";
-        }
+    for (i = 0; i < li.length; i++) {
+      h6 = li[i].getElementsByTagName("h6")[0];
+      txtValue = h6.textContent || h6.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
       }
     }
-  </script>
+  }
+</script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Function to fetch products from the backend
-      async function fetchProducts() {
-        try {
-          console.log("Fetching products...");
-          const response = await fetch("/user/product-details/:id");
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          const products = await response.json();
-          console.log("Products fetched:", products); // Log the fetched products
-          renderProducts(products);
-        } catch (error) {
-          console.error("Error fetching products:", error);
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Function to fetch products from the backend
+    async function fetchProducts() {
+      try {
+        console.log("Fetching products...");
+        const response = await fetch("/user/product-details/:id");
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        const products = await response.json();
+        console.log("Products fetched:", products); // Log the fetched products
+        renderProducts(products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
       }
+    }
 
-      // Function to render products
-      function renderProducts(products) {
-        const productGrid = document.querySelector(".product-grid");
-        productGrid.innerHTML = "";
+    // Function to render products
+    function renderProducts(products) {
+      const productGrid = document.querySelector(".product-grid");
+      productGrid.innerHTML = "";
 
-        products.forEach((product) => {
-          const productCard = document.createElement("div");
-          productCard.className = "product-card";
-          productCard.innerHTML = `
+      products.forEach((product) => {
+        const productCard = document.createElement("div");
+        productCard.className = "product-card";
+        productCard.innerHTML = `
                 ${product.offerpercentage > 0 ? '<div class="sale-badge">SALE</div>' : ""}
                 <img src="${product.primaryImages[0]?.path || "placeholder.jpg"}" alt="${product.name}">
                 <h3>${product.name}</h3>
                 <div class="rating">${renderRating(product.ratings)}</div>
                 <p class="price">$${product.price.toFixed(2)}</p>
             `;
-          productGrid.appendChild(productCard);
-        });
-      }
+        productGrid.appendChild(productCard);
+      });
+    }
 
-      // // Function to render star ratings
-      // function renderRating(ratings) {
-      //   const averageRating = ratings.length
-      //     ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
-      //       ratings.length
-      //     : 0;
-      //   let stars = "";
-      //   for (let i = 0; i < 5; i++) {
-      //     stars +=
-      //       i < averageRating
-      //         ? '<span class="rating-star">★</span>'
-      //         : '<span class="rating-star">☆</span>';
-      //   }
-      //   return stars;
-      // }
+    // // Function to render star ratings
+    // function renderRating(ratings) {
+    //   const averageRating = ratings.length
+    //     ? ratings.reduce((sum, rating) => sum + rating.rating, 0) /
+    //       ratings.length
+    //     : 0;
+    //   let stars = "";
+    //   for (let i = 0; i < 5; i++) {
+    //     stars +=
+    //       i < averageRating
+    //         ? '<span class="rating-star">★</span>'
+    //         : '<span class="rating-star">☆</span>';
+    //   }
+    //   return stars;
+    // }
 
-      // // Function to sort products by price
-      // function sortProducts(products) {
-      //   const sortValue = document.getElementById("sort").value;
-      //   products.sort((a, b) => {
-      //     if (sortValue === "low-high") {
-      //       return a.price - b.price;
-      //     } else {
-      //       return b.price - a.price;
-      //     }
-      //   });
-      //   renderProducts(products);
-      // }
+    // // Function to sort products by price
+    // function sortProducts(products) {
+    //   const sortValue = document.getElementById("sort").value;
+    //   products.sort((a, b) => {
+    //     if (sortValue === "low-high") {
+    //       return a.price - b.price;
+    //     } else {
+    //       return b.price - a.price;
+    //     }
+    //   });
+    //   renderProducts(products);
+    // }
 
-      // // Fetch products on page load
-      // fetchProducts();
-    });
-  </script>
-</body>
+    // // Fetch products on page load
+    // fetchProducts();
+  });
+</script>
 
 <%- include('../../views/partials/user/footer') %>

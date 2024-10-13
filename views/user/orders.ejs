@@ -1,3 +1,4 @@
+<!-- orders.ejs -->
 <%- include('../partials/user/header') %>
 
 <style>
@@ -46,7 +47,7 @@
       <section class="col-lg-8">
         <div class="row justify-content-center">
           <div class="col-10">
-            <div class="card p-4  mb-5">
+            <div class="card p-4 mb-5">
               <h4 class="mb-4">Order Summary</h4>
 
               <% order.forEach((order, index) => { %>
@@ -55,9 +56,9 @@
                   <h5 class="order-id mb-3"><%= (currentPage - 1)* perPage + index +1 %>) Order ID: <%= order._id %></h5>
                   <div class="row">
                     <% order.items.forEach((item, index) => { %>
-                    <div class="col-md-6 ">
+                    <div class="col-md-6">
                       <div class="order-item p-3 mb-3 border rounded">
-                        <div class="row ">
+                        <div class="row">
                           <div class="col-md-12">
                             <% let imagePath = ''; %> <% if (item.productId.primaryImages && item.productId.primaryImages.length > 0) { %> <%
                             imagePath = item.productId.primaryImages[0].name; %> <% } %>
@@ -72,17 +73,15 @@
                             <p><%= item.productId.name %> (<%= item.quantity %>)</p>
                             <p></p>
                             <p><strong>Order Date:</strong> <%= new Date(order.createdAt).toLocaleDateString() %></p>
-                            <p>
-                              <strong>Price:</strong> ₹<%= order.totalPrice %>
-                              
-                            </p>
+                            <p><strong>Price:</strong> ₹<%= order.totalPrice %></p>
 
-                            <p><strong>Delivery: </strong>
+                            <p>
+                              <strong>Delivery: </strong>
                               <span
-                              class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
-                            >
-                             Delivery <%= item.status %>
-                            </span>
+                                class="badge <%= item.status === 'Delivered' ? 'badge-success' : item.status === 'Cancelled' ? 'badge-danger' : 'badge-warning' %>"
+                              >
+                                Delivery <%= item.status %>
+                              </span>
                             </p>
                             <p>
                               <strong>Status:</strong>
