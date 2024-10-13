@@ -3,27 +3,6 @@
 <%- include('../../views/partials/user/header') %>
 
 <style>
-
-.input-invisible {
-    position: absolute;
-    opacity: 0;
-  }
-
-  .size-label {
-    display: inline-block;
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  /* When the radio is checked, apply the selected color */
-  .input-invisible:checked + .size-label {
-    background-color: #000000; /* Your desired color */
-    color: white;
-    border-color: #000000;
-  }
-
   
   .product__details__pic__item {
     max-width: 500px;
@@ -233,7 +212,6 @@
                             ></label>
 
                             <input
-                              type="radio"
                               name="colour"
                               value="<%= variant.color._id %>"
                               id="colour_<%= variant.color.name %>"
@@ -260,7 +238,6 @@
                               <%= variant.size.value %>
                               <input
                                 class="input-invisible"
-                                type="radio"
                                 name="size"
                                 value="<%= variant.size._id %>"
                                 id="size_<%= variant.size.value %>"
