@@ -383,8 +383,8 @@
           </div>
           <div class="product__item__text">
             <h6><%= product.name %></h6>
-            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> <% if (totalStock >
-            0){%>
+            <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock; %> <% }); %> 
+            <% if (totalStock >0){%>
             <a href="/user/add-to-cart" class="add-cart">+ Add To Cart</a>
             <% } else { %>
             <a href="#" class="out-of-stock">Out of Stock</a>
