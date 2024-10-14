@@ -1,6 +1,9 @@
+// categoryController.js
+
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 
+// Get Category
 const categoryInfo = async (req, res) => {
   try {
     let search = "";
@@ -14,21 +17,20 @@ const categoryInfo = async (req, res) => {
     const categoryData = await Category.find({
       $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
     })
-    .skip((page - 1) * perPage)
-    .limit(perPage)
-    .sort({createdAt: -1})
-    .exec();
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 })
+      .exec();
 
     const count = await Category.find({
       $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
     }).countDocuments();
 
-   const nextPage = parseInt(page) + 1;
-   const totalPages = Math.ceil(count/perPage);
-   const hasPrevPage = page > 1
-   const hasNextPage = page < totalPages
+    const nextPage = parseInt(page) + 1;
+    const totalPages = Math.ceil(count / perPage);
+    const hasPrevPage = page > 1;
+    const hasNextPage = page < totalPages;
 
-    // Render the EJS template with data
     res.render("admin/category", {
       cat: categoryData,
 
@@ -41,23 +43,21 @@ const categoryInfo = async (req, res) => {
       totalPages,
     });
   } catch (error) {
-    console.error("Error fetching category data:", error);
     res.redirect("/pageerror");
   }
 };
 
+// Add Category
 const addCategory = async (req, res) => {
   let { name, description, offer } = req.body;
-  
+
   offer = parseInt(offer);
 
-  console.log(req.body);
   try {
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
       return res.status(400).json({ error: "Category already exists" });
     }
-
 
     const newCategory = new Category({
       name,
@@ -67,36 +67,32 @@ const addCategory = async (req, res) => {
 
     await newCategory.save();
 
-
     const products = await Product.find({ category: newCategory._id });
 
-    console.log("this is products in category", products)
-
     //Product offer and category offer
-    for(let product of products){
+    for (let product of products) {
       const productOffer = product.offerDiscountRate;
-      const newProductOfferSellingPrice = product.actualPrice*(1-productOffer/100);
-      const newCategoryOfferSellingPrice = product.actualPrice*(1-offer/100);
+      const newProductOfferSellingPrice = product.actualPrice * (1 - productOffer / 100);
+      const newCategoryOfferSellingPrice = product.actualPrice * (1 - offer / 100);
 
-      if(newProductOfferSellingPrice<newCategoryOfferSellingPrice){
+      if (newProductOfferSellingPrice < newCategoryOfferSellingPrice) {
         await Product.updateOne(
           { _id: product._id }, // Match all products in the given category
           [
             {
               $set: {
-                sellingPrice: Math.round(newProductOfferSellingPrice)
+                sellingPrice: Math.round(newProductOfferSellingPrice),
               },
             },
           ]
         );
-
-      }else{
+      } else {
         await Product.updateOne(
           { _id: product._id }, // Match all products in the given category
           [
             {
               $set: {
-                sellingPrice: Math.round(newCategoryOfferSellingPrice)
+                sellingPrice: Math.round(newCategoryOfferSellingPrice),
               },
             },
           ]
@@ -104,27 +100,13 @@ const addCategory = async (req, res) => {
       }
     }
 
-
-    // await Product.updateMany(
-    //   { category: newCategory._id }, // Match all products in the given category
-    //   [
-    //     {
-    //       $set: {
-    //         sellingPrice: {
-    //           $trunc: [{ $multiply: ["$sellingPrice", { $subtract: [1, offer / 100] }] }],
-    //         },
-    //       },
-    //     },
-    //   ]
-    // );
-
     return res.json({ message: "Category added successfully" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "The first letter has to capital and should not leave any space in between" });
   }
 };
 
+// Get Category Details
 const getCategoryDetails = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -137,10 +119,10 @@ const getCategoryDetails = async (req, res) => {
   }
 };
 
+// Edit Category
 const editCategory = async (req, res) => {
   const { id, name, description, offer } = req.body;
 
-  console.log("this is edit category", req.body);
   try {
     const category = await Category.findById(id);
     if (!category) {
@@ -156,33 +138,30 @@ const editCategory = async (req, res) => {
 
     const products = await Product.find({ category: category._id });
 
-    console.log("this is products in category", products)
-
     //Product offer and category offer
-    for(let product of products){
+    for (let product of products) {
       const productOffer = product.offerDiscountRate;
-      const newProductOfferSellingPrice = product.actualPrice*(1-productOffer/100);
-      const newCategoryOfferSellingPrice = product.actualPrice*(1-offer/100);
+      const newProductOfferSellingPrice = product.actualPrice * (1 - productOffer / 100);
+      const newCategoryOfferSellingPrice = product.actualPrice * (1 - offer / 100);
 
-      if(newProductOfferSellingPrice<newCategoryOfferSellingPrice){
+      if (newProductOfferSellingPrice < newCategoryOfferSellingPrice) {
         await Product.updateOne(
           { _id: product._id }, // Match all products in the given category
           [
             {
               $set: {
-                sellingPrice: Math.round(newProductOfferSellingPrice)
+                sellingPrice: Math.round(newProductOfferSellingPrice),
               },
             },
           ]
         );
-
-      }else{
+      } else {
         await Product.updateOne(
           { _id: product._id }, // Match all products in the given category
           [
             {
               $set: {
-                sellingPrice: Math.round(newCategoryOfferSellingPrice)
+                sellingPrice: Math.round(newCategoryOfferSellingPrice),
               },
             },
           ]
@@ -192,7 +171,6 @@ const editCategory = async (req, res) => {
 
     res.redirect("/admin/category");
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -204,7 +182,6 @@ const categoryListed = async (req, res) => {
     await Category.updateOne({ _id: id }, { $set: { isListed: true } });
     res.redirect("/admin/category");
   } catch (error) {
-    console.error("Error listing category:", error);
     res.redirect("/pageerror");
   }
 };
@@ -216,7 +193,6 @@ const categoryUnlisted = async (req, res) => {
     await Category.updateOne({ _id: id }, { $set: { isListed: false } });
     res.redirect("/admin/category");
   } catch (error) {
-    console.error("Error unlisting category:", error);
     res.redirect("/pageerror");
   }
 };

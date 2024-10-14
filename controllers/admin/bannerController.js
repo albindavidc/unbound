@@ -1,8 +1,11 @@
+// bannerController.js
+
 const Banner = require("../../models/bannerSchema");
 const fs = require("fs");
 const path = require("path");
 
 module.exports = {
+  // Get Banner
   getAllBanner: async (req, res) => {
     try {
       const banners = await Banner.find();
@@ -10,6 +13,7 @@ module.exports = {
     } catch (error) {}
   },
 
+  // Add Banner
   addBanner: async (req, res) => {
     try {
       if (!req.files || !req.files.banner_images || req.files.banner_images.length === 0) {
@@ -69,6 +73,7 @@ module.exports = {
     }
   },
 
+  // Edit & Delete Banner (Just for Demo)
   editBanner: async (req, res) => {
     try {
     } catch (error) {}

@@ -1,3 +1,5 @@
+// adminController.js
+
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
@@ -47,21 +49,20 @@ const login = async (req, res) => {
 };
 
 //Load-Dashboard
-
 const loadDashboard = async (req, res) => {
   if (req.session.admin) {
     try {
       // Extract the start and end dates from the query parameters, or provide defaults if not specified
-      let startDate = req.query.startDate || new Date(new Date().setFullYear(new Date().getFullYear() - 1)); // Default to one year ago
-      let endDate = req.query.endDate || new Date(); // Default to current date
+      let startDate = req.query.startDate || new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+      let endDate = req.query.endDate || new Date();
 
       // Convert string dates to Date objects if provided as strings
       startDate = new Date(startDate);
       endDate = new Date(endDate);
 
       // Convert the start and end dates to UTC format using .toISOString()
-      const startDateUTC = new Date(startDate).toISOString(); // Convert start date to UTC
-      const endDateUTC = new Date(endDate).toISOString(); // Convert end date to UTC
+      const startDateUTC = new Date(startDate).toISOString();
+      const endDateUTC = new Date(endDate).toISOString();
 
       console.log(`Start Date (UTC): ${startDateUTC}`);
       console.log(`End Date (UTC): ${endDateUTC}`);
@@ -73,7 +74,7 @@ const loadDashboard = async (req, res) => {
       const order = await Order.aggregate([
         {
           $group: {
-            _id: "$paymentMethod", // Group by payment method
+            _id: "$paymentMethod",
             users: { $addToSet: "$customerId" },
           },
         },
@@ -88,7 +89,6 @@ const loadDashboard = async (req, res) => {
 
       const orderBar = await Order.aggregate([
         {
-          // Match orders with 'createdAt' between 'startDate' and 'endDate'
           $match: {
             createdAt: {
               $gte: startDate,
@@ -96,24 +96,24 @@ const loadDashboard = async (req, res) => {
             },
           },
         },
-        { $unwind: "$items" }, // Unwind items array
+        { $unwind: "$items" },
         {
           $lookup: {
-            from: "products", // Assuming 'products' is your product collection
+            from: "products",
             localField: "items.productId",
             foreignField: "_id",
             as: "productInfo",
           },
         },
-        { $unwind: "$productInfo" }, // Unwind productInfo to access fields
+        { $unwind: "$productInfo" },
         {
           $group: {
-            _id: "$items.productId", // Group by productId
-            productName: { $first: "$productInfo.name" }, // Get product name from populated data
-            totalQuantitySold: { $sum: "$items.quantity" }, // Sum of quantities sold
+            _id: "$items.productId",
+            productName: { $first: "$productInfo.name" },
+            totalQuantitySold: { $sum: "$items.quantity" },
             totalRevenueForProduct: {
               $sum: {
-                $multiply: ["$items.quantity", { $toDouble: "$items.price" }], // Calculate revenue for the product
+                $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
               },
             },
           },
@@ -123,12 +123,10 @@ const loadDashboard = async (req, res) => {
             totalQuantitySold: -1,
           },
         },
-        // Additional grouping and final project stage...
       ]);
 
       const bestSellingCat = await Order.aggregate([
         {
-          // Match orders with 'createdAt' between 'startDate' and 'endDate'
           $match: {
             createdAt: {
               $gte: startDate,
@@ -136,47 +134,46 @@ const loadDashboard = async (req, res) => {
             },
           },
         },
-        { $unwind: "$items" }, // Unwind items array
+        { $unwind: "$items" },
         {
           $lookup: {
-            from: "products", // Lookup products collection
-            localField: "items.productId", // Match productId from items
-            foreignField: "_id", // Match with _id in products
+            from: "products",
+            localField: "items.productId",
+            foreignField: "_id",
             as: "productInfo",
           },
         },
-        { $unwind: "$productInfo" }, // Unwind productInfo to access product fields
+        { $unwind: "$productInfo" },
         {
           $lookup: {
-            from: "categories", // Lookup category collection
-            localField: "productInfo.category", // Match category field from productInfo
-            foreignField: "_id", // Match with _id in categories
+            from: "categories",
+            localField: "productInfo.category",
+            foreignField: "_id",
             as: "categoryInfo",
           },
         },
-        { $unwind: "$categoryInfo" }, // Unwind categoryInfo to access category fields
+        { $unwind: "$categoryInfo" },
         {
           $group: {
-            _id: "$categoryInfo._id", // Group by category ID
-            categoryName: { $first: "$categoryInfo.name" }, // Capture category name
-            categoryQuantitySold: { $sum: "$items.quantity" }, // Sum quantities sold for the category
+            _id: "$categoryInfo._id",
+            categoryName: { $first: "$categoryInfo.name" },
+            categoryQuantitySold: { $sum: "$items.quantity" },
             totalRevenueForCategory: {
               $sum: {
-                $multiply: ["$items.quantity", { $toDouble: "$items.price" }], // Calculate total revenue for the category
+                $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
               },
             },
           },
         },
         {
           $sort: {
-            categoryQuantitySold: -1, // Sort by total quantity sold for each category
+            categoryQuantitySold: -1,
           },
         },
       ]);
 
       const bestSellingBrands = await Order.aggregate([
         {
-          // Match orders with 'createdAt' between 'startDate' and 'endDate'
           $match: {
             createdAt: {
               $gte: startDate,
