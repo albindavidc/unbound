@@ -1,3 +1,5 @@
+// cartController.js
+
 const mongoose = require("mongoose");
 const Product = require("../../models/productSchema");
 const Order = require("../../models/orderSchema");
@@ -10,7 +12,6 @@ const handleCartUpdate = async (req, res, operation) => {
     const userID = req.session.user;
     const { id: productId, variant: variantId } = req.params;
 
-    // Input validation
     if (!productId || !variantId) {
       return res.status(400).json({ success: false, message: "Product ID and Variant ID are required" });
     }
@@ -31,7 +32,6 @@ const handleCartUpdate = async (req, res, operation) => {
     // Check stock early
     const product = await Product.findById(productId).populate("variants");
     const variant = product.variants.find((v) => v._id.toString() === variantId);
-    console.log(product, variant, variantId, "this is the variant and stock from the backend");
     const stock = variant.stock;
 
     if (isNaN(stock) || stock <= 0) {
@@ -41,12 +41,12 @@ const handleCartUpdate = async (req, res, operation) => {
     const incrementOrDecrement = operation === "increment";
     let updatedQuantity;
 
-    if(stock >= item.quantity){
+    if (stock >= item.quantity) {
       updatedQuantity = incrementOrDecrement ? item.quantity + 1 : item.quantity - 1;
-    }else{
-      updatedQuantity = stock
+    } else {
+      updatedQuantity = stock;
     }
-    
+
     // Handle quantity limits
     if (incrementOrDecrement && item.quantity >= stock) {
       return res.status(400).json({ success: false, message: `Quantity exceeds product stock. their only ${stock} stocks left`, stock });
@@ -56,9 +56,6 @@ const handleCartUpdate = async (req, res, operation) => {
       return res.status(400).json({ success: false, message: "This is the max order for this order" });
     }
 
-   
-
-    // Ensure price is treated as a number
     const price = Number(item.price);
     if (isNaN(price)) {
       return res.status(400).json({ success: false, message: "Invalid price value" });
@@ -78,14 +75,14 @@ const handleCartUpdate = async (req, res, operation) => {
 
     await cart.save();
 
-    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice, carts:cart, stock });
+    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice, carts: cart, stock });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 module.exports = {
+  // Get Cart
   getCart: async (req, res) => {
     try {
       const userId = req.session.user;
@@ -97,11 +94,10 @@ module.exports = {
       let cartQuantity;
 
       cart.items.forEach((item) => {
-        const product = item.productId; // Assuming productId is an object, not an array.
+        const product = item.productId;
 
         cartQuantity = item.quantity;
         if (product) {
-          // Ensure product exists
           bundleQuantity = product.bundleQuantity;
           sellingPrice = product.sellingPrice;
           bundlePrice = product.bundlePrice;
@@ -111,15 +107,11 @@ module.exports = {
       for (const cartItems of cart.items) {
         cartItems.productId.variants.forEach(async (item) => {
           if (item.stock < cartItems.quantity) {
-            cartItems.quantity = item.stock
-            await cart.save()
+            cartItems.quantity = item.stock;
+            await cart.save();
           }
         });
       }
-
-
-
-      
 
       if (cartQuantity >= bundleQuantity) {
         sellingPrice = bundlePrice;
@@ -146,9 +138,7 @@ module.exports = {
         cart.totalPrice = totalPrice;
         cart.payable = totalPrice;
 
-        console.log("this is the total price", totalPriceOfEachProduct);
         // if category offer is active or product offer is active
-
         for (const item of cart.items) {
           const products = await Product.findById(item.productId);
 
@@ -157,19 +147,16 @@ module.exports = {
           }).populate("variants variants.color variants.size");
 
           if (!product) {
-            console.log(`The Product ${item.productId} is not found!!`);
             errors.push(`The Product ${item.productId} is not found!!`);
             continue;
           }
 
           if (!product.isActive) {
-            console.log(`The Product ${product.name} is not available!!`);
             errors.push(`The Product ${product.name} is not available!!`);
             continue;
           }
 
           if (!products.variants) {
-            console.log(`The Variant of Product ${product.name} is not found!!`);
             errors.push(`The Variant of Product ${product.name} is not found!!`);
             continue;
           }
@@ -179,7 +166,6 @@ module.exports = {
           const stock = variant?.stock;
           if (item.quantity > stock) {
             item.outOfStock = true;
-            console.log(`The Product ${product.name}, Color: ${variant.color.name}, Size: ${variant.size.value} is out of stock!!`);
             errors.push(`The Product ${product.name}, Color: ${variant.color.name}, Size: ${variant.size.value} is out of stock!!`);
           }
         }
@@ -202,9 +188,6 @@ module.exports = {
       const getTotalPrice = await Cart.findOne({ userId }, { _id: 0, totalPrice: 1 });
       const totalPrices = getTotalPrice.totalPrice;
 
-
-
-
       res.render("user/cart", {
         totalPriceOfEachProduct,
         cartList: cart.items,
@@ -217,11 +200,11 @@ module.exports = {
         user: req.session.user,
       });
     } catch (error) {
-      console.error("this is a fantastic error", error);
       res.status(500).json({ error: "An error occurred while fetching the cart." });
     }
   },
 
+  // Add Cart
   addToCart: async (req, res) => {
     try {
       const { productId, colorId, sizeId, quantity, price } = req.body;
@@ -249,22 +232,6 @@ module.exports = {
       const existingCartItem = cart.items.find(
         (item) => item.productId.toString() === productId && item.colorId.toString() === colorId && item.sizeId.toString() === sizeId
       );
-
-      console.log(existingCartItem);
-
-      // //Cart Quantity validation with product stock and cart added stock
-      // const currentCartQuantity = existingCartItem ? existingCartItem.quantity : 0;
-      // const totalQuantity = currentCartQuantity + Number(quantity);
-      // const availableStock = selectedVariant.stock;
-
-      // console.log("this is backend", currentCartQuantity, totalQuantity, availableStock)
-      // // Check if the total quantity exceeds the available stock
-      // if (totalQuantity > availableStock) {
-      //   return res.status(404).json({
-      //     success: false,
-      //     message: `You can't add more than ${availableStock} items to the cart. Current cart quantity: ${currentCartQuantity}`,
-      //   });
-      // }
 
       if (existingCartItem) {
         existingCartItem.quantity = Number(existingCartItem.quantity) + Number(quantity);
@@ -296,20 +263,16 @@ module.exports = {
       }
       res.json({ message: "Product added to cart", count: cart.items.length });
     } catch (error) {
-      console.error(error);
       res.status(500).json({ message: "Error adding product to cart" });
     }
   },
 
+  // Remove Cart Item
   removeCartItem: async (req, res) => {
     let productId = req.params.productId;
     let variantId = req.params.variantId;
     let userId = req.session.user;
-
-    console.log("these are the productId, variantId, UserId: ", productId, variantId, userId);
     const cart = await Cart.findOne({ userId }).populate("items.productId");
-
-    console.log("this is cart", cart);
 
     if (!cart) {
       return res.status(404).json({ status: false, message: "Cart not found" });
@@ -337,13 +300,14 @@ module.exports = {
   },
 
   incrementCartItem: async (req, res) => {
-    handleCartUpdate(req, res, "increment"); // For increment
+    handleCartUpdate(req, res, "increment");
   },
 
   decrementCartItem: async (req, res) => {
-    handleCartUpdate(req, res, "decrement"); // For decrement
+    handleCartUpdate(req, res, "decrement");
   },
 
+  // Order Success
   getOrderSuccess: async (req, res) => {
     let userId = req.session.user;
     let user = await User.findById(userId);

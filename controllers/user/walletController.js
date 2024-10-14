@@ -1,3 +1,5 @@
+// walletController.js
+
 const Wallet = require("../../models/walletSchema");
 const User = require("../../models/userSchema");
 
@@ -20,12 +22,12 @@ const createRazorpayOrder = async (order_id, total) => {
     const order = await instance.orders.create(options);
     return order;
   } catch (error) {
-    console.error("Error in creating Razorpay order:", error);
     throw new Error("Failed to create Razorpay order");
   }
 };
 
 module.exports = {
+  // Get Wallet
   getWallet: async (req, res) => {
     const userId = req.session.user;
     const wallet = await Wallet.findOne({ userId });
@@ -38,21 +40,19 @@ module.exports = {
           {
             message: "Sign in bonus",
             amount: 10,
-            type: "Credit", 
+            type: "Credit",
           },
         ],
       });
 
       await newWallet.save();
-      console.log("New wallet created for user");
-    } else {
-      console.log("Wallet already exists for this user");
     }
     try {
       res.render("user/wallet", { user: req.session.user, wallet });
     } catch (error) {}
   },
 
+  // Add to Wallet
   addToWallet: async (req, res) => {
     try {
       const { amount } = req.body;
@@ -65,15 +65,12 @@ module.exports = {
         return res.status(500).json({ success: false, message: "Failed to create payment" });
       }
 
-      console.log("i have reached here ", payment, user);
       res.json({ success: true, payment, user });
     } catch (error) {
       const { message } = error;
       res.status(500).json({ success: false, message });
     }
   },
-
-  // Helper function to generate a random id
 
   verifyPayment: async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body.response;

@@ -1,3 +1,5 @@
+// productController.js
+
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Color = require("../../models/attributes/colorSchema");
@@ -6,11 +8,12 @@ const Size = require("../../models/attributes/sizeSchema");
 const Variants = require("../../models/attributes/variantSchema");
 const Cart = require("../../models/cartSchema");
 const Customize = require("../../models/customizedProduct");
-const Order = require("../../models/orderSchema")
+const Order = require("../../models/orderSchema");
 
 const mongoose = require("mongoose");
 
 module.exports = {
+  // Get Product List
   loadProductList: async (req, res) => {
     const { color, size, price, brand, category, sort } = req.query;
 
@@ -41,7 +44,7 @@ module.exports = {
     }
 
     let sortQuery = {};
-    let filterQuery = {}; 
+    let filterQuery = {};
 
     switch (sort) {
       case "low-to-high":
@@ -115,11 +118,11 @@ module.exports = {
         totalPages,
       });
     } catch (error) {
-      console.error(error);
       res.status(500).send("Error loading products");
     }
   },
 
+  // Get Product Details
   loadProductDetails: async (req, res) => {
     try {
       const productId = req.params.id;
@@ -133,7 +136,7 @@ module.exports = {
         .populate("variants.stock")
         .populate("wishlist")
         .populate("bundlePrice bundleQuantity quantity")
-        .populate("ratings")
+        .populate("ratings");
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -141,11 +144,8 @@ module.exports = {
 
       let stocks;
       product.variants.forEach((variant) => {
-        console.log("This is stock:", variant.stock || "Stock not available");
         stocks = variant.stock;
       });
-
-      console.log("this is stock", stocks);
 
       product.variants.forEach((variant) => {
         variant.isOutOfStock = variant.stock <= 0;
@@ -153,7 +153,7 @@ module.exports = {
 
       const relatedProducts = await Product.find({
         category: product.category._id,
-        _id: { $ne: productId }, 
+        _id: { $ne: productId },
         isActive: true,
       }).limit(4);
 
@@ -173,27 +173,21 @@ module.exports = {
         existingQuantity = 0;
       }
 
-      console.log(existingQuantity, "this is existing cart item");
-
       const productWishlist = product.wishlist;
 
-      console.log("this is product wishlist", productId);
-
-
-      const userId = req.session.user
+      const userId = req.session.user;
 
       const customize = await Customize.findOne({ userId: userId });
 
-      let status = false ;
-      if(customize){
-        customize.products.forEach(item => {
-          if(item.productId.toString() === productId.toString()){
-            status = item.customizedProductOption
+      let status = false;
+      if (customize) {
+        customize.products.forEach((item) => {
+          if (item.productId.toString() === productId.toString()) {
+            status = item.customizedProductOption;
           }
-        })
+        });
       }
 
-      console.log( customize, status, "this is custom product");
       res.render("user/product-details", {
         productWishlist,
         productId,
@@ -207,25 +201,24 @@ module.exports = {
         customProduct: status,
       });
     } catch (error) {
-      console.error("Error fetching product details:", error);
       res.status(500).send("Internal Server Error");
     }
   },
 
+  // Get Customize Product
   loadCustomizeProduct: async (req, res) => {
     try {
       const user = req.session.user;
-      const productId = req.params.id
+      const productId = req.params.id;
 
-      console.log(productId, "this is product id")
       const product = await Product.findById(productId);
-      console.log(product, "this is product")
       res.render("user/customizeProduct", { product, user });
     } catch (error) {
-      console.error("Error fetching product details: ");
+      return res.redirect("/pageNotFound");
     }
   },
 
+  // Save Customized Image
   saveCustomizedImage: async (req, res) => {
     const { allCanvasData, productId } = req.body;
     const userId = req.session.user;
@@ -268,11 +261,11 @@ module.exports = {
 
       res.json({ success: true, message: "Canvas saved successfully", customize });
     } catch (error) {
-      console.error(error);
       res.status(500).json({ error: "Error saving canvas data" });
     }
   },
 
+  // Custom Product Details Confirm in Product Details Page
   productDetailsCustomConfirm: async (req, res) => {
     try {
       const { productId, status } = req.body;
@@ -281,8 +274,6 @@ module.exports = {
       const customize = await Customize.findOne({ userId: userId });
       let foundProduct = false;
 
-      console.log(productId, status, customize, userId, foundProduct, "this is hte message from the backend");
-
       customize.products.forEach((item) => {
         if (item.productId.toString() === productId.toString()) {
           item.customizedProductOption = status;
@@ -290,7 +281,6 @@ module.exports = {
         }
       });
 
-      console.log(foundProduct, "the product has found");
       if (foundProduct) {
         await customize.save();
         res.json({ message: "Customized product seleted" });

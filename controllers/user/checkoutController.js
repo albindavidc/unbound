@@ -1,3 +1,5 @@
+// checkoutController.js
+
 const User = require("../../models/userSchema");
 const Cart = require("../../models/cartSchema");
 const Order = require("../../models/orderSchema");
@@ -49,6 +51,7 @@ const createRazorpayOrder = async (order_id, total) => {
 };
 
 module.exports = {
+  // Get Checkout
   getCheckout: async (req, res) => {
     const userId = req.session.user;
 
@@ -115,7 +118,6 @@ module.exports = {
       expiringDate: { $gte: Date.now() },
       // usedBy: [{ $: req.user.id }],
     });
-    // console.log(coupons);
 
     let isCOD = true;
 
@@ -129,7 +131,6 @@ module.exports = {
     userWallet.forEach((items) => {
       newWallet = items.balance;
     });
-    console.log(userWallet, "this is user wallet");
 
     let isInsufficient;
     if (totalPrice > newWallet) {
@@ -137,8 +138,6 @@ module.exports = {
     } else {
       isInsufficient = false;
     }
-
-    console.log("this is isInsufficient", totalPrice, newWallet, isInsufficient);
 
     const getPayable = await Cart.findOne({ userId }, { _id: 0, payable: 1 });
     const payable = getPayable.payable;
@@ -160,6 +159,7 @@ module.exports = {
     });
   },
 
+  // Place Order
   placeOrder: async (req, res) => {
     try {
       const { paymentMethod, address } = req.body;
@@ -222,14 +222,6 @@ module.exports = {
         });
       }
 
-
-      // const cartUpdate = await Cart.findOne({ userId });
-      // if (cartUpdate && cartUpdate.customized === true) {
-      //   order.customized  = true;
-      //   console.log(cartUpdate.customized, "this is cartUpdate")
-      // }
-
-
       order.items.forEach((item) => {
         item.status = status;
       });
@@ -268,11 +260,6 @@ module.exports = {
                 return res.status(400).json({ error: "Insufficient stock" });
               }
 
-              // console.log("this is product", product);
-              // console.log("this is variant", variant);
-              // console.log("this is stock", variant.stock);
-              // console.log("this is the quantity", item.quantity);
-
               variant.stock -= item.quantity;
 
               item.productDetail = {
@@ -285,15 +272,12 @@ module.exports = {
               await product.save();
             }
 
-            // Save the updated product and order
             const orderPlaced = await order.save();
             req.session.orderDetails = orderPlaced;
 
             if (!orderPlaced) {
               return res.status(500).json({ error: "Failed to create order" });
             }
-
-            // Proceed with the rest of the checkout process here
 
             const userId = req.session.user;
 
@@ -356,7 +340,6 @@ module.exports = {
             // reduce stock of the variant
             for (const item of userCart.items) {
               const product = await Product.findById(item.productId).catch((error) => {
-                console.error(error);
                 return res.status(500).json({ error: "Failed to find product" });
               });
 
@@ -370,12 +353,9 @@ module.exports = {
                 return res.status(404).json({ error: "Variant not found" });
               }
 
-              console.log(product.variants[variantIndex]);
-
               product.variants[variantIndex].stock -= item.quantity;
 
               await product.save().catch((error) => {
-                console.error(error);
                 return res.status(500).json({ error: "Failed to update product stock" });
               });
             }
@@ -407,10 +387,11 @@ module.exports = {
           break;
       }
     } catch (error) {
-      console.error(error);
       res.status(400).json({ message: "Detailed error message" });
     }
   },
+
+  // Verify Payment
   verifyPayment: async (req, res) => {
     try {
       const secret = process.env.RAZ_KEY_SECRET;
@@ -423,7 +404,6 @@ module.exports = {
       const isSignatureValid = hmac === razorpay_signature;
 
       if (!isSignatureValid) {
-        console.log("Signature mismatch", { razorpay_order_id, razorpay_payment_id, razorpay_signature, generated_hmac: hmac });
         return res.status(400).json({ success: false, message: "Invalid signature" });
       }
 
@@ -464,7 +444,6 @@ module.exports = {
 
       let couponId = await Order.findOne({ _id: order_id }).populate("coupon");
 
-      console.log(couponId);
       if (couponId.coupon) {
         couponId = couponId.coupon._id;
         if (couponId) {
@@ -483,7 +462,6 @@ module.exports = {
 
       return res.json({ success: true, message: "Payment verified successfully" });
     } catch (error) {
-      console.error("Error in payment verification:", error);
       return res.status(500).json({ success: false, message: "Payment verification failed" });
     }
   },

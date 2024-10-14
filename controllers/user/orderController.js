@@ -1,12 +1,13 @@
+// orderController.js
+
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
 const Wallet = require("../../models/walletSchema");
-const User = require("../../models/userSchema")
-const Payment = require("../../models/paymentSchema")
+const User = require("../../models/userSchema");
+const Payment = require("../../models/paymentSchema");
 
-const Razorpay = require("razorpay")
+const Razorpay = require("razorpay");
 const crypto = require("crypto");
-
 
 const path = require("path");
 const PDFDocument = require("pdfkit");
@@ -22,20 +23,20 @@ module.exports = {
     let currentPage = parseInt(req.query.page) || 1;
 
     const order = await Order.find({ customerId: userId })
-    .populate({
-      path: "items.productId",
-      select: "name price primaryImages secondaryImages", // Select the fields you want from the product
-    })
-    .populate("items.color items.size shippingAddress")
+      .populate({
+        path: "items.productId",
+        select: "name price primaryImages secondaryImages", // Select the fields you want from the product
+      })
+      .populate("items.color items.size shippingAddress")
 
-    .skip((currentPage - 1) * perPage)
-    .limit(perPage)
-    .sort({ createdAt: -1 })
-    .exec();
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 })
+      .exec();
 
     const count = await Order.countDocuments({ customerId: userId });
     const nextPage = parseInt(currentPage) + 1;
-    const totalPages = Math.ceil(count/perPage);
+    const totalPages = Math.ceil(count / perPage);
     const hasPrevPage = currentPage > 1;
     const hasNextPage = currentPage < totalPages;
 
@@ -47,7 +48,7 @@ module.exports = {
       pagination: order,
       currentPage,
       perPage,
-      nextPage, 
+      nextPage,
       hasPrevPage,
       hasNextPage,
       totalPages,
@@ -56,6 +57,7 @@ module.exports = {
     });
   },
 
+  // Get Order
   getOrder: async (req, res) => {
     try {
       const orderId = req.params.orderId;
@@ -65,31 +67,24 @@ module.exports = {
       let order = await Order.find({ customerId: userId })
         .populate({
           path: "items.productId",
-          select: "name price primaryImages secondaryImages", 
+          select: "name price primaryImages secondaryImages",
         })
         .populate("items.color items.size shippingAddress _id items.orderID")
         .populate("items.productId.primaryImages")
         .populate({
-          path: 'items.productId', 
+          path: "items.productId",
           populate: {
-            path: 'ratings' 
-          }
+            path: "ratings",
+          },
         })
-        .populate('customerId'); 
-        
+        .populate("customerId");
 
-      const user = await User.findById(userId)
-      const orders = await Order.findById(orderId)
-      const payment = await Payment.find({orderId: order._id})
+      const user = await User.findById(userId);
+      const orders = await Order.findById(orderId);
+      const payment = await Payment.find({ orderId: order._id });
 
-      // Example of accessing the first orderID
-      console.log("This is the first item's orderID:", order[0].items[0].orderID);
-      console.log("this is orderId");
-      console.log(payment, "this is backend orders and user")
-      
-      res.render("user/order", { order, orderId, user: req.session.user, user, orders,payment });
+      res.render("user/order", { order, orderId, user: req.session.user, user, orders, payment });
     } catch (error) {
-      console.error("Error fetching order details:", error);
       res.status(500).send("Server Error");
     }
   },
@@ -110,17 +105,14 @@ module.exports = {
       return order;
     };
 
-    const {order} = req.body;
-    const orderId = order._id
+    const { order } = req.body;
+    const orderId = order._id;
     const userId = req.session.user;
 
-    console.log(order._id, "this is order id of the contienue order" )
-    const user = await User.findById(userId)
-    const orders = await Order.findById(orderId)
+    const user = await User.findById(userId);
+    const orders = await Order.findById(orderId);
 
     let total = parseInt(orders.totalPrice);
-    // let order_id = createOrder._id;
-
     const RazorpayOrder = await createRazorpayOrder(orderId, total).then((order) => order);
 
     const timestamp = RazorpayOrder.created_at;
@@ -137,16 +129,14 @@ module.exports = {
       createdAt: formattedDate,
     });
     await payment.save();
-    console.log(payment,"this is the razorpay payment")
     return res.json({
       status: true,
       order: RazorpayOrder,
       user,
     });
-
   },
 
-
+  // Update Order
   updateOrder: async (req, res) => {
     const { orderId } = req.params;
     const { action, cancelReason, returnReason, orderCancelRefundMethod, orderReturnRefundMethod } = req.body;
@@ -158,11 +148,11 @@ module.exports = {
         if (orderReturnRefundMethod === "RefundToBankAccount") {
           result = await Order.findOneAndUpdate(
             {
-              "items.orderID": orderId, 
+              "items.orderID": orderId,
             },
             {
               $set: {
-                "items.$.status": "Return", 
+                "items.$.status": "Return",
                 "items.$.paymentStatus": "Refund",
                 "items.$.returnReason": returnReason,
                 "items.$.returnRefundMethod": "Refund to Bank Account",
@@ -175,7 +165,6 @@ module.exports = {
           const order = await Order.findOne({
             items: { $elemMatch: { orderID: orderId } },
           });
-          console.log("this is the ordercanel through wallet in backend", order);
 
           let isPending = false;
           let itemTotal = 0;
@@ -190,11 +179,7 @@ module.exports = {
             }
           });
 
-          console.log("this is item total in the backend", itemTotal);
-          console.log(itemTotal, "this is item total from the backend");
-
           const wallet = await Wallet.findOne({ userId: req.session.user });
-          console.log("Wallet balance", wallet.balance);
 
           if (wallet) {
             const amount = wallet.balance + itemTotal;
@@ -248,7 +233,6 @@ module.exports = {
           const order = await Order.findOne({
             items: { $elemMatch: { orderID: orderId } },
           });
-          console.log("this is the ordercanel through wallet in backend", order);
 
           //Pending products don't Refund
           let isPending = false;
@@ -264,10 +248,7 @@ module.exports = {
             }
           });
 
-          console.log("this is pending", isPending, itemTotal);
-
           const wallet = await Wallet.findOne({ userId: req.session.user });
-          // console.log("Wallet balance", wallet.balance);
 
           if (wallet && isPending === false) {
             const amount = wallet.balance + itemTotal;
@@ -276,7 +257,7 @@ module.exports = {
             wallet.balance = Math.round(amount);
             wallet.transactions.push({
               date: new Date(),
-              amount: Math.round(itemTotal), // Only round the new transaction
+              amount: Math.round(itemTotal),
               message: "Product Refund",
               type: "Credit",
             });
@@ -285,11 +266,11 @@ module.exports = {
 
             result = await Order.findOneAndUpdate(
               {
-                "items.orderID": orderId, // Corrected to search by the orderID inside items array
+                "items.orderID": orderId,
               },
               {
                 $set: {
-                  "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+                  "items.$.status": "Cancelled",
                   "items.$.paymentStatus": "Refund",
                   "items.$.cancelReason": cancelReason,
                   "items.$.cancelRefundMethod": "Refund to Wallet",
@@ -301,11 +282,11 @@ module.exports = {
           } else {
             result = await Order.findOneAndUpdate(
               {
-                "items.orderID": orderId, // Corrected to search by the orderID inside items array
+                "items.orderID": orderId,
               },
               {
                 $set: {
-                  "items.$.status": "Cancelled", // Use $ to update the matched element in the array
+                  "items.$.status": "Cancelled",
                   "items.$.paymentStatus": "Refund",
                   "items.$.cancelReason": cancelReason,
                   "items.$.cancelledOn": Date.now(),
@@ -318,19 +299,16 @@ module.exports = {
       }
 
       if (!result) {
-        console.log("Order not found");
         res.status(400).json({ message: "Detailed error message" });
-      } else {
-        console.log("Updated order:", result);
       }
 
       res.status(200).json({ success: true, message: `Order ${action}ed successfully` });
     } catch (error) {
-      console.error(error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
 
+  // Get PDF
   getInvoicePdf: async (req, res) => {
     try {
       const orderId = req.query.orderId;
@@ -338,7 +316,6 @@ module.exports = {
         return res.status(400).json({ success: false, message: "Order ID is missing" });
       }
 
-      // Find the order and populate the product details for each item
       const order = await Order.findById(orderId).populate("items.productId");
 
       if (!order) {
@@ -348,9 +325,7 @@ module.exports = {
       let totalQuantity = 0;
       let totalPrice = order.totalPrice;
 
-      // Calculate total quantity
       if (Array.isArray(order.items)) {
-        
         order.items.forEach((item) => {
           totalQuantity += item.quantity;
         });
@@ -366,7 +341,7 @@ module.exports = {
       // Header
       doc.fontSize(15).text("Order Invoice", { align: "center" }).moveDown();
 
-      const margin = { left: 20, top: 100, bottom: 100};
+      const margin = { left: 20, top: 100, bottom: 100 };
       const columnWidths = {
         date: 80,
         products: 150,
@@ -433,45 +408,38 @@ module.exports = {
       // Pipe the PDF to response
       doc.pipe(res);
       doc.end();
-
-      console.log(PDFDocument, "THIS IS PDF DOCUMENT", order)
     } catch (error) {
-      console.log(error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
 
-  submitReview: async (req, res) =>{
-
+  // Submit Review
+  submitReview: async (req, res) => {
     try {
-      const {productId, orderId} = req.params;
-      const {rating, review} = req.body;
+      const { productId, orderId } = req.params;
+      const { rating, review } = req.body;
 
-      if(!rating || !review){
-        return res.status(400).json({success: false, message: 'Rating and review are required'})
+      if (!rating || !review) {
+        return res.status(400).json({ success: false, message: "Rating and review are required" });
       }
-      
+
       const product = await Product.findById(productId);
 
-      if(!product){
-        return res.status(404).json({success: false, message: "Product not found"})
+      if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found" });
       }
 
       product.ratings.push({
         rating: parseInt(rating),
-        review:review,
+        review: review,
         user: req.session.user,
         orderId: orderId,
-      })
+      });
       await product.save();
 
-      res.json({success: true, message: 'Review added successfully!'})
+      res.json({ success: true, message: "Review added successfully!" });
     } catch (error) {
-      console.error("Error submitting review:", error)
-      res.status(500).json({success: false, message: "Server error. Please try again later"})
+      res.status(500).json({ success: false, message: "Server error. Please try again later" });
     }
-
   },
-
-
 };
