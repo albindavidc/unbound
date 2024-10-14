@@ -1,15 +1,15 @@
+<!-- product.ejs -->
+
 <%- include("../../partials/admin/header") %>
 
 <style>
   .table thead th {
-    background-color: #f8f9fa; /* Change this to your desired color */
-    color: #000; /* Optional: change the text color if needed */
-    text-align: left; /* Optional: change the text alignment if needed */
-    padding: 10px; /* Optional: change the padding if needed */
+    background-color: #f8f9fa;
+    color: #000;
+    text-align: left;
+    padding: 10px;
   }
 
-
-    
   .userProfileMain {
     width: 100%;
     height: 30%;
@@ -30,6 +30,7 @@
   }
 </style>
 
+<!-- Products Header -->
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -38,19 +39,14 @@
   </div>
 </section>
 
-
-
+<!-- Show Products -->
 <section class="content-main">
-
-    <div class="d-flex justify-content-end">
-      <div class="p-3">
-
-        <a href="/admin/stocks" class="btn btn-dark btn-sm rounded">Manage Stocks</a>
-      </div>
-      <div class="p-3">
-
-        <a href="/admin/add-product" class="btn btn-dark btn-sm rounded">Add products</a>
-      </div>
+  <div class="d-flex justify-content-end">
+    <div class="p-3">
+      <a href="/admin/stocks" class="btn btn-dark btn-sm rounded">Manage Stocks</a>
+    </div>
+    <div class="p-3">
+      <a href="/admin/add-product" class="btn btn-dark btn-sm rounded">Add products</a>
     </div>
   </div>
 
@@ -88,22 +84,14 @@
               <td><%= product.category.name %></td>
               <td>₹<%= product.sellingPrice %></td>
 
-
-
               <td>
-                <% let totalStock = 0; // Initialize total stock to 0 %> 
-                
-                <% product.variants.forEach(variant => { %> 
-                <% totalStock += variant.stock;
-                // Add stock of each variant %> <% }); %> <% if (totalStock > 0) { %>
+                <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock;%> <% }); %> 
+                <% if (totalStock>0) { %>
                 <span class="text text-success">In Stock (<%= totalStock %>)</span>
                 <% } else { %>
                 <span class="text text-danger">Out Of Stock</span>
                 <% } %>
               </td>
-
-
-
 
               <td>
                 <% if (product.isActive) { %>
@@ -124,12 +112,9 @@
                 </button>
                 <% } else { %>
                 <button class="btn btn-warning btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')">
-                 List
+                  List
                 </button>
                 <% } %>
-                
-              
-                
               </td>
             </tr>
             <% }) %> <% } else { %>
@@ -143,14 +128,13 @@
     </div>
   </div>
 
-
   <%- include('.././pagination') %>
-
-  
 </section>
-<!-- content-main end// -->
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
 <script>
+  // List or Unlist Product Confirmation
   const confirmAction = (productId, action, productName) => {
     let actionText, confirmButtonText;
 
@@ -178,10 +162,10 @@
       showCancelButton: true,
       confirmButtonText: confirmButtonText,
       cancelButtonText: "No, cancel!",
-      showConfirmButton: true, // Hide the confirm button
+      showConfirmButton: true,
       reverseButtons: true,
-      timer: 5000, // Auto-close after 3 seconds
-      timerProgressBar: true, // Optional: Show a progress bar
+      timer: 5000,
+      timerProgressBar: true,
     }).then((result) => {
       if (result.isConfirmed) {
         if (action === "delete") {

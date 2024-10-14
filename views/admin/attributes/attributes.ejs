@@ -1,16 +1,18 @@
+<!-- attribute.ejs -->
+
 <%- include('../../partials/admin/header') %>
 
 <style>
   .btn {
     display: flex;
-    align-items: center; /* Vertically centers the content */
-    justify-content: center; /* Horizontally centers the content */
+    align-items: center;
+    justify-content: center;
   }
 
   .btn i {
-    margin-right: 0.5rem; /* Adds space between the icon and text */
+    margin-right: 0.5rem;
   }
-    
+
   .userProfileMain {
     width: 100%;
     height: 30%;
@@ -53,7 +55,6 @@
 </div>
 
 <!-- Atribute List -->
-
 <section id="attributeSection" class="text-capitalize container">
   <div class="container">
     <div class="row">
@@ -268,7 +269,6 @@
                 </div>
               </fieldset>
             </div>
-            <!-- Add more form fields as needed -->
             <button type="submit" onclick="addAttribute('addColorForm', 'color')" class="btn btn-primary m-2 w-100">Add Color</button>
           </form>
         </div>
@@ -296,7 +296,6 @@
                 </div>
               </fieldset>
             </div>
-            <!-- Add more form fields as needed -->
             <button type="submit" onclick="addAttribute('addSizeForm', 'size')" class="btn btn-primary m-2 w-100">Add Size</button>
           </form>
         </div>
@@ -324,7 +323,6 @@
                 </div>
               </fieldset>
             </div>
-            <!-- Add more form fields as needed -->
             <button type="submit" onclick="addAttribute('addBrandForm', 'brand')" class="btn btn-primary m-2 w-100">Add Brand</button>
           </form>
         </div>
@@ -332,7 +330,6 @@
     </div>
   </div>
 </div>
-<!-- End Add Atribute Modal -->
 
 <!-- Edit Color Modal -->
 <div class="modal fade" id="editColorModal" tabindex="-1" aria-labelledby="editColorModalLabel">
@@ -358,7 +355,6 @@
                 </div>
               </fieldset>
             </div>
-            <!-- Add more form fields as needed -->
             <button type="submit" class="btn btn-primary m-2 w-100">Add Attribute</button>
           </form>
         </div>
@@ -366,7 +362,6 @@
     </div>
   </div>
 </div>
-<!-- End Edit Color Modal -->
 
 <!-- Edit Size -->
 <div class="modal fade" id="editSizeModal" tabindex="-1" aria-labelledby="editSizeModalLabel">
@@ -388,7 +383,6 @@
                 </div>
               </fieldset>
             </div>
-            <!-- Add more form fields as needed -->
             <button type="submit" class="btn btn-primary m-2 w-100">Add Attribute</button>
           </form>
         </div>
@@ -396,7 +390,6 @@
     </div>
   </div>
 </div>
-<!-- End Edit Size -->
 
 <!-- Edit Brand -->
 <div class="modal fade" id="editBrandModal" tabindex="-1" aria-labelledby="editBrandModalLabel">
@@ -418,7 +411,6 @@
                 </div>
               </fieldset>
             </div>
-            <!-- Add more form fields as needed -->
             <button type="submit" class="btn btn-primary m-2 w-100">Edit Brand</button>
           </form>
         </div>
@@ -426,7 +418,6 @@
     </div>
   </div>
 </div>
-<!-- End Brand Size -->
 
 <%- include('../../partials/admin/footer') %>
 
@@ -442,7 +433,6 @@
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      // Collect form data
       let data;
       let modal;
 
@@ -464,7 +454,7 @@
           modal = document.getElementById("addColorModal");
           break;
         case "brand":
-          const brand = document.getElementById("brand").value; // Assuming 'brand' is an input element
+          const brand = document.getElementById("brand").value;
           console.log(brand);
           data = {
             brand,
@@ -472,11 +462,9 @@
           modal = document.getElementById("addBrandModal");
           break;
         default:
-          // Optional: Handle the case where 'type' is not 'size', 'color', or 'brand'
           console.log("Invalid type");
       }
 
-      // Confirmation dialog
       Swal.fire({
         title: "Are you sure?",
         text: `You want to add this ${type}!`,
@@ -497,7 +485,6 @@
             });
 
             if (!response.ok) {
-              // Handle non-2xx responses
               const errorData = await response.json();
               Swal.fire({
                 icon: "error",
@@ -514,7 +501,6 @@
               text: responseData.message,
             }).then(() => {
               if (responseData.success) {
-                // Optionally, close the modal and refresh the page or update the UI
                 // modal.hide();
                 location.reload();
               }
@@ -543,7 +529,6 @@
       confirmButtonText: "Yes, toggle it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // show loading using swal
         Swal.fire({
           title: "Please wait...",
           allowOutsideClick: false,
@@ -587,14 +572,13 @@
     });
   }
 
+  // Edit Color Modal
   const editColorModal = document.getElementById("editColorModal");
-
   editColorModal.addEventListener("show.bs.modal", async (e) => {
     const editColorButton = e.relatedTarget;
 
     const colorId = editColorButton.getAttribute("data-color-id");
     try {
-      // show loading using swal
       const response = await fetch(`/admin/attributes/color/${colorId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch color");
@@ -611,6 +595,8 @@
       });
     }
   });
+
+  //Edit Size Modal
   editSizeModal.addEventListener("show.bs.modal", async (e) => {
     const editSizeButton = e.relatedTarget;
 
@@ -631,6 +617,8 @@
       });
     }
   });
+
+  // Edit Brand Modal
   editBrandModal.addEventListener("show.bs.modal", async (e) => {
     const editBrandButton = e.relatedTarget;
 
@@ -652,6 +640,7 @@
     }
   });
 
+  // Delete Attribute
   function deleteAttribute(id, type, attribute) {
     console.log(type);
     Swal.fire({
@@ -672,7 +661,6 @@
         })
           .then(async (response) => {
             if (!response.ok) {
-              // If the response is not OK, read the response body to get the error message
               const text = await response.text();
               throw new Error(text);
             }
@@ -684,12 +672,11 @@
               title: "Success",
               text: data.message.toUpperCase(),
             }).then(() => {
-              location.reload(); // Reload the current window
+              location.reload();
             });
           })
           .catch((error) => {
             console.log(error);
-            // Display an error message based on the error caught
             Swal.fire({
               icon: "error",
               title: "Oops...",

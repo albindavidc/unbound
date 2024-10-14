@@ -1,5 +1,6 @@
-<%- include("../../partials/admin/header") %>
+<!-- stock.ejs -->
 
+<%- include("../../partials/admin/header") %>
 
 <style>
   .userProfileMain {
@@ -18,6 +19,7 @@
   }
 </style>
 
+<!-- Stock Management Header -->
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -25,100 +27,94 @@
     </div>
   </div>
 </section>
-  
-  <section class="container text-capitalize">
-    <div class="container table-responsive">
-      <table class="table table-hover table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Product</th>
-            <th>Variants</th>
-            <th>Update Stock</th> <!-- Added column for updating stock -->
-          </tr>
-        </thead>
-        <tbody>
-          <% products.forEach((product, index) => { %>
-          <tr>
-            <td class="align-middle"><%- index + 1 %></td>
-            <td class="align-middle"><%- product.name %></td>
-            <td>
-              <% product?.variants.forEach((element, i) => { %>
-              <span class="form-control-plaintext">
-                  <span class="text-muted"><%- i+1 %></span>
-                <span class="fw-bold">Color:</span> <%- element.color?.name %>,
-                <span class="fw-bold">Size:</span> <%- element.size?.value %> <br>
-              </span>
-              <% }) %>
-            </td>
-            <td>
-              <!-- Added Update Stock column -->
-              <div class="row">
-                <% product.variants.forEach((variant, index) => { %>
-                  <div class="col-auto">
-                    <input type="number" class="form-control" name="variants[<%= index %>][stock]" min="0" id="stock-<%= variant._id %>" value="<%= variant.stock %>">
-                  </div>
-                  <div class="col-auto">
-                    <button onclick="updateStock('<%= variant._id %>')" class="btn btn-dark btn-l">Update</button>
-                  </div>
-                <% }); %>
-              </div>
-              
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-  </section>
 
-  <%- include("../../partials/admin/footer") %>
-<!-- Include SweetAlert2 library -->
+<!-- Update Stocks -->
+<section class="container text-capitalize">
+  <div class="container table-responsive">
+    <table class="table table-hover table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>Variants</th>
+          <th>Update Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach((product, index) => { %>
+        <tr>
+          <td class="align-middle"><%-((currentPage -1) * perPage) + index + 1 %></td>
+          <td class="align-middle"><%- product.name %></td>
+          <td>
+            <% product?.variants.forEach((element, i) => { %>
+            <span class="form-control-plaintext">
+              <span class="text-muted"><%- i+1 %></span>
+              <span class="fw-bold">Color:</span> <%- element.color?.name %>, <span class="fw-bold">Size:</span> <%- element.size?.value %> <br />
+            </span>
+            <% }) %>
+          </td>
+          <td>
+            <div class="row">
+              <% product.variants.forEach((variant, index) => { %>
+              <div class="col-auto">
+                <input
+                  type="number"
+                  class="form-control"
+                  name="variants[<%= index %>][stock]"
+                  min="0"
+                  id="stock-<%= variant._id %>"
+                  value="<%= variant.stock %>"
+                />
+              </div>
+              <div class="col-auto">
+                <button onclick="updateStock('<%= variant._id %>')" class="btn btn-dark btn-l">Update</button>
+              </div>
+              <% }); %>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div class="mb-3">
+    <%- include('../pagination') %>
+
+  </div>
+</section>
+
+<%- include("../../partials/admin/footer") %>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
-  
-  <script defer>
-  
-      const updateStock = async (variantId) => {
-          const stock = document.getElementById(`stock-${variantId}`).value;
-  
-          // Use SweetAlert to ask for confirmation
-          Swal.fire({
-              title: 'Are you sure?',
-              text: "You are about to update the stock for this variant.!",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Yes, update it!'
-          }).then(async (result) => {
-              if (result.isConfirmed) {
-                  // If confirmed, proceed with the stock update
-                  const response = await fetch(`/admin/update-stock`, {
-                      method: 'PATCH',
-                      headers: {'Content-type': 'application/json'},
-                      body: JSON.stringify({
-                          variantId,
-                          stock
-                      })
-                  });
-                  // Handle the response as needed
-                  if (response.ok) {
-                      Swal.fire(
-                          'Updated!',
-                          'Stock has been updated.',
-                          'success'
-                      );
-                  } else {
-                      Swal.fire(
-                          'Error!',
-                          'Something went wrong.',
-                          'error'
-                      );
-                  }
-              }
-          });
+<script defer>
+  const updateStock = async (variantId) => {
+    const stock = document.getElementById(`stock-${variantId}`).value;
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to update the stock for this variant.!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, update it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const response = await fetch(`/admin/update-stock`, {
+          method: "PATCH",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify({
+            variantId,
+            stock,
+          }),
+        });
+        if (response.ok) {
+          Swal.fire("Updated!", "Stock has been updated.", "success");
+        } else {
+          Swal.fire("Error!", "Something went wrong.", "error");
+        }
       }
-  
-  </script>
-  
+    });
+  };
+</script>

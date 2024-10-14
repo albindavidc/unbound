@@ -1,3 +1,5 @@
+<!-- add-products.ejs -->
+
 <%- include("../../partials/admin/header") %>
 
 <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
@@ -51,10 +53,6 @@
     border-radius: 50%;
     cursor: pointer;
   }
-  /* 
-    .imagemodal {
-      display: none; 
-    } */
 
   .imagemodal {
     display: none;
@@ -62,7 +60,7 @@
     z-index: 5;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Center the modal horizontally and vertically */
+    transform: translate(-50%, -50%);
     width: 100%;
     height: 100%;
     overflow: auto;
@@ -70,30 +68,30 @@
   }
 
   .modal-content {
-    margin: 10px auto; /* Center the modal horizontally */
+    margin: 10px auto;
     padding: 20px;
     background-color: #fff;
     border: 1px solid #888;
     display: flex;
-    flex-direction: column; /* Ensure the content is stacked vertically */
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     width: 50%;
-    border-radius: 15px; /* Add rounded corners */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
   }
 
   .img-container {
     display: flex;
-    justify-content: center; /* Center the image horizontally */
-    align-items: center; /* Center the image vertically */
+    justify-content: center;
+    align-items: center;
     width: 100%;
   }
 
   .img-container img {
-    max-width: 100%; /* Make the image responsive */
+    max-width: 100%;
     height: auto;
-    border-radius: 10px; /* Add rounded corners to the image */
+    border-radius: 10px;
   }
 
   .padding {
@@ -120,6 +118,7 @@
   }
 </style>
 
+<!-- Add product header -->
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -129,6 +128,7 @@
 </section>
 
 <section>
+  <!-- Crop modal -->
   <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -149,6 +149,7 @@
     </div>
   </div>
 
+  <!-- Add product -->
   <div class="content">
     <main>
       <div class="bottom-data">
@@ -160,7 +161,6 @@
                   <button type="button" class="btn btn-dark" id="addPrimaryImageButton">Add Primary Image</button>
                   <input type="file" id="primaryInput" accept="image/*" style="display: none" />
                   <div id="croppedPrimaryImages"></div>
-                  <!-- <div id="primary-image-error" class="error-div"></div> -->
                 </div>
 
                 <hr />
@@ -176,7 +176,6 @@
                 <div class="margin-custom form-group">
                   <label for="product-name" class="form-label">Name</label>
                   <input type="text" name="productName" id="product-name" placeholder="Product name" class="form-control" required />
-                  <!-- <div id="product-name-error" class="error-div"></div> -->
                   <small></small>
                 </div>
                 <div class="mb-4 mt-5">
@@ -189,13 +188,11 @@
                     required
                   ></textarea>
                   <small></small>
-                  <!-- <div id="product-description-error" class="error-div"></div> -->
                 </div>
 
                 <div class="mb-4 mt-5">
                   <label class="form-label">Selling Price is calculated automatically with product and category offer</label>
                   <input placeholder="₹" id="selling-price" name="sellingPrice" type="number" class="form-control" value="0" disabled />
-                  <!-- <div id="selling-price-error" class="error-message error-div"></div> -->
                   <small></small>
                 </div>
 
@@ -206,7 +203,6 @@
                         <label class="form-label" for="actual-price">Actual Price</label>
                         <input placeholder="₹" name="actualPrice" type="number" id="actual-price" class="form-control" required />
                         <small></small>
-                        <!-- <div id="actual-price-error" class="error-message error-div"></div> -->
                       </div>
                     </div>
 
@@ -214,7 +210,6 @@
                       <div class="mb-4">
                         <label class="form-label">Bundle Price </label>
                         <input placeholder="₹" id="bundle-price" name="bundlePrice" type="number" class="form-control" required />
-                        <!-- <div id="bundle-price-error" class="error-message error-div"></div> -->
                         <small></small>
                       </div>
                     </div>
@@ -247,7 +242,6 @@
                           <option value="<%= color._id %>"><%= color.name %></option>
                           <% }); %>
                         </select>
-                        <!-- <div id="color-error" class="error-div"></div> -->
                         <small></small>
                       </div>
                     </div>
@@ -261,7 +255,6 @@
                           <option value="<%= size._id %>"><%= size.value %></option>
                           <% }); %>
                         </select>
-                        <!-- <div id="size-error" class="error-div"></div> -->
                         <small></small>
                       </div>
                     </div>
@@ -269,7 +262,6 @@
                       <div class="mb-4">
                         <label for="variant-stock" class="form-label">Stock of Product</label>
                         <input placeholder="Stock" id="variant-stock" name="variants[0][stock]" type="number" class="form-control" required />
-                        <!-- <div id="stock-error" class="error-message error-div"></div> -->
                         <small></small>
                       </div>
                     </div>
@@ -282,7 +274,6 @@
                       <div class="mb-4">
                         <label class="form-label" for="offer-discount-rate">Product Offer(%)</label>
                         <input placeholder="%" name="offerDiscountRate" type="number" class="form-control" id="offer-discount-rate" required />
-                        <!-- <div id="offer-discount-rate-error" class="error-message error-div"></div> -->
                         <small></small>
                       </div>
                     </div>
@@ -299,7 +290,6 @@
                     <% }); %>
                   </select>
                   <small></small>
-                  <!-- <div id="brandError" class="error-div"></div> -->
                 </div>
                 <div class="form-group mb-3">
                   <label for="category" class="form-label">Category Name</label>
@@ -310,7 +300,6 @@
                     <% }); %>
                   </select>
                   <small></small>
-                  <!-- <div id="categoryError" class="error-div"></div> -->
                 </div>
                 <div class="d-flex justify-content-center mt-5" style="padding: 40px">
                   <div class="d-grid col-md-5">
@@ -360,7 +349,7 @@
   const maxSecondaryImages = 4;
   let currentSecondaryImages = 0;
 
-  // Handle primary and secondary image button clicks
+  // Add images
   addPrimaryImageButton.addEventListener("click", function () {
     croppingPrimary = true;
     primaryInput.click();
@@ -463,10 +452,6 @@
   async function addproduct(event) {
     event.preventDefault();
 
-    // if (!validateForm()) {
-    //   return;
-    // }
-
     if (croppedPrimaryImagesDiv.childElementCount === 0) {
       Swal.fire({
         icon: "error",
@@ -502,18 +487,6 @@
       const blob = await fetch(blobUrl).then((r) => r.blob());
       formData.append("secondaryImage", blob, `secondaryImage${i}.png`);
     }
-
-    console.log(formData.entries());
-
-    //   // Collect variants
-    //   const variants = [];
-    //   document.querySelectorAll(".variant").forEach((variant) => {
-    //     const color = variant.querySelector(".variant-color").value;
-    //     const size = variant.querySelector(".variant-size").value;
-    //     const stock = variant.querySelector(".variant-stock").value;
-    // variants.push({ color, size, stock: parseInt(stock, 10) }); // Ensure stock is a number
-    //   });
-    //   formData.append("variants", JSON.stringify(variants));
 
     try {
       let isNameValid = checkName(),
@@ -556,8 +529,16 @@
       const data = await response.json();
 
       if (data.isvalid) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "You have successfully created the product",
+          showConfirmButton: false,
+          timer: 2000,
+        }).then(() => {
+          window.location.replace(`/admin/products`);
+        });
         const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
-        window.location.href = `${API_BASE_URL}/admin/products`;
       } else {
         Swal.fire({
           icon: "error",
@@ -599,11 +580,7 @@
 
     if (!isRequired(description)) {
       showError(descriptionEl, "Description cannot be blank.");
-    }
-    // else if (!/^[a-zA-Z\s]+$/.test(description)) {
-    //   showError(descriptionEl, "Description should not contain numbers.");
-    // }
-    else {
+    } else {
       showSuccess(descriptionEl);
       isValid = true;
     }
@@ -822,7 +799,7 @@
     "input",
     debounce(function (e) {
       switch (e.target.id) {
-        case "product-name": // Assuming this is the full name field
+        case "product-name":
           checkName();
           break;
         case "product-description":
@@ -841,8 +818,8 @@
           checkMaxProduct();
           break;
         case "max-bundle":
-        checkMaxBundle();
-        break;
+          checkMaxBundle();
+          break;
 
         case "color":
           checkColor();
@@ -873,7 +850,7 @@
     "change",
     debounce(function (e) {
       switch (e.target.id) {
-        case "product-name": // Assuming this is the full name field
+        case "product-name":
           checkName();
           break;
         case "product-description":
@@ -892,8 +869,8 @@
           checkMaxProduct();
           break;
         case "max-bundle":
-        checkMaxBundle();
-        break;
+          checkMaxBundle();
+          break;
         case "color":
           checkColor();
           break;
@@ -956,38 +933,8 @@
         isBrand &&
         isCategory;
 
-      // if (isFormValid) {
-      //   // form.submit();
-      // }
       return isFormValid;
     });
-
-    // // Validate price
-    // const price = document.querySelector('input[name="price"]').value;
-    // if (isNaN(price) || price < 0) {
-    //   document.getElementById("price-error").innerText = "Price must be a number greater than or equal to 0.";
-    //   isValid = true;
-    // } else {
-    //   document.getElementById("price-error").innerText = "";
-    // }
-
-    // // Validate product name
-    // const productName = document.querySelector('input[name="productName"]').value;
-    // if (productName.trim() === "") {
-    //   document.getElementById("product-name-error").innerText = "Product name is required.";
-    //   isValid = true;
-    // } else {
-    //   document.getElementById("product-name-error").innerText = "";
-    // }
-
-    // // Validate product description
-    // const productDescription = document.querySelector('textarea[name="productdescription"]').value;
-    // if (productDescription.trim() === "") {
-    //   document.getElementById("product-description-error").innerText = "Product description is required.";
-    //   isValid = true;
-    // } else {
-    //   document.getElementById("product-description-error").innerText = "";
-    // }
 
     // Validate file inputs
     const allowedExtensions = ["jpg", "jpeg", "png", "gif"];

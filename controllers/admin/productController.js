@@ -539,7 +539,7 @@ module.exports = {
   getStocks: async (req, res) => {
     try {
       let perPage = 9;
-      let page = req.query.page || 1;
+      let page = parseInt(req.query.page) || 1;
 
       const products = await Product.find()
         .sort({ createdAt: -1 })
@@ -547,22 +547,27 @@ module.exports = {
         .populate("category")
         .populate("variants.color")
         .populate("variants.size")
-        .skip(perPage * page - perPage)
+        .skip((page-1) * perPage)
         .limit(perPage)
+        .sort({createdAt: -1})
         .exec();
 
       const count = await Product.find().countDocuments();
       const nextPage = parseInt(page) + 1;
-      const hasNextPage = nextPage <= Math.ceil(count / perPage);
+      const totalPages = Math.ceil(count/perPage)
+      const hasPrevPage = page > 1
+      const hasNextPage = page < totalPages;
 
-      // console.log(products);
-      console.log(products[0]);
       res.render("admin/products/stocks", {
         products,
-        current: page,
-        pages: Math.ceil(count / perPage),
-        nextPage: hasNextPage ? nextPage : null,
-        currentRoute: "/admin/products/",
+
+        pagination: products,
+        currentPage: page,
+        perPage,
+        nextPage,
+        hasPrevPage,
+        hasNextPage,
+        totalPages,
       });
     } catch (error) {
       console.error(error);

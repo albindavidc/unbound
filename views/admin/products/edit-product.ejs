@@ -1,3 +1,5 @@
+<!-- edit-product.ejs -->
+
 <%- include("../../partials/admin/header") %>
 
 <head>
@@ -58,7 +60,7 @@
       z-index: 5;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%); /* Center the modal horizontally and vertically */
+      transform: translate(-50%, -50%);
       width: 100%;
       height: 100%;
       overflow: auto;
@@ -66,30 +68,30 @@
     }
 
     .modal-content {
-      margin: 10px auto; /* Center the modal horizontally */
+      margin: 10px auto;
       padding: 20px;
       background-color: #fff;
       border: 1px solid #888;
       display: flex;
-      flex-direction: column; /* Ensure the content is stacked vertically */
-      justify-content: center; /* Center content vertically */
-      align-items: center; /* Center content horizontally */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       width: 50%;
-      border-radius: 15px; /* Add rounded corners */
-      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
+      border-radius: 15px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .img-container {
       display: flex;
-      justify-content: center; /* Center the image horizontally */
-      align-items: center; /* Center the image vertically */
+      justify-content: center;
+      align-items: center;
       width: 100%;
     }
 
     .img-container img {
-      max-width: 100%; /* Make the image responsive */
+      max-width: 100%;
       height: auto;
-      border-radius: 10px; /* Add rounded corners to the image */
+      border-radius: 10px;
     }
 
     .padding {
@@ -116,6 +118,7 @@
     }
   </style>
 
+  <!-- Edit Product Header -->
   <section>
     <div class="pb-5 text-center">
       <div class="card userProfileMain rounded">
@@ -125,6 +128,7 @@
   </section>
 
   <section>
+    <!-- Crop Image Modal -->
     <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -146,6 +150,7 @@
     </div>
   </section>
 
+  <!-- Edit Product -->
   <section class="content-main">
     <form id="addProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data">
       <div class="container mt-4">
@@ -172,8 +177,13 @@
                 </div>
                 <div class="mb-4">
                   <label for="product-description" class="form-label">Description</label>
-                  <input placeholder="Type here" value="<%= product.description.trim() %>" id="product-description" class="form-control" name="description">
-                </input>
+                  <input
+                    placeholder="Type here"
+                    value="<%= product.description.trim() %>"
+                    id="product-description"
+                    class="form-control"
+                    name="description"
+                  />
                   <div id="productDescriptionError" class="text-danger"></div>
                 </div>
 
@@ -191,9 +201,6 @@
                       />
                     </div>
                   </div>
-
-
-
 
                   <div class="col-lg-3">
                     <div class="mb-4">
@@ -236,7 +243,6 @@
                       />
                     </div>
                   </div>
-                 
 
                   <div class="col-lg-12">
                     <div class="mb-4">
@@ -463,7 +469,6 @@
                           >
                             <i class="bi bi-trash"> </i>Delete
                           </button> -->
-
                       <div id="croppedSecondaryImage4" style="display: none"></div>
                     </div>
                     <!-- </div>
@@ -489,13 +494,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    // Delete Image
     async function deleteImage(imageId, productId) {
       try {
-        // Show a confirmation dialog
         const result = await Swal.fire({
           title: "Are you sure?",
           text: "You won't be able to revert this!",
@@ -507,19 +511,15 @@
         });
 
         if (result.isConfirmed) {
-          // Send a request to the server to delete the image
           const response = await fetch(`/admin/products/delete-image?productId=${productId}&imageId=${imageId}`, {
             method: "DELETE",
           });
 
           if (response.ok) {
-            // If the image was deleted successfully, show a success message
             Swal.fire("Deleted!", "The image has been deleted.", "success").then(() => {
               location.reload();
             });
-            // Optionally, remove the image from the UI here
           } else {
-            // If there was an error, show an error message
             Swal.fire({
               icon: "error",
               title: "Oops...",
@@ -551,13 +551,11 @@
       const croppedImagesDiv = document.getElementById(croppedImagesDivId);
       const button = document.getElementById(buttonId);
 
-      // Handle image button click
       button.addEventListener("click", function () {
         currentImageInputId = inputId;
         input.click();
       });
 
-      // Handle file input change event
       input.addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
@@ -572,21 +570,18 @@
       function openCropModal(imageSrc) {
         imageToCrop.src = imageSrc;
         cropImageModal.style.display = "block";
-
-        // Ensure Cropper is destroyed before re-initializing
         if (cropper) {
           cropper.destroy();
         }
-
         cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1, // Square aspect ratio
-          viewMode: 3, // Restrict the crop box to not exceed the canvas
+          aspectRatio: 1,
+          viewMode: 3,
         });
       }
 
       // Crop the image and add it to the appropriate container
       cropButton.addEventListener("click", function () {
-        if (!cropper) return; // Ensure Cropper is initialized
+        if (!cropper) return;
 
         const canvas = cropper.getCroppedCanvas();
         canvas.toBlob(function (blob) {
@@ -642,10 +637,6 @@
     document.getElementById("addProductForm").addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      // if (!validateForm()) {
-      //   return;
-      // }
-
       let form = document.getElementById("addProductForm");
       let formData = new FormData(form);
 
@@ -658,26 +649,6 @@
         formData.append("primaryImage", primaryBlob, "primaryImage.png");
       }
 
-      // //Add secodnary image to formData
-      // const secondaryImage0 = document?.getElementById("croppedSecondaryImage1")?.children[0]?.querySelector("img");
-      // const secondary0BlobUrl = secondaryImage0?.dataset?.blob;
-
-      // if(secondary0BlobUrl) {
-      //   const secondaryBlob0 = await fetch(secondary0BlobUrl).then((r) => r?.blob());
-      //   formData.append("secondaryImage0", secondaryBlob0, "secondaryImage0.png");
-      // }
-
-      // const secondaryImage1 = document?.getElementById("croppedSecondaryImage2")?.children[0]?.querySelector("img");
-      // const secondary1BlobUrl = secondaryImage1?.dataset?.blob;
-
-      // if(secondary1BlobUrl) {
-      //   const secondaryBlob1 = await fetch(secondary1BlobUrl).then((r) => r?.blob());
-      //   formData.append("secondaryImage1", secondaryBlob1, "secondaryImage1.png");
-      // }
-
-      // const secodnaryImage2 = document?.getElementById("croppedSecondaryImage3")?.children[2]?.querySelector("img");
-      // const secondary
-
       async function appendSecondaryImageToFormData(formData, index) {
         const secondaryImage = document?.getElementById(`croppedSecondaryImage${index + 1}`)?.children[0]?.querySelector("img");
         const secondaryBlobUrl = secondaryImage?.dataset?.blob;
@@ -688,28 +659,10 @@
         }
       }
 
-      await appendSecondaryImageToFormData(formData, 0); // For secondaryImage0
-      await appendSecondaryImageToFormData(formData, 1); // For secondaryImage1
-      await appendSecondaryImageToFormData(formData, 2); // For secondaryImage2
-      await appendSecondaryImageToFormData(formData, 3); // For secondaryImage3
-
-      // // Add secondary images to formData
-      // const secondaryImages = [
-      //   document.getElementById("croppedSecondaryImage2"),
-      //   document.getElementById("croppedSecondaryImage3"),
-      //   document.getElementById("croppedSecondaryImage4"),
-      // ];
-
-      // for (let i = 0; i < secondaryImages.length; i++) {
-      //   if (secondaryImages[i]?.childElementCount > 0) {
-      //     const blobUrl = secondaryImages[i]?.querySelector("img")?.dataset?.blob;
-      //     if (blobUrl) {
-      //       const blob = await fetch(blobUrl).then((r) => r?.blob());
-
-      //       formData.append(`secondaryImage`, blob, `secondaryImage${i + 1}.png`);
-      //     }
-      //   }
-      // }
+      await appendSecondaryImageToFormData(formData, 0);
+      await appendSecondaryImageToFormData(formData, 1);
+      await appendSecondaryImageToFormData(formData, 2);
+      await appendSecondaryImageToFormData(formData, 3);
 
       const result = await Swal.fire({
         title: "Are you sure ? ",
@@ -724,38 +677,36 @@
 
       if (result.isConfirmed) {
         try {
-
           let isNameValid = checkName(),
-        isDesciptionValid = checkDescription(),
-        isActualPriceValid = checkActualPrice(),
-        isBundlePriceValid = checkBundlePrice(),
-        isStockValid = checkVariantStock(),
-        isMaxProduct = checkMaxProduct(),
-        isMaxBundle = checkBundleMaxQuantity(),
-        isColor = checkColor(),
-        isSize = checkSize(),
-        isDiscountRate = checkOfferDiscountRate(),
-        isBrand = checkBrand(),
-        isCategory = checkCategory();
+            isDesciptionValid = checkDescription(),
+            isActualPriceValid = checkActualPrice(),
+            isBundlePriceValid = checkBundlePrice(),
+            isStockValid = checkVariantStock(),
+            isMaxProduct = checkMaxProduct(),
+            isMaxBundle = checkBundleMaxQuantity(),
+            isColor = checkColor(),
+            isSize = checkSize(),
+            isDiscountRate = checkOfferDiscountRate(),
+            isBrand = checkBrand(),
+            isCategory = checkCategory();
 
-      let isFormValid =
-        isNameValid &&
-        isDesciptionValid &&
-        isActualPriceValid &&
-        isBundlePriceValid &&
-        isStockValid &&
-        isMaxProduct &&
-        isMaxBundle &&
-        isColor &&
-        isSize &&
-        isDiscountRate &&
-        isBrand &&
-        isCategory;
+          let isFormValid =
+            isNameValid &&
+            isDesciptionValid &&
+            isActualPriceValid &&
+            isBundlePriceValid &&
+            isStockValid &&
+            isMaxProduct &&
+            isMaxBundle &&
+            isColor &&
+            isSize &&
+            isDiscountRate &&
+            isBrand &&
+            isCategory;
 
-      if (!isFormValid) {
-        throw new Error("Form is not valid");
-      }
-
+          if (!isFormValid) {
+            throw new Error("Form is not valid");
+          }
 
           const response = await fetch(form.action, {
             method: "POST",
@@ -813,11 +764,7 @@
 
       if (!isRequired(description)) {
         showError(descriptionEl, "Description cannot be blank.");
-      }
-      // else if (!/^[a-zA-Z\s]+$/.test(description)) {
-      //   showError(descriptionEl, "Description should not contain numbers.");
-      // }
-      else {
+      } else {
         showSuccess(descriptionEl);
         isValid = true;
       }
@@ -838,7 +785,6 @@
       }
       return isValid;
     };
-
 
     const checkBundlePrice = () => {
       const bundlePriceEl = document.querySelector("#bundle-price");
@@ -926,8 +872,6 @@
       return isValid;
     };
 
-   
-
     const checkOfferDiscountRate = () => {
       const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
       const offerDiscountRate = offerDiscountRateEl.value;
@@ -996,11 +940,9 @@
     const debounce = (fn, delay = 500) => {
       let timeoutId;
       return (...args) => {
-        // cancel the previous timer
         if (timeoutId) {
           clearTimeout(timeoutId);
         }
-        // setup a new timer
         timeoutId = setTimeout(() => {
           fn.apply(null, args);
         }, delay);
@@ -1011,7 +953,7 @@
       "input",
       debounce(function (e) {
         switch (e.target.id) {
-          case "product-name": // Assuming this is the full name field
+          case "product-name":
             checkName();
             break;
           case "product-description":
@@ -1049,7 +991,6 @@
           case "category":
             checkCategory();
             break;
-          
         }
       })
     );
@@ -1058,7 +999,7 @@
       "change",
       debounce(function (e) {
         switch (e.target.id) {
-          case "product-name": // Assuming this is the full name field
+          case "product-name":
             checkName();
             break;
           case "product-description":
@@ -1067,7 +1008,7 @@
           case "actual-price":
             checkActualPrice();
             break;
-     
+
           case "bundle-price":
             checkBundlePrice();
             break;
@@ -1080,14 +1021,14 @@
           case "max-bundle":
             checkBundleMaxQuantity();
             break;
-        
+
           case "color":
             checkColor();
             break;
           case "size":
             checkSize();
             break;
-     
+
           case "offer-discount-rate":
             checkOfferDiscountRate();
             break;
@@ -1133,52 +1074,8 @@
           isDiscountRate &&
           isBrand &&
           isCategory;
-
-        // if (isFormValid) {
-        //   // form.submit();
-        // }
         return isFormValid;
       });
-
-      // // Validate price
-      // const priceElement = document.getElementById("priceError");
-      // const price = document.querySelector('input[name="price"]').value;
-      // if (isNaN(price) || price < 0) {
-      //   if (priceElement) priceElement.innerText = "Price must be a number greater than or equal to 0.";
-      //   isValid = false;
-      // } else {
-      //   if (priceElement) priceElement.innerText = "";
-      // }
-
-      // // Validate quantity
-      // const quantityElement = document.getElementById("quantityError");
-      // const quantity = document.querySelector('input[name="quantity"]').value;
-      // if (isNaN(quantity) || quantity <= 0) {
-      //   if (quantityElement) quantityElement.innerText = "Quantity must be a number greater than 0.";
-      //   isValid = false;
-      // } else {
-      //   if (quantityElement) quantityElement.innerText = "";
-      // }
-
-      // // Validate product name
-      // const productNameElement = document.getElementById("productNameError");
-      // const productName = document.querySelector('input[name="name"]').value;
-      // if (productName.trim() === "") {
-      //   if (productNameElement) productNameElement.innerText = "Product name is required.";
-      //   isValid = false;
-      // } else {
-      //   if (productNameElement) productNameElement.innerText = "";
-      // }
-
-      // // Validate product description
-      // const productDescriptionElement = document.getElementById("productDescriptionError");
-      // const productDescription = document.querySelector('textarea[name="description"]').value;
-      // if (productDescription.trim() === "") {
-      //   if (productDescriptionElement) productDescriptionElement.innerText = "Product description is required.";
-      //   isValid = false;
-      // } else {
-      //   if (productDescriptionElement) productDescriptionElement.innerText = "";
-      // }
 
       // Validate file inputs
       const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
