@@ -1,3 +1,5 @@
+<!-- coupon.ejs -->
+
 <%- include('../partials/admin/header') %>
 <style>
   .userProfileMain {
@@ -15,6 +17,7 @@
     font-size: 6vw;
   }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -22,6 +25,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 
+<!-- Coupon Header -->
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -61,13 +65,13 @@
 
       <div class="mb-4">
         <label for="starting_date" class="form-label">Starting Date</label>
-        <input type="date" name="startingDate" id="starting_date" class="form-control">
+        <input type="date" name="startingDate" id="starting_date" class="form-control" />
         <small></small>
       </div>
 
       <div class="mb-4">
         <label for="expiring_date" class="form-label">Expiring Date</label>
-        <input type="date" name="expiringDate" id="expiring_date" class="form-control">
+        <input type="date" name="expiringDate" id="expiring_date" class="form-control" />
         <small></small>
       </div>
 
@@ -75,8 +79,6 @@
         <button type="submit" class="btn btn-dark btn-max-width">Create Coupon</button>
         <button type="button" id="close_button" class="btn btn-secondary btn-max-width" onclick="closeForm()">Close</button>
       </div>
-
-
     </form>
   </div>
 
@@ -86,9 +88,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Edit Coupon</h5>
-          
-          <button type="button" class="btn-close" id="close_button" onclick="closeForm()">
-          </button>
+
+          <button type="button" class="btn-close" id="close_button" onclick="closeForm()"></button>
         </div>
         <div class="modal-body">
           <form id="edit_coupon_form">
@@ -130,20 +131,19 @@
               <small></small>
             </div>
 
-
             <div class="form-group">
               <label for="edit_starting_date">Starting Date</label>
-              <input type="date" name="startingDate" id="edit_starting_date" class="form-control">
+              <input type="date" name="startingDate" id="edit_starting_date" class="form-control" />
               <small></small>
             </div>
-            <div class="form-group"></div>
+            <div class="form-group">
               <label for="edit_expiring_date">Expiring Date</label>
-              <input type="date" name="expiringDate" id="edit_expiring_date" class="form-control">
+              <input type="date" name="expiringDate" id="edit_expiring_date" class="form-control" />
               <small></small>
             </div>
 
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary"  id="close_button" onclick="closeForm()">Close</button>
+              <button type="button" class="btn btn-secondary" id="close_button" onclick="closeForm()">Close</button>
               <button type="submit" class="btn btn-dark">Update Coupon</button>
             </div>
           </form>
@@ -167,24 +167,21 @@
                 <th>Expiry Date</th>
                 <th></th>
                 <th>Actions</th>
-
               </tr>
             </thead>
             <tbody>
               <% for(let i = 0; i < coup.length; i++) { %>
               <tr>
-                <td ><%= coup[i].code %></td>
+                <td><%= coup[i].code %></td>
                 <td><%= coup[i].description %></td>
                 <td class="text-center"><%= coup[i].rateOfDiscount %> %</td>
                 <td class="text-center"><%= coup[i].minPurchaseAmount %></td>
                 <th><%= new Date(coup[i].startingDate).toLocaleString() %></th>
                 <th><%= new Date(coup[i].expiringDate).toLocaleString() %></th>
                 <td>
-                  <!-- Edit Button -->
                   <button class="btn btn-dark edit_coupon_button" data-coupon-id="<%= coup[i]._id %>">Edit</button>
                 </td>
                 <td>
-                  <!-- Delete Button -->
                   <button class="btn btn-danger" onclick="deleteCoupon('<%= coup[i].code %>')">Delete</button>
                 </td>
               </tr>
@@ -195,13 +192,12 @@
       </div>
     </div>
   </div>
-  
+
   <%- include('./pagination') %>
-
-
 </section>
 
 <script>
+  // Delete Coupon
   const deleteCoupon = async (couponCode) => {
     const result = await Swal.fire({
       icon: "warning",
@@ -247,7 +243,7 @@
     document.getElementById("add_coupon_form").style.display = "none";
     document.getElementById("edit_coupon_form").style.display = "none";
     document.getElementById("new_coupon_button").style.display = "block";
-    document.getElementById("edit_coupon_modal").style.display ="none";
+    document.getElementById("edit_coupon_modal").style.display = "none";
     location.reload();
   };
 
@@ -279,7 +275,6 @@
       const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
       const startingDate = document.getElementById("starting_date").value;
       const expiringDate = document.getElementById("expiring_date").value;
-      
 
       // Perform fetch request if form is valid
       fetch("/admin/addCoupon", {
@@ -302,7 +297,7 @@
             Swal.fire({
               icon: "success",
               title: "Success",
-              text: data.message, // Success message from backend
+              text: data.message,
               timer: 3000,
               showConfirmButton: false,
             }).then(() => location.reload());
@@ -390,35 +385,33 @@
         return valid;
       };
 
-  
-
-      const checkStartingDate =() =>{
+      const checkStartingDate = () => {
         const startingDateEl = document.querySelector("#starting_date");
         let valid = false;
         const startingDate = startingDateEl.value.trim();
 
-        if(!isRequired(startingDate)){
+        if (!isRequired(startingDate)) {
           showError(startingDateEl, "Starting Date cannot be blank");
-        }else{
+        } else {
           showSuccess(startingDateEl);
-          valid= true;
+          valid = true;
         }
         return valid;
-      }
+      };
 
-      const checkExpiringDate = () =>{
+      const checkExpiringDate = () => {
         const expiringDateEl = document.querySelector("#expiring_date");
         let valid = false;
         const expiringDate = expiringDateEl.value.trim();
 
-        if(!isRequired(expiringDate)){
+        if (!isRequired(expiringDate)) {
           showError(expiringDate, "Expiring Date cannot be blank");
-        }else{
+        } else {
           showSuccess(expiringDateEl);
-          valid= true;
+          valid = true;
         }
         return valid;
-      }
+      };
 
       const isRequired = (value) => (value === "" ? false : true);
 
@@ -452,7 +445,8 @@
       isStartingDateValid = checkStartingDate();
       isExpiringDateValid = checkExpiringDate();
 
-      let isFormValid = isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid  && isStartingDateValid && isExpiringDateValid ;
+      let isFormValid =
+        isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isStartingDateValid && isExpiringDateValid;
 
       return isFormValid;
     };
@@ -508,20 +502,20 @@
   // Open Edit Coupon Modal and Populate Data
   document.querySelectorAll(".edit_coupon_button").forEach((btn) => {
     btn.addEventListener("click", (event) => {
-      const couponId = event.target.dataset.couponId; // Assuming edit button has a data attribute with coupon ID
+      const couponId = event.target.dataset.couponId;
 
       const formatDateToInput = (date) => {
         const d = new Date(date);
-        let month = '' + (d.getMonth() + 1); // Months are 0-based
-        let day = '' + d.getDate();
+        let month = "" + (d.getMonth() + 1);
+        let day = "" + d.getDate();
         const year = d.getFullYear();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
 
-        return [year, month, day].join('-');
+        return [year, month, day].join("-");
       };
-      
+
       console.log("this is couponId", couponId);
       fetch(`/admin/getCoupon/${couponId}`)
         .then((response) => response.json())
@@ -549,7 +543,6 @@
   const checkCode = () => {
     const codeEl = document.getElementById("edit_coupon_code");
     const code = codeEl.value.trim();
-
     const regex = /^\S{5,}$/; // No spaces, minimum 5 characters
 
     if (!code) {
@@ -606,35 +599,33 @@
     }
   };
 
-
-  const checkStartingDate =() =>{
+  const checkStartingDate = () => {
     const startingDateEl = document.querySelector("#edit_starting_date");
     let valid = false;
     const startingDate = startingDateEl.value.trim();
 
-    if(!startingDate){
+    if (!startingDate) {
       showError(startingDateEl, "Starting Date cannot be blank");
-    }else{
+    } else {
       showSuccess(startingDateEl);
-      valid= true;
+      valid = true;
     }
     return valid;
-  }
+  };
 
-  const checkExpiringDate = () =>{
+  const checkExpiringDate = () => {
     const expiringDateEl = document.querySelector("#edit_expiring_date");
     let valid = false;
     const expiringDate = expiringDateEl.value.trim();
 
-    if(!expiringDate){
+    if (!expiringDate) {
       showError(expiringDate, "Expiring Date cannot be blank");
-    }else{
+    } else {
       showSuccess(expiringDateEl);
-      valid= true;
+      valid = true;
     }
     return valid;
-  }
-
+  };
 
   const showError = (input, message) => {
     const formField = input.parentElement;
@@ -667,7 +658,7 @@
       isRateOfDiscountValid = checkRateOfDiscount(),
       isMinPurchaseAmountValid = checkMinPurchaseAmount(),
       isStartingDateValid = checkStartingDate();
-      isExpiringDateValid = checkExpiringDate();
+    isExpiringDateValid = checkExpiringDate();
 
     // Form is valid only if all fields are valid
     return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isStartingDateValid && isExpiringDateValid;
@@ -732,164 +723,4 @@
         });
       });
   });
-
-  // // Form validation functions
-  // const formValid = async () => {
-  //   let isCodeValid = checkCode(),
-  //     isDescriptionValid = checkDescription(),
-  //     isRateOfDiscountValid = checkRateOfDiscount(),
-  //     isMinPurchaseAmountValid = checkMinPurchaseAmount(),
-  //     isMaxDiscountAmountValid = checkMaxDiscountAmount();
-
-  //   // Form is valid only if all fields are valid
-  //   return isCodeValid && isDescriptionValid && isRateOfDiscountValid && isMinPurchaseAmountValid && isMaxDiscountAmountValid;
-  // };
-
-  // // Specific field validation functions
-  // const checkCode = () => {
-  //   const codeEl = document.querySelector("#edit_coupon_code");
-  //   let valid = false;
-  //   const code = codeEl.value.trim();
-
-  //   if (!isRequired(code)) {
-  //     showError(codeEl, "Code cannot be blank");
-  //   } else if (code.length < 5) {
-  //     showError(codeEl, "The code must have at least 5 characters");
-  //   } else if (/\s/.test(code)) {
-  //     showError(codeEl, "Code cannot contain white spaces.");
-  //   } else {
-  //     showSuccess(codeEl);
-  //     valid = true;
-  //   }
-  //   return valid;
-  // };
-
-  // const checkDescription = () => {
-  //   const descriptionEl = document.querySelector("#edit_coupon_description");
-  //   let valid = false;
-  //   const description = descriptionEl.value.trim();
-
-  //   if (!isRequired(description)) {
-  //     showError(descriptionEl, "Description cannot be blank");
-  //   } else if (description.length < 5) {
-  //     showError(descriptionEl, "The description must have at least 5 words");
-  //   } else {
-  //     showSuccess(descriptionEl);
-  //     valid = true;
-  //   }
-  //   return valid;
-  // };
-
-  // const checkRateOfDiscount = () => {
-  //   const rateOfDiscountEl = document.querySelector("#edit_coupon_rate_of_discount");
-  //   let valid = false;
-  //   const rateOfDiscount = parseFloat(rateOfDiscountEl.value.trim());
-
-  //   if (!isRequired(rateOfDiscount)) {
-  //     showError(rateOfDiscountEl, "Rate of Discount cannot  be blank");
-  //   } else if (rateOfDiscount <= 0) {
-  //     showError(rateOfDiscountEl, "Rate of Discount cannot be Zero");
-  //   } else {
-  //     showSuccess(rateOfDiscountEl);
-  //     valid = true;
-  //   }
-  //   return valid;
-  // };
-
-  // const checkMinPurchaseAmount = () => {
-  //   const minPurchaseAmountEl = document.querySelector("#edit_coupon_min_purchase_amount");
-  //   let valid = false;
-  //   const minPurchaseAmount = parseFloat(minPurchaseAmountEl.value.trim());
-
-  //   if (!isRequired(minPurchaseAmount)) {
-  //     showError(minPurchaseAmountEl, "Min. purchase amount cannot be blank");
-  //   } else if (minPurchaseAmount <= 0) {
-  //     showError(minPurchaseAmountEl, "Min purchase amount cannot be zero");
-  //   } else {
-  //     showSuccess(minPurchaseAmountEl);
-  //     valid = true;
-  //   }
-  //   return valid;
-  // };
-
-  // const checkMaxDiscountAmount = () => {
-  //   const maxDiscountAmountEl = document.querySelector("#edit_coupon_max_discount_amount");
-  //   let valid = false;
-  //   const maxDiscountAmount = parseFloat(maxDiscountAmountEl.value.trim());
-
-  //   if (!isRequired(maxDiscountAmount)) {
-  //     showError(maxDiscountAmountEl, "Max. discount amount cannot be blank");
-  //   } else if (maxDiscountAmount <= 0) {
-  //     showError(maxDiscountAmountEl, "Max. discount amount cannot be zero");
-  //   } else {
-  //     showSuccess(maxDiscountAmountEl);
-  //     valid = true;
-  //   }
-  //   return valid;
-  // };
-
-  // // Utility functions
-  // const isRequired = (value) => value !== "";
-
-  // const showError = (input, message) => {
-  //   const formField = input.parentElement;
-  //   formField.classList.remove("success", "is-valid");
-  //   input.classList.remove("success", "is-valid");
-  //   formField.classList.add("error", "is-invalid");
-  //   input.classList.add("error", "is-invalid");
-  //   const error = formField.querySelector("small");
-  //   if (error) {
-  //     error.textContent = message;
-  //   }
-  // };
-
-  // const showSuccess = (input) => {
-  //   const formField = input.parentElement;
-  //   formField.classList.remove("error", "is-invalid");
-  //   input.classList.remove("error", "is-invalid");
-  //   formField.classList.add("success", "is-valid");
-  //   input.classList.add("success", "is-valid");
-  //   const error = formField.querySelector("small");
-  //   if (error) {
-  //     error.textContent = "";
-  //   }
-  // };
-
-  // // Debouncing for real-time validation
-  // const debounce = (fn, delay = 500) => {
-  //   let timeoutId;
-  //   return (...args) => {
-  //     if (timeoutId) {
-  //       clearTimeout(timeoutId);
-  //     }
-  //     timeoutId = setTimeout(() => {
-  //       fn.apply(null, args);
-  //     }, delay);
-  //   };
-  // };
-
-  // // Attach real-time validation to input fields
-  // const editForm = document.querySelector("#edit_form");
-  // editForm.addEventListener(
-  //   "input",
-  //   debounce(function (e) {
-  //     switch (e.target.id) {
-  //       case "edit_coupon_code":
-  //         checkCode();
-  //         break;
-  //       case "edit_coupon_description":
-  //         checkDescription();
-  //         break;
-  //       case "edit_coupon_rate_of_discount":
-  //         checkRateOfDiscount();
-  //         break;
-  //       case "edit_coupon_min_purchase_amount":
-  //         checkMinPurchaseAmount();
-  //         break;
-  //       case "edit_coupon_max_discount_amount":
-  //         checkMaxDiscountAmount();
-  //         break;
-  //     }
-  //   })
-  // );
 </script>

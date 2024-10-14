@@ -1,3 +1,5 @@
+<!-- salesReport.ejs -->
+
 <%- include('../partials/admin/header') %>
 
 <style>
@@ -245,7 +247,7 @@
                 </tr>
               </thead>
               <tbody>
-                <% orders.forEach((order, index) => { %> 
+                <% orders.forEach((order, index) => { %>
 
                 <tr>
                   <td><%= (currentPage - 1) * perPage + index + 1 %></td>
@@ -331,7 +333,7 @@
         // Auto-submit form after selecting predefined reports
         startDateInput.value = startDate;
         endDateInput.value = endDate;
-        form.submit(); // Automatically submit form
+        form.submit();
         console.log("this is start date and end date", startDate, endDate);
       }
     });
@@ -347,9 +349,9 @@
 
         if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
           event.preventDefault();
-          errorMessage.style.display = "block"; // Show error message
+          errorMessage.style.display = "block";
         } else {
-          errorMessage.style.display = "none"; // Hide error message
+          errorMessage.style.display = "none";
         }
       }
     });

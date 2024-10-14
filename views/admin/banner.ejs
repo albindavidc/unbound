@@ -1,3 +1,5 @@
+<!-- banner.ejs -->
+
 <%- include('../partials/admin/header') %>
 
 <style>
@@ -67,19 +69,22 @@
           </tr>
         </thead>
         <tbody>
-          <% if (banners !== 'undefined' && banners.length > 0) { %> <% banners.forEach((banner,index) => { %> 
+          <% if (banners !== 'undefined' && banners.length > 0) { %> <% banners.forEach((banner,index) => { %>
 
           <tr class="align-middle text-center">
             <td><%= index +1 %></td>
 
-            
             <td>
-                <% banner.images.forEach(image => { %>
-                
-                <img width="70rem" class="mx-auto d-block img-fluid img-thumbnail" src="/uploads/banners/<%= image.folderName %>/<%= image.filename %>" alt="" />
-            
-            
-                <% }) %>
+              <% banner.images.forEach(image => { %>
+
+              <img
+                width="70rem"
+                class="mx-auto d-block img-fluid img-thumbnail"
+                src="/uploads/banners/<%= image.folderName %>/<%= image.filename %>"
+                alt=""
+              />
+
+              <% }) %>
             </td>
 
             <td><%= banner.name %></td>
@@ -88,7 +93,7 @@
             <td class="text-success">Listed</td>
             <% }else{ %>
             <td class="text-danger">Unlisted</td>
-            <% } %> 
+            <% } %>
 
             <td>
               <div class="btn-group mx-2" role="group" aria-label="Delete/Edit Button">
@@ -100,7 +105,6 @@
               </div>
             </td>
           </tr>
-
 
           <% }) %> <% }else{ %>
           <tr>

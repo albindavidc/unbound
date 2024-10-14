@@ -1,3 +1,5 @@
+<!-- productCustomizeDownload.ejs -->
+
 <%- include('../partials/admin/header') %>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
 
@@ -5,11 +7,11 @@
   .image-container {
     display: flex;
     flex-direction: column;
-    align-items: center; /* To center the button below the image */
+    align-items: center;
   }
 
   .download-btn {
-    margin-top: 10px; /* Adds some spacing between the image and the button */
+    margin-top: 10px;
   }
 
   .userProfileMain {
@@ -39,6 +41,7 @@
   }
 </style>
 
+<!-- Custom Design Download Header -->
 <section>
   <div class="pb-5 text-center">
     <div class="card userProfileMain rounded">
@@ -108,118 +111,117 @@
 <%- include('../partials/admin/footer') %>
 <script src="https://unpkg.com/idb@5.0.8/build/iife/index-min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 
 <script>
-    let frontImage = document.getElementById("frontImage");
-    let backImage = document.getElementById("backImage");
-    let leftImage = document.getElementById("leftImage");
-    let rightImage = document.getElementById("rightImage");
+  let frontImage = document.getElementById("frontImage");
+  let backImage = document.getElementById("backImage");
+  let leftImage = document.getElementById("leftImage");
+  let rightImage = document.getElementById("rightImage");
 
-    let canvasElement = document.getElementById("canvasElement");
-    const canvasData = <%- JSON.stringify(customDesign.canvasData) %>;
+  let canvasElement = document.getElementById("canvasElement");
+  const canvasData = <%- JSON.stringify(customDesign.canvasData) %>;
 
-    const sides = ['front', 'back', 'left', 'right'];
+  const sides = ["front", "back", "left", "right"];
 
-    sides.forEach((item) => {
-      const backgroundImageUrl = canvasData[item].backgroundImage;
+  sides.forEach((item) => {
+    const backgroundImageUrl = canvasData[item].backgroundImage;
 
-      fabric.util.loadImage(backgroundImageUrl, function (img) {
-        const image = new fabric.Image(img);
+    fabric.util.loadImage(backgroundImageUrl, function (img) {
+      const image = new fabric.Image(img);
 
-        canvasElement.width = image.width;
-        canvasElement.height = image.height;
+      canvasElement.width = image.width;
+      canvasElement.height = image.height;
 
-        const canvas = new fabric.Canvas(canvasElement);
+      const canvas = new fabric.Canvas(canvasElement);
 
-        canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
-          scaleX: canvasElement.width / image.width,
-          scaleY: canvasElement.height / image.height,
+      canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
+        scaleX: canvasElement.width / image.width,
+        scaleY: canvasElement.height / image.height,
+      });
+
+      canvas.loadFromJSON(canvasData[item].content, () => {
+        canvas.renderAll();
+
+        const imageUrl = canvas.toDataURL({
+          format: "png",
+          multiplier: 2,
         });
 
-        canvas.loadFromJSON(canvasData[item].content, () => {
-          canvas.renderAll();
+        if (item === "front") {
+          frontImage.src = imageUrl;
+        } else if (item === "back") {
+          backImage.src = imageUrl;
+        } else if (item === "left") {
+          leftImage.src = imageUrl;
+        } else if (item === "right") {
+          rightImage.src = imageUrl;
+        }
+      });
+    });
+  });
 
-          const imageUrl = canvas.toDataURL({
-            format: "png",
-            multiplier: 2,
+  // Download All customized Design
+  function downloadAllDesigns() {
+    const sides = ["front", "back", "left", "right"];
+    const zip = new JSZip();
+
+    let promises = sides.map((side) => {
+      return new Promise((resolve, reject) => {
+        const canvasElement = document.createElement("canvas");
+        const ctx = canvasElement.getContext("2d");
+
+        const backgroundImageUrl = canvasData[side].backgroundImage;
+
+        fabric.util.loadImage(backgroundImageUrl, function (img) {
+          const image = new fabric.Image(img);
+
+          canvasElement.width = image.width;
+          canvasElement.height = image.height;
+
+          const canvas = new fabric.Canvas(canvasElement);
+
+          canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
+            scaleX: canvasElement.width / image.width,
+            scaleY: canvasElement.height / image.height,
           });
 
-          if (item === 'front') {
-            frontImage.src = imageUrl;
-          } else if (item === 'back') {
-            backImage.src = imageUrl;
-          } else if (item === 'left') {
-            leftImage.src = imageUrl;
-          } else if (item === 'right') {
-            rightImage.src = imageUrl;
-          }
+          canvas.loadFromJSON(canvasData[side].content, () => {
+            canvas.renderAll();
+
+            const imageUrl = canvas.toDataURL({
+              format: "png",
+              multiplier: 2,
+            });
+
+            fetch(imageUrl)
+              .then((res) => res.blob())
+              .then((blob) => {
+                zip.file(`${side}-custom-design.png`, blob);
+                resolve();
+              })
+              .catch((err) => reject(err));
+          });
         });
       });
     });
 
-    function downloadAllDesigns() {
-      const sides = ['front', 'back', 'left', 'right'];
-      const zip = new JSZip();
-
-      let promises = sides.map((side) => {
-        return new Promise((resolve, reject) => {
-          const canvasElement = document.createElement("canvas");
-          const ctx = canvasElement.getContext("2d");
-
-          const backgroundImageUrl = canvasData[side].backgroundImage;
-
-          fabric.util.loadImage(backgroundImageUrl, function (img) {
-            const image = new fabric.Image(img);
-
-            canvasElement.width = image.width;
-            canvasElement.height = image.height;
-
-            const canvas = new fabric.Canvas(canvasElement);
-
-            canvas.setBackgroundImage(image, canvas.renderAll.bind(canvas), {
-              scaleX: canvasElement.width / image.width,
-              scaleY: canvasElement.height / image.height,
-            });
-
-            canvas.loadFromJSON(canvasData[side].content, () => {
-              canvas.renderAll();
-
-              const imageUrl = canvas.toDataURL({
-                format: "png",
-                multiplier: 2,
-              });
-
-              fetch(imageUrl)
-                .then(res => res.blob())
-                .then(blob => {
-                  zip.file(`${side}-custom-design.png`, blob);
-                  resolve();
-                })
-                .catch(err => reject(err));
-            });
-          });
+    Promise.all(promises)
+      .then(() => {
+        zip.generateAsync({ type: "blob" }).then((content) => {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(content);
+          link.download = "custom-designs.zip";
+          link.click();
         });
+      })
+      .catch((err) => {
+        console.error("Error generating zip file:", err);
       });
+  }
 
-      Promise.all(promises)
-        .then(() => {
-          zip.generateAsync({ type: 'blob' })
-            .then((content) => {
-              const link = document.createElement("a");
-              link.href = URL.createObjectURL(content);
-              link.download = 'custom-designs.zip';
-              link.click();
-            });
-        })
-        .catch(err => {
-          console.error("Error generating zip file:", err);
-        });
-    }
-
-    function downloadCustomAllDesigns() {
-    const sides = ['front', 'back', 'left', 'right'];
+  function downloadCustomAllDesigns() {
+    const sides = ["front", "back", "left", "right"];
     const zip = new JSZip();
 
     let promises = sides.map((side) => {
@@ -230,13 +232,13 @@
         const canvasWidth = 800;
         const canvasHeight = 1000;
 
-        canvasElement.width = canvasWidth /2 ;
-        canvasElement.height = canvasHeight /2;
+        canvasElement.width = canvasWidth / 2;
+        canvasElement.height = canvasHeight / 2;
 
         const canvas = new fabric.Canvas(canvasElement);
 
         canvas.loadFromJSON(canvasData[side].content, () => {
-        canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+          canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
 
           canvas.renderAll();
 
@@ -246,27 +248,26 @@
           });
 
           fetch(imageUrl)
-            .then(res => res.blob())
-            .then(blob => {
+            .then((res) => res.blob())
+            .then((blob) => {
               zip.file(`${side}-custom-design.png`, blob);
               resolve();
             })
-            .catch(err => reject(err));
+            .catch((err) => reject(err));
         });
       });
     });
 
     Promise.all(promises)
       .then(() => {
-        zip.generateAsync({ type: 'blob' })
-          .then((content) => {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(content);
-            link.download = 'custom-designs.zip';
-            link.click();
-          });
+        zip.generateAsync({ type: "blob" }).then((content) => {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(content);
+          link.download = "custom-designs.zip";
+          link.click();
+        });
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error generating zip file:", err);
       });
   }

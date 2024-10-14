@@ -1,3 +1,5 @@
+<!-- category.ejs -->
+
 <%- include("../../views/partials/admin/header") %>
 
 <style>
@@ -92,6 +94,7 @@
   </div>
 </section>
 
+<!-- Category Header -->
 <section class="content-main">
   <header class="card-header text-center mb-20">
     <form action="/admin/category" method="get" class="d-inline">
@@ -102,10 +105,12 @@
     </form>
   </header>
 
+  <!-- Add New Category -->
   <div class="text-center d-flex justify-content-end">
     <button class="btn btn-dark" id="new-category-button" style="margin-top: 20px">New Category</button>
   </div>
 
+  <!-- Show Category -->
   <div id="add-category-form" style="display: none; margin-top: 20px">
     <form method="post" action="/admin/addCategory">
       <div class="mb-4">
@@ -215,16 +220,14 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Attach event listener to add and edit forms
     document.getElementById("add-category-form").addEventListener("submit", handleAddFormSubmit);
-
-    // Attach event listener to new category button
     document.getElementById("new-category-button").addEventListener("click", showNewCategoryForm);
+
     // Function to show the form for creating a new category
     function showNewCategoryForm() {
       document.getElementById("add-category-form").style.display = "block";
-      document.getElementById("edit-category-form").style.display = "none"; // Hide edit form
-      document.getElementById("new-category-button").style.display = "none"; // Hide new category button
+      document.getElementById("edit-category-form").style.display = "none";
+      document.getElementById("new-category-button").style.display = "none";
     }
 
     // Function to handle form submission for adding a category
@@ -342,60 +345,58 @@
     });
 
     // Function to handle form submission for editing a category
-  // Function to handle form submission for editing a category
-async function handleEditFormSubmit(event) {
-  event.preventDefault();
-  const id = document.getElementById("editCategoryId").value;
-  const name = document.getElementById("editName").value;
-  const description = document.getElementById("editDescription").value;
-  const offer = document.getElementById("edit_category_offer").value;
+    async function handleEditFormSubmit(event) {
+      event.preventDefault();
+      const id = document.getElementById("editCategoryId").value;
+      const name = document.getElementById("editName").value;
+      const description = document.getElementById("editDescription").value;
+      const offer = document.getElementById("edit_category_offer").value;
 
-  if (!validateForm(name, description, offer)) {
-    return;
-  }
+      if (!validateForm(name, description, offer)) {
+        return;
+      }
 
-  console.log("edit going to the backend", id, name, description, offer);
+      console.log("edit going to the backend", id, name, description, offer);
 
-  try {
-    const response = await fetch("/admin/editCategory", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id, name, description, offer }),
-    });
+      try {
+        const response = await fetch("/admin/editCategory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id, name, description, offer }),
+        });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error); // Throw error if response is not ok
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error); 
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            timer: 3000,
+            showConfirmButton: false,
+            text: "Category updated successfully!",
+          }).then(() => {
+            window.location.href = "/admin/categories"; 
+          });
+        } else {
+          throw new Error("Unexpected response from the server.");
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops",
+          timer: 3000,
+          showConfirmButton: false,
+          text: error.message || "An error occurred while editing the category",
+        });
+      }
     }
-
-    const result = await response.json();
-
-    if (result.success) {
-      Swal.fire({
-        icon: "success",
-        title: "Success",
-        timer: 3000,
-        showConfirmButton: false,
-        text: "Category updated successfully!",
-      }).then(() => {
-        window.location.href = "/admin/categories"; // Redirect after success
-      });
-    } else {
-      throw new Error("Unexpected response from the server.");
-    }
-
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Oops",
-      timer: 3000,
-      showConfirmButton: false,
-      text: error.message || "An error occurred while editing the category",
-    });
-  }
-}
 
     // Function to validate form inputs
     function validateForm(name, description, offer) {
@@ -435,7 +436,7 @@ async function handleEditFormSubmit(event) {
         element.style.display = "none";
       });
     }
-    
+
     // Attach event listener to add and edit forms
     document.getElementById("add-category-form").addEventListener("submit", handleAddFormSubmit);
     document.getElementById("edit-category-form").addEventListener("submit", handleEditFormSubmit);

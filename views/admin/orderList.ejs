@@ -1,205 +1,195 @@
+<!-- orderList.ejs -->
+
 <%- include('../partials/admin/header') %>
 
-  <style>
-    .userProfileMain {
-      width: 100%;
-      height: 30%;
-      margin: 0 auto;
-      background-color: rgb(0, 0, 0);
-    }
+<style>
+  .userProfileMain {
+    width: 100%;
+    height: 30%;
+    margin: 0 auto;
+    background-color: rgb(0, 0, 0);
+  }
 
-    .userProfileH1 {
-      width: 100%;
-      margin: 10px;
-      font-family: "Baloo", cursive;
-      color: white;
-      font-size: 6vw;
-    }
+  .userProfileH1 {
+    width: 100%;
+    margin: 10px;
+    font-family: "Baloo", cursive;
+    color: white;
+    font-size: 6vw;
+  }
 
-    .breadcrumbCls {
-      background-color: rgb(0, 0, 0);
-    }
+  .breadcrumbCls {
+    background-color: rgb(0, 0, 0);
+  }
 
-    .custom-table thead th {
-      text-align: center;
-      vertical-align: middle;
-      padding: 15px;
-      color: #ffffff;
-    }
-  </style>
+  .custom-table thead th {
+    text-align: center;
+    vertical-align: middle;
+    padding: 15px;
+    color: #ffffff;
+  }
+</style>
 
-  <section>
-    <div class="pb-5 text-center">
-      <div class="card userProfileMain rounded">
-        <h1 class="userProfileH1">Order Managment</h1>
-      </div>
+<!-- Order Management Header -->
+<section>
+  <div class="pb-5 text-center">
+    <div class="card userProfileMain rounded">
+      <h1 class="userProfileH1">Order Managment</h1>
     </div>
-  </section>
-  <section class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-12">
-        <% if (orders && orders.length> 0) { %>
-          <div class="table-responsive">
-            <table class="table table-hover custom-table">
-              <thead class="table " style="background-color: black;">
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Payment </th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Amount</th>
-                  <th scope="col">Products</th>
-                  <th scope="col">Customized</th>
-                  <th scope="col">Delivery Status</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% orders.forEach((order, index)=> { %>
-                  <tr>
-                    <td>
-                      <%= (currentPage-1)*perPage + index + 1 %>
-                    </td>
-                    <td>
-                      <strong>
-                        <%= order.customerId.name %>
-                      </strong><br>
-                      <small>(<%= order.customerId.email %>)</small>
-                    </td>
-                    <td><%- order.createdAt.toLocaleDateString('en-GB') %></td>
-                    <td class="d-flex justify-content-center">
-                      <%- order.paymentMethod %><br>
-                    </td>
-                    <td>
-                      <% order.items.forEach((item, itemIndex)=> { %>
-                        <div class="pb-4">
-                          <p name="paymentStatus" id="paymentStatus" value="<%= item.paymentStatus %>">
-                            <%= item.paymentStatus %>
-                          </p>
-                        </div>
-                        <% }) %>
+  </div>
+</section>
+<section class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <% if (orders && orders.length> 0) { %>
+      <div class="table-responsive">
+        <table class="table table-hover custom-table">
+          <thead class="table" style="background-color: black">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Date</th>
+              <th scope="col">Payment</th>
+              <th scope="col">Status</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Products</th>
+              <th scope="col">Customized</th>
+              <th scope="col">Delivery Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach((order, index)=> { %>
+            <tr>
+              <td><%= (currentPage-1)*perPage + index + 1 %></td>
+              <td>
+                <strong> <%= order.customerId.name %> </strong><br />
+                <small>(<%= order.customerId.email %>)</small>
+              </td>
+              <td><%- order.createdAt.toLocaleDateString('en-GB') %></td>
+              <td class="d-flex justify-content-center"><%- order.paymentMethod %><br /></td>
+              <td>
+                <% order.items.forEach((item, itemIndex)=> { %>
+                <div class="pb-4">
+                  <p name="paymentStatus" id="paymentStatus" value="<%= item.paymentStatus %>"><%= item.paymentStatus %></p>
+                </div>
+                <% }) %>
+              </td>
+              <td>
+                <% order.items.forEach((item, itemIndex)=> { %>
+                <div class="pb-4">₹<%= item.productId.sellingPrice %></div>
+                <% }) %>
+              </td>
+              <td>
+                <% order.items.forEach((item, itemIndex)=> { %>
+                <ul class="list-unstyled">
+                  <li class="mb-2">
+                    <strong> <%= item.productId.name %> </strong><br />
+                    <small>Qty: <%= item.quantity %></small>
+                  </li>
+                </ul>
+                <% }) %>
+              </td>
 
-                    </td>
-                    <td>
-                      <% order.items.forEach((item, itemIndex)=> { %>
-                        <div class="pb-4">
-                          ₹<%= item.productId.sellingPrice %>
-                        </div>
-                        <% }) %>
-                    </td>
-                    <td>
-                      <% order.items.forEach((item, itemIndex)=> { %>
-                        <ul class="list-unstyled">
-                          <li class="mb-2">
-                            <strong>
-                              <%= item.productId.name %>
-                            </strong><br>
-                            <small>Qty: <%= item.quantity %></small>
-                          </li>
-                        </ul>
-                        <% }) %>
-                    </td>
+              <td>
+                <% order.items.forEach(item => { %> <% if (item.customized === true) { %>
+                <a
+                  href="/admin/customize-download/<%= order._id %>/<%= item.productId._id %>"
+                  class="d-flex align-items-center justify-content-center btn btn-dark mb-2"
+                  >Download <%= item.name %></a
+                >
+                <% }else { %>
+                <p class="d-flex align-items-center justify-content-center">No</p>
+                <% } %> <% }) %>
+              </td>
 
-                    <td>
-                      <% order.items.forEach(item => { %>
-                      <% if (item.customized === true) { %>
-                        <a href="/admin/customize-download/<%= order._id %>/<%= item.productId._id %>" class="d-flex align-items-center justify-content-center btn btn-dark mb-2">Download <%= item.name %></a>
-                      <% }else { %>
-                        <p class="d-flex align-items-center justify-content-center">No</p>
-                      <% } %>
-                      <% }) %>
-                    </td>
+              <td>
+                <% order.items.forEach((item, itemIndex)=> { %>
+                <div class="p-2">
+                  <select
+                    class="form-select"
+                    name="paymentStatus"
+                    id="deliveryStatus-<%= order._id %>-<%= itemIndex %>"
+                    data-order-id="<%= order._id %>"
+                    data-item-index="<%= itemIndex %>"
+                    aria-label="Select Delivery Status"
+                  >
+                    <% statuses.forEach(status=> { %> <option value="<%= status %>" <%=status===item.status ? 'selected' : '' %>><%= status %> <% });
+                    %>
+                  </select>
+                </div>
+                <% }) %>
+              </td>
 
-
-                    <td>
-                      <% order.items.forEach((item, itemIndex)=> { %>
-                        <div class="p-2">
-                          <select class="form-select" name="paymentStatus"
-                            id="deliveryStatus-<%= order._id %>-<%= itemIndex %>" data-order-id="<%= order._id %>"
-                            data-item-index="<%= itemIndex %>" aria-label="Select Delivery Status">
-                            <% statuses.forEach(status=> { %>
-                              <option value="<%= status %>" <%=status===item.status ? 'selected' : '' %>><%= status %>
-                              </option>
-                              <% }); %>
-                          </select>
-                        </div>
-                        <% }) %>
-                    </td>
-
-                    <td>
-                      <% order.items.forEach((item, itemIndex)=> { %>
-                        <% if( item.status !=="Return" && item.status !=="Cancelled" ){ %>
-                          <div class="p-2">
-                            <button type="button" class="btn btn-sm btn-dark update-button"
-                              data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>">Update</button>
-                          </div>
-                          <% } %>
-                            <% }) %>
-                    </td>
-
-                  </tr>
-                  <% }) %>
-              </tbody>
-            </table>
-          </div>
-          <% } else { %>
-            <div class="text-danger text-center">
-              No Orders Available
-            </div>
-            <% } %>
+              <td>
+                <% order.items.forEach((item, itemIndex)=> { %> <% if( item.status !=="Return" && item.status !=="Cancelled" ){ %>
+                <div class="p-2">
+                  <button type="button" class="btn btn-sm btn-dark update-button" data-order-id="<%= order._id %>" data-item-index="<%= itemIndex %>">
+                    Update
+                  </button>
+                </div>
+                <% } %> <% }) %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
       </div>
+      <% } else { %>
+      <div class="text-danger text-center">No Orders Available</div>
+      <% } %>
     </div>
+  </div>
 
-    <%- include('./pagination') %>
-  </section>
+  <%- include('./pagination') %>
+</section>
 
+<%- include('../partials/admin/footer') %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <%- include('../partials/admin/footer') %>
+<script>
+  document.querySelectorAll(".update-button").forEach((button) => {
+    button.addEventListener("click", async function (e) {
+      e.preventDefault(); // Prevent the default link behavior
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      const orderId = this.getAttribute("data-order-id");
+      const itemIndex = this.getAttribute("data-item-index");
+      const selectedStatus = document.querySelector(`#deliveryStatus-${orderId}-${itemIndex}`).value;
 
-    <script>
-      document.querySelectorAll('.update-button').forEach(button => {
-        button.addEventListener('click', async function (e) {
-          e.preventDefault(); // Prevent the default link behavior
-
-          const orderId = this.getAttribute('data-order-id');
-          const itemIndex = this.getAttribute('data-item-index');
-          const selectedStatus = document.querySelector(`#deliveryStatus-${orderId}-${itemIndex}`).value;
-
-          fetch(`/admin/orderList/updateOrder/${orderId}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ itemIndex, status: selectedStatus }),
-          })
-            .then(response => {
-              if (!response.ok) {
-                return response.json().then(err => { throw new Error(err.error); });
-              }
-              return response.json();
-            })
-            .then(() => {
-              Swal.fire({
-                icon: "success",
-                title: "Success",
-                timer: 3000,
-                showConfirmButton: false,
-                text: "Order updated successfully!",
-              }).then(() => location.reload());
-            })
-            .catch(err => {
-              Swal.fire({
-                icon: "error",
-                title: "Oops",
-                timer: 3000,
-                showConfirmButton: false,
-                text: "Couldn't update the status of the delivery",
-              }).then(() => location.reload());
+      fetch(`/admin/orderList/updateOrder/${orderId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemIndex, status: selectedStatus }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((err) => {
+              throw new Error(err.error);
             });
+          }
+          return response.json();
+        })
+        .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            timer: 3000,
+            showConfirmButton: false,
+            text: "Order updated successfully!",
+          }).then(() => location.reload());
+        })
+        .catch((err) => {
+          Swal.fire({
+            icon: "error",
+            title: "Oops",
+            timer: 3000,
+            showConfirmButton: false,
+            text: "Couldn't update the status of the delivery",
+          }).then(() => location.reload());
         });
-      });
-    </script>
+    });
+  });
+</script>
