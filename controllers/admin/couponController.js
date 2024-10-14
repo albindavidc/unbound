@@ -1,28 +1,30 @@
+// couponController.js
+
 const Coupon = require("../../models/couponSchema");
 
 module.exports = {
+  // Get coupons
   getCouponList: async (req, res) => {
     try {
-
       let perPage = 10;
       let page = parseInt(req.query.page) || 1;
 
       const couponData = await Coupon.find()
-      .skip((page-1) * perPage)
-      .limit(perPage)
-      .sort({createdAt: -1})
-      .exec();
+        .skip((page - 1) * perPage)
+        .limit(perPage)
+        .sort({ createdAt: -1 })
+        .exec();
 
       const count = await Coupon.countDocuments();
 
-      const nextPage = parseInt(page) +1;
-      const totalPages = Math.ceil(count/perPage);
-      const hasPrevPage = page>1;
+      const nextPage = parseInt(page) + 1;
+      const totalPages = Math.ceil(count / perPage);
+      const hasPrevPage = page > 1;
       const hasNextPage = page < totalPages;
 
-      res.render("admin/coupons", { 
+      res.render("admin/coupons", {
         coup: couponData,
-        
+
         pagination: couponData,
         currentPage: page,
         perPage,
@@ -37,6 +39,7 @@ module.exports = {
     }
   },
 
+  // Add Coupons
   addCoupons: async (req, res) => {
     const { couponCode, couponDescription, couponRateOfDiscount, couponMinPurchaseAmount, startingDate, expiringDate } = req.body;
 
@@ -57,60 +60,54 @@ module.exports = {
       await newCoupon.save();
       return res.json({ success: true, message: "Coupon added successfully" });
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ error: "Internal server error" });
     }
   },
 
-  getCouponById : async (req, res) => {
+  getCouponById: async (req, res) => {
     try {
-      const {id} = req.params;
+      const { id } = req.params;
       const coupon = await Coupon.findById(id);
       if (!coupon) {
-        return res.status(404).json({ success: false, message: 'Coupon not found' });
+        return res.status(404).json({ success: false, message: "Coupon not found" });
       }
-      console.log("this is id in admin side", id)
       res.json(coupon);
     } catch (error) {
-      console.error('Error fetching coupon:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+      res.status(500).json({ success: false, message: "Server error" });
     }
   },
-  
+
   // Update a coupon by its ID
-  updateCoupon : async (req, res) => {
+  updateCoupon: async (req, res) => {
     try {
-      const {id} = req.params;
-      console.log("this is update id",id)
+      const { id } = req.params;
       const updatedCoupon = await Coupon.findOneAndUpdate(
-        { _id: id }, // Find the coupon by the ID
+        { _id: id },
         {
           code: req.body.couponCode,
           description: req.body.couponDescription,
           rateOfDiscount: req.body.couponRateOfDiscount,
           minPurchaseAmount: req.body.couponMinPurchaseAmount,
-          startingDate:req.body.startingDate,
-          expiringDate:req.body.expiringDate,
+          startingDate: req.body.startingDate,
+          expiringDate: req.body.expiringDate,
         },
         { new: true }
       );
-      
-  
+
       if (!updatedCoupon) {
-        return res.status(404).json({ success: false, message: 'Coupon not found' });
+        return res.status(404).json({ success: false, message: "Coupon not found" });
       }
-  
-      res.json({ success: true, message: 'Coupon updated successfully', coupon: updatedCoupon });
+
+      res.json({ success: true, message: "Coupon updated successfully", coupon: updatedCoupon });
     } catch (error) {
-      console.error('Error updating coupon:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+      res.status(500).json({ success: false, message: "Server error" });
     }
   },
 
+  // Delete Coupon
   deleteCoupon: async (req, res) => {
     try {
       const { couponCode } = req.body;
-      console.log("this is coupon id", couponCode);
 
       const deleteCouponFromDB = await Coupon.findOneAndDelete({ code: couponCode });
       if (deleteCouponFromDB) {
@@ -119,7 +116,6 @@ module.exports = {
         return res.json({ success: false, message: "Coupon deletion incomplete" });
       }
     } catch (error) {
-      console.error(error);
       return res.status(500).json({ error: "Internal server error" });
     }
   },

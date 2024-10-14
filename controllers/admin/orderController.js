@@ -1,3 +1,5 @@
+// orderController.js
+
 const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
 const Color = require("../../models/attributes/colorSchema");
@@ -5,6 +7,7 @@ const Size = require("../../models/attributes/sizeSchema");
 const Customize = require("../../models/customizedProduct");
 
 module.exports = {
+  // Get Order List
   getOrderList: async (req, res) => {
     try {
       const statuses = ["Pending", "Shipped", "Delivered", "Cancelled", "Return"];
@@ -23,8 +26,6 @@ module.exports = {
         .exec();
 
       orderDetails.forEach((order) => {
-
-
         let itemStatuses = order.items.map((item) => item.status);
 
         if (itemStatuses.includes("Return")) {
@@ -66,14 +67,11 @@ module.exports = {
     }
   },
 
+  // Update Delivery Status
   updateDeliveryStatus: async (req, res) => {
     try {
       const { orderId } = req.params;
       const { itemIndex, status } = req.body;
-
-      // Update the status of all items in the order
-      // await Order.updateOne({ _id: id }, { $set: { "items.$[].status": status, status } });
-
       const order = await Order.findById(orderId);
       order.items[itemIndex].status = status;
 
@@ -113,12 +111,13 @@ module.exports = {
     }
   },
 
+  // Get product customized
   productCustomized: async (req, res) => {
     const orderId = req.params.orderId;
-    const productId = req.params.itemId
+    const productId = req.params.itemId;
     const order = await Order.findById(orderId);
     const userId = order.customerId;
-    let  customDesign = await Customize.findOne({ userId: userId });
+    let customDesign = await Customize.findOne({ userId: userId });
 
     const checkProductId = customDesign.products.find((customItem) => {
       return order.items.some((orderItem) => customItem.productId.toString() === productId.toString());
@@ -127,18 +126,16 @@ module.exports = {
     if (!checkProductId) {
       return res.status(404).send("No matching custom design for this product.");
     }
-    
-    const products = await Product.findOne({_id: checkProductId.productId})
-    console.log(checkProductId, "this is product id")
-    
-    customDesign = checkProductId
+
+    const products = await Product.findOne({ _id: checkProductId.productId });
+    console.log(checkProductId, "this is product id");
+
+    customDesign = checkProductId;
     res.render("admin/productCustomizeDownload", {
       order,
       customDesign,
       checkProductId,
-      products
+      products,
     });
   },
-
- 
 };

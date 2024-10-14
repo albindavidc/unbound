@@ -8,8 +8,6 @@ const Order = require("../../models/orderSchema");
 const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 
-// const { fetchSalesReportData } = require('../utils/salesReportUtils'); // Adjust the path as needed
-
 module.exports = {
   getSalesReport: async (req, res) => {
     try {
@@ -20,9 +18,8 @@ module.exports = {
       const reportType = req.query.reportType || "yearly";
       const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
       const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
-      console.log(reportType, "this is the report type"); // Debug reportType
 
-      let endOfDay; // To store the end of the time period
+      let endOfDay;
 
       let matchCondition = {};
       const now = new Date();
@@ -38,24 +35,24 @@ module.exports = {
           break;
 
         case "monthly":
-          const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)); // First day of the month
-          const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)); // Last day of the month
-          endOfMonth.setUTCHours(23, 59, 59, 999); // Set to end of the day
+          const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+          const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0));
+          endOfMonth.setUTCHours(23, 59, 59, 999);
 
           matchCondition.createdAt = {
-            $gte: startOfMonth, // Start of the month
-            $lte: endOfMonth, // End of the month
+            $gte: startOfMonth,
+            $lte: endOfMonth,
           };
           break;
 
         case "yearly":
-          const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)); // First day of the year
-          const endOfYear = new Date(Date.UTC(now.getUTCFullYear(), 11, 31)); // Last day of the year
-          endOfYear.setUTCHours(23, 59, 59, 999); // Set to end of the day
+          const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+          const endOfYear = new Date(Date.UTC(now.getUTCFullYear(), 11, 31));
+          endOfYear.setUTCHours(23, 59, 59, 999);
 
           matchCondition.createdAt = {
-            $gte: startOfYear, // Start of the year
-            $lte: endOfYear, // End of the year
+            $gte: startOfYear,
+            $lte: endOfYear,
           };
           break;
 
@@ -63,7 +60,7 @@ module.exports = {
           if (startDate && endDate) {
             matchCondition.createdAt = {
               $gte: new Date(startDate),
-              $lte: new Date(new Date(endDate).setUTCHours(23, 59, 59, 999)), // Set end of the custom range to end of the day
+              $lte: new Date(new Date(endDate).setUTCHours(23, 59, 59, 999)),
             };
           } else {
             throw new Error("Custom date range is required for custom report type.");
@@ -74,17 +71,15 @@ module.exports = {
           throw new Error("Invalid report type.");
       }
 
-      console.log(matchCondition, "this is the matchCondition"); // Debug matchCondition
-
+      console.log(matchCondition, "this is the matchCondition");
 
       let perpage = 10;
       let page = parseInt(req.query.page) || 1;
 
-      // Fetch orders with pagination and populate required fields
       const orders = await Order.find(matchCondition)
         .populate({
           path: "items.productId",
-          select: "name price offerDiscountPrice offerDiscountPersantage categoryDiscountAmount", // Selecting required product fields
+          select: "name price offerDiscountPrice offerDiscountPersantage categoryDiscountAmount",
         })
         .populate({
           path: "customerId",
@@ -94,25 +89,21 @@ module.exports = {
           path: "shippingAddress",
           select: "addressLine1 city state postalCode",
         })
-        .skip((page-1) * perpage)
+        .skip((page - 1) * perpage)
         .limit(perpage)
         .sort({ createdAt: -1 })
         .exec();
 
-
       const totalOrders = await Order.countDocuments(matchCondition);
       const nextPage = parseInt(page) + 1;
-      const totalPages = Math.ceil(totalOrders/perpage)
-      // const hasNextPage = nextPage <= Math.ceil(totalOrders/perpage);
-
+      const totalPages = Math.ceil(totalOrders / perpage);
       const hasPrevPage = page > 1;
-      const hasNextPage = page < totalPages
-
+      const hasNextPage = page < totalPages;
 
       // Calculate the total amount and discount using aggregation
       const totalAmount = await Order.aggregate([
         { $match: matchCondition },
-        { $unwind: "$items" }, // Unwind the 'items' array
+        { $unwind: "$items" },
         {
           $group: {
             _id: null,
@@ -127,8 +118,6 @@ module.exports = {
       const overallAmount = totalAmount.length ? totalAmount[0].totalAmount : 0;
       const overallDiscount = totalAmount.length ? totalAmount[0].totalDiscount : 0;
 
-
-      // Now you have populated orders with all details, you can create variables to store the data you need:
       const reportData = orders.map((order) => ({
         orderId: order.orderId,
         userName: `${order.customerId.name}`,
@@ -152,11 +141,9 @@ module.exports = {
         createdAt: order.createdAt,
       }));
 
-
-
       res.render("admin/salesReport", {
         locals,
-        orders: reportData, // Pass the processed data to the view
+        orders: reportData,
         pagination: reportData,
         totalOrders,
         overallAmount,
@@ -170,7 +157,6 @@ module.exports = {
         hasPrevPage,
         hasNextPage,
         totalPages,
-        // nextPage: hasNextPage ? nextPage : null,
       });
     } catch (error) {
       console.error(error);
@@ -197,7 +183,7 @@ module.exports = {
       // Fetch orders within the date range
       let orders = await Order.find({
         createdAt: { $gte: startDate, $lte: endDate },
-        return: { $ne: true }, // Ensures return: false or undefined
+        return: { $ne: true },
       })
         .populate({ path: "customerId", select: "name" })
         .populate({ path: "items.productId", select: "name price" })
@@ -208,7 +194,7 @@ module.exports = {
       // Prepare data for Excel
       const excelData = orders.flatMap((order) =>
         order.items.map((product) => ({
-          _id: order._id.toString().slice(-7).toUpperCase(), // Formatting Order ID
+          _id: order._id.toString().slice(-7).toUpperCase(),
           customer: `${order.customerId.name}`,
           productName: product.productId.name,
           price: product.price,
@@ -266,8 +252,8 @@ module.exports = {
 
       // Styling headers
       worksheet.getRow(1).eachCell((cell) => {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "00FF00" } }; // Yellow background
-        cell.font = { bold: true, color: { argb: "000000" } }; // Black text
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "00FF00" } }; // Yellow Background
+        cell.font = { bold: true, color: { argb: "000000" } }; // Black Text
         cell.alignment = { horizontal: "center" };
       });
 
@@ -279,7 +265,7 @@ module.exports = {
         // Add alternating row color
         if (rowNumber % 2 === 0) {
           row.eachCell({ includeEmpty: true }, (cell) => {
-            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F2F2F2" } }; // Light grey
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F2F2F2" } }; // Light Grey
           });
         }
       });
@@ -358,7 +344,7 @@ module.exports = {
         status: 80,
       };
       const rowHeight = 30;
-      const maxRowsPerPage = 20; // Max rows per page
+      const maxRowsPerPage = 20;
 
       let yPosition = margins.top + rowHeight * 2;
       let currentPage = 1;
@@ -405,7 +391,7 @@ module.exports = {
           .moveTo(margins.left, margins.top + rowHeight)
           .lineTo(margins.left + Object.values(columnWidths).reduce((acc, width) => acc + width, 0), margins.top + rowHeight)
           .stroke();
-        yPosition = margins.top + rowHeight + 10; // Adjust yPosition after the line
+        yPosition = margins.top + rowHeight + 10;
       };
 
       // Draw a line before each order details
@@ -415,7 +401,7 @@ module.exports = {
           .moveTo(margins.left, yPosition)
           .lineTo(margins.left + Object.values(columnWidths).reduce((acc, width) => acc + width, 0), yPosition)
           .stroke();
-        yPosition += 5; // Space after the line
+        yPosition += 5;
       };
 
       // Wrap text function
@@ -556,7 +542,7 @@ module.exports = {
       drawRows();
 
       drawFooter();
-      
+
       // Sending the PDF
       doc.pipe(res);
       doc.end();

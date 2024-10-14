@@ -1,5 +1,8 @@
+// customerController.js
+
 const User = require("../../models/userSchema");
 
+// Get customer page
 const customerInfo = async (req, res) => {
   try {
     let search = "";
@@ -10,7 +13,6 @@ const customerInfo = async (req, res) => {
     let perPage = 10;
     let page = parseInt(req.query.page) || 1;
 
-    //Fetch - user data
     const userData = await User.find({
       isAdmin: false,
       $or: [{ name: { $regex: ".*" + search + ".*" } }, { email: { $regex: ".*" + search + ".*" } }],
@@ -48,6 +50,7 @@ const customerInfo = async (req, res) => {
   }
 };
 
+// Block Customers
 const customerBlocked = async (req, res) => {
   try {
     let id = req.query.id;
@@ -59,6 +62,7 @@ const customerBlocked = async (req, res) => {
   }
 };
 
+// Unblock Customer
 const customerunBlocked = async (req, res) => {
   try {
     let id = req.query.id;
