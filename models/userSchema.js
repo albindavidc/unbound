@@ -1,3 +1,5 @@
+// userSchema.js
+
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -35,7 +37,6 @@ const userSchema = new Schema(
     referralCode: {
       type: String,
       unique: true,
-
     },
     referrals: {
       type: mongoose.Schema.Types.ObjectId,

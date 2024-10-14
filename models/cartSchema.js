@@ -1,3 +1,5 @@
+// cartSchema.js
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const Product = require("./productSchema");
@@ -9,7 +11,7 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-    customized:{
+    customized: {
       type: Boolean,
       default: false,
     },
@@ -20,7 +22,7 @@ const cartSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        customized:{
+        customized: {
           type: Boolean,
           default: false,
         },
@@ -60,7 +62,7 @@ const cartSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    shipmentFee:{
+    shipmentFee: {
       type: Number,
       default: 40,
     },

@@ -1,3 +1,5 @@
+// variantSchema.js
+
 const mongoose = require("mongoose");
 
 const variantSchema = new mongoose.Schema(

@@ -1,21 +1,23 @@
+// referralSchema.js
+
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const referralSchema = new Schema({
   referrer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // The user who referred another person
+    ref: "User",
   },
   referredUserDetails: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // The referred user
+        ref: "User",
         required: true,
       },
       date: {
         type: Date,
-        default: Date.now, // Automatically sets the current date
+        default: Date.now,
       },
       status: {
         type: String,

@@ -1,3 +1,5 @@
+// orderSchema.js
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
@@ -13,11 +15,11 @@ const orderSchema = new Schema(
     },
     orderId: {
       type: String,
-      default: () => uuidv4(), 
-      unique: true, 
+      default: () => uuidv4(),
+      unique: true,
       required: true,
     },
-    customized:{
+    customized: {
       type: Boolean,
       default: false,
     },
@@ -28,13 +30,13 @@ const orderSchema = new Schema(
           ref: "Product",
           required: true,
         },
-        customized:{
+        customized: {
           type: Boolean,
           default: false,
         },
-        review:{
+        review: {
           type: ObjectId,
-          ref:"Product",
+          ref: "Product",
         },
         variant: {
           type: ObjectId,

@@ -1,10 +1,12 @@
+// productSchema.js
+
 const mongoose = require("mongoose");
 
 const ratingSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
-    rating: { type: Number, required: true }, 
-    orderId: {type: String, require: true},
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    rating: { type: Number, required: true },
+    orderId: { type: String, require: true },
     review: { type: String },
   },
   { timestamps: true }
@@ -26,16 +28,16 @@ const imageSchema = new mongoose.Schema(
 const variantSchema = new mongoose.Schema({
   // _id: {
   //   type: String,
-  //   unique: true,  
-  //   default: () => new mongoose.Types.ObjectId(),  
+  //   unique: true,
+  //   default: () => new mongoose.Types.ObjectId(),
   color: {
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Color",
     // required: true,
   },
   size: {
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "Size", 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Size",
     // required: true,
   },
   stock: {

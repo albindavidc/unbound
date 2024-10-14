@@ -1,3 +1,5 @@
+//sizeSchema.js
+
 const mongoose = require("mongoose");
 const sizeSchema = new mongoose.Schema(
   {

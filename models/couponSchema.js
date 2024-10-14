@@ -1,3 +1,5 @@
+// couponSchema.js
+
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -6,8 +8,8 @@ const couponSchema = new Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true, // Ensures each coupon code is unique
-    set: (value) => value.toUpperCase() // Set the value to uppercase
+    unique: true,
+    set: (value) => value.toUpperCase(),
   },
   description: {
     type: String,
@@ -16,7 +18,7 @@ const couponSchema = new Schema({
   rateOfDiscount: {
     type: Number,
     required: true,
-    min: 0, // Ensures the value is non-negative
+    min: 0,
   },
   minPurchaseAmount: {
     type: Number,
