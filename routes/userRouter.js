@@ -114,7 +114,6 @@ router.put("/cart/:id/:variant/increment", userAuth, cartController.incrementCar
 router.put("/cart/:id/:variant/decrement", userAuth, cartController.decrementCartItem);
 
 router.get("/checkout", checkoutController.getCheckout);
-router.get("/checkout-details", checkoutController.checkoutDetailsReload)
 
 router.post("/checkout/add-address", userController.addAddress);
 router.route("/checkout/edit-address/:id")

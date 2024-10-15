@@ -78,7 +78,7 @@ module.exports = {
       cart.couponDiscount = 0;
 
       await cart.save();
-      return res.status(200).json({ message: "Coupon removed successfully" });
+      return res.status(200).json({ message: "Coupon removed successfully", newGrandTotal: cart.payable });
     } catch (error) {
       return res.status(500).json({ message: "Internal server error" });
     }

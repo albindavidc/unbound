@@ -130,7 +130,7 @@
                 <button
                   onclick="removeCoupon()"
                   type="button"
-                  class="btn btn-outline-warning <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? '' : 'd-none' %>"
+                  class="btn btn-outline-warning mt-4 <%- (typeof userCart.coupon !== 'undefined' && userCart.coupon) ? '' : 'd-none' %>"
                 >
                   Remove Coupon
                 </button>
@@ -178,11 +178,6 @@
             <p class="lead text-warning">No Coupons Available</p>
             <% } %>
           </div>
-
-          <li class="list-group-item d-flex justify-content-between">
-            <span>Grand Total (INR)</span>
-            <strong>₹<span id="grandTotal"><%- totalPrice %></span></strong>
-          </li>
         </ul>
       </div>
 
@@ -612,42 +607,6 @@
 <script defer src="/public/js/user/checkout.js"></script>
 
 <script>
-  // function reloadOrderDetails() {
-  //   fetch('/checkout-details')
-  //   .then(response => response.text())
-  //   .then(data =>{
-  //     document.getElementById('orderDetailsReload').innerHTML = data
-  //   })
-  //   .catch(error =>{
-  //     console.error('There is a small eror to relaod', error)
-  //   })
-  // }
-
-    // Function to reload the div
-    function reloadOrderDetails() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/checkout-details', true); 
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); 
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                document.getElementById('orderDetailsReload').innerHTML = xhr.responseText; 
-            }
-        };
-        xhr.send();
-    }
-
-    document.getElementById('applyCoupon').addEventListener('submit', function(e){
-    e.preventDefault();
-
-    reloadOrderDetails();
-  })
-
-
-
-
-
-
   const copyCode = async (code) => {
     await navigator.clipboard.writeText(code);
     Swal.fire({
@@ -656,126 +615,156 @@
     });
   };
 
-  const couponCodeVal = document.getElementById("couponCode").value;
-  document.querySelector("#applyCoupon").addEventListener("submit", function (event) {
-    event.preventDefault(); 
 
-    const couponCodeInput = document.getElementById("couponCode");
-    const couponCodeVal = document.getElementById("couponCode").value;
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector("#applyCoupon").addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to apply this coupon? " + couponCodeVal.toUpperCase(),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, apply it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            icon: "info",
-            title: "Applying Coupon",
-            html: "Please wait while we verify and apply the coupon...",
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-            timer: 4200,
-          });
+      const couponCodeInput = document.getElementById("couponCode");
+      const couponCodeVal = couponCodeInput.value.trim().toLowerCase();
 
-          const response = await fetch("/checkout/verify-coupon", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              code: couponCodeVal.toLowerCase(),
-            }),
-          });
-
-          Swal.close();
-
-          if (response.ok) {
-            const data = await response.json();
-
-            const coupon = document.getElementById("appliedCoupon");
-            const couponCode = document.getElementById("coupon");
-            const discountAmount = document.getElementById("discountAmount");
-            let grandTotal = document.getElementById("grandTotal").innerHTML;
-
-            coupon.classList.remove("d-none");
-            couponCode.innerText = `${data.coupon.code}`;
-            discountAmount.innerText = `-₹${data.discountAmount}`;
-
-            couponCodeInput.disabled = true;
-            couponCodeInput.value = "";
-            Swal.fire("Applied!", data.message, "success").then(() => {
-              // location.reload()
-            });
-          } else {
-            const errorData = await response.json();
-            Swal.fire("Error!", errorData.message || "There was an error applying the coupon.", "error");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          Swal.fire("Error!", "There was an error applying the coupon.", "error");
-        }
+      if (!couponCodeVal) {
+        Swal.fire("Error", "Please enter a valid coupon code.", "error");
+        return;
       }
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: `Do you want to apply this coupon? ${couponCodeVal.toUpperCase()}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, apply it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.fire({
+              icon: "info",
+              title: "Applying Coupon",
+              html: "Please wait while we verify and apply the coupon...",
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+            });
+
+            const response = await fetch("/checkout/verify-coupon", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ code: couponCodeVal }),
+            });
+
+            Swal.close();
+
+            if (response.ok) {
+              const data = await response.json();
+              const { discountAmount, coupon } = data;
+
+              // Update DOM elements
+              document.getElementById("appliedCoupon").classList.remove("d-none");
+              document.getElementById("coupon").innerText = coupon.code;
+              document.getElementById("discountAmount").innerText = `-₹${discountAmount.toFixed(0)}`; // Round to 2 decimal places
+
+              // Update grand total and round it
+              const grandTotalElement = document.getElementById("grandTotal");
+              let grandTotal = parseFloat(grandTotalElement.innerHTML);
+              grandTotal -= discountAmount;
+              grandTotalElement.innerHTML = grandTotal.toFixed(0); // Round to 2 decimal places
+
+              // Disable coupon input and apply button after applying
+              couponCodeInput.disabled = true;
+              document.querySelector(".btn.btn-outline-primary").disabled = true;
+
+              // Show the remove button
+              document.querySelector(".btn.btn-outline-warning").classList.remove("d-none");
+
+              Swal.fire("Coupon Applied!", `You saved ₹${discountAmount.toFixed(0)}`, "success");
+            } else {
+              const errorData = await response.json();
+              Swal.fire("Error!", errorData.message || "Failed to apply coupon.", "error");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire("Error!", "There was an error applying the coupon.", "error");
+          }
+        }
+      });
     });
+
+    // Function to remove coupon
+    window.removeCoupon = async function () {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to remove this coupon?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, remove it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.fire({
+              icon: "info",
+              title: "Removing Coupon",
+              html: "Please wait while we remove the coupon...",
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+            });
+
+            const response = await fetch("/checkout/remove-coupon", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            Swal.close();
+
+            if (response.ok) {
+              const data = await response.json();
+              
+              // Extract the new grand total from the response
+              const newGrandTotal = parseFloat(data.newGrandTotal);
+
+              // Update DOM after coupon removal
+              document.getElementById("appliedCoupon").classList.add("d-none");
+              const couponCodeInput = document.getElementById("couponCode");
+              couponCodeInput.disabled = false;
+              couponCodeInput.value = "";
+
+              // Update the grand total with backend-calculated value
+              const grandTotalElement = document.getElementById("grandTotal");
+              grandTotalElement.innerHTML = newGrandTotal.toFixed(0); // Ensure it is properly rounded
+
+              const discountElement = document.getElementById("discountAmount");
+              discountElement.innerText = `-₹`; 
+
+              // Re-enable the apply button
+              document.querySelector(".btn.btn-outline-primary").disabled = false;
+
+              // Hide the remove button
+              document.querySelector(".btn.btn-outline-warning").classList.add("d-none");
+
+              Swal.fire("Removed!", data.message, "success");
+            } else {
+              const errorData = await response.json();
+              Swal.fire("Error!", errorData.message || "Failed to remove the coupon.", "error");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire("Error!", "There was an error removing the coupon.", "error");
+          }
+        }
+      });
+    };
   });
 
-  const removeCoupon = async () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to remove this coupon? " + couponCodeVal.toUpperCase(),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, remove it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            icon: "info",
-            title: "Removing Coupon",
-            html: "Please wait while we remove the coupon...",
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-
-          const response = await fetch("/checkout/remove-coupon", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          Swal.close();
-
-          if (response.ok) {
-            const data = await response.json();
-
-            Swal.fire("Removed!", data.message, "success").then(() => {
-              location.reload();
-            });
-          } else {
-            const errorData = await response.json();
-            Swal.fire("Error!", errorData.message || "There was an error removing the coupon.", "error").then(() => {
-              location.reload();
-            });
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          Swal.fire("Error!", "There was an error removing the coupon.", "error");
-        }
-      }
-    });
-  };
 </script>
 
 <script>
