@@ -1,3 +1,5 @@
+// salesReportController.js
+
 const puppeteer = require("puppeteer");
 const excelJs = require("exceljs");
 const path = require("path");
@@ -9,6 +11,7 @@ const Product = require("../../models/productSchema");
 const User = require("../../models/userSchema");
 
 module.exports = {
+  // Get Sales Report
   getSalesReport: async (req, res) => {
     try {
       const locals = {
@@ -22,7 +25,8 @@ module.exports = {
       let endOfDay;
 
       let matchCondition = {};
-      const now = new Date();
+      let now = new Date();
+      
 
       switch (reportType) {
         case "daily":
@@ -71,8 +75,6 @@ module.exports = {
           throw new Error("Invalid report type.");
       }
 
-      console.log(matchCondition, "this is the matchCondition");
-
       let perpage = 10;
       let page = parseInt(req.query.page) || 1;
 
@@ -113,7 +115,6 @@ module.exports = {
         },
       ]);
 
-      console.log(totalAmount, "this is the total amount");
 
       const overallAmount = totalAmount.length ? totalAmount[0].totalAmount : 0;
       const overallDiscount = totalAmount.length ? totalAmount[0].totalDiscount : 0;
@@ -159,14 +160,15 @@ module.exports = {
         totalPages,
       });
     } catch (error) {
-      console.error(error);
       res.status(500).json({ success: false, error: "An error occurred while fetching the sales report." });
     }
   },
 
+  // Export to Excel
   exportToExcel: async (req, res) => {
     let startDate = req.query.startDate ? new Date(req.query.startDate) : new Date();
     let endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+
 
     // Validate dates
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {

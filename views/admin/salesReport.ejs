@@ -279,6 +279,7 @@
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <%- include('../partials/admin/footer') %>
 <script>
@@ -290,6 +291,8 @@
     altFormat: "F j, Y", // Displays formatted date
   });
 
+
+
   document.addEventListener("DOMContentLoaded", () => {
     const reportTypeSelect = document.getElementById("reportType");
     const customDateInputs = document.getElementById("custom-date-inputs");
@@ -300,11 +303,14 @@
     const errorMessage = document.getElementById("error-message");
     const form = document.getElementById("date-filter-form");
 
+   
+
     // Hide custom date inputs initially
     customDateInputs.style.display = "none";
 
     // Handle report type change
     reportTypeSelect.addEventListener("change", (event) => {
+      
       const reportType = event.target.value;
 
       if (reportType === "custom") {
@@ -340,6 +346,7 @@
 
     // Handle form submit (Custom dates)
     form.addEventListener("submit", (event) => {
+      
       const reportType = reportTypeSelect.value;
 
       // If custom date is selected, validate the inputs
@@ -358,6 +365,30 @@
 
     // Handle Export Links
     function updateExportLinks() {
+      let now = new Date();
+      now.setDate(now.getDate() + 1)
+
+      now.setHours(0, 0, 0, 0); // Set current time to 00:00 for comparison
+
+      // Convert input values to Date objects
+      let diffStartDate = new Date(startDateInput.value);
+      let diffEndDate = new Date(endDateInput.value);
+
+      // Check if dates are valid before comparing
+      if (diffStartDate > now || diffEndDate > now) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Kindly select present or past dates because the future sales records are yet to break",
+        });
+      } else if (diffStartDate > diffEndDate) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "End date must be after start date",
+        });
+      }
+
       const startDate = encodeURIComponent(startDateInput.value);
       const endDate = encodeURIComponent(endDateInput.value);
       exportExcel.href = `/admin/sales-report/export/excel?startDate=${startDate}&endDate=${endDate}`;
