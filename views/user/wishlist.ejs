@@ -32,6 +32,9 @@
 <!-- Wishlist -->
 <section class="container mt-5 p-6">
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+
+    <% if (wishlist && wishlist.length > 0) { %> 
+
     <% wishlist.forEach(item => { %> <% item.products.forEach(product => { %> <% if (product.wishlist === true) { %>
 
     <div class="col">
@@ -169,7 +172,7 @@
       </div>
     </div>
 
-    <% } %> <% }) %> <% }) %>
+    <% } %> <% }) %> <% }) %> <% } %>
   </div>
 </section>
 

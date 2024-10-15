@@ -8,6 +8,7 @@ const Address = require("../../models/addressSchema");
 const Referral = require("../../models/referralSchema");
 const Wallet = require("../../models/walletSchema");
 const Cart = require("../../models/cartSchema");
+const Wishlist = require("../../models/wishlistSchema")
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -27,9 +28,14 @@ const loadHomepage = async (req, res) => {
   try {
     const userId = req.session.user;
     let cart = await Cart.findOne({ userId });
+    let wishlist = await Wishlist.findOne({userId})
     if (!cart) {
       cart = new Cart({ userId });
       await cart.save();
+    }
+    if (!wishlist) {
+      wishlist = new Wishlist({ userId });
+      await wishlist.save();
     }
 
     if (req.session.user) {

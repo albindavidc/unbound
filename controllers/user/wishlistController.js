@@ -8,8 +8,10 @@ module.exports = {
   // Get Wishlist
   getWishlist: async (req, res) => {
     try {
-      userId = req.session.user;
-      const wishlist = await Wishlist.find({ userId }).populate({
+      const userId = req.session.user;
+
+      // Fetch the user's wishlist, or return an empty list if none exists
+      let wishlist = await Wishlist.findOne({ userId }).populate({
         path: "products.productId",
         populate: {
           path: "variants",
@@ -17,45 +19,65 @@ module.exports = {
         },
       });
 
-      let products;
-      let allStocks;
-
-      let productId;
-      wishlist.forEach((wish) => {
-        wish.products.forEach((product) => {
-          products = product.productId;
-          productId = product.productId;
-
-          product.productId.variants.forEach((variant) => {
-            allStocks = variant.stock;
-          });
-        });
-      });
-
-      const product = await Product.find({ _id: productId });
-
-      let variants;
-      product.forEach((product) => {
-        variants = product.variants;
-      });
-
-      const cart = await Cart.findOne({ userId });
-      let existingQuantity;
-      if (cart) {
-        let existingItem;
-        cart.items.forEach((item) => {
-          cart.items.forEach((item) => {
-            existingItem = item.productId.toString() === productId._id.toString();
-            existingQuantity = item.quantity;
-          });
-        });
-      } else {
-        existingQuantity = 3;
+      // If no wishlist exists for the user, initialize an empty wishlist object
+      if (!wishlist) {
+        wishlist = { products: [] }; // Empty array of products
       }
 
-      res.render("user/wishlist", { wishlist, user: userId, product, variants, stocks: allStocks, existingQuantity });
+      let products = [];
+      let allStocks = [];
+      let productId;
+
+      // Check if the wishlist contains products
+      wishlist.products.forEach((wish) => {
+        wish.products.forEach((product) => {
+          products.push(product.productId);
+          productId = product.productId?._id; // Use optional chaining to prevent error
+
+          if (product.productId && product.productId.variants) {
+            product.productId.variants.forEach((variant) => {
+              allStocks.push(variant.stock);
+            });
+          }
+        });
+      });
+
+      // Fetch product data if productId is defined
+      let product = [];
+      let variants = [];
+
+      if (productId) {
+        product = await Product.find({ _id: productId });
+        product.forEach((p) => {
+          variants = p.variants;
+        });
+      }
+
+      // Fetch cart details
+      const cart = await Cart.findOne({ userId });
+      let existingQuantity = 3; // Default quantity for new users
+
+      if (cart) {
+        cart.items.forEach((item) => {
+          const existingItem = item.productId.toString() === productId?.toString();
+          if (existingItem) {
+            existingQuantity = item.quantity;
+          }
+        });
+      }
+
+      // Render wishlist view
+      res.render("user/wishlist", {
+        wishlist,
+        user: userId,
+        product,
+        variants,
+        stocks: allStocks,
+        existingQuantity,
+      });
     } catch (error) {
-      res.redirect("user/pageNotFound");
+      console.error(error);
+      res.status(500).send("Internal Server Error");
     }
   },
 
