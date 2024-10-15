@@ -101,12 +101,13 @@ module.exports = {
         totalPrice -= couponDiscount;
 
         await Cart.findOneAndUpdate({ _id: userCart._id }, { $set: { totalPrice: totalPrice, couponDiscount: couponDiscount } });
-      } else {
-        // If the total is less than the minimum purchase amount, remove the coupon
-        userCart.coupon = undefined;
-        userCart.couponDiscount = 0;
-        await userCart.save();
-      }
+      } 
+      // else {
+      //   // If the total is less than the minimum purchase amount, remove the coupon
+      //   userCart.coupon = undefined;
+      //   userCart.couponDiscount = 0;
+      //   await userCart.save();
+      // }
     }
 
     // Correctly calculate cartCount
@@ -157,6 +158,85 @@ module.exports = {
       checkout: true,
       isInsufficient,
     });
+  },
+
+  checkoutDetailsReload: async (req, res) =>{
+    const userId = req.session.user
+    let user = await User.findById(userId);
+    const userCart = await Cart.findOne({ userId: userId }).populate(
+      "items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity"
+    );
+        
+    let totalPrice = 0;
+    let totalPriceBeforeOffer = 0;
+
+    for (const prod of userCart.items) {
+      prod.price = prod.productId.bundleQuantity > prod.quantity ? prod.productId.sellingPrice : prod.productId.bundlePrice;
+
+      const itemTotal = prod.price * prod.quantity;
+      prod.itemTotal = itemTotal;
+      totalPrice += itemTotal;
+      totalPriceBeforeOffer += prod.price;
+    }
+
+    // Apply coupon discount if applicable
+    let couponDiscount = 0;
+    if (userCart.coupon) {
+      const coupon = await Coupon.findById(userCart.coupon);
+      if (coupon && coupon.isActive && new Date() <= coupon.expiringDate && totalPrice >= coupon.minPurchaseAmount) {
+        couponDiscount = totalPrice * (coupon.rateOfDiscount / 100);
+        totalPrice -= couponDiscount;
+
+        await Cart.findOneAndUpdate({ _id: userCart._id }, { $set: { totalPrice: totalPrice, couponDiscount: couponDiscount } });
+      } 
+    }
+
+    // Correctly calculate cartCount
+    let cartCount = userCart.items.length;
+
+    const coupons = await Coupon.find({
+      isActive: true,
+      minPurchaseAmount: { $lte: totalPriceBeforeOffer },
+      expiringDate: { $gte: Date.now() },
+    });
+
+    let isCOD = true;
+
+    if (totalPrice > 1000) {
+      isCOD = false;
+    }
+
+    const userWallet = await Wallet.find({ userId: userId });
+
+    let newWallet;
+    userWallet.forEach((items) => {
+      newWallet = items.balance;
+    });
+
+    let isInsufficient;
+    if (totalPrice > newWallet) {
+      isInsufficient = true;
+    } else {
+      isInsufficient = false;
+    }
+
+    const getPayable = await Cart.findOne({ userId }, { _id: 0, payable: 1 });
+    const payable = getPayable.payable;
+
+    res.render('partials/user/checkoutDetails', {
+      user,
+      userCart,
+      coupons,
+      couponDiscount,
+      isCOD,
+      cartList: userCart.items,
+      cartCount,
+      wallet: userWallet,
+      totalPrice,
+      payable,
+      checkout: true,
+      isInsufficient,
+    })
   },
 
   // Place Order
