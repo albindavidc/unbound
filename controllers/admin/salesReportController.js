@@ -348,8 +348,6 @@ module.exports = {
       startDate.setUTCHours(0, 0, 0, 0);
       endDate.setUTCHours(23, 59, 59, 999);
 
-      console.log(startDate, endDate, "these are the startdate and the end date");
-
       // Fetch orders within the date range
       const orders = await Order.find({
         createdAt: { $gte: startDate, $lte: endDate },
@@ -358,8 +356,6 @@ module.exports = {
         .populate({ path: "customerId", select: "name" })
         .populate({ path: "items.productId", select: "name" })
         .lean();
-
-      console.log(orders, "these are the pdf orders");
 
       // Handle empty result or send response
       if (orders.length === 0) {
@@ -375,7 +371,8 @@ module.exports = {
         });
         totalPrice += order.totalPrice;
       });
-      console.log(orders, "these are the pdf orders");
+
+
       const doc = new PDFDocument({ margin: 20, size: "A4" });
 
       let filename = "sales_report.pdf";
@@ -383,10 +380,18 @@ module.exports = {
       res.setHeader("content-disposition", `attachment; filename="${filename}"`);
       res.setHeader("content-type", "application/pdf");
 
-      doc.fontSize(15).text("Sales Report", { align: "center" }).moveDown();
+
+      const logoPath = './public/uploads/profile/logo.png'
+      const logoImage = fs.readFileSync(logoPath);
+
+      doc.image(logoImage, {fit: [150, 150], align: 'center', valign: 'top'})
+
+      doc.moveDown();
+
+      doc.fontSize(24).text("Sales Report", { align: "center" }).moveDown();
 
       // Define column widths and starting positions
-      const margins = { left: 20, top: 50 };
+      const margins = { left: 20, top: 100 };
       const columnWidths = {
         orderId: 80,
         date: 80,
