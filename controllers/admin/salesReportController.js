@@ -26,7 +26,6 @@ module.exports = {
 
       let matchCondition = {};
       let now = new Date();
-      
 
       switch (reportType) {
         case "daily":
@@ -115,7 +114,6 @@ module.exports = {
         },
       ]);
 
-
       const overallAmount = totalAmount.length ? totalAmount[0].totalAmount : 0;
       const overallDiscount = totalAmount.length ? totalAmount[0].totalDiscount : 0;
 
@@ -169,7 +167,6 @@ module.exports = {
     let startDate = req.query.startDate ? new Date(req.query.startDate) : new Date();
     let endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
 
-
     // Validate dates
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       return res.status(400).json({ error: "Invalid date format" });
@@ -216,6 +213,19 @@ module.exports = {
       const workBook = new excelJs.Workbook();
       const worksheet = workBook.addWorksheet("Sales Report");
 
+      const logoPath = "./public/uploads/profile/logo.png";
+      const logoImage = fs.readFileSync(logoPath);
+      const imageId = workBook.addImage({
+        buffer: logoImage,
+        extension: "png",
+      });
+
+      worksheet.addImage(imageId, {
+        tl: { col: 0, row: 0 },
+        ext: { width: 200, height: 100 },
+      });
+
+      // Define worksheet columns (starting from row 6)
       worksheet.columns = [
         { header: "Order ID", key: "_id", width: 15 },
         { header: "Customer", key: "customer", width: 25 },
@@ -228,6 +238,35 @@ module.exports = {
         { header: "Status", key: "status", width: 15 },
         { header: "Date", key: "createdAt", width: 15 },
       ];
+
+      worksheet.mergeCells("A1:J6");
+
+      worksheet.getCell("A1").value = "Sales Report";
+      worksheet.getCell("A1").font = {
+        bold: true,
+        size: 22,
+        color: { argb: "FFFFFFFF" },
+      };
+      worksheet.getCell("A1").alignment = { vertical: "middle", horizontal: "center" };
+
+      const headersRow = worksheet.getRow(6);
+      headersRow.values = worksheet.columns.map((column) => column.header);
+      headersRow.font = { bold: true };
+
+      worksheet.getCell("A1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF000000" },
+      };
+      worksheet.getCell("A1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" },
+      };
+
+      headersRow.eachCell((cell) => {
+        cell.alignment = { horizontal: "center" };
+      });
 
       // Adding rows
       excelData.forEach((row) => {
@@ -253,7 +292,8 @@ module.exports = {
       });
 
       // Styling headers
-      worksheet.getRow(1).eachCell((cell) => {
+
+      worksheet.getRow(6).eachCell((cell) => {
         cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "00FF00" } }; // Yellow Background
         cell.font = { bold: true, color: { argb: "000000" } }; // Black Text
         cell.alignment = { horizontal: "center" };
@@ -271,6 +311,17 @@ module.exports = {
           });
         }
       });
+
+      worksheet.getCell("A1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF000000" },
+      };
+      worksheet.getCell("A1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" },
+      };
 
       // Sending the response
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
