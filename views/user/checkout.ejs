@@ -612,18 +612,32 @@
 <script defer src="/public/js/user/checkout.js"></script>
 
 <script>
-  function reloadOrderDetails() {
-    fetch('/checkout-details')
-    .then(response => response.text())
-    .then(data =>{
-      document.getElementById('orderDetailsReload').innerHTML = data
-    })
-    .catch(error =>{
-      console.error('There is a small eror to relaod', error)
-    })
-  }
+  // function reloadOrderDetails() {
+  //   fetch('/checkout-details')
+  //   .then(response => response.text())
+  //   .then(data =>{
+  //     document.getElementById('orderDetailsReload').innerHTML = data
+  //   })
+  //   .catch(error =>{
+  //     console.error('There is a small eror to relaod', error)
+  //   })
+  // }
 
-  document.getElementById('applyCoupon').addEventListener('submit', function(e){
+    // Function to reload the div
+    function reloadOrderDetails() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/checkout-details', true); 
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); 
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                document.getElementById('orderDetailsReload').innerHTML = xhr.responseText; 
+            }
+        };
+        xhr.send();
+    }
+
+    document.getElementById('applyCoupon').addEventListener('submit', function(e){
     e.preventDefault();
 
     reloadOrderDetails();
@@ -698,7 +712,7 @@
             couponCodeInput.disabled = true;
             couponCodeInput.value = "";
             Swal.fire("Applied!", data.message, "success").then(() => {
-              location.reload()
+              // location.reload()
             });
           } else {
             const errorData = await response.json();
