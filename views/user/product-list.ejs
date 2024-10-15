@@ -20,13 +20,19 @@
 <section class="shop spad">
   <div class="container">
     <div class="row">
+
+
       <div class="col-lg-3">
         <div class="shop__sidebar">
           <div class="shop__sidebar__search">
-            <form action="#">
-              <input id="myInput" type="text" onkeyup="myFunction()" placeholder="Search..." />
+            <form id="searchForm" onsubmit="handleSearch(); return false;">
+              <input id="myInput" type="text" placeholder="Search..." />
               <button type="submit"><span class="icon_search"></span></button>
-            </form>
+            </form> 
+            <div class="pt-3 pb-3">
+              <a href="/user/product-list" class="btn btn-dark btn-sm  float-end">Clear All</a>
+            </div>
+           
           </div>
           <div class="shop__sidebar__accordion">
             <div class="accordion" id="accordionExample">
@@ -138,6 +144,9 @@
                 <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__color">
+                      <div class="mb-3">
+                        <a href="#" class="d-flex justify-content-start  color-filter <%= !currentColorId || currentColorId === 'all' ? '' : 'active' %>" data-size="all">All</a>
+                      </div>
                       <% colors.forEach(color => { %>
                       <label
                         class="color-filter"
@@ -163,6 +172,8 @@
           </div>
         </div>
       </div>
+
+      
       <div class="col-lg-9">
         <div class="shop__product__option">
           <div class="row">
@@ -355,7 +366,13 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+</script>
+
+
+
+<script>  
+document.addEventListener("DOMContentLoaded", function () {
+
     // Combine event listeners for category, brand, and price filters
     document.querySelectorAll(".category-filter, .brand-filter, .price-filter, .size-filter,.color-filter").forEach(function (element) {
       element.addEventListener("click", function (e) {
@@ -364,32 +381,26 @@
         let currentUrl = new URL(window.location.href);
         let params = new URLSearchParams(currentUrl.search);
 
-        // Handle category filter
+        // Handle category filter & Set the category parameter in the URL
         if (this.classList.contains("category-filter")) {
-          // Set the category parameter in the URL
           params.set("category", this.getAttribute("data-category"));
 
-          // Add 'active' class to the clicked category
           document.querySelectorAll(".category-filter").forEach((el) => el.classList.remove("active"));
           this.classList.add("active");
         }
 
         // Handle brand filter
         if (this.classList.contains("brand-filter")) {
-          // Set the brand parameter in the URL
           params.set("brand", this.getAttribute("data-brand"));
 
-          // Add 'active' class to the clicked brand
           document.querySelectorAll(".brand-filter").forEach((el) => el.classList.remove("active"));
           this.classList.add("active");
         }
 
         // Handle price filter
         if (this.classList.contains("price-filter")) {
-          // Set the price parameter in the URL
           params.set("price", this.getAttribute("data-price"));
 
-          // Add 'active' class to the clicked price range
           document.querySelectorAll(".price-filter").forEach((el) => el.classList.remove("active"));
           this.classList.add("active");
         }
@@ -402,10 +413,8 @@
         }
 
         if (this.classList.contains("color-filter")) {
-          // Set the brand parameter in the URL
           params.set("color", this.getAttribute("data-color"));
 
-          // Add 'active' class to the clicked brand
           document.querySelectorAll(".color-filter").forEach((el) => el.classList.remove("active"));
           this.classList.add("active");
         }
@@ -422,11 +431,10 @@
       });
     });
   });
-</script>
 
-<script>
+
   document.getElementById("sortForm").addEventListener("change", function (e) {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
 
     let currentUrl = new URL(window.location.href);
     let params = new URLSearchParams(currentUrl.search);
@@ -436,16 +444,12 @@
 
     // Keep category and brand parameters if they exist
     if (params.has("category")) {
-      // Do nothing, keep the existing category parameter
     }
     if (params.has("brand")) {
-      // Do nothing, keep the existing brand parameter
     }
     if (params.has("price")) {
-      // Do nothing, keep the existing price parameter
     }
     if (params.has("size")) {
-      // Do nothing, keep the existing size parameter
     }
 
     // Construct the new URL and navigate
@@ -455,23 +459,39 @@
 </script>
 
 <script>
-  function myFunction() {
-    var input, filter, ul, li, h6, i, txtValue;
-    input = document.getElementById("myInput");
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("myUL");
-    li = ul.getElementsByClassName("product-item");
+function handleSearch() {
+  var input = document.getElementById("myInput");
+  var filter = input.value.trim();  // Get the search input value
 
-    for (i = 0; i < li.length; i++) {
-      h6 = li[i].getElementsByTagName("h6")[0];
-      txtValue = h6.textContent || h6.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        li[i].style.display = "";
-      } else {
-        li[i].style.display = "none";
-      }
-    }
+  let currentUrl = new URL(window.location.href);  // Get the current URL
+  let params = new URLSearchParams(currentUrl.search);  // Get the query parameters
+
+  // Add or remove the 'search' parameter based on the input value
+  if (filter) {
+    params.set("search", filter);  // Set the search parameter in the URL
+  } else {
+    params.delete("search");  // Remove the search parameter if the input is empty
   }
+
+  // Retain other filter and sort parameters if they exist
+  if (params.has("category")) {
+  }
+  if (params.has("brand")) {
+  }
+  if (params.has("price")) {
+  }
+  if (params.has("size")) {
+  }
+  if (params.has("color")) {
+  }
+  if (params.has("sort")) {
+  }
+
+  // Navigate to the new URL with updated query parameters
+  currentUrl.search = params.toString();
+  window.location.href = currentUrl.toString();
+}
+
 </script>
 
 <script>
@@ -485,7 +505,6 @@
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const products = await response.json();
-        console.log("Products fetched:", products); // Log the fetched products
         renderProducts(products);
       } catch (error) {
         console.error("Error fetching products:", error);

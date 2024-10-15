@@ -20,6 +20,9 @@ module.exports = {
     const currentCategoryId = req.query.categoryId;
     const currentBrandId = req.query.brandId;
     const currentSizeId = req.query.sizeId;
+    const currentColorId = req.query.colorId;
+    const search = req.query.search || "";
+
     let query = {};
 
     if (category && category !== "all") {
@@ -70,24 +73,40 @@ module.exports = {
     }
 
     try {
-      const product = await Product.find({ isActive: true }).populate("variants.color").populate("variants.stock");
-
       const categories = await Category.find({ isListed: true });
       const brand = await Brand.find({ isListed: true });
       const size = await Size.find({});
       const colors = await Color.find({ isListed: true });
       const variants = await Variants.find({});
 
-      const perPage = 9;
+      const perPage = 6;
       const page = parseInt(req.query.page) || 1;
 
-      const products = await Product.find({ ...query, ...filterQuery })
+      const searchQuery = { name: { $regex: search, $options: "i" } };
+      const combinedQuery = { ...searchQuery, ...query, ...filterQuery };
+      const productCount = await Product.countDocuments(combinedQuery);
+
+      const products = await Product.find(combinedQuery)
+        // .populate("variants.color")
+        // .populate("variants.stock")
         .skip((page - 1) * perPage)
         .limit(perPage)
         .sort(sortQuery)
         .exec();
 
-      const productCount = await Product.countDocuments({ ...query, ...filterQuery });
+      function buildQueryString(queryParams, page = null) {
+        const params = { ...queryParams };
+
+        delete params.page;
+
+        if (page !== null) {
+          params.page = page;
+        }
+
+        return Object.keys(params)
+          .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+          .join("&");
+      }
 
       const nextPage = parseInt(page) + 1;
       const totalPages = Math.ceil(productCount / perPage);
@@ -96,7 +115,7 @@ module.exports = {
 
       res.render("user/product-list", {
         user: req.session.user,
-        product,
+        // product,
         products,
         categories,
         brand,
@@ -107,9 +126,11 @@ module.exports = {
         currentCategoryId,
         currentBrandId,
         currentSizeId,
+        currentColorId,
         variants,
+        queryString: buildQueryString(req.query),
 
-        pagination: product,
+        pagination: products,
         currentPage: page,
         perPage,
         nextPage,
@@ -118,6 +139,7 @@ module.exports = {
         totalPages,
       });
     } catch (error) {
+      console.log(error);
       res.status(500).send("Error loading products");
     }
   },

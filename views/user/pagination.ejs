@@ -82,9 +82,8 @@
     pointer-events: none; /* Disable click for current page */
   }
 </style>
-
 <!-- Pagination-Advanced -->
-<% if (pagination.length>0 && nextPage || currentPage === totalPages) { %>
+<% if (pagination.length > 0 && nextPage || currentPage === totalPages) { %>
 <nav aria-label="Order Pagination">
   <ul class="pagination justify-content-center mt-5 p-3 pb-0" style="background-color: white">
     <!-- First Page Link -->
@@ -92,25 +91,25 @@
     <li class="page-item disabled">
       <a href="#" class="page-link">First</a>
     </li>
-    <% }else{ %>
+    <% } else { %>
     <li class="page-item">
-      <a href="?page=1" class="page-link">First</a>
+      <a href="?<%= queryString %>&page=1" class="page-link">First</a>
     </li>
     <% } %>
 
     <!-- Previous Page Link -->
     <% if (hasPrevPage) { %>
     <li class="page-item">
-      <a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a>
+      <a href="?<%= queryString %>&page=<%= currentPage - 1 %>" class="page-link">Previous</a>
     </li>
-    <% }else{ %>
+    <% } else { %>
     <li class="page-item disabled">
       <a href="#" class="page-link">Previous</a>
     </li>
     <% } %>
 
-    <!-- center pages  -->
-    <% var i = (currentPage> 5 ?currentPage - 4 : 1) %> <% if (i !== 1) { %>
+    <!-- Center Pages -->
+    <% var i = (currentPage > 5 ? currentPage - 4 : 1) %> <% if (i !== 1) { %>
     <li class="page-item disabled">
       <a href="#" class="page-link">...</a>
     </li>
@@ -118,9 +117,9 @@
     <li class="page-item active">
       <a href="#" class="page-link"><%= i %></a>
     </li>
-    <% }else { %>
+    <% } else { %>
     <li class="page-item">
-      <a href="?page=<%= i %>" class="page-link"><%= i %></a>
+      <a href="?<%= queryString %>&page=<%= i %>" class="page-link"><%= i %></a>
     </li>
     <% } %> <% } %> <% if (i <= totalPages) { %>
     <li class="page-item disabled">
@@ -128,25 +127,25 @@
     </li>
     <% } %>
 
-    <!-- next page link -->
+    <!-- Next Page Link -->
     <% if (hasNextPage) { %>
     <li class="page-item">
-      <a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a>
+      <a href="?<%= queryString %>&page=<%= currentPage + 1 %>" class="page-link">Next</a>
     </li>
-    <% }else { %>
+    <% } else { %>
     <li class="page-item disabled">
       <a href="#" class="page-link">Next</a>
     </li>
     <% } %>
 
-    <!-- Last Page link -->
+    <!-- Last Page Link -->
     <% if (currentPage == totalPages) { %>
     <li class="page-item disabled">
-      <a href="#" class="page-link">...</a>
+      <a href="#" class="page-link">Last</a>
     </li>
-    <% }else{ %>
+    <% } else { %>
     <li class="page-item">
-      <a href="?page=<%= totalPages %>" class="page-link">Last</a>
+      <a href="?<%= queryString %>&page=<%= totalPages %>" class="page-link">Last</a>
     </li>
     <% } %>
   </ul>

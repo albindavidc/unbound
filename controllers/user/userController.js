@@ -13,6 +13,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const { checkout } = require("../../routes/userRouter");
 
+// Page Not Found
 const pageNotFound = async (req, res) => {
   try {
     return res.render("user/page-404");
@@ -21,6 +22,7 @@ const pageNotFound = async (req, res) => {
   }
 };
 
+// Load Home Page
 const loadHomepage = async (req, res) => {
   try {
     const userId = req.session.user;
@@ -42,6 +44,7 @@ const loadHomepage = async (req, res) => {
   }
 };
 
+// Load Signup
 const loadSignup = async (req, res) => {
   try {
     const user = req.session.user;
@@ -87,6 +90,7 @@ async function sendVerificationEmail(email, otp) {
   }
 }
 
+// Signup
 const signup = async (req, res) => {
   try {
     const { name, phone, email, password, cPassword, referrals, referrer } = req.body;
@@ -246,6 +250,7 @@ const loadLogin = async (req, res) => {
   }
 };
 
+// Login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -284,6 +289,7 @@ const getFrogotPass = async (req, res) => {
   res.render("user/forgotPassword");
 };
 
+// Forgot Password
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -319,6 +325,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
+// Verify Forgot Password
 const forgotPassVerifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
@@ -358,6 +365,7 @@ const passwordReset = async (req, res) => {
   res.render("user/forgot-password-cpassword");
 };
 
+// Reset Password
 const passwordChange = async (req, res) => {
   try {
     const { password, confirmPassword } = req.body;
@@ -427,7 +435,6 @@ const logout = async (req, res) => {
 };
 
 // Get Profile
-
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.session.user;
@@ -469,7 +476,6 @@ const getUserProfile = async (req, res) => {
 };
 
 // Edit Profile
-
 const editProfile = async (req, res) => {
   try {
     const userId = req.session.user;
@@ -575,6 +581,7 @@ const getEditAddress = async (req, res) => {
   }
 };
 
+// Edit Address
 const editAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
@@ -596,6 +603,7 @@ const editAddress = async (req, res) => {
   }
 };
 
+// Delete Address
 const deleteAddress = async (req, res) => {
   let id = req.params.id;
   try {
@@ -610,6 +618,7 @@ const deleteAddress = async (req, res) => {
   }
 };
 
+// Get Referrals
 const getReferrals = async (req, res) => {
   const user = await User.findOne({ _id: req.session.user }).populate("referralCode referrals");
 
