@@ -196,6 +196,9 @@
   <%- include('./pagination') %>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 <script>
   // Delete Coupon
   const deleteCoupon = async (couponCode) => {
@@ -275,6 +278,30 @@
       const couponMinPurchaseAmount = parseFloat(document.getElementById("coupon_min_purchase_amount").value);
       const startingDate = document.getElementById("starting_date").value;
       const expiringDate = document.getElementById("expiring_date").value;
+
+      let now = new Date();
+      now.setDate(now.getDate() + 1)
+
+      now.setHours(0, 0, 0, 0); // Set current time to 00:00 for comparison
+
+      // Convert input values to Date objects
+      let diffStartDate = new Date(document.getElementById("starting_date").value);
+      let diffEndDate = new Date(document.getElementById("expiring_date").value);
+
+      // Check if dates are valid before comparing
+      if (diffStartDate < now || diffEndDate < now) {
+        return Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Kindly select present or future dates for coupons",
+        });
+      } else if (diffStartDate > diffEndDate) {
+        return Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "End date must be after start date",
+        });
+      }
 
       // Perform fetch request if form is valid
       fetch("/admin/addCoupon", {
@@ -516,7 +543,6 @@
         return [year, month, day].join("-");
       };
 
-      console.log("this is couponId", couponId);
       fetch(`/admin/getCoupon/${couponId}`)
         .then((response) => response.json())
         .then((data) => {
@@ -682,6 +708,31 @@
     const couponMinPurchaseAmount = parseFloat(document.getElementById("edit_coupon_min_purchase_amount").value);
     const startingDate = document.getElementById("edit_starting_date").value;
     const expiringDate = document.getElementById("edit_expiring_date").value;
+
+    let now = new Date();
+    now.setDate(now.getDate() + 1)
+
+    now.setHours(0, 0, 0, 0); // Set current time to 00:00 for comparison
+
+    // Convert input values to Date objects
+    let diffStartDate = new Date(document.getElementById("edit_starting_date").value);
+    let diffEndDate = new Date(document.getElementById("edit_expiring_date").value);
+
+    // Check if dates are valid before comparing
+    if (diffStartDate < now || diffEndDate < now) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Kindly select present or future dates for coupons",
+      });
+    } else if (diffStartDate > diffEndDate) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "End date must be after start date",
+      });
+    }
+
 
     fetch(`/admin/updateCoupon/${couponId}`, {
       method: "PUT",
