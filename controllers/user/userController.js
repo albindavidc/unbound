@@ -26,7 +26,6 @@ const pageNotFound = async (req, res) => {
 // Load Home Page
 const loadHomepage = async (req, res) => {
   try {
-    
     const userId = req.session.user;
     let cart = await Cart.findOne({ userId });
     let wishlist = await Wishlist.findOne({userId})
@@ -54,14 +53,11 @@ const loadHomepage = async (req, res) => {
 // Load Signup
 const loadSignup = async (req, res) => {
   try {
-    const locals = {
-      title: "Signup",
-    };
     const user = req.session.user;
     if ((user = req.session.user)) {
       res.render("user/home", { user: req.session.user });
     } else {
-      return res.render("user/signup",{locals});
+      return res.render("user/signup");
     }
   } catch (error) {
     res.status(500).send("Server Error");
@@ -117,6 +113,7 @@ const signup = async (req, res) => {
     }
 
     const otp = generateOtp();
+    console.log(otp);
 
     const emailSent = await sendVerificationEmail(email, otp);
 
@@ -267,14 +264,6 @@ const login = async (req, res) => {
 
     const findUser = await User.findOne({ isAdmin: 0, email: email });
 
-    const passwordMatch = await bcrypt.compare(password, findUser.password);
-
-    if (!passwordMatch) {
-      return res.render("user/signup", {
-        message: "Entered Incorrect password",
-      });
-    }
-
     if (!findUser) {
       return res.render("user/signup", { message: "User not found" });
     }
@@ -285,7 +274,13 @@ const login = async (req, res) => {
       });
     }
 
-  
+    const passwordMatch = await bcrypt.compare(password, findUser.password);
+
+    if (!passwordMatch) {
+      return res.render("user/signup", {
+        message: "Entered Incorrect password",
+      });
+    }
 
     req.session.user = findUser._id;
 

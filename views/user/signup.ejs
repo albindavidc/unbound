@@ -35,17 +35,17 @@
         <div id="error5" class="error-message"></div>
       </div>
 
-        <div class="elementsField">
-          <input
-            type="text"
-            name="referrals"
-            id="referrals"
-            value="<%= typeof referrals !== undefined ? referrals : '' %>"
-            placeholder="Referrals(Optional)"
-          />
-          <div id="error6" class="error-message"></div>
-        </div>
-       
+      <div class="elementsField">
+        <input
+          type="text"
+          name="referrals"
+          id="referrals"
+          value="<%= typeof referrals !== undefined ? referrals : '' %>"
+          placeholder="Referrals(Optional)"
+        />
+        <div id="error6" class="error-message"></div>
+      </div>
+
       <%if(locals.message && message.length>0){%>
       <div class="alert alert-danger text-center"><%=message%></div>
       <%}%>
@@ -57,9 +57,7 @@
   <div class="form-container sign-in-container">
     <form id="loginform" method="post" action="/login">
       <h1 style="padding: 2rem">Sign in</h1>
-      <div class="social-container">
-        <a href="/auth/google" class="social"><i class="fab fa-google-plus-g"></i></a>
-      </div>
+
       <span>or use your account</span>
 
       <div class="elementsField">
