@@ -6,9 +6,9 @@ const Wallet = require("../../models/walletSchema");
 const User = require("../../models/userSchema");
 const Payment = require("../../models/paymentSchema");
 
+const fs = require("fs");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-
 
 const path = require("path");
 const PDFDocument = require("pdfkit");
@@ -340,12 +340,11 @@ module.exports = {
       res.setHeader("Content-disposition", `attachment; filename="${filename}"`);
       res.setHeader("Content-type", "application/pdf");
 
-      const logoPath = `./public/uploads/profile/logo.png`
+      const logoPath = `./public/uploads/profile/logo.png`;
       const logoImage = fs.readFileSync(logoPath);
 
-      doc.image(logoImage, {fit: [150, 150], align: 'center', valign: 'top'})
+      doc.image(logoImage, { fit: [100, 100], align: "center", valign: "top" });
       doc.moveDown();
-
 
       // Header
       doc.fontSize(24).text("Order Invoice", { align: "center" }).moveDown();
@@ -362,6 +361,10 @@ module.exports = {
 
       // Draw Header
       const drawHeader = () => {
+        doc.moveTo(margin.left, yPosition).lineTo(550, yPosition).stroke();
+
+        yPosition += 20;
+
         doc.fontSize(12).font("Helvetica-Bold");
         doc.text("Date", margin.left, yPosition);
         doc.text("Products", margin.left + columnWidths.date, yPosition);
@@ -406,10 +409,55 @@ module.exports = {
 
       // Footer
       const drawFooter = () => {
-        yPosition += 200; // Move down
+        yPosition += 100;
         doc.fontSize(12).font("Helvetica-Bold");
+
+        doc
+          .moveTo(margin.left, yPosition - 10)
+          .lineTo(margin.left + 500, yPosition - 10)
+          .stroke();
+
         doc.text(`Total Quantity: ${totalQuantity}`, margin.left, yPosition);
         doc.text(`Total Price: ${totalPrice.toFixed(2)}`, margin.left + 200, yPosition);
+
+        yPosition += 30;
+
+        doc
+          .moveTo(margin.left, yPosition - 10)
+          .lineTo(margin.left + 500, yPosition - 10)
+          .stroke();
+
+          yPosition += 20;
+
+        // Shipping Address details
+        doc.fontSize(10).font("Helvetica");
+        doc.text(`Shipping Address:`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`Name: ${order.shippingAddress.name}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`House Name: ${order.shippingAddress.houseName}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`Locality: ${order.shippingAddress.locality}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`Area/Street: ${order.shippingAddress.areaStreet}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`Phone: ${order.shippingAddress.phone}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`Zipcode: ${order.shippingAddress.zipcode}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`State: ${order.shippingAddress.state}`, margin.left, yPosition);
+
+        yPosition += 15;
+        doc.text(`Landmark: ${order.shippingAddress.landmark}`, margin.left, yPosition);
+
+        yPosition += 30;
       };
 
       drawFooter();
@@ -418,6 +466,7 @@ module.exports = {
       doc.pipe(res);
       doc.end();
     } catch (error) {
+      console.log(error, "this is fantastic error");
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
