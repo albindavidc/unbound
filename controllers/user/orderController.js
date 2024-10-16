@@ -85,7 +85,19 @@ module.exports = {
       const orders = await Order.findById(orderId);
       const payment = await Payment.find({ orderId: order._id });
 
-      res.render("user/order", { order, orderId, user: req.session.user, user, orders, payment });
+      let totalPrice
+      let newOrderId
+      let createdDate
+
+      order.forEach(item =>{
+        totalPrice = item.totalPrice
+        newOrderId = item._id
+        createdDate = new Date(item.createdAt).toLocaleDateString()
+      })
+
+      console.log(totalPrice, newOrderId, createdDate, "this is the total price")
+
+      res.render("user/order", { totalPrice, newOrderId, createdDate, order, orderId, user: req.session.user, user, orders, payment });
     } catch (error) {
       res.status(500).send("Server Error");
     }

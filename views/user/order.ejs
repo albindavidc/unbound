@@ -66,28 +66,26 @@
   <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-12 col-md-10">
-        <!-- Iterate over each order -->
-        <% order.forEach(singleOrder => { %>
-        <!-- Check if the order ID matches the selected orderId -->
         <!-- Order Summary -->
         <div class="order-summary mb-4 p-4 border rounded bg-light shadow">
           <h4 class="mb-3">Order Details</h4>
           <button
-            class="btn btn-outline-success ms-auto d-flex justify-content-end align-items-center"
-            onclick="downloadPdf('<%= singleOrder._id %>')"
-            id="downloadPdf"
+          class="btn btn-outline-success ms-auto d-flex justify-content-end align-items-center"
+          onclick="downloadPdf('<%= newOrderId %>')"
+          id="downloadPdf"
           >
-            Download Invoice
-          </button>
-          <p><strong>Order Number:</strong> <%= singleOrder._id %></p>
-
-          <p><strong>Order Date:</strong> <%= new Date(singleOrder.createdAt).toLocaleDateString() %></p>
-          <p><strong>Total(Including delivery charge) : </strong> ₹<%= singleOrder.totalPrice %></p>
-        </div>
-
-        <!-- Items List -->
-        <div class="items-list mb-4">
-          <h5 class="mb-3">Items in Your Order</h5>
+          Download Invoice
+        </button>
+        <p><strong>Order Number:</strong> <%= newOrderId %></p>
+        
+        <p><strong>Order Date:</strong> <%= createdDate %></p>
+        <p><strong>Total(Including delivery charge) : </strong> ₹<%= totalPrice %></p>
+      </div>
+      
+      <!-- Items List -->
+      <div class="items-list mb-4">
+        <h5 class="mb-3">Items in Your Order</h5>
+        <% order.forEach(singleOrder => { %>
           <% if (singleOrder._id.toString() === orderId.toString()) { %> <% singleOrder.items.forEach((item, index) => { %>
           <div class="order-item p-3 mb-3 border rounded shadow">
             <div class="row align-items-center">
@@ -125,13 +123,22 @@
                 <% } else { %>
                 <p><strong>Delivery Date:</strong> --</p>
                 <p><strong>Return By:</strong> --</p>
-                <% } %> <% if (item.paymentStatus === "Pending") { %>
+                <% } %> 
+                
+                <% if (singleOrder.paymentMethod === "Online" && item.paymentStatus === "Pending") { %>
                 <div class="d-flex d-row align-items-center">
                   <div class="">
                     <button class="btn btn-outline-success complete_payment_button mr-4">Complete payment</button>
                   </div>
                   <div id="timer"></div>
                 </div>
+                <% } %>
+                <% if (singleOrder.paymentMethod === "COD" && item.paymentStatus === "Pending") { %>
+                  <div class="d-flex d-row align-items-center">
+                    <div class="">
+                      <button class="btn btn-outline-success complete_payment_button mr-4">Complete payment</button>
+                    </div>
+                  </div>
                 <% } %>
 
                 <!-- Actions -->
@@ -228,7 +235,7 @@
                               <small id="wordCount-<%= item.orderID %>">0/1000 words</small>
                             </div>
 
-                            <%= console.log(item) %> <% if (item.paymentStatus.toString() === "Paid") { %>
+                            <% if (item.paymentStatus.toString() === "Paid") { %>
 
                             <div class="mb-3 row mt-4">
                               <label for="orderCancelRefundMethod-<%= item.orderID%>" class="form-label">Refund method</label>
@@ -409,43 +416,65 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
   const orders = <%- JSON.stringify(orders) %>;
 
-  if (orders.paymentMethod !== 'COD') {
-    let countTimer = 600;
+  if (orders.length > 0) {
+    const order = orders[0]; 
 
-    function startCount() {
-      const timerId = document.getElementById("timer");
-      const cancelButton = document.querySelector(".cancel-btn");
-      const continueButton = document.querySelector(".complete_payment_button");
+    if (order.paymentMethod === 'Online') {
+      let countTimer = 600; 
 
-      const createdAtTime = new Date(orders.createdAt).getTime();  // Store the order created time
-      const deadlineTime = createdAtTime + (countTimer * 1000);  // Add the countTimer in milliseconds
+      function startCount() {
+        const timerId = document.getElementById("timer");
+        const cancelButton = document.querySelector(".cancel-btn");
+        const continueButton = document.querySelector(".complete_payment_button");
 
-      const countdownInterval = setInterval(() => {
-        const currentTime = Date.now();
-        const timeLeft = Math.floor((deadlineTime - currentTime) / 1000);  // Time remaining in seconds
+        const createdAtTime = new Date(order.createdAt).getTime(); 
+        const currentTime = Date.now(); 
 
-        if (timeLeft > 0) {
-          let minutes = Math.floor(timeLeft / 60);
-          let seconds = timeLeft % 60;
+        const timePassed = Math.floor((currentTime - createdAtTime) / 1000);
 
-          minutes = minutes < 10 ? "0" + minutes : minutes;
-          seconds = seconds < 10 ? "0" + seconds : seconds;
+        let timeLeft = countTimer - timePassed;
 
-          timerId.textContent = `Make the payment before the time ${minutes}:${seconds}`;
-        } else {
-          // Time is up
-          clearInterval(countdownInterval);
+        if (timeLeft <= 0) {
           timerId.textContent = "Your time is over for making the payments";
-          cancelButton.style.display = "none";
-          continueButton.style.display = "none";
-          continueButton.style.margin = "0";
+          if (cancelButton) cancelButton.style.display = "none";
+          if (continueButton) {
+            continueButton.style.display = "none";
+            continueButton.style.margin = "0";
+          }
+          return; 
         }
-      }, 1000);
-    }
 
-    startCount();
+        const countdownInterval = setInterval(() => {
+          const currentTime = Date.now(); 
+
+          const timePassed = Math.floor((currentTime - createdAtTime) / 1000);
+          timeLeft = countTimer - timePassed;
+
+          if (timeLeft > 0) {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            timerId.textContent = `Make the payment before the time ${minutes}:${seconds}`;
+          } else {
+            clearInterval(countdownInterval);
+            timerId.textContent = "Your time is over for making the payments";
+            if (cancelButton) cancelButton.style.display = "none";
+            if (continueButton) {
+              continueButton.style.display = "none";
+              continueButton.style.margin = "0";
+            }
+          }
+        }, 1000); 
+      }
+
+      startCount(); 
+    }
   }
 </script>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -453,7 +482,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (completePayment) {
       const orders = <%- JSON.stringify(orders) %>;
       const user = <%- JSON.stringify(user) %>;
-      console.log( orders,orders.totalPrice, "this is the order page order and user" )
 
       completePayment.addEventListener("click", async function (e) {
         e.preventDefault();
