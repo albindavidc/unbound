@@ -5,6 +5,7 @@ const Product = require("../../models/productSchema");
 const Color = require("../../models/attributes/colorSchema");
 const Size = require("../../models/attributes/sizeSchema");
 const Customize = require("../../models/customizedProduct");
+// const { default: items } = require("razorpay/dist/types/items");
 
 module.exports = {
   // Get Order List
@@ -72,7 +73,7 @@ module.exports = {
     try {
       const { orderId } = req.params;
       const { itemIndex, status } = req.body;
-      const order = await Order.findById(orderId);
+      const order = await Order.findById(orderId).populate("items.productId", "items.productId.ratings");
       order.items[itemIndex].status = status;
 
       console.log("this is order", order);
@@ -103,7 +104,25 @@ module.exports = {
           return res.status(400).json({ error: "Invalid delivery status" });
       }
 
+      if (status == "Delivered") {
+        const order = await Order.findById(orderId)
+        .populate({
+          path: "items.productId",
+          select: "ratings"
+        });
+
+        const product = order.items[itemIndex].productId
+
+        product.ratings.push({
+            orderId: order.items[itemIndex]._id,
+        })
+        console.log(orderId, product.ratings, product, "these are important details")
+        await product.save();
+
+      }
+
       await order.save();
+
       res.json({ success: true, message: "Order updated successfully" });
     } catch (error) {
       console.error(error);

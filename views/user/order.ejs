@@ -268,35 +268,38 @@
               <hr class="mt-4 ml-3" style="width: 700px" />
 
               <div class="ml-2">
-                <%= console.log(item, "this is rating") %> <% item.productId.ratings.forEach(rating => { %> <% if (rating.orderId === item._id) { %>
+               <% item.productId.ratings.forEach(rating => { %> 
+                  
+                <% if (rating.orderId == item._id) { %>
 
-                <h3>Reviews & Rating</h3>
-
-                <div class="rating mt-4" id="starRating" data-product-id="" data-order-id="">
-                  <% for( let i = 1; i <= 5; i++ ) { %>
-                  <i class="fa fa-star <%= i <= rating.rating ? 'text-warning': 'disabled' %>" data-value="<%= i %>"></i>
-                  <% } %>
-                </div>
-
-                <p class="mt-4">Review: <%= rating.review %></p>
-
+                  <div class="col mt-4 mb-3">
+                    <h3>Reviews & Rating</h3>
+                    <div class="rating mt-4" id="starRating" data-product-id="<%= item.productId._id %>" data-order-id="<%= item._id %>">
+                      <i class="fa fa-star" data-value="1"></i>
+                      <i class="fa fa-star" data-value="2"></i>
+                      <i class="fa fa-star" data-value="3"></i>
+                      <i class="fa fa-star" data-value="4"></i>
+                      <i class="fa fa-star" data-value="5"></i>
+                    </div>
+                    <div class="review ml-0 pl-0">
+                      <textarea id="reviewText" class="table" placeholder="Write your review here..." rows="4"></textarea>
+                      <div id="reviewMessage"></div>
+                    </div>
+                    <button id="submitReview" class="btn btn-primary">Submit Review</button>
+                  </div>
+               
                 <% }else{ %>
 
-                <div class="col mt-4 mb-3">
                   <h3>Reviews & Rating</h3>
-                  <div class="rating mt-4" id="starRating" data-product-id="<%= item.productId._id %>" data-order-id="<%= item._id %>">
-                    <i class="fa fa-star" data-value="1"></i>
-                    <i class="fa fa-star" data-value="2"></i>
-                    <i class="fa fa-star" data-value="3"></i>
-                    <i class="fa fa-star" data-value="4"></i>
-                    <i class="fa fa-star" data-value="5"></i>
+
+                  <div class="rating mt-4" id="starRating" data-product-id="" data-order-id="">
+                    <% for( let i = 1; i <= 5; i++ ) { %>
+                    <i class="fa fa-star <%= i <= rating.rating ? 'text-warning': 'disabled' %>" data-value="<%= i %>"></i>
+                    <% } %>
                   </div>
-                  <div class="review ml-0 pl-0">
-                    <textarea id="reviewText" class="table" placeholder="Write your review here..." rows="4"></textarea>
-                    <div id="reviewMessage"></div>
-                  </div>
-                  <button id="submitReview" class="btn btn-primary">Submit Review</button>
-                </div>
+  
+                  <p class="mt-4">Review: <%= rating.review %></p>
+               
                 <% } %> <% }) %>
               </div>
             </div>

@@ -85,6 +85,8 @@ module.exports = {
       const orders = await Order.findById(orderId);
       const payment = await Payment.find({ orderId: order._id });
 
+
+
       res.render("user/order", { order, orderId, user: req.session.user, user, orders, payment });
     } catch (error) {
       res.status(500).send("Server Error");
@@ -491,7 +493,8 @@ module.exports = {
         rating: parseInt(rating),
         review: review,
         user: req.session.user,
-        orderId: orderId,
+        // orderId: orderId,
+        createdAt: new Date(),
       });
       await product.save();
 
