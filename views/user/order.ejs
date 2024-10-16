@@ -69,7 +69,6 @@
         <!-- Iterate over each order -->
         <% order.forEach(singleOrder => { %>
         <!-- Check if the order ID matches the selected orderId -->
-        <% if (singleOrder._id.toString() === orderId.toString()) { %> <% singleOrder.items.forEach((item, index) => { %>
         <!-- Order Summary -->
         <div class="order-summary mb-4 p-4 border rounded bg-light shadow">
           <h4 class="mb-3">Order Details</h4>
@@ -89,6 +88,7 @@
         <!-- Items List -->
         <div class="items-list mb-4">
           <h5 class="mb-3">Items in Your Order</h5>
+          <% if (singleOrder._id.toString() === orderId.toString()) { %> <% singleOrder.items.forEach((item, index) => { %>
           <div class="order-item p-3 mb-3 border rounded shadow">
             <div class="row align-items-center">
               <div class="col-md-4">
@@ -268,39 +268,37 @@
               <hr class="mt-4 ml-3" style="width: 700px" />
 
               <div class="ml-2">
-               <% item.productId.ratings.forEach(rating => { %> 
-                  
-                <% if (rating.orderId == item._id) { %>
-
-                  <div class="col mt-4 mb-3">
-                    <h3>Reviews & Rating</h3>
-                    <div class="rating mt-4" id="starRating" data-product-id="<%= item.productId._id %>" data-order-id="<%= item._id %>">
-                      <i class="fa fa-star" data-value="1"></i>
-                      <i class="fa fa-star" data-value="2"></i>
-                      <i class="fa fa-star" data-value="3"></i>
-                      <i class="fa fa-star" data-value="4"></i>
-                      <i class="fa fa-star" data-value="5"></i>
-                    </div>
-                    <div class="review ml-0 pl-0">
-                      <textarea id="reviewText" class="table" placeholder="Write your review here..." rows="4"></textarea>
-                      <div id="reviewMessage"></div>
-                    </div>
-                    <button id="submitReview" class="btn btn-primary">Submit Review</button>
-                  </div>
-               
-                <% }else{ %>
-
+                <% if (item.status === "Delivered") { %> 
+                <% item.productId.ratings.forEach(rating => { %>                   
+                <% if(!rating.review){ %>
+                <div class="col mt-4 mb-3">
                   <h3>Reviews & Rating</h3>
+                  <div class="rating mt-4" id="starRating-<%= item.productId._id %>" data-product-id="<%= item.productId._id %>" data-order-id="<%= item._id %>">
+                    <i class="fa fa-star" data-value="1"></i>
+                    <i class="fa fa-star" data-value="2"></i>
+                    <i class="fa fa-star" data-value="3"></i>
+                    <i class="fa fa-star" data-value="4"></i>
+                    <i class="fa fa-star" data-value="5"></i>
+                  </div>
+                  <div class="review ml-0 pl-0">
+                    <textarea id="reviewText-<%= item.productId._id %>" class="table" placeholder="Write your review here..." rows="4"></textarea>
+                    <div id="reviewMessage-<%= item.productId._id %>"></div>
+                  </div>
+                  <button id="submitReview-<%= item.productId._id %>" class="btn btn-primary">Submit Review</button>
+                </div>
 
-                  <div class="rating mt-4" id="starRating" data-product-id="" data-order-id="">
-                    <% for( let i = 1; i <= 5; i++ ) { %>
+                <% } else { %>
+                <h3>Reviews & Rating</h3>
+
+                <div class="rating mt-4" id="starRating" data-product-id="<%= item.productId._id %>" data-order-id="<%= item._id %>">
+                  <% for( let i = 1; i <= 5; i++ ) { %>
                     <i class="fa fa-star <%= i <= rating.rating ? 'text-warning': 'disabled' %>" data-value="<%= i %>"></i>
                     <% } %>
-                  </div>
-  
-                  <p class="mt-4">Review: <%= rating.review %></p>
-               
-                <% } %> <% }) %>
+                </div>
+
+                <p class="mt-4">Review: <%= rating.review %></p>
+
+                <% } %> <% }) %> <% } %>
               </div>
             </div>
           </div>
@@ -329,13 +327,23 @@
 </section>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    let selectedRating = 0;
-    const stars = document.querySelectorAll("#starRating i");
-    const productId = document.querySelector("#starRating").dataset.productId;
-    const orderId = document.querySelector("#starRating").dataset.orderId;
-    const reviewMessage = document.getElementById("reviewMessage");
+document.addEventListener("DOMContentLoaded", () => {
+  // Select all rating sections by their data-product-id attribute
+  const ratingSections = document.querySelectorAll("[data-product-id]");
 
+  ratingSections.forEach(section => {
+    let selectedRating = 0;
+
+    // Get the stars, productId, and orderId for each section
+    const stars = section.querySelectorAll("i");
+    const productId = section.getAttribute("data-product-id");
+    const orderId = section.getAttribute("data-order-id");
+
+    const reviewMessage = document.getElementById(`reviewMessage-${productId}`);
+    const reviewTextElement = document.getElementById(`reviewText-${productId}`);
+    const submitReviewButton = document.getElementById(`submitReview-${productId}`);
+
+    // Handle star rating selection
     stars.forEach((star) => {
       star.addEventListener("click", () => {
         selectedRating = star.getAttribute("data-value");
@@ -347,41 +355,55 @@
       });
     });
 
-    document.getElementById("submitReview").addEventListener("click", () => {
-      const reviewText = document.getElementById("reviewText").value;
+    // Handle review submission
+    if (submitReviewButton) {
+      submitReviewButton.addEventListener("click", () => {
+        const reviewText = reviewTextElement.value;
 
-      if (!selectedRating || !reviewText.trim()) {
-        reviewMessage.textContent = "Please provide both rating and review.";
-        return;
-      }
+        if (!selectedRating || !reviewText.trim()) {
+          reviewMessage.textContent = "Please provide both rating and review.";
+          return;
+        }
 
-      //MAKE API CALL TO SUBMIT
-      fetch(`/submit-review/${productId}/${orderId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rating: selectedRating,
-          review: reviewText,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            document.getElementById("reviewMessage").textContent = "Thankyou for your review";
-            document.getElementById("reviewText").value = "";
-            stars.forEach((star) => star.classList.remove("checked"));
-            selectedRating = 0;
-          } else {
-            document.getElementById("reviewMessage").textContent = "There was an error while submitting your review";
-          }
+        // Make API call to submit the review
+        fetch(`/submit-review/${productId}/${orderId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rating: selectedRating,
+            review: reviewText,
+          }),
         })
-        .catch((error) => {
-          document.getElementById("reviewMessage").textContent = "An error occurred, Please try again";
-        });
-    });
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "You have successfully entered your review",
+              }).then(() => {
+                window.location.reload();
+              });
+
+              reviewMessage.textContent = "Thank you for your review";
+              reviewTextElement.value = "";
+              stars.forEach((star) => star.classList.remove("checked"));
+              selectedRating = 0;
+            } else {
+              reviewMessage.textContent = "There was an error while submitting your review";
+            }
+          })
+          .catch((error) => {
+            reviewMessage.textContent = "An error occurred. Please try again.";
+          });
+      });
+    }
   });
+});
+
+
 </script>
 
 <script>

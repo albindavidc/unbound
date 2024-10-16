@@ -85,8 +85,6 @@ module.exports = {
       const orders = await Order.findById(orderId);
       const payment = await Payment.find({ orderId: order._id });
 
-
-
       res.render("user/order", { order, orderId, user: req.session.user, user, orders, payment });
     } catch (error) {
       res.status(500).send("Server Error");
@@ -429,7 +427,7 @@ module.exports = {
           .lineTo(margin.left + 500, yPosition - 10)
           .stroke();
 
-          yPosition += 20;
+        yPosition += 20;
 
         // Shipping Address details
         doc.fontSize(10).font("Helvetica");
@@ -484,22 +482,51 @@ module.exports = {
       }
 
       const product = await Product.findById(productId);
+      const userId = req.session.user;
 
       if (!product) {
         return res.status(404).json({ success: false, message: "Product not found" });
       }
 
-      product.ratings.push({
-        rating: parseInt(rating),
-        review: review,
-        user: req.session.user,
-        // orderId: orderId,
-        createdAt: new Date(),
-      });
-      await product.save();
+      // First, check if a rating already exists for the user and order
+      const existingRating = product.ratings.find(
+        (rating) => rating.user.toString() === userId.toString() && rating.orderId.toString() === orderId.toString()
+      );
+
+      if (existingRating) {
+        // If rating exists, update it using an array filter
+        await Product.findOneAndUpdate(
+          { _id: product._id, "ratings.user": userId, "ratings.orderId": orderId },
+          {
+            $set: {
+              "ratings.$.rating": parseInt(rating), // Target the existing rating and update fields as needed
+              "ratings.$.review": review,
+              "ratings.$.createdAt": new Date(),
+              // Add any other fields you want to update, e.g. rating, review, etc.
+            },
+          },
+          { new: true, upsert: true }
+        );
+      } else {
+        // If rating doesn't exist, push a new one
+        await Product.findOneAndUpdate(
+          { _id: product._id },
+          {
+            $push: {
+              ratings: {
+                rating: parseInt(rating),
+                review: review,
+                createdAt: new Date(),
+              },
+            },
+          },
+          { new: true, upsert: true }
+        );
+      }
 
       res.json({ success: true, message: "Review added successfully!" });
     } catch (error) {
+      console.log(error, "this is error")
       res.status(500).json({ success: false, message: "Server error. Please try again later" });
     }
   },

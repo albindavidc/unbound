@@ -105,20 +105,51 @@ module.exports = {
       }
 
       if (status == "Delivered") {
-        const order = await Order.findById(orderId)
-        .populate({
+        const order = await Order.findById(orderId).populate({
           path: "items.productId",
-          select: "ratings"
+          select: "ratings",
         });
 
-        const product = order.items[itemIndex].productId
+        const product = order.items[itemIndex].productId;
+        const userId = order.customerId;
+        const itemOrderId = order.items[itemIndex]._id;
 
-        product.ratings.push({
-            orderId: order.items[itemIndex]._id,
-        })
-        console.log(orderId, product.ratings, product, "these are important details")
-        await product.save();
+        // First, check if a rating already exists for the user and order
+        const existingRating = product.ratings.find(
+          (rating) => rating.user.toString() === userId.toString() && rating.orderId.toString() === itemOrderId.toString()
+        );
 
+        if (existingRating) {
+          // If rating exists, update it using an array filter
+          await Product.findOneAndUpdate(
+            { _id: product._id, "ratings.user": userId, "ratings.orderId": itemOrderId },
+            {
+              $set: {
+                "ratings.$.user": userId, // Target the existing rating and update fields as needed
+                "ratings.$.orderId": itemOrderId,
+                // Add any other fields you want to update, e.g. rating, review, etc.
+              },
+            },
+            { new: true, upsert: true }
+          );
+        } else {
+          // If rating doesn't exist, push a new one
+          await Product.findOneAndUpdate(
+            { _id: product._id },
+            {
+              $push: {
+                ratings: {
+                  user: userId,
+                  orderId: itemOrderId,
+                  // Add other fields like rating, review, etc.
+                },
+              },
+            },
+            { new: true, upsert: true }
+          );
+        }
+
+        console.log(product, "this is productId");
       }
 
       await order.save();
