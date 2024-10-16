@@ -16,6 +16,7 @@ const PDFDocument = require("pdfkit");
 const { loadProductDetails } = require("./productController");
 
 module.exports = {
+  // Get Orders
   getOrders: async (req, res) => {
     let userId = req.session.user;
     const product = await Product.find({});
@@ -339,10 +340,17 @@ module.exports = {
       res.setHeader("Content-disposition", `attachment; filename="${filename}"`);
       res.setHeader("Content-type", "application/pdf");
 
-      // Header
-      doc.fontSize(15).text("Order Invoice", { align: "center" }).moveDown();
+      const logoPath = `./public/uploads/profile/logo.png`
+      const logoImage = fs.readFileSync(logoPath);
 
-      const margin = { left: 20, top: 100, bottom: 100 };
+      doc.image(logoImage, {fit: [150, 150], align: 'center', valign: 'top'})
+      doc.moveDown();
+
+
+      // Header
+      doc.fontSize(24).text("Order Invoice", { align: "center" }).moveDown();
+
+      const margin = { left: 20, top: 100, bottom: 50 };
       const columnWidths = {
         date: 80,
         products: 150,
