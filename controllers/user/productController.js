@@ -79,7 +79,7 @@ module.exports = {
       const colors = await Color.find({ isListed: true });
       const variants = await Variants.find({});
 
-      const perPage = 6;
+      const perPage = 9;
       const page = parseInt(req.query.page) || 1;
 
       const searchQuery = { name: { $regex: search, $options: "i" } };
