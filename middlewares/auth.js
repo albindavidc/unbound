@@ -9,7 +9,9 @@ const userAuth = (req, res, next) => {
         if (data && !data.isBlocked) {
           next();
         } else {
-          res.redirect("/login");
+          req.session.destroy((err) => {
+            res.redirect("/login");
+          });
         }
       })
       .catch((error) => {
@@ -26,7 +28,9 @@ const adminAuth = (req, res, next) => {
       if (data) {
         next();
       } else {
-        res.redirect("/admin/login");
+        req.session.destroy((err) => {
+          res.redirect("/admin/login");
+        });
       }
     })
     .catch((error) => {
