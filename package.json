@@ -19,7 +19,7 @@
     "cropper": "^4.1.0",
     "debug": "~2.6.9",
     "dotenv": "^16.4.5",
-    "ejs": "^6.0.1",
+    "ejs": "^3.1.10",
     "exceljs": "^4.4.0",
     "express": "^4.19.2",
     "express-session": "^1.18.0",

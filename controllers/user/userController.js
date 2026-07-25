@@ -18,7 +18,7 @@ const pageNotFound = async (req, res) => {
   try {
     return res.render("user/page-404");
   } catch (error) {
-    res.status(500).send("Server Error: Could not render 404 page. " + error.message + "\\nStack: " + error.stack);
+    res.status(500).send("Server Error: Could not render 404 page.");
   }
 };
 
