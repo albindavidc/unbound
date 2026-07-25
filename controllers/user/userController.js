@@ -18,7 +18,7 @@ const pageNotFound = async (req, res) => {
   try {
     return res.render("user/page-404");
   } catch (error) {
-    res.status(500).send("Server Error: Could not render 404 page");
+    res.status(500).send("Server Error: Could not render 404 page. " + error.message + "\\nStack: " + error.stack);
   }
 };
 
@@ -126,7 +126,7 @@ const signup = async (req, res) => {
 
     res.redirect("/verify-otp");
   } catch (error) {
-    res.redirect("/pageNotFound");
+    res.status(500).send("Error in signup: " + error.message);
   }
 };
 
@@ -252,7 +252,7 @@ const loadLogin = async (req, res) => {
 
     return res.render("user/signup", { referrals, referrer });
   } catch (error) {
-    res.redirect("/pageNotFound");
+    res.status(500).send("Error in loadLogin: " + error.message);
   }
 };
 
@@ -430,13 +430,13 @@ const logout = async (req, res) => {
     }
     req.session.destroy((err) => {
       if (err) {
-        return res.redirect("/pageNotFound");
+        return res.status(500).send("Error in logout: " + err.message);
       }
       return res.redirect("/login");
     });
   } catch (error) {
     console.log("Logout error", error);
-    res.redirect("/pageNotFound");
+    res.status(500).send("Logout error: " + error.message);
   }
 };
 
