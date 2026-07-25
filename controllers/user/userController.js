@@ -11,7 +11,7 @@ const Cart = require("../../models/cartSchema");
 const Wishlist = require("../../models/wishlistSchema")
 
 const nodemailer = require("nodemailer");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { checkout } = require("../../routes/userRouter");
 
 // Page Not Found

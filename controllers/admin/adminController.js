@@ -6,7 +6,7 @@ const Order = require("../../models/orderSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/attributes/brandSchema");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 //Page-error
 const pageerror = async (req, res) => {

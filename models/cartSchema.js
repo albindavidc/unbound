@@ -1,7 +1,7 @@
 // cartSchema.js
 
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Product = require("./productSchema");
 const Coupon = require("./couponSchema");
 
