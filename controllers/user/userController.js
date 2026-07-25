@@ -14,12 +14,11 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const { checkout } = require("../../routes/userRouter");
 
-// Page Not Found
 const pageNotFound = async (req, res) => {
   try {
     return res.render("user/page-404");
   } catch (error) {
-    res.redirect("/pageNotFound");
+    res.status(500).send("Server Error: Could not render 404 page");
   }
 };
 
