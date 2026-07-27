@@ -548,7 +548,7 @@ const getAddress = async (req, res) => {
   const address = await Address.find({
     customerId: req.session.user,
     delete: false,
-  });
+  }).lean();
 
   res.render("user/address", {
     address,
@@ -644,7 +644,7 @@ const getReferrals = async (req, res) => {
     await user.save();
   }
 
-  const referrals = await Referral.find({ referrer: req.session.user }).populate("referredUserDetails.user");
+  const referrals = await Referral.find({ referrer: req.session.user }).populate("referredUserDetails.user").lean();
 
   let totalCountOfUsers = 0;
   // Loop through each referral

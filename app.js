@@ -8,6 +8,7 @@ const flash = require("connect-flash");
 const MongoStore = require("connect-mongo");
 const nocache = require("nocache");
 const methodOverride = require("method-override");
+const compression = require("compression");
 // const bodyParser = require('body-parser');
 
 
@@ -39,6 +40,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
+app.use(compression());
+
+// Static file middlewares before nocache so they can be cached by browsers
+app.use(express.static(path.join(__dirname, "public"), { maxAge: "7d" }));
+app.use("/admin-assets", express.static("public/admin-assets", { maxAge: "7d" }));
+app.use("/public", express.static("public", { maxAge: "7d" })); // Static files for uploaded images
+
 app.use(nocache());
 
 
@@ -59,9 +67,6 @@ app.use((req, res, next) => {
 // View engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/admin-assets", express.static("public/admin-assets"));
-app.use("/public", express.static("public")); // Static files for uploaded images
 
 //Middlewares
 app.use(logger("dev"));

@@ -73,11 +73,11 @@ module.exports = {
     }
 
     try {
-      const categories = await Category.find({ isListed: true });
-      const brand = await Brand.find({ isListed: true });
-      const size = await Size.find({});
-      const colors = await Color.find({ isListed: true });
-      const variants = await Variants.find({});
+      const categories = await Category.find({ isListed: true }).lean();
+      const brand = await Brand.find({ isListed: true }).lean();
+      const size = await Size.find({}).lean();
+      const colors = await Color.find({ isListed: true }).lean();
+      const variants = await Variants.find({}).lean();
 
       const perPage = 9;
       const page = parseInt(req.query.page) || 1;
@@ -92,6 +92,7 @@ module.exports = {
         .skip((page - 1) * perPage)
         .limit(perPage)
         .sort(sortQuery)
+        .lean()
         .exec();
 
       function buildQueryString(queryParams, page = null) {
@@ -158,7 +159,8 @@ module.exports = {
         .populate("variants.stock")
         .populate("wishlist")
         .populate("bundlePrice bundleQuantity quantity")
-        .populate("ratings");
+        .populate("ratings")
+        .lean();
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -177,11 +179,11 @@ module.exports = {
         category: product.category._id,
         _id: { $ne: productId },
         isActive: true,
-      }).limit(4);
+      }).limit(4).lean();
 
-      const productData = await Product.find({ productId });
+      const productData = await Product.find({ productId }).lean();
 
-      const cart = await Cart.findOne({ userId: req.session.user });
+      const cart = await Cart.findOne({ userId: req.session.user }).lean();
       let existingQuantity;
       if (cart) {
         const existingItem = cart.items.find((item) => item.productId.toString() === productId);
@@ -199,7 +201,7 @@ module.exports = {
 
       const userId = req.session.user;
 
-      const customize = await Customize.findOne({ userId: userId });
+      const customize = await Customize.findOne({ userId: userId }).lean();
 
       let status = false;
       if (customize) {
@@ -233,7 +235,7 @@ module.exports = {
       const user = req.session.user;
       const productId = req.params.id;
 
-      const product = await Product.findById(productId);
+      const product = await Product.findById(productId).lean();
       res.render("user/customizeProduct", { product, user });
     } catch (error) {
       return res.redirect("/pageNotFound");
