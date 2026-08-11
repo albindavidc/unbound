@@ -3,18 +3,8 @@
 <%- include("../../views/partials/admin/header") %>
 
 <style>
-  .col-md-3 {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin: 10px;
-  }
-
-  .form-label {
-    margin-bottom: 8px;
-  }
-
-  .form-control {
+  #add-category-form .form-control,
+  #edit-category-form .form-control {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
@@ -22,92 +12,54 @@
     border-radius: 5px;
     box-sizing: border-box;
   }
-
-  .d-grid {
-    margin-top: 20px;
+  .error-message { color: red; }
+  .custom-table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #424649;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 12px 16px;
   }
-
-  .btn-primary {
-    background-color: #007bff;
-    color: #fff;
-    border: 1px solid #007bff;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-
-  .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-  }
-
-  .pagination-container {
-    text-align: center;
-  }
-
-  .pagination {
-    display: inline-block;
-  }
-
-  .pagination a,
-  .pagination .current-page {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 0 2px;
-    border: 1px solid #ddd;
-    text-decoration: none;
-    color: #333;
-  }
-
-  .pagination a:hover {
-    background-color: #f5f5f5;
-  }
-
-  .error-message {
-    color: red;
-  }
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
-  }
-
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
-  }
-
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
+  .custom-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
   }
 </style>
 
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Category</h1>
-    </div>
-  </div>
-</section>
+
 
 <!-- Category Header -->
 <section class="content-main">
-  <header class="card-header text-center mb-20">
-    <form action="/admin/category" method="get" class="d-inline">
-      <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px">
-        <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search" />
-        <button class="btn" type="submit">Search</button>
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Category</h2>
+      <p class="text-muted font-sm">Manage your product categories and offers</p>
+    </div>
+  </div>
+    <div class="card mb-4">
+    <header class="card-header bg-white border-0">
+      <div class="row gx-3 py-3 align-items-center">
+        <div class="col-lg-6 col-md-8 col-12 mx-auto">
+          <form action="/admin/category" method="get">
+            <div class="input-group search-bar-modern">
+              <span class="input-group-text border-0 text-muted px-3">
+                <i class="material-icons md-search"></i>
+              </span>
+              <input type="text" class="form-control border-0 px-2 shadow-none" placeholder="Search..." name="search" />
+              <button class="btn btn-dark" type="submit">Search</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
-  </header>
+    </header>
+  </div>
 
   <!-- Add New Category -->
   <div class="text-center d-flex justify-content-end">
-    <button class="btn btn-dark" id="new-category-button" style="margin-top: 20px">New Category</button>
+    <button class="btn btn-dark d-inline-flex align-items-center gap-1" id="new-category-button"><i class="material-icons md-add" style="font-size:18px;"></i> New Category</button>
   </div>
 
   <!-- Show Category -->
@@ -161,52 +113,52 @@
     </form>
   </div>
 
-  <div class="card" style="margin: 50px 0">
+  <div class="card mb-4" style="margin-top: 20px">
     <div class="card-body">
-      <div class="row">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Offer</th>
-                <th>
-                  <span style="margin: 0px 40px"> Status </span>
-                  <span style="margin: 0px 30px">List/Unlist</span>
-                </th>
-                <th class="text-start">Edit</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% for (let i = 0; i < cat.length; i++) { %>
-              <tr>
-                <td><%= cat[i].name %></td>
-                <td><%= cat[i].description %></td>
-                <td><%= cat[i].categoryOffer %></td>
-                <td>
-                  <% if (cat[i].isListed === false) { %>
-
-                  <span class="badge rounded-pill alert-danger" style="width: 60px; margin: 0px 40px">Unlisted</span>
-                  <button class="btn btn-success" style="width: 80px">
-                    <a href="/admin/category/<%= cat[i]._id %>/list" class="text-white" style="text-decoration: none">List</a>
-                  </button>
-                  <% } else { %>
-
-                  <span class="badge rounded-pill alert-success" style="width: 60px; margin: 0px 40px">Listed</span>
-                  <button class="btn btn-danger" style="width: 80px">
-                    <a href="/admin/category/<%= cat[i]._id %>/unlist" class="text-white" style="text-decoration: none">Unlist</a>
-                  </button>
-                  <% } %>
-                </td>
-                <td class="text-start">
-                  <button class="btn btn-dark" data-id="<%= cat[i]._id %>">Edit</button>
-                </td>
-              </tr>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Offer</th>
+              <th>Status</th>
+              <th>List / Unlist</th>
+              <th class="text-end">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let i = 0; i < cat.length; i++) { %>
+            <tr>
+              <td class="fw-bold text-dark"><%= cat[i].name %></td>
+              <td class="text-muted"><%= cat[i].description %></td>
+              <td><span class="badge bg-light text-dark border"><%= cat[i].categoryOffer %>% off</span></td>
+              <td>
+                <% if (cat[i].isListed === false) { %>
+                  <span class="badge rounded-pill alert-danger">Unlisted</span>
+                <% } else { %>
+                  <span class="badge rounded-pill alert-success">Listed</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (cat[i].isListed === false) { %>
+                  <a href="/admin/category/<%= cat[i]._id %>/list" class="btn btn-success btn-sm px-3">List</a>
+                <% } else { %>
+                  <a href="/admin/category/<%= cat[i]._id %>/unlist" class="btn btn-danger btn-sm px-3">Unlist</a>
+                <% } %>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-dark btn-sm px-3" data-id="<%= cat[i]._id %>">Edit</button>
+              </td>
+            </tr>
+            <% } %>
+            <% if (!cat || cat.length === 0) { %>
+            <tr>
+              <td colspan="6" class="text-center py-5 text-muted">No categories found</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

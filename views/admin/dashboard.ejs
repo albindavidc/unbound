@@ -3,85 +3,93 @@
 <%- include("../../views/partials/admin/header") %>
 
 <style>
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
-  }
-
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
-  }
-
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
-  }
-
   body {
-    background-color: #121212;
-    color: #e0e0e0;
-    font-family: "Roboto", sans-serif;
+    background-color: #f4f5f9;
+    font-family: "Inter", sans-serif;
   }
 
-  .card-body {
-    padding: 20px;
-  }
 
-  .icontext .icon {
-    background-color: #2a2a2a;
-    color: #ffffff;
-  }
 
-  .icontext .text h6 {
-    color: #ffffff;
-  }
-
-  .icontext .text span {
-    color: #bdbdbd;
-    font-size: 1.2rem;
-  }
-
-  .icontext .icon:hover {
+  .card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     background-color: #ffffff;
-    color: #1f1f1f;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .card-title {
-    font-size: 1rem;
-    margin-bottom: 10px;
-    font-weight: bold;
   }
 
   .card:hover {
-    transform: translateY(-5px);
-    transition: all 0.3s ease-in-out;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .icontext {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .icontext .icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f4f8;
+    color: #424649;
+    border-radius: 12px !important;
+  }
+  
+  .icontext .icon i {
+    font-size: 24px;
+  }
+
+  .icontext .text h6 {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .icontext .text span {
+    color: #212529;
+    font-size: 1.5rem;
+    font-weight: 700;
   }
 
   .content-main {
-    padding: 30px;
+    padding: 20px 30px;
+  }
+
+  h2, h5 {
+    color: #212529;
+    font-weight: 600;
+    font-family: "Inter", sans-serif;
+  }
+  
+  hr {
+    border-color: #e9ecef;
   }
 
   @media (max-width: 768px) {
-    .card-body {
+    .content-main {
       padding: 15px;
     }
   }
 </style>
 
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Dashboard</h1>
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Dashboard</h2>
+      <p class="text-muted font-sm">A complete overview of your store's performance</p>
     </div>
   </div>
-</section>
-<section class="content-main">
+
   <div class="row">
     <!-- Total Users Card -->
     <div class="col-lg-3 col-md-6 col-sm-12">
@@ -147,64 +155,155 @@
   </div>
 
   <div class="row">
-    <div class="col">
-      <div id="piechart" class="col-lg-12 col-md-12 col-sm-12 rounded"></div>
+    <!-- Left Column: Payment & Sales Performance Charts -->
+    <div class="col-lg-6 col-md-12 mb-4">
+      <!-- Card 1: Payment Method Distribution Pie Chart -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 font-sm">
+            <i class="material-icons md-pie_chart text-dark"></i> Payment Methods Distribution
+          </h5>
+        </div>
+        <div id="piechart" class="w-100" style="min-height: 280px;"></div>
+      </div>
 
-      <div class="col-lg-12 col-md-12 col-sm-12 rounded">
-        <canvas id="myChart" style="width: 100%; max-width: 600px"></canvas>
+      <!-- Card 2: Products Sold Bar Chart -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 font-sm">
+            <i class="material-icons md-bar_chart text-dark"></i> Product Sales Performance
+          </h5>
+        </div>
+        <div class="w-100 p-2">
+          <canvas id="myChart" style="width: 100%; height: 280px;"></canvas>
+        </div>
       </div>
     </div>
 
-    <div class="col">
-      <div class="d-flex justify-content-center mb-4">
-        <h2>Top Selling List</h2>
-      </div>
-
-      <form action="/admin/dashboard" method="GET">
-        <div class="option-buttons pb-4 d-flex justify-content-end">
-          <h3 class="d-flex align-items-center">Filter:</h3>
-      
-          <button class="btn btn-outline-dark btn-sm m-1" id="daily">Day</button>
-          <button class="btn btn-outline-dark btn-sm m-1" id="weekly">Week</button>
-          <button class="btn btn-outline-dark btn-sm m-1" id="monthly">Month</button>
-          <button class="btn btn-outline-dark btn-sm m-1" id="yearly">Year</button>
-          <button class="btn btn-outline-dark btn-sm m-1" id="custom">Custom</button>
-      
-          <button class="btn btn-outline-dark m-1" type="button" onclick="removeAll()">Remove All</button>
+    <!-- Right Column: Top Selling Analytics -->
+    <div class="col-lg-6 col-md-12 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+            <i class="material-icons md-leaderboard text-dark"></i> Top Selling Analytics
+          </h4>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-flex align-items-center gap-1 font-xs" type="button" onclick="removeAll()">
+            <i class="material-icons md-refresh" style="font-size:16px;"></i> Reset
+          </button>
         </div>
-      
-        <div id="custom_date_inputs" class="mb-3 d-flex justify-content-end align-items-center">
-          <label for="customFilterStartDate" class="text-dark">Start Date: </label>
-          <input type="date" name="startDate" id="customFilterStartDate" class="btn btn-outline-dark btn-sm m-1" />
-      
-          <label for="customFilterEndDate" class="text-dark">End Date: </label>
-          <input type="date" name="endDate" id="customFilterEndDate" class="btn btn-outline-dark btn-sm m-1" />
-          <button type="submit" class="btn-sm btn-outline-dark">Filter</button>
+
+        <form action="/admin/dashboard" method="GET" class="mb-4">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 bg-light p-2 rounded-3 border">
+            <span class="fw-bold font-xs text-muted px-2"><i class="material-icons md-filter_list" style="font-size:16px;"></i> FILTER</span>
+            <div class="btn-group btn-group-sm flex-wrap gap-1" role="group" aria-label="Filter timeline">
+              <button type="button" class="btn btn-outline-dark rounded-pill px-3 font-xs fw-bold" id="daily">Day</button>
+              <button type="button" class="btn btn-outline-dark rounded-pill px-3 font-xs fw-bold" id="weekly">Week</button>
+              <button type="button" class="btn btn-outline-dark rounded-pill px-3 font-xs fw-bold" id="monthly">Month</button>
+              <button type="button" class="btn btn-outline-dark rounded-pill px-3 font-xs fw-bold" id="yearly">Year</button>
+              <button type="button" class="btn btn-outline-dark rounded-pill px-3 font-xs fw-bold" id="custom">Custom</button>
+            </div>
+          </div>
+
+          <div id="custom_date_inputs" class="p-3 bg-light rounded-3 border mb-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-5">
+                <label for="customFilterStartDate" class="form-label font-xs fw-bold text-muted mb-1">Start Date</label>
+                <input type="date" name="startDate" id="customFilterStartDate" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-5">
+                <label for="customFilterEndDate" class="form-label font-xs fw-bold text-muted mb-1">End Date</label>
+                <input type="date" name="endDate" id="customFilterEndDate" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-sm btn-dark w-100 font-xs fw-bold">Apply</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <!-- Top 10 Lists -->
+        <div class="d-flex flex-column gap-3">
+          <!-- Top Products -->
+          <div class="card border rounded-3 overflow-hidden shadow-none">
+            <div class="card-header bg-dark text-white py-2 px-3 fw-bold font-sm d-flex justify-content-between align-items-center">
+              <span><i class="material-icons md-shopping_bag me-1" style="font-size:16px;"></i> Top 10 Selling Products</span>
+              <span class="badge bg-white text-dark font-xs"><%= orderBar ? orderBar.length : 0 %> items</span>
+            </div>
+            <div class="card-body p-0">
+              <ul class="list-group list-group-flush">
+                <% if (orderBar && orderBar.length > 0) { %>
+                  <% orderBar.slice(0, 10).forEach((item, index) => { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-circle <%= index === 0 ? 'bg-warning text-dark' : (index === 1 ? 'bg-secondary text-white' : (index === 2 ? 'bg-dark text-white' : 'bg-light text-dark border')) %>" style="width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-size:11px;">
+                          <%= index + 1 %>
+                        </span>
+                        <span class="fw-bold font-sm text-dark"><%= item.productName %></span>
+                      </div>
+                      <span class="badge bg-light text-dark border font-xs"><%= item.totalQuantitySold %> sold</span>
+                    </li>
+                  <% }) %>
+                <% } else { %>
+                  <li class="list-group-item text-center py-3 text-muted font-sm">No sales data recorded</li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Top Categories -->
+          <div class="card border rounded-3 overflow-hidden shadow-none">
+            <div class="card-header bg-dark text-white py-2 px-3 fw-bold font-sm d-flex justify-content-between align-items-center">
+              <span><i class="material-icons md-category me-1" style="font-size:16px;"></i> Top 10 Selling Categories</span>
+              <span class="badge bg-white text-dark font-xs"><%= bestSellingCat ? bestSellingCat.length : 0 %> items</span>
+            </div>
+            <div class="card-body p-0">
+              <ul class="list-group list-group-flush">
+                <% if (bestSellingCat && bestSellingCat.length > 0) { %>
+                  <% bestSellingCat.slice(0, 10).forEach((item, index) => { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-circle <%= index === 0 ? 'bg-warning text-dark' : 'bg-light text-dark border' %>" style="width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-size:11px;">
+                          <%= index + 1 %>
+                        </span>
+                        <span class="fw-bold font-sm text-dark"><%= item.categoryName %></span>
+                      </div>
+                      <span class="badge bg-light text-dark border font-xs"><%= item.categoryQuantitySold %> sold</span>
+                    </li>
+                  <% }) %>
+                <% } else { %>
+                  <li class="list-group-item text-center py-3 text-muted font-sm">No sales data recorded</li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Top Brands -->
+          <div class="card border rounded-3 overflow-hidden shadow-none">
+            <div class="card-header bg-dark text-white py-2 px-3 fw-bold font-sm d-flex justify-content-between align-items-center">
+              <span><i class="material-icons md-stars me-1" style="font-size:16px;"></i> Top 10 Selling Brands</span>
+              <span class="badge bg-white text-dark font-xs"><%= bestSellingBrands ? bestSellingBrands.length : 0 %> items</span>
+            </div>
+            <div class="card-body p-0">
+              <ul class="list-group list-group-flush">
+                <% if (bestSellingBrands && bestSellingBrands.length > 0) { %>
+                  <% bestSellingBrands.slice(0, 10).forEach((item, index) => { %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-circle <%= index === 0 ? 'bg-warning text-dark' : 'bg-light text-dark border' %>" style="width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; font-size:11px;">
+                          <%= index + 1 %>
+                        </span>
+                        <span class="fw-bold font-sm text-dark"><%= item.brandName %></span>
+                      </div>
+                      <span class="badge bg-light text-dark border font-xs"><%= item.brandQuantitySold %> sold</span>
+                    </li>
+                  <% }) %>
+                <% } else { %>
+                  <li class="list-group-item text-center py-3 text-muted font-sm">No sales data recorded</li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
         </div>
-      </form>
-        
-      <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
-        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling products</h5>
-        <% orderBar.slice(0,10).forEach(item => { %>
-        <h6><%= item.productName %> (<%= item.totalQuantitySold %> )</h6>
-        <hr />
-        <% }) %>
-      </div>
-
-      <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
-        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling categories</h5>
-        <% bestSellingCat.slice(0,10).forEach(item => { %>
-        <h6><%= item.categoryName %> (<%= item.categoryQuantitySold %> )</h6>
-        <hr />
-        <% }) %>
-      </div>
-
-      <div class="card card-body col-lg-12 col-md-12 col-sm-12 rounded">
-        <h5 class="border rounded p-3 d-flex justify-content-center mb-4">Top 10 selling brands</h5>
-        <% bestSellingBrands.slice(0,10).forEach(item => { %>
-        <h6><%= item.brandName %> (<%= item.brandQuantitySold %> )</h6>
-        <hr />
-        <% }) %>
       </div>
     </div>
   </div>
@@ -240,16 +339,15 @@ let selectedReportType = 'daily'; // Default value can be 'daily'
 
 // Update the selected report type based on button clicks
 function setActive(button, reportType) {
-  // Remove the 'active' class from all buttons
-  buttons.forEach(btn => btn.classList.remove('active'));
+  buttons.forEach(btn => {
+    btn.classList.remove('btn-dark', 'text-white', 'active', 'shadow-sm');
+    btn.classList.add('btn-outline-dark');
+  });
 
-  // Add the 'active' class to the clicked button
-  button.classList.add('active');
+  button.classList.remove('btn-outline-dark');
+  button.classList.add('btn-dark', 'text-white', 'active', 'shadow-sm');
 
-  // Update the global report type variable
   selectedReportType = reportType;
-
-  // Handle report type logic (custom date visibility)
   handleReportType(reportType);
 }
 
@@ -332,7 +430,13 @@ form.addEventListener("submit", (event) => {
 
     var data = google.visualization.arrayToDataTable(chartData);
 
-    var options = { title: "All payment methods used by users", height: 400 };
+    var options = {
+      pieHole: 0.4,
+      chartArea: { width: "90%", height: "80%" },
+      legend: { position: "bottom", textStyle: { fontSize: 13, color: "#495057" } },
+      colors: ["#424649", "#6366f1", "#06b6d4", "#10b981", "#f59e0b"],
+      fontName: "Inter, sans-serif"
+    };
 
     var chart = new google.visualization.PieChart(document.getElementById("piechart"));
     chart.draw(data, options);
@@ -343,57 +447,54 @@ form.addEventListener("submit", (event) => {
   var xValues = [];
   var yValues = [];
   var barColors = [
-    "red",
-    "green",
-    "blue",
-    "yellow",
-    "orange",
-    "brown",
-    "gray",
-    "black",
-    "lavender",
-    "teal",
-    "turquoise",
-    "coral",
-    "blush",
-    "indigo",
-    "aqua",
-    "mint",
-    "maroon",
-    "cerulean",
-    "navy",
-    "plum",
-    "periwinkle",
-    "mauve",
-    "mustard",
+    "#424649",
+    "#6366f1",
+    "#06b6d4",
+    "#10b981",
+    "#f59e0b",
+    "#ec4899",
+    "#8b5cf6",
+    "#3b82f6",
+    "#14b8a6",
+    "#84cc16",
+    "#eab308",
+    "#f97316",
+    "#ef4444"
   ];
 
   const paymentMethodBar = JSON.parse('<%- JSON.stringify(orderBar) %>');
 
   paymentMethodBar.forEach((item) => {
-    console.log(item.productName, "this is the newItem product name");
-    xValues.push(item.totalQuantitySold); // Switch: Use quantity sold for x-axis
-    yValues.push(item.productName); // Switch: Use product names for y-axis
+    xValues.push(item.totalQuantitySold);
+    yValues.push(item.productName);
   });
 
   new Chart("myChart", {
     type: "horizontalBar",
     data: {
-      labels: yValues, // Now yValues represent the product names
+      labels: yValues,
       datasets: [
         {
           backgroundColor: barColors,
-          data: xValues, // Now xValues represent the quantities sold
+          data: xValues,
         },
       ],
     },
     options: {
-      indexAxis: "y", // Makes the bars horizontal
+      indexAxis: "y",
       legend: { display: false },
       title: {
-        display: true,
-        text: "Products with Quantity Sold",
+        display: false,
       },
+      scales: {
+        xAxes: [{
+          gridLines: { color: "#f3f4f6" },
+          ticks: { beginAtZero: true }
+        }],
+        yAxes: [{
+          gridLines: { display: false }
+        }]
+      }
     },
   });
 </script>

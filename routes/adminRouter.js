@@ -58,6 +58,7 @@ router.route("/add-product").get(adminAuth, productController.getAddProducts).po
 
 router.post("/product/action", productController.listOrUnlistProduct);
 router.delete("/product/deleteProduct", productController.deleteProduct);
+router.delete("/products/delete-image", adminAuth, productController.deleteImage);
 router.get("/products/deleteProduct/:id", adminAuth, productController.deleteProduct);
 
 const editUpload = productUpload.fields([
@@ -127,6 +128,7 @@ router.get("/sales-report/export/pdf", salesReportController.exportToPdf);
 router.get("/banner", bannerController.getAllBanner);
 router.post("/banner/add-banner", bannerUpload.fields([{ name: "banner_images", maxCount: 5 }]), bannerController.addBanner);
 router.post("/banner/edit-banner", bannerUpload.fields([{ name: "banner_images" }]), bannerController.editBanner);
-router.get("/banner/delete-banner", bannerController.deleteBanner);
+router.delete("/banner/delete-banner/:id", bannerController.deleteBanner);
+router.get("/banner/delete-banner/:id", bannerController.deleteBanner);
 
 module.exports = router;

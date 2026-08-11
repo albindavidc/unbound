@@ -14,24 +14,11 @@
     margin-top: 10px;
   }
 
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
-  }
+  
 
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
-  }
+  
 
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
-  }
+  
 
   .custom-table thead th {
     text-align: center;
@@ -42,15 +29,14 @@
 </style>
 
 <!-- Custom Design Download Header -->
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Download Custom Design</h1>
+
+
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Download Custom Design</h2>
     </div>
   </div>
-</section>
-
-<section>
   <div class="p-2">
     <table class="table">
       <thead class="table">
@@ -120,7 +106,7 @@
   let rightImage = document.getElementById("rightImage");
 
   let canvasElement = document.getElementById("canvasElement");
-  const canvasData = <%- JSON.stringify(customDesign.canvasData) %>;
+  const canvasData = JSON.parse('<%- JSON.stringify(customDesign && customDesign.canvasData ? customDesign.canvasData : {}) %>');
 
   const sides = ["front", "back", "left", "right"];
 

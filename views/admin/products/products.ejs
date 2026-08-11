@@ -1,59 +1,68 @@
-<!-- product.ejs -->
+<!-- products.ejs -->
 
 <%- include("../../partials/admin/header") %>
 
 <style>
-  .table thead th {
+  .product-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+  .custom-table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #424649;
     background-color: #f8f9fa;
-    color: #000;
-    text-align: left;
-    padding: 10px;
+    border-bottom: 2px solid #e9ecef;
+    padding: 12px 16px;
   }
-
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
-  }
-
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
-  }
-
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
+  .custom-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
   }
 </style>
 
-<!-- Products Header -->
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Products</h1>
-    </div>
-  </div>
-</section>
-
 <!-- Show Products -->
 <section class="content-main">
-  <div class="d-flex justify-content-end">
-    <div class="p-3">
-      <a href="/admin/stocks" class="btn btn-dark btn-sm rounded">Manage Stocks</a>
+  <div class="content-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="content-title card-title">Products</h2>
+      <p class="text-muted font-sm">Manage your product catalog, stock levels, and visibility</p>
     </div>
-    <div class="p-3">
-      <a href="/admin/add-product" class="btn btn-dark btn-sm rounded">Add products</a>
+    <div class="d-flex gap-2">
+      <a href="/admin/stocks" class="btn btn-outline-dark d-inline-flex align-items-center gap-1">
+        <i class="material-icons md-inventory_2"></i> Manage Stocks
+      </a>
+      <a href="/admin/add-product" class="btn btn-dark d-inline-flex align-items-center gap-1">
+        <i class="material-icons md-add"></i> Add Product
+      </a>
     </div>
   </div>
 
   <div class="card mb-4">
+    <header class="card-header bg-white border-0 py-3">
+      <div class="row gx-3 align-items-center">
+        <div class="col-lg-6 col-md-8 col-12 mx-auto">
+          <form action="/admin/products" method="get">
+            <div class="input-group search-bar-modern">
+              <span class="input-group-text border-0 text-muted px-3">
+                <i class="material-icons md-search"></i>
+              </span>
+              <input type="text" class="form-control border-0 px-2 shadow-none" placeholder="Search products..." name="search" />
+              <button class="btn btn-dark" type="submit">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </header>
+
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table text-capitalize table-hover">
+        <table class="table table-hover align-middle custom-table mb-0">
           <thead>
             <tr>
               <th>#</th>
@@ -61,65 +70,71 @@
               <th>Name</th>
               <th>Category</th>
               <th>Price</th>
-              <th>Stocks</th>
+              <th>Stock</th>
               <th>Status</th>
-              <th>Edit Product</th>
-              <th class="text-center">Actions</th>
+              <th>Edit</th>
+              <th class="text-end">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <% if (product && product.length > 0) { %> <% product.forEach((product, index) => { %>
+            <% if (product && product.length > 0) { %> 
+            <% product.forEach((item, index) => { %>
             <tr>
-              <td><%- index + 1 %></td>
+              <td class="fw-bold"><%= index + 1 %></td>
 
               <td>
                 <img
-                  class="img-fluid img-thumbnail"
-                  src="/uploads/images/<%= product.primaryImages.length > 0 ? product.primaryImages[0].name : 'default.jpg' %>"
-                  width="70rem"
-                  alt=""
+                  class="product-thumb shadow-sm"
+                  src="/uploads/images/<%= item.primaryImages && item.primaryImages.length > 0 ? item.primaryImages[0].name : 'default.jpg' %>"
+                  alt="<%= item.name %>"
                 />
               </td>
-              <td><%= product.name %></td>
-              <td><%= product.category.name %></td>
-              <td>₹<%= product.sellingPrice %></td>
+              <td class="fw-bold text-dark"><%= item.name %></td>
+              <td>
+                <span class="badge bg-light text-dark border px-2 py-1"><%= item.category ? item.category.name : 'Uncategorized' %></span>
+              </td>
+              <td class="fw-bold text-dark">₹<%= item.sellingPrice %></td>
 
               <td>
-                <% let totalStock = 0; %> <% product.variants.forEach(variant => { %> <% totalStock += variant.stock;%> <% }); %> 
-                <% if (totalStock>0) { %>
-                <span class="text text-success">In Stock (<%= totalStock %>)</span>
+                <% let totalStock = 0; %> 
+                <% if(item.variants) { %>
+                  <% item.variants.forEach(variant => { totalStock += variant.stock; }); %> 
+                <% } %>
+                <% if (totalStock > 0) { %>
+                <span class="badge rounded-pill alert-success">In Stock (<%= totalStock %>)</span>
                 <% } else { %>
-                <span class="text text-danger">Out Of Stock</span>
+                <span class="badge rounded-pill alert-danger">Out Of Stock</span>
                 <% } %>
               </td>
 
               <td>
-                <% if (product.isActive) { %>
+                <% if (item.isActive) { %>
                 <span class="badge rounded-pill alert-success">Listed</span>
                 <% } else { %>
                 <span class="badge rounded-pill alert-danger">Unlisted</span>
                 <% } %>
               </td>
               <td>
-                <a href="/admin/edit-product/<%= product._id %>" class="btn btn-sm font-sm rounded btn-dark">
-                  <i class="material-icons md-edit"></i> Edit
+                <a href="/admin/edit-product/<%= item._id %>" class="btn btn-sm btn-dark d-inline-flex align-items-center gap-1">
+                  <i class="material-icons md-edit" style="font-size: 16px;"></i> Edit
                 </a>
               </td>
-              <td class="text-center">
-                <% if (product.isActive) { %>
-                <button class="btn btn-danger btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'unlist', '<%= product.name %>')">
+              <td class="text-end">
+                <% if (item.isActive) { %>
+                <button class="btn btn-danger btn-sm px-3" onclick="confirmAction('<%= item._id %>', 'unlist', '<%= item.name %>')">
                   Unlist
                 </button>
                 <% } else { %>
-                <button class="btn btn-warning btn-sm rounded" onclick="confirmAction('<%= product._id %>', 'list', '<%= product.name %>')">
+                <button class="btn btn-success btn-sm px-3" onclick="confirmAction('<%= item._id %>', 'list', '<%= item.name %>')">
                   List
                 </button>
                 <% } %>
               </td>
             </tr>
-            <% }) %> <% } else { %>
+            <% }) %> 
+            <% } else { %>
             <tr>
-              <td colspan="9" class="text-center">No products found</td>
+              <td colspan="9" class="text-center py-5 text-muted">No products found</td>
             </tr>
             <% } %>
           </tbody>
@@ -193,7 +208,7 @@
           title: "Success!",
           text: shouldList ? "Product has been listed." : "Product has been unlisted.",
           icon: "success",
-          showConfirmButton: false,
+          showCancelButton: false,
           timer: 1500,
         }).then(() => {
           location.reload();
@@ -203,8 +218,7 @@
           title: "Error!",
           text: "Something went wrong.",
           icon: "error",
-          showConfirmButton: false,
-
+          showCancelButton: false,
           timer: 1500,
         });
       }
@@ -213,8 +227,7 @@
         title: "Error!",
         text: "Something went wrong.",
         icon: "error",
-        showConfirmButton: false,
-
+        showCancelButton: false,
         timer: 1500,
       });
     }
@@ -235,8 +248,7 @@
           title: "Deleted!",
           text: "Product has been deleted.",
           icon: "success",
-          showConfirmButton: false,
-
+          showCancelButton: false,
           timer: 1500,
         }).then(() => {
           location.reload();
@@ -246,8 +258,7 @@
           title: "Error!",
           text: "Something went wrong.",
           icon: "error",
-          showConfirmButton: false,
-
+          showCancelButton: false,
           timer: 1500,
         });
       }
@@ -256,8 +267,7 @@
         title: "Error!",
         text: "Something went wrong.",
         icon: "error",
-        showConfirmButton: false,
-
+        showCancelButton: false,
         timer: 1500,
       });
     }

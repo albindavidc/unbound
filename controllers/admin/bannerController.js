@@ -54,7 +54,6 @@ module.exports = {
       const banner = new Banner({
         name: req.body.banner_name,
         description: req.body.description,
-        reference: req.body.reference,
         images: uploadedFiles,
       });
 
@@ -80,6 +79,40 @@ module.exports = {
   },
   deleteBanner: async (req, res) => {
     try {
-    } catch (error) {}
+      const bannerId = req.params.id || req.query.id;
+      if (!bannerId) {
+        return res.status(400).json({ success: false, message: "Banner ID is required" });
+      }
+
+      const banner = await Banner.findById(bannerId);
+      if (!banner) {
+        return res.status(404).json({ success: false, message: "Banner not found" });
+      }
+
+      // Remove physical banner images from filesystem
+      if (banner.images && banner.images.length > 0) {
+        banner.images.forEach((image) => {
+          if (image.folderName) {
+            const folderPath = path.join(__dirname, "../../public/uploads/banners", image.folderName);
+            if (fs.existsSync(folderPath)) {
+              fs.rmSync(folderPath, { recursive: true, force: true });
+            }
+          }
+        });
+      }
+
+      await Banner.findByIdAndDelete(bannerId);
+
+      return res.json({
+        success: true,
+        message: "Banner deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting banner:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error deleting banner",
+      });
+    }
   },
 };

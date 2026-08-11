@@ -3,29 +3,6 @@
 <%- include('../partials/admin/header') %>
 
 <style>
-  body {
-    background-color: rgb(0, 0, 0);
-  }
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
-  }
-
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
-  }
-
-  /* Add Banner */
-  .error {
-    color: rgb(255, 0, 0);
-  }
-
   .crop-banner {
     position: absolute;
     top: 50%;
@@ -38,145 +15,122 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Banner Managment</h1>
+<section class="content-main">
+  <div class="content-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="content-title card-title">Banner Management</h2>
     </div>
-  </div>
-</section>
-
-<section>
-  <div class="container d-flex flex-wrap flex-md-nowrap pt-3 pb-2 mb-3">
-    <div class="btn-toolbar mb-2 mb-md-0 ms-auto d-flex justify-content-end align-items-end">
+    <div>
       <a href="#addBanner" data-bs-toggle="modal">
-        <button type="button" class="btn btn-sm btn-outline-success">Add Banner</button>
+        <button type="button" class="btn btn-dark"><i class="material-icons md-add me-1"></i> Add Banner</button>
       </a>
     </div>
   </div>
 
-  <div class="card" style="margin: 50px">
+  <div class="card mb-4">
     <div class="card-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Image</th>
-            <th scope="col">Name</th>
-            <th scope="col">Reference</th>
-            <th scope="col">Status</th>
-            <th scope="col">Delete/Edit</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (banners !== 'undefined' && banners.length > 0) { %> <% banners.forEach((banner,index) => { %>
-
-          <tr class="align-middle text-center">
-            <td><%= index +1 %></td>
-
-            <td>
-              <% banner.images.forEach(image => { %>
-
-              <img
-                width="70rem"
-                class="mx-auto d-block img-fluid img-thumbnail"
-                src="/uploads/banners/<%= image.folderName %>/<%= image.filename %>"
-                alt=""
-              />
-
-              <% }) %>
-            </td>
-
-            <td><%= banner.name %></td>
-            <td><%= banner.reference %></td>
-            <% if (banner.isActive) { %>
-            <td class="text-success">Listed</td>
-            <% }else{ %>
-            <td class="text-danger">Unlisted</td>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Image</th>
+              <th scope="col">Name</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (typeof banners !== 'undefined' && banners && banners.length > 0) { %> 
+            <% banners.forEach((banner, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td>
+                <% if(banner.images && banner.images.length > 0) { %>
+                  <% banner.images.forEach(image => { %>
+                  <img
+                    width="80"
+                    class="rounded img-thumbnail"
+                    src="/uploads/banners/<%= image.folderName %>/<%= image.filename %>"
+                    alt="<%= banner.name %>"
+                  />
+                  <% }) %>
+                <% } else { %>
+                  <span class="text-muted">No Image</span>
+                <% } %>
+              </td>
+              <td><strong><%= banner.name %></strong></td>
+              <td>
+                <% if (banner.isActive) { %>
+                <span class="badge rounded-pill alert-success">Listed</span>
+                <% } else { %>
+                <span class="badge rounded-pill alert-danger">Unlisted</span>
+                <% } %>
+              </td>
+              <td class="text-end">
+                <button type="button" onclick="deleteBanner('<%= banner._id %>')" class="btn btn-sm btn-danger">
+                  Delete
+                </button>
+              </td>
+            </tr>
+            <% }) %> 
+            <% } else { %>
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">No banners found</td>
+            </tr>
             <% } %>
-
-            <td>
-              <div class="btn-group mx-2" role="group" aria-label="Delete/Edit Button">
-                <div class="d-flex align-items-center">
-                  <button type="button" onclick="deleteBanner('<%= banner._id %>', '<% banner.images %>')" class="btn btn-sm btn-danger">
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </td>
-          </tr>
-
-          <% }) %> <% }else{ %>
-          <tr>
-            <td colspan="6" class="text-center text-danger table-danger">No banners found</td>
-          </tr>
-
-          <% } %>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- Banner ADD -->
+  <!-- Banner ADD Modal -->
   <div class="modal fade" id="addBanner" tabindex="-1" aria-labelledby="addBannerLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 90%; width: 100%">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Add New Banner</h3>
+          <h5 class="modal-title" id="addBannerLabel">Add New Banner</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="card container py-5 w mb-5 col-lg-6">
-            <form class="card-body rounded-3 bg-body-tertiary" id="new-banner" enctype="multipart/form-data">
-              <div class="err mb-3 text-danger"></div>
-              <div class="row mb-3">
-                <div class="form-group my-3">
-                  <label class="form-label" for="">Banner Name</label>
-                  <input type="text" class="form-control" name="banner_name" />
-                </div>
-                <div class="form-group my-3">
-                  <label class="form-label" for="">Banner Description</label>
-                  <textarea name="description" id="banner_description" cols="30" rows="10" class="form-control"></textarea>
-                </div>
-                <div class="form-group my-3">
-                  <label class="form-label" for="">Reference Link</label>
-                  <input type="text" id="start_date" class="form-control" name="reference" />
-                </div>
-                <div class="form-group my-3">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <label class="form-label" for="">Banner Image</label>
-                    <div class="d-flex align-items-center justify-content-center">
-                      <img id="banner_prev" class="border my-1 rounded img-fluid img-thumbnail" src="" alt="" />
-                    </div>
-                  </div>
-                  <input
-                    id="banner_image"
-                    name="banner_images"
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.webp,.svg,.avif,.gif"
-                    class="form-control FilUploader"
-                    class="mb-3"
-                    required
-                    multiple
-                  />
-                  <input id="cropped_banner" type="hidden" name="" value="" />
-                </div>
+          <form id="new-banner" enctype="multipart/form-data">
+            <div class="err mb-3 text-danger"></div>
+            <div class="mb-3">
+              <label class="form-label">Banner Name</label>
+              <input type="text" class="form-control" name="banner_name" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Banner Description</label>
+              <textarea name="description" id="banner_description" rows="4" class="form-control"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Banner Image</label>
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <img id="banner_prev" class="border rounded img-thumbnail" style="display: none; max-width: 150px;" src="" alt="" />
               </div>
-              <div class="button-grp">
-                <button type="submit" class="btn btn-sm btn-primary px-3">Submit</button>
-                <button type="reset" class="btn btn-sm btn-warning px-3">Clear</button>
-              </div>
-            </form>
-            <div style="display: none" class="crop-banner card container p-2 shadow" id="banner-crp-container">
-              <div class="d-flex flex-column">
-                <img src="" id="bannerIMG" style="object-fit: cover" class="img-fluid" />
-                <button id="cropImageBtn" class="btn btn-primary mt-3">Crop Image</button>
-              </div>
+              <input
+                id="banner_image"
+                name="banner_images"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.svg,.avif,.gif"
+                class="form-control"
+                required
+                multiple
+              />
+              <input id="cropped_banner" type="hidden" name="" value="" />
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="reset" class="btn btn-secondary px-4">Clear</button>
+              <button type="submit" class="btn btn-dark px-4">Submit</button>
+            </div>
+          </form>
+          <div style="display: none" class="crop-banner card p-3 shadow" id="banner-crp-container">
+            <div class="d-flex flex-column">
+              <img src="" id="bannerIMG" style="object-fit: cover" class="img-fluid" />
+              <button id="cropImageBtn" class="btn btn-dark mt-3">Crop Image</button>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -185,7 +139,7 @@
 
 <%- include('../partials/admin/footer') %>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css " />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
 
 <script>
   const modal = document.getElementById("addBanner");
@@ -194,17 +148,6 @@
   const bannerPrevImg = document.getElementById("banner_prev");
 
   let imageFiles = [];
-
-  document.querySelector('a[href="#addBanner"]').addEventListener("click", function () {
-    modal.style.display = "block";
-  });
-
-  modal.addEventListener("click", function (event) {
-    if (event.target === modal || event.target.classList.contains("close-modal")) {
-      modal.style.display = "none";
-      resetForm();
-    }
-  });
 
   // Handle image preview on file change
   bannerImageInput.addEventListener("change", function (e) {
@@ -231,7 +174,6 @@
 
     const formData = new FormData(bannerForm);
 
-    // Append each image file to the FormData
     imageFiles.forEach((file) => {
       formData.append("banner_images", file);
     });
@@ -244,8 +186,6 @@
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result.message);
-
         Swal.fire({
           icon: "success",
           title: "Banner Uploaded",
@@ -253,7 +193,6 @@
           confirmButtonText: "OK",
         }).then(() => {
           window.location.reload();
-          resetForm();
         });
       } else {
         throw new Error("Failed to upload images");
@@ -268,10 +207,52 @@
     }
   });
 
-  // Reset form and clear previews
   function resetForm() {
     bannerForm.reset();
     imageFiles = [];
     bannerPrevImg.style.display = "none";
+  }
+
+  async function deleteBanner(bannerId) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You will not be able to recover this banner!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#424649",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`/admin/banner/delete-banner/${bannerId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Deleted!",
+            text: data.message || "Banner deleted successfully.",
+            confirmButtonText: "OK"
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          throw new Error(data.message || "Failed to delete banner");
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.message || "Something went wrong!"
+        });
+      }
+    }
   }
 </script>

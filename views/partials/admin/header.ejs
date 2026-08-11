@@ -20,92 +20,277 @@
 
 <style>
 body {
-    background-color: #ffffff; 
+    background-color: #f4f5f9; 
+    font-family: "Inter", sans-serif;
 }
 
 .navbar {
-    background-color: #000000; 
+    background-color: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .navbar-aside {
-    background-color: #000000; 
+    background-color: #ffffff; 
+    border-right: 1px solid #e9ecef;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.01);
 }
 
 .menu-item a.menu-link {
-    color: #ffffff; 
+    color: #495057; 
+    transition: all 0.2s ease;
 }
 
 .menu-item a.menu-link:hover,
 .menu-item a.menu-link.active {
-    background-color: #ffffff; 
-    color: #000000; 
+    background-color: #f8f9fa; 
+    color: #424649; 
     border-radius: 8px;
 }
 
 .dropdown-menu {
-    background-color: #000000; 
+    background-color: #ffffff; 
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
 .dropdown-item:hover {
-    background-color: #ffffff; 
-    color: #000000; 
-    border-radius: 8px;
+    background-color: #f8f9fa; 
+    color: #424649; 
 }
 
 nav {
-    background-color: #000000; 
+    background-color: transparent; 
 }
 
 nav ul {
     list-style: none;
-    padding: 0;
+    padding: 10px;
     margin: 0;
 }
 
 nav li {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 nav a {
-    color: #ffffff; 
+    color: #495057; 
     text-decoration: none;
-    font-family: "Inter-SemiBold", sans-serif;
-    font-size: 16px;
-    font-weight: 600;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 12px 15px;
 }
 
-nav a:hover {
-    color: #000000; 
-    background-color: #ffffff; 
+nav a:hover, nav a.active {
+    color: #424649; 
+    background-color: #e9ecef; 
     border-radius: 8px;
-    padding: 10px;
 }
 
-nav img {
-    width: 22px;
-    height: 22px;
-    filter: invert(100%); 
+nav i.icon {
+    font-size: 20px;
+    color: #6c757d;
 }
 
-nav a:hover img {
-    filter: invert(0%); 
+nav a:hover i.icon, nav a.active i.icon {
+    color: #424649;
 }
 
+.btn-icon {
+    color: #495057;
+}
+.btn-icon:hover {
+    color: #424649;
+}
+
+/* Modern Search Bar */
+.search-bar-modern {
+    background-color: #f8f9fa;
+    border-radius: 50px;
+    padding: 2px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+}
+
+.search-bar-modern:focus-within {
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(33, 37, 41, 0.12);
+    border-color: rgba(33, 37, 41, 0.3);
+}
+
+.search-bar-modern .input-group-text, 
+.search-bar-modern .form-control {
+    background: transparent !important;
+    font-size: 0.95rem;
+}
+
+.search-bar-modern .form-control:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.search-bar-modern .btn {
+    border-radius: 50px !important;
+    padding: 6px 20px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+
+/* Custom Button Overrides for Dark Aesthetic */
+.btn-danger {
+    background-color: #991b1b !important;
+    border-color: #991b1b !important;
+    color: #ffffff !important;
+}
+.btn-danger:hover {
+    background-color: #7f1d1d !important;
+    border-color: #7f1d1d !important;
+}
+
+.btn-warning {
+    background-color: #d97706 !important;
+    border-color: #d97706 !important;
+    color: #ffffff !important;
+}
+.btn-warning:hover {
+    background-color: #b45309 !important;
+    border-color: #b45309 !important;
+}
+
+/* Header Visible Logout Button */
+.btn-logout-header {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+.btn-logout-header:hover {
+    background-color: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.btn-success {
+    background-color: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+.btn-success:hover {
+    background-color: #166534 !important;
+    border-color: #166534 !important;
+}
+
+.btn-info {
+    background-color: #424649 !important;
+    border-color: #424649 !important;
+    color: #ffffff !important;
+}
+.btn-info:hover {
+    background-color: #1a1e21 !important;
+    border-color: #1a1e21 !important;
+}
+
+.alert-success {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+    border-color: #bbf7d0 !important;
+}
+.alert-danger {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+    border-color: #fecaca !important;
+}
+
+/* Global #424649 Button Theme Overrides */
+.btn-dark {
+    background-color: #424649 !important;
+    border-color: #424649 !important;
+    color: #ffffff !important;
+}
+.btn-dark:hover, .btn-dark:focus, .btn-dark:active {
+    background-color: #2b2e30 !important;
+    border-color: #2b2e30 !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-dark {
+    color: #424649 !important;
+    border-color: #424649 !important;
+}
+.btn-outline-dark:hover, .btn-outline-dark:focus, .btn-outline-dark:active, .btn-outline-dark.active {
+    background-color: #424649 !important;
+    border-color: #424649 !important;
+    color: #ffffff !important;
+}
+
+/* Sidebar Active & Hover state styling */
+.menu-item.active > .menu-link,
+.menu-item > .menu-link.active {
+    background-color: #e9ecef !important;
+    color: #424649 !important;
+    font-weight: 600 !important;
+    border-radius: 8px;
+}
+.menu-item.active > .menu-link i.icon,
+.menu-item > .menu-link.active i.icon {
+    color: #424649 !important;
+}
 </style>
+
+
+
 </head>
-<body>
+<body class="aside-mini">
+    <script>
+      (function() {
+        var storedState = localStorage.getItem('adminSidebarState');
+        if (storedState === 'expanded') {
+          document.body.classList.remove('aside-mini');
+        } else {
+          document.body.classList.add('aside-mini');
+        }
+      })();
+
+      function toggleAdminSidebar(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (window.innerWidth < 768) {
+          document.body.classList.remove('aside-mini');
+          var overlay = document.querySelector('.screen-overlay');
+          var navbar = document.querySelector('#offcanvas_aside');
+          if (overlay) overlay.classList.toggle('show');
+          if (navbar) navbar.classList.toggle('show');
+          document.body.classList.toggle('offcanvas-active');
+        } else {
+          document.body.classList.toggle('aside-mini');
+          var isMini = document.body.classList.contains('aside-mini');
+          localStorage.setItem('adminSidebarState', isMini ? 'collapsed' : 'expanded');
+        }
+      }
+    </script>
 
     <div class="screen-overlay"></div>
     <aside class="navbar-aside" id="offcanvas_aside">
         <div class="aside-top">
-            <a href="#" class="brand-wrap">
-                <img src="/img/logo.png"  class="logo" alt="Unbound Dashboard">
+            <a href="/admin" class="brand-wrap">
+                <img src="/img/logo.png" class="logo" alt="Unbound Dashboard">
             </a>
             <div>
-                <button class="btn btn-icon btn-aside-minimize"> <i class="text-muted material-icons md-menu_open"></i> </button>
+                <button class="btn btn-icon btn-aside-minimize" onclick="toggleAdminSidebar(event)" title="Toggle Sidebar"> <i class="text-muted material-icons md-menu_open"></i> </button>
             </div>
         </div>
         <nav>
@@ -122,7 +307,7 @@ nav a:hover img {
 
                 </li>
                 <li class="menu-item">
-                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-person"></i>
+                    <a class="menu-link" href="/admin/category"> <i class="icon material-icons md-category"></i>
                         <span class="text">Category</span>
                     </a>
 
@@ -163,20 +348,46 @@ nav a:hover img {
                 </li>
             </ul>
         </nav>
+    
     </aside>
+    <script>
+      function highlightActiveMenu() {
+        var path = window.location.pathname;
+        var links = document.querySelectorAll('.menu-aside .menu-link');
+        links.forEach(function(link) {
+          var href = link.getAttribute('href');
+          if (href === path || (href !== '/admin' && href !== '/admin/' && path.startsWith(href))) {
+            link.classList.add('active');
+            var parent = link.closest('.menu-item');
+            if (parent) parent.classList.add('active');
+          } else if ((path === '/admin' || path === '/admin/') && (href === '/admin' || href === '/admin/')) {
+            link.classList.add('active');
+            var parent = link.closest('.menu-item');
+            if (parent) parent.classList.add('active');
+          }
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", highlightActiveMenu);
+      } else {
+        highlightActiveMenu();
+      }
+    </script>
+
     <main class="main-wrap">
-        <header class="main-header navbar">
-            <div class="col-search">
+        <header class="main-header navbar px-4">
+            <div class="col-search d-flex align-items-center">
+                <button class="btn btn-icon btn-mobile me-auto d-md-none" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
             </div>
-            <div class="col-nav">
-                <ul class="nav">
-                    <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="/admin-assets/imgs/people/avatar2.jpg" alt="User"></a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="/admin/logout"><i class="material-icons md-exit_to_app"></i>Logout</a>
-                        </div>
-                    </li>
-                </ul>
+            <div class="col-nav d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <img class="img-xs rounded-circle shadow-sm" src="/admin-assets/imgs/people/avatar2.jpg" alt="Admin Avatar" style="width: 34px; height: 34px; object-fit: cover;">
+                    <span class="fw-bold text-dark font-xs d-none d-md-inline">Admin</span>
+                </div>
+                <a href="/admin/logout" class="btn-logout-header d-inline-flex align-items-center gap-1">
+                    <i class="material-icons md-exit_to_app" style="font-size: 18px;"></i>
+                    <span>Logout</span>
+                </a>
             </div>
         </header>

@@ -21,19 +21,26 @@ module.exports = {
         search = req.query.search;
       }
 
-      let perPage = 10;
+      let perPage = 5;
       let page = parseInt(req.query.page) || 1;
 
-      const product = await Product.find()
+      const searchQuery = search
+        ? {
+            $or: [
+              { name: { $regex: ".*" + search + ".*", $options: "i" } },
+              { description: { $regex: ".*" + search + ".*", $options: "i" } },
+            ],
+          }
+        : {};
+
+      const product = await Product.find(searchQuery)
         .populate("category")
         .skip((page - 1) * perPage)
         .limit(perPage)
         .sort({ createdAt: -1 })
         .exec();
 
-      const count = await Product.find({
-        $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
-      }).countDocuments();
+      const count = await Product.countDocuments(searchQuery);
 
       const nextPage = parseInt(page) + 1;
       const totalPages = Math.ceil(count / perPage);
@@ -50,8 +57,10 @@ module.exports = {
         hasPrevPage,
         hasNextPage,
         totalPages,
+        search,
       });
     } catch (error) {
+      console.error(error);
       res.status(500).json({ message: "Internal server error" });
     }
   },
@@ -237,163 +246,142 @@ module.exports = {
       const productId = req.params.id;
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res.status(404).json({ isvalid: false, message: "Product not found" });
       }
+
+      const files = req.files || {};
+      const baseUploadPath = path.join(__dirname, "../../public/uploads/images/");
 
       // Handle primary image
       let primaryImages = product.primaryImages || [];
-      if (req.files.primaryImage) {
-        const inputPath = req.files.primaryImage[0].path;
-        const outputPath = path.join(__dirname, "../../public/uploads/images/", req.files.primaryImage[0].filename);
+      if (files.primaryImage && files.primaryImage.length > 0) {
+        const inputPath = files.primaryImage[0].path;
+        const outputPath = path.join(baseUploadPath, files.primaryImage[0].filename);
 
         // Delete the old primary image if it exists
         if (primaryImages.length > 0) {
           const oldPrimaryImage = primaryImages[0];
-          const oldPath = path.join(__dirname, "../../public/uploads/images/", oldPrimaryImage.name);
+          const oldPath = path.join(baseUploadPath, oldPrimaryImage.name);
           if (fs.existsSync(oldPath)) {
-            fs.unlinkSync(oldPath);
+            try {
+              fs.unlinkSync(oldPath);
+            } catch (err) {
+              console.warn('Failed to delete old primary image:', err.message);
+            }
           }
         }
 
-        const image = await Jimp.read(inputPath);
-        await image.resize(500, 500).writeAsync(outputPath);
+        if (inputPath === outputPath) {
+          const buffer = await sharp(inputPath).resize(500, 500).toBuffer();
+          await fs.promises.writeFile(outputPath, buffer);
+        } else {
+          await sharp(inputPath).resize(500, 500).toFile(outputPath);
+        }
 
-        // Update the primaryImages array
         primaryImages = [
           {
-            name: req.files.primaryImage[0].filename,
+            name: files.primaryImage[0].filename,
             path: outputPath,
           },
         ];
       }
 
-      let secondaryImages = product.secondaryImages || []; // Maintain existing secondary images
-      const baseUploadPath = path.join(__dirname, "../../public/uploads/images/");
+      let secondaryImages = product.secondaryImages || [];
 
       // Secondary Image Handling
       const deleteAndUpdateSecondaryImage = async (imageIndex) => {
+        const key = `secondaryImage${imageIndex}`;
+        if (!files[key] || files[key].length === 0) return;
+
         if (secondaryImages[imageIndex]) {
           const oldSecondaryImage = secondaryImages[imageIndex];
           const oldSecondaryPath = path.join(baseUploadPath, oldSecondaryImage.name);
           if (fs.existsSync(oldSecondaryPath)) {
-            fs.unlinkSync(oldSecondaryPath);
+            try {
+              fs.unlinkSync(oldSecondaryPath);
+            } catch (err) {
+              console.warn('Failed to delete old secondary image:', err.message);
+            }
           }
         }
 
-        const newImage = await Jimp.read(req.files[`secondaryImage${imageIndex}`][0].path);
-        const newImagePath = path.join(baseUploadPath, req.files[`secondaryImage${imageIndex}`][0].filename);
-        await newImage.resize(500, 500).writeAsync(newImagePath);
-        console.log(`Resized and saved new secondary image ${imageIndex}:`, req.files[`secondaryImage${imageIndex}`][0].filename);
+        const inputPath = files[key][0].path;
+        const newImagePath = path.join(baseUploadPath, files[key][0].filename);
+        if (inputPath === newImagePath) {
+          const buffer = await sharp(inputPath).resize(500, 500).toBuffer();
+          await fs.promises.writeFile(newImagePath, buffer);
+        } else {
+          await sharp(inputPath).resize(500, 500).toFile(newImagePath);
+        }
 
-        // Update the corresponding index in the secondaryImages array
         secondaryImages[imageIndex] = {
-          name: req.files[`secondaryImage${imageIndex}`][0].filename,
+          name: files[key][0].filename,
           path: newImagePath,
         };
       };
 
-      // Handle each secondary image separately
-      if (req.files.secondaryImage0) {
-        await deleteAndUpdateSecondaryImage(0);
+      for (let i = 0; i < 4; i++) {
+        await deleteAndUpdateSecondaryImage(i);
       }
 
-      if (req.files.secondaryImage1) {
-        await deleteAndUpdateSecondaryImage(1);
-      }
+      // Process variants safely
+      const variants = req.body.variants || [];
+      const rawVariants = Array.isArray(variants) ? variants : Object.values(variants);
+      const processedVariants = rawVariants.map((variant) => {
+        const colorId = typeof variant.color === "object" ? variant.color?._id : variant.color;
+        const sizeId = typeof variant.size === "object" ? variant.size?._id : variant.size;
+        const stockNum = parseInt(variant.stock, 10) || 0;
 
-      if (req.files.secondaryImage2) {
-        await deleteAndUpdateSecondaryImage(2);
-      }
+        const existingVariant = product.variants ? product.variants.find(
+          (v) => (v.color ? String(v.color._id || v.color) : "") === String(colorId) && (v.size ? String(v.size._id || v.size) : "") === String(sizeId)
+        ) : null;
 
-      if (req.files.secondaryImage3) {
-        await deleteAndUpdateSecondaryImage(3);
-      }
-      const variants = req.body.variants;
-
-      // First, retrieve the existing product
-      const existingProduct = await Product.findById(productId);
-
-      // Process variants (assuming you have Color and Size models)
-      const processedVariants = await Promise.all(
-        variants.map(async (variant) => {
-          const { color, size, stock } = variant;
-
-          // Find an existing variant with the same color and size
-          const existingVariant = existingProduct.variants.find((v) => toString(v.color) === toString(color) && toString(v.size) === toString(size));
-
-          return {
-            _id: existingVariant ? existingVariant._id : new mongoose.Types.ObjectId(), // Preserve existing _id or create new one
-            color: await Color.findById(color), // Ensure valid color ObjectId
-            size: await Size.findById(size), // Ensure valid size ObjectId
-            stock: parseInt(stock, 10), // Ensure stock is a number
-          };
-        })
-      );
+        return {
+          _id: existingVariant ? existingVariant._id : new mongoose.Types.ObjectId(),
+          color: colorId,
+          size: sizeId,
+          stock: stockNum,
+        };
+      });
 
       const updateProduct = {
         name: req.body.name,
-        isActive: req.body.status,
-        description: req.body.description.trim().trimStart(),
-        actualPrice: req.body.actualPrice,
-        bundlePrice: req.body.bundlePrice,
-        quantity: req.body.quantity,
-        bundleQuantity: req.body.bundleQuantity,
+        isActive: req.body.status === "true" || req.body.status === true,
+        description: req.body.description ? req.body.description.trim() : "",
+        actualPrice: Number(req.body.actualPrice) || 0,
+        bundlePrice: Number(req.body.bundlePrice) || 0,
+        quantity: Number(req.body.quantity) || 0,
+        bundleQuantity: Number(req.body.bundleQuantity) || 0,
         variants: processedVariants,
-        offerDiscountRate: req.body.offerDiscountRate,
+        offerDiscountRate: Number(req.body.offerDiscountRate) || 0,
         category: req.body.category,
         brand: req.body.brand,
         primaryImages,
         secondaryImages,
       };
 
-      await Product.findOneAndUpdate({ _id: productId }, updateProduct, { new: true, upsert: true });
+      await Product.findByIdAndUpdate(productId, updateProduct, { new: true });
 
-      //Calculate Offer
-      const sellingPrice = req.body.sellingPrice;
-      const actualPrice = req.body.actualPrice;
-
+      // Calculate Offer & Selling Price
       const categoryId = req.body.category;
-      const catOffer = await Category.findOne({ _id: categoryId }, { categoryOffer: 1 });
-      const categoryOffer = catOffer.categoryOffer;
+      const catOffer = categoryId ? await Category.findById(categoryId, { categoryOffer: 1 }) : null;
+      const categoryOffer = catOffer ? (catOffer.categoryOffer || 0) : 0;
+      const productOffer = Number(req.body.offerDiscountRate) || 0;
+      const actualPriceNum = Number(req.body.actualPrice) || 0;
 
-      const productOffer = req.body.offerDiscountRate;
+      const newProductOfferSellingPrice = actualPriceNum * (1 - productOffer / 100);
+      const newCategoryOfferSellingPrice = actualPriceNum * (1 - categoryOffer / 100);
 
-      const newProductOfferSellingPrice = product.actualPrice * (1 - productOffer / 100);
-      const newCategoryOfferSellingPrice = product.actualPrice * (1 - categoryOffer / 100);
+      const finalSellingPrice = Math.round(Math.min(newProductOfferSellingPrice, newCategoryOfferSellingPrice));
 
-      if (Number(newProductOfferSellingPrice) < Number(newCategoryOfferSellingPrice)) {
-        await Product.updateOne(
-          { _id: product._id }, // Match all products in the given category
-          [
-            {
-              $set: {
-                sellingPrice: Math.round(newProductOfferSellingPrice),
-              },
-            },
-          ]
-        );
-      } else {
-        await Product.updateOne(
-          { _id: product._id }, // Match all products in the given category
-          [
-            {
-              $set: {
-                sellingPrice: Math.round(newCategoryOfferSellingPrice),
-              },
-            },
-          ]
-        );
-      }
+      await Product.findByIdAndUpdate(productId, { $set: { sellingPrice: finalSellingPrice } });
 
       req.flash("success", "Product edited successfully");
-
-      res.json({ isvalid: true });
+      return res.json({ isvalid: true });
     } catch (error) {
-      req.flash("error", error.message);
-
-      // Ensure only one response is sent
+      console.error("Error updating product:", error);
       if (!res.headersSent) {
-        return res.redirect(`/admin/products/edit-product/${req.params.id}`);
+        return res.json({ isvalid: false, message: error.message });
       }
     }
   },
@@ -451,6 +439,55 @@ module.exports = {
       return res.status(200).json({ success: true, message: "Product successfully deleted" });
     } catch (error) {
       return res.status(500).json({ success: false, message: "Server error", error });
+    }
+  },
+
+  deleteImage: async (req, res) => {
+    try {
+      const { productId, imageId } = req.query;
+      const product = await Product.findById(productId);
+
+      if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found" });
+      }
+
+      let imageDeleted = false;
+
+      // Check primary images
+      if (product.primaryImages) {
+        const primaryIndex = product.primaryImages.findIndex((img) => img.name === imageId);
+        if (primaryIndex !== -1) {
+          product.primaryImages.splice(primaryIndex, 1);
+          imageDeleted = true;
+        }
+      }
+
+      // Check secondary images
+      if (!imageDeleted && product.secondaryImages) {
+        const secondaryIndex = product.secondaryImages.findIndex((img) => img.name === imageId);
+        if (secondaryIndex !== -1) {
+          product.secondaryImages.splice(secondaryIndex, 1);
+          imageDeleted = true;
+        }
+      }
+
+      if (imageDeleted) {
+        await product.save();
+        const imagePath = path.join(__dirname, "../../public/uploads/images/", imageId);
+        if (fs.existsSync(imagePath)) {
+          try {
+            fs.unlinkSync(imagePath);
+          } catch (err) {
+            console.warn("Failed to delete image file from disk:", err.message);
+          }
+        }
+        return res.status(200).json({ success: true, message: "Image deleted successfully" });
+      } else {
+        return res.status(404).json({ success: false, message: "Image not found" });
+      }
+    } catch (error) {
+      console.error("Error in deleteImage:", error);
+      return res.status(500).json({ success: false, message: "Server error" });
     }
   },
 

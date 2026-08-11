@@ -1,89 +1,122 @@
 <!-- customers.ejs -->
 
 <%- include("../../views/partials/admin/header") %>
+
 <style>
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
+  .custom-table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #424649;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 12px 16px;
   }
-
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
+  .custom-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
   }
-
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
+  .avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #424649;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    flex-shrink: 0;
   }
 </style>
 
-<!-- Customers Header -->
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Customers</h1>
+<section class="content-main">
+  <div class="content-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="content-title card-title">Customers</h2>
+      <p class="text-muted font-sm">View and manage all registered customers</p>
     </div>
   </div>
-</section>
-<section class="m-4">
-  <header class="card-header text-center mb-20">
-    <form action="/admin/users/" method="get" class="d-inline">
-      <div
-        class="input-group input-group-sm border border-1 border-grey rounded-pill d-flex justify-content-center"
-        style="width: 500px; margin-left: 230px"
-      >
-        <input type="text" class="form-control border-0 rounded-pill" placeholder="Search customers..." name="search" />
-        <button class="btn border-0" type="submit">Search</button>
-      </div>
-    </form>
-  </header>
-  <div class="card" style="margin: 50px 0">
-    <div class="card-body">
-      <div class="row">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col"><b>#</b></th>
-                <th scope="col"><b>Name</b></th>
-                <th scope="col"><b>Email</b></th>
-                <th scope="col"><b>Phone No</b></th>
-                <th scope="col"><b>Action</b></th>
-              </tr>
-            </thead>
-            <tbody>
-              <% for(let i = 0; i < data.length; i++ ) { %>
 
-              <tr>
-                <td><%= (currentPage -1) * perPage + i + 1 %></td>
-                <td><%= data[i].name %></td>
-                <td><%= data[i].email %></td>
-                <td><%= data[i].phone %></td>
-                <td>
-                  <% if (data[i].isBlocked === false) { %>
-                  <button class="btn btn-danger pr-5" style="width: 80px">
-                    <a href="/admin/blockCustomer?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none">Block</a>
-                  </button>
-                  <% } else{ %>
-
-                  <button class="btn btn-success pr-5" style="width: 80px">
-                    <a href="/admin/unblockCustomer?id=<%= data[i]._id %>" class="text-white" style="text-decoration: none">Unblock</a>
-                  </button>
-                  <% } %>
-                </td>
-              </tr>
-              <% } %>
-            </tbody>
-          </table>
+  <div class="card mb-4">
+    <header class="card-header bg-white border-0 py-3">
+      <div class="row gx-3 align-items-center">
+        <div class="col-lg-6 col-md-8 col-12 mx-auto">
+          <form action="/admin/users/" method="get">
+            <div class="input-group search-bar-modern">
+              <span class="input-group-text border-0 text-muted px-3">
+                <i class="material-icons md-search"></i>
+              </span>
+              <input type="text" class="form-control border-0 px-2 shadow-none" placeholder="Search customers..." name="search" />
+              <button class="btn btn-dark" type="submit">Search</button>
+            </div>
+          </form>
         </div>
       </div>
+    </header>
+
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table mb-0">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Email</th>
+              <th scope="col">Phone</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let i = 0; i < data.length; i++) { %>
+            <tr>
+              <td class="fw-bold"><%= (currentPage - 1) * perPage + i + 1 %></td>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar-circle">
+                    <%= data[i].name ? data[i].name.charAt(0).toUpperCase() : '?' %>
+                  </div>
+                  <span class="fw-bold text-dark"><%= data[i].name %></span>
+                </div>
+              </td>
+              <td class="text-muted"><%= data[i].email %></td>
+              <td>
+                <% if (data[i].phone) { %>
+                  <span class="badge bg-light text-dark border px-2 py-1"><%= data[i].phone %></span>
+                <% } else { %>
+                  <span class="text-muted font-xs">—</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (data[i].isBlocked === false) { %>
+                  <span class="badge rounded-pill alert-success">Active</span>
+                <% } else { %>
+                  <span class="badge rounded-pill alert-danger">Blocked</span>
+                <% } %>
+              </td>
+              <td class="text-end">
+                <% if (data[i].isBlocked === false) { %>
+                <a href="/admin/blockCustomer?id=<%= data[i]._id %>" class="btn btn-danger btn-sm px-3">Block</a>
+                <% } else { %>
+                <a href="/admin/unblockCustomer?id=<%= data[i]._id %>" class="btn btn-success btn-sm px-3">Unblock</a>
+                <% } %>
+              </td>
+            </tr>
+            <% } %>
+            <% if (!data || data.length === 0) { %>
+            <tr>
+              <td colspan="6" class="text-center py-5 text-muted">No customers found</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
+
   <div class="mb-5"><%- include('./pagination') %></div>
 </section>
 

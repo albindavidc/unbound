@@ -151,10 +151,10 @@
                       <label
                         class="color-filter"
                         data-color="<%= color._id %>"
-                        style="background-color: <%= color.hex %>"
+                        <%- `style="background-color: ${color.hex};"` %>
                         for="color_<%= color._id %>"
                       >
-                        <input
+                        <input 
                           class="color-filter"
                           data-color="<%= color._id %>"
                           type="radio"
@@ -243,9 +243,18 @@
                     <% } %>
                   </ul>
                   <a href="/user/product-list/<%= product._id %>">
+                    <%
+                      let customizedDataUrl = null;
+                      if (locals.customizeDoc && locals.customizeDoc.products) {
+                        const customProd = locals.customizeDoc.products.find(p => p.productId.toString() === product._id.toString());
+                        if (customProd && customProd.customizedProductOption && customProd.canvasData && customProd.canvasData.front && customProd.canvasData.front.dataUrl) {
+                          customizedDataUrl = customProd.canvasData.front.dataUrl;
+                        }
+                      }
+                    %>
                     <img
-                      src="/uploads/images/<%= product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name %>"
-                      alt="<%= product.productName %>"
+                      src="<%= customizedDataUrl ? customizedDataUrl : '/uploads/images/' + (product.primaryImages[0] ? product.primaryImages[0].name : product.secondaryImages[0].name) %>"
+                      alt="<%= product.name %>"
                     />
 
                     </div>

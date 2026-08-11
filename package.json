@@ -32,6 +32,7 @@
     "js-image-zoom": "^0.7.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
+    "kill-port": "^2.0.1",
     "loader": "^2.1.1",
     "method-override": "^3.0.0",
     "mongodb": "^6.9.0",

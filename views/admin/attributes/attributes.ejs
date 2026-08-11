@@ -1,116 +1,168 @@
 <!-- attribute.ejs -->
 
 <%- include('../../partials/admin/header') %>
+<section class="content-main">
+  <div class="content-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="content-title card-title">Attributes</h2>
+      <p class="text-muted font-sm">Manage product colors, sizes, and brand specifications</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-dark d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addColorModal">
+        <i class="material-icons md-palette" style="font-size:18px;"></i> Add Color
+      </button>
+      <button type="button" class="btn btn-dark d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addSizeModal">
+        <i class="material-icons md-aspect_ratio" style="font-size:18px;"></i> Add Size
+      </button>
+      <button type="button" class="btn btn-dark d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+        <i class="material-icons md-local_offer" style="font-size:18px;"></i> Add Brand
+      </button>
+    </div>
+  </div>
 
 <style>
-  .btn {
-    display: flex;
+  .table-responsive {
+    overflow-x: hidden !important;
+  }
+  .custom-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .custom-table th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #424649;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+    padding: 10px 8px;
+  }
+  .custom-table td {
+    padding: 10px 8px;
+    vertical-align: middle !important;
+  }
+  .custom-table .badge {
+    font-size: 0.72rem;
+    padding: 4px 8px;
+  }
+  .color-swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.15);
+    vertical-align: middle;
+    box-shadow: inset 0 0 2px rgba(0,0,0,0.1);
+    background-color: var(--swatch-color, #ccc);
+  }
+  .btn-action {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    padding: 0;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+    background-color: #ffffff;
   }
-
-  .btn i {
-    margin-right: 0.5rem;
+  .btn-action-edit {
+    color: #424649;
   }
-
-  .userProfileMain {
-    width: 100%;
-    height: 30%;
-    margin: 0 auto;
-    background-color: rgb(0, 0, 0);
+  .btn-action-edit:hover {
+    background-color: #424649;
+    color: #ffffff;
+    border-color: #424649;
   }
-
-  .userProfileH1 {
-    width: 100%;
-    margin: 10px;
-    font-family: "Baloo", cursive;
-    color: white;
-    font-size: 6vw;
+  .btn-action-toggle {
+    color: #6c757d;
   }
-
-  .breadcrumbCls {
-    background-color: rgb(0, 0, 0);
+  .btn-action-toggle:hover {
+    background-color: #e9ecef;
+    color: #212529;
+    border-color: #ced4da;
+  }
+  .btn-action-delete {
+    color: #dc3545;
+  }
+  .btn-action-delete:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+    border-color: #dc3545;
   }
 </style>
 
 <!-- Add Bootstrap Icons CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-<!-- Add Bootstrap CSS (for overall styling) -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
 
-<section>
-  <div class="pb-5 text-center">
-    <div class="card userProfileMain rounded">
-      <h1 class="userProfileH1">Attributes</h1>
-    </div>
-  </div>
-</section>
-
-<div class="container d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <div class="btn-group btn-toolbar mb-2 mb-md-2 mx-4">
-    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#addColorModal">Add Color</button>
-    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#addSizeModal">Add Size</button>
-    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">Add Brand</button>
-  </div>
-</div>
-
-<!-- Atribute List -->
-<section id="attributeSection" class="text-capitalize container">
-  <div class="container">
-    <div class="row">
-      <div class="col" style="background-color: rgba(255, 240, 240, 0.503)">
-        <div class="container table-responsive">
-          <table class="table table-hover table-sm table-striped">
-            <legend class="pt-4">Color Attribute</legend>
+<!-- Attribute List Cards -->
+<div class="row g-4">
+  <!-- Color Attribute Card -->
+  <div class="col-lg-4 col-md-12">
+    <div class="card h-100 mb-0 shadow-sm border-0">
+      <div class="card-header bg-white py-3 border-0 d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 text-dark fw-bold"><i class="material-icons md-palette me-2 text-muted" style="vertical-align:middle;"></i>Colors</h5>
+        <span class="badge bg-light text-dark border px-2 py-1"><%= colors.length %> Total</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle custom-table mb-0">
             <thead>
-              <tr class="text-center align-middle">
-                <th>Color</th>
-                <th>Hex</th>
-                <th>Status</th>
-                <th>Actions</th>
+              <tr>
+                <th style="width: 38%;">Color</th>
+                <th style="width: 28%;">Status</th>
+                <th style="width: 34%;" class="text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <% colors.forEach((color,index) => { %>
-              <tr class="text-center align-middle">
-                <td><%- color.name %></td>
-                <td><%- color.hex %></td>
-                <td class="<%- color.isDeleted ? 'text-danger' : 'text-success' %>"><%- color.isDeleted ? 'Unlisted' : 'Listed' %></td>
+              <% colors.forEach((color) => { %>
+              <tr>
                 <td>
-                  <div class="btn-group">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="color-swatch flex-shrink-0" style="--swatch-color: <%- color.hex %>;"></span>
+                    <div class="text-truncate">
+                      <span class="fw-bold text-dark d-block text-capitalize mb-0"><%- color.name %></span>
+                      <small class="text-muted font-xs"><%- color.hex %></small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <% if (color.isDeleted) { %>
+                    <span class="badge rounded-pill alert-danger">Unlisted</span>
+                  <% } else { %>
+                    <span class="badge rounded-pill alert-success">Listed</span>
+                  <% } %>
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-1 align-items-center justify-content-end">
                     <button
                       data-color-id="<%- color._id %>"
                       data-bs-target="#editColorModal"
                       data-bs-toggle="modal"
                       type="button"
-                      class="btn btn-sm btn-warning"
+                      class="btn btn-action btn-action-edit"
+                      title="Edit Color"
                     >
                       <i class="bi bi-pencil"></i>
                     </button>
-                    <% if (color.isDeleted) { %>
                     <button
                       id="toggleListColor"
                       onclick="toggleListing('<%- color._id %>', 'color')"
                       type="button"
-                      class="btn btn-sm btn-outline-success"
+                      class="btn btn-action btn-action-toggle"
+                      title="Toggle Listing"
                     >
-                      <i class="bi bi-bookmark-plus"></i> List
+                      <i class="bi <%- color.isDeleted ? 'bi-eye-slash' : 'bi-eye' %>"></i>
                     </button>
-                    <% } else { %>
-                    <button
-                      id="toggleListColor"
-                      onclick="toggleListing('<%- color._id %>', 'color')"
-                      type="button"
-                      class="btn btn-sm btn-outline-danger"
-                    >
-                      <i class="bi bi-bookmark-dash"></i> Unlist
-                    </button>
-                    <% } %>
                     <button
                       type="button"
                       onclick="deleteAttribute('<%- color._id%>','color','<%- color.name%>')"
-                      class="btn btn-sm btn-danger"
+                      class="btn btn-action btn-action-delete"
                       data-color-id="<%- color._id %>"
+                      title="Delete Color"
                     >
                       <i class="bi bi-trash"></i>
                     </button>
@@ -118,131 +170,152 @@
                 </td>
               </tr>
               <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="col" style="background-color: rgb(240, 255, 240, 0.503)">
-        <div class="container table-responsive">
-          <table class="table table-hover table-sm table-striped">
-            <legend class="pt-4">Size Attribute</legend>
-            <thead>
-              <tr class="text-center align-middle">
-                <th>Size</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% sizes.forEach((size,index) => { %>
-              <tr class="text-center align-middle">
-                <td><%- size.value %></td>
-                <td class="<%- size.isDeleted ? 'text-danger' : 'text-success' %>"><%- size.isDeleted ? 'Unlisted' : 'Listed' %></td>
-                <td>
-                  <div class="btn-group">
-                    <button
-                      id="editSizeButton"
-                      type="button"
-                      class="btn btn-sm btn-warning"
-                      data-size-id="<%- size._id %>"
-                      data-bs-toggle="modal"
-                      data-bs-target="#editSizeModal"
-                    >
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <% if (size.isDeleted) { %>
-                    <button
-                      id="toggleListSize"
-                      onclick="toggleListing('<%- size._id %>', 'size')"
-                      type="button"
-                      class="btn btn-sm btn-outline-success"
-                    >
-                      <i class="bi bi-bookmark-plus"></i> List
-                    </button>
-                    <% } else { %>
-                    <button
-                      id="toggleListSize"
-                      onclick="toggleListing('<%- size._id %>', 'size')"
-                      type="button"
-                      class="btn btn-sm btn-outline-danger"
-                    >
-                      <i class="bi bi-bookmark-dash"></i> Unlist
-                    </button>
-                    <% } %>
-                    <button type="button" onclick="deleteAttribute('<%- size._id%>','size','<%- size.value%>')" class="btn btn-sm btn-danger">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="col" style="background-color: rgb(240, 240, 255, 0.503)">
-        <div class="container table-responsive">
-          <table class="table table-hover table-sm table-striped">
-            <legend class="pt-4">Brands</legend>
-            <thead>
-              <tr class="text-center align-middle">
-                <th>Brand</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% brands?.forEach((brand,index) => { %>
-              <tr class="text-center align-middle">
-                <td><%- brand.name %></td>
-                <td class="<%- brand.isActive ? 'text-danger' : 'text-success' %>"><%- brand.isActive ? 'Unlisted' : 'Listed' %></td>
-                <td>
-                  <div class="btn-group">
-                    <button
-                      id="editBrandButton"
-                      type="button"
-                      class="btn btn-sm btn-warning"
-                      data-brand-id="<%- brand._id %>"
-                      data-bs-toggle="modal"
-                      data-bs-target="#editBrandModal"
-                    >
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <% if (brand.isActive) { %>
-                    <button
-                      id="toggleListBrand"
-                      onclick="toggleListing('<%- brand._id %>', 'brand')"
-                      type="button"
-                      class="btn btn-sm btn-outline-success"
-                    >
-                      <i class="bi bi-bookmark-plus"></i> List
-                    </button>
-                    <% } else { %>
-                    <button
-                      id="toggleListBrand"
-                      onclick="toggleListing('<%- brand._id %>', 'brand')"
-                      type="button"
-                      class="btn btn-sm btn-outline-danger"
-                    >
-                      <i class="bi bi-bookmark-dash"></i> Unlist
-                    </button>
-                    <% } %>
-                    <button type="button" onclick="deleteAttribute('<%- brand._id%>','brand','<%- brand.name%>')" class="btn btn-sm btn-danger">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <% }) %>
+              <% if (colors.length === 0) { %>
+              <tr><td colspan="3" class="text-center py-4 text-muted">No colors found</td></tr>
+              <% } %>
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Size Attribute Card -->
+  <div class="col-lg-4 col-md-12">
+    <div class="card h-100 mb-0 shadow-sm border-0">
+      <div class="card-header bg-white py-3 border-0 d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 text-dark fw-bold"><i class="material-icons md-aspect_ratio me-2 text-muted" style="vertical-align:middle;"></i>Sizes</h5>
+        <span class="badge bg-light text-dark border px-2 py-1"><%= sizes.length %> Total</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle custom-table mb-0">
+            <thead>
+              <tr>
+                <th style="width: 38%;">Size</th>
+                <th style="width: 28%;">Status</th>
+                <th style="width: 34%;" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% sizes.forEach((size) => { %>
+              <tr>
+                <td class="fw-bold text-dark"><%- size.value %></td>
+                <td>
+                  <% if (size.isDeleted) { %>
+                    <span class="badge rounded-pill alert-danger">Unlisted</span>
+                  <% } else { %>
+                    <span class="badge rounded-pill alert-success">Listed</span>
+                  <% } %>
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-1 align-items-center justify-content-end">
+                    <button
+                      id="editSizeButton"
+                      type="button"
+                      class="btn btn-action btn-action-edit"
+                      data-size-id="<%- size._id %>"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editSizeModal"
+                      title="Edit Size"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button
+                      id="toggleListSize"
+                      onclick="toggleListing('<%- size._id %>', 'size')"
+                      type="button"
+                      class="btn btn-action btn-action-toggle"
+                      title="Toggle Listing"
+                    >
+                      <i class="bi <%- size.isDeleted ? 'bi-eye-slash' : 'bi-eye' %>"></i>
+                    </button>
+                    <button type="button" onclick="deleteAttribute('<%- size._id%>','size','<%- size.value%>')" class="btn btn-action btn-action-delete" title="Delete Size">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+              <% if (sizes.length === 0) { %>
+              <tr><td colspan="3" class="text-center py-4 text-muted">No sizes found</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand Attribute Card -->
+  <div class="col-lg-4 col-md-12">
+    <div class="card h-100 mb-0 shadow-sm border-0">
+      <div class="card-header bg-white py-3 border-0 d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 text-dark fw-bold"><i class="material-icons md-local_offer me-2 text-muted" style="vertical-align:middle;"></i>Brands</h5>
+        <span class="badge bg-light text-dark border px-2 py-1"><%= brands ? brands.length : 0 %> Total</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle custom-table mb-0">
+            <thead>
+              <tr>
+                <th style="width: 38%;">Brand</th>
+                <th style="width: 28%;">Status</th>
+                <th style="width: 34%;" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% brands?.forEach((brand) => { %>
+              <tr>
+                <td class="fw-bold text-dark text-capitalize"><%- brand.name %></td>
+                <td>
+                  <% if (brand.isActive) { %>
+                    <span class="badge rounded-pill alert-danger">Unlisted</span>
+                  <% } else { %>
+                    <span class="badge rounded-pill alert-success">Listed</span>
+                  <% } %>
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-1 align-items-center justify-content-end">
+                    <button
+                      id="editBrandButton"
+                      type="button"
+                      class="btn btn-action btn-action-edit"
+                      data-brand-id="<%- brand._id %>"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editBrandModal"
+                      title="Edit Brand"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button
+                      id="toggleListBrand"
+                      onclick="toggleListing('<%- brand._id %>', 'brand')"
+                      type="button"
+                      class="btn btn-action btn-action-toggle"
+                      title="Toggle Listing"
+                    >
+                      <i class="bi <%- brand.isActive ? 'bi-eye-slash' : 'bi-eye' %>"></i>
+                    </button>
+                    <button type="button" onclick="deleteAttribute('<%- brand._id%>','brand','<%- brand.name%>')" class="btn btn-action btn-action-delete" title="Delete Brand">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+              <% if (!brands || brands.length === 0) { %>
+              <tr><td colspan="3" class="text-center py-4 text-muted">No brands found</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </section>
 
-<!-- End Attribute List -->
 
 <!-- Add Atrribute Modal -->
 <!-- Color -->
@@ -256,20 +329,15 @@
       <div class="modal-body">
         <div class="card">
           <form id="addColorForm" class="card-body">
-            <div class="row">
-              <fieldset class="col card mx-2">
-                <legend>Color</legend>
-                <div class="mb-3">
-                  <label for="colorName" class="form-label">Color</label>
-                  <input name="colorName" type="text" class="form-control text-capitalize" id="colorName" />
-                </div>
-                <div class="mb-3">
-                  <label for="colorHex" class="form-label">Color Hex</label>
-                  <input name="colorHex" type="color" class="form-control" id="colorHex" />
-                </div>
-              </fieldset>
+            <div class="mb-3">
+              <label for="colorName" class="form-label">Color Name</label>
+              <input name="colorName" type="text" class="form-control text-capitalize" id="colorName" />
             </div>
-            <button type="submit" onclick="addAttribute('addColorForm', 'color')" class="btn btn-primary m-2 w-100">Add Color</button>
+            <div class="mb-3">
+              <label for="colorHex" class="form-label">Color Hex</label>
+              <input name="colorHex" type="color" class="form-control" id="colorHex" />
+            </div>
+            <button type="submit" onclick="addAttribute('addColorForm', 'color')" class="btn btn-dark w-100">Add Color</button>
           </form>
         </div>
       </div>
@@ -287,16 +355,11 @@
       <div class="modal-body">
         <div class="card">
           <form id="addSizeForm" class="card-body">
-            <div class="row">
-              <fieldset class="col card mx-2">
-                <legend>Size</legend>
-                <div class="mb-3">
-                  <label for="size" class="form-label">Size</label>
-                  <input name="size" type="number" min="6" class="form-control" id="size" />
-                </div>
-              </fieldset>
+            <div class="mb-3">
+              <label for="size" class="form-label">Size</label>
+              <input name="size" type="number" min="6" class="form-control" id="size" />
             </div>
-            <button type="submit" onclick="addAttribute('addSizeForm', 'size')" class="btn btn-primary m-2 w-100">Add Size</button>
+            <button type="submit" onclick="addAttribute('addSizeForm', 'size')" class="btn btn-dark w-100">Add Size</button>
           </form>
         </div>
       </div>
@@ -314,16 +377,11 @@
       <div class="modal-body">
         <div class="card">
           <form id="addBrandForm" class="card-body">
-            <div class="row">
-              <fieldset class="col card mx-2">
-                <legend>Brand</legend>
-                <div class="mb-3">
-                  <label for="brand" class="form-label">Brand</label>
-                  <input name="brand" type="text" class="form-control text-capitalize" id="brand" />
-                </div>
-              </fieldset>
+            <div class="mb-3">
+              <label for="brand" class="form-label">Brand Name</label>
+              <input name="brand" type="text" class="form-control text-capitalize" id="brand" />
             </div>
-            <button type="submit" onclick="addAttribute('addBrandForm', 'brand')" class="btn btn-primary m-2 w-100">Add Brand</button>
+            <button type="submit" onclick="addAttribute('addBrandForm', 'brand')" class="btn btn-dark w-100">Add Brand</button>
           </form>
         </div>
       </div>
@@ -342,20 +400,15 @@
       <div class="modal-body">
         <div class="card">
           <form id="editColorForm" class="card-body" method="POST">
-            <div class="row">
-              <fieldset class="col card mx-2">
-                <legend>Color</legend>
-                <div class="mb-3">
-                  <label for="colorName" class="form-label">Color</label>
-                  <input name="colorName" type="text" class="form-control text-capitalize" id="colorNameEdit" required />
-                </div>
-                <div class="mb-3">
-                  <label for="colorHex" class="form-label">Color Hex</label>
-                  <input name="colorHex" type="color" class="form-control" id="colorHexEdit" required />
-                </div>
-              </fieldset>
+            <div class="mb-3">
+              <label for="colorNameEdit" class="form-label">Color Name</label>
+              <input name="colorName" type="text" class="form-control text-capitalize" id="colorNameEdit" required />
             </div>
-            <button type="submit" class="btn btn-primary m-2 w-100">Add Attribute</button>
+            <div class="mb-3">
+              <label for="colorHexEdit" class="form-label">Color Hex</label>
+              <input name="colorHex" type="color" class="form-control" id="colorHexEdit" required />
+            </div>
+            <button type="submit" class="btn btn-dark w-100">Save Changes</button>
           </form>
         </div>
       </div>
@@ -374,16 +427,11 @@
       <div class="modal-body">
         <div class="card">
           <form id="editSizeForm" class="card-body" method="POST">
-            <div class="row">
-              <fieldset class="col card mx-2">
-                <legend>Size</legend>
-                <div class="mb-3">
-                  <label for="size" class="form-label">Size</label>
-                  <input name="size" type="number" min="6" class="form-control" id="sizeEdit" required />
-                </div>
-              </fieldset>
+            <div class="mb-3">
+              <label for="sizeEdit" class="form-label">Size</label>
+              <input name="size" type="number" min="6" class="form-control" id="sizeEdit" required />
             </div>
-            <button type="submit" class="btn btn-primary m-2 w-100">Add Attribute</button>
+            <button type="submit" class="btn btn-dark w-100">Save Changes</button>
           </form>
         </div>
       </div>
@@ -396,22 +444,17 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editBrandModalLabel">Edit Size Attribute</h5>
+        <h5 class="modal-title" id="editBrandModalLabel">Edit Brand Attribute</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="card">
           <form id="editBrandForm" class="card-body" method="POST">
-            <div class="row">
-              <fieldset class="col card mx-2">
-                <legend>Brand</legend>
-                <div class="mb-3">
-                  <label for="brand" class="form-label">Brand</label>
-                  <input name="brand" type="text" class="form-control text-capitalize" id="brandEdit" required />
-                </div>
-              </fieldset>
+            <div class="mb-3">
+              <label for="brandEdit" class="form-label">Brand Name</label>
+              <input name="brand" type="text" class="form-control text-capitalize" id="brandEdit" required />
             </div>
-            <button type="submit" class="btn btn-primary m-2 w-100">Edit Brand</button>
+            <button type="submit" class="btn btn-dark w-100">Save Changes</button>
           </form>
         </div>
       </div>

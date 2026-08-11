@@ -88,7 +88,6 @@ module.exports = {
       const perPage = 9;
       const page = parseInt(req.query.page) || 1;
 
-
       const products = await Product.find(combinedQuery)
         // .populate("variants.color")
         // .populate("variants.stock")
@@ -97,6 +96,12 @@ module.exports = {
         .sort(sortQuery)
         .lean()
         .exec();
+
+      const userId = req.session.user;
+      let customizeDoc = null;
+      if (userId) {
+        customizeDoc = await Customize.findOne({ userId }).lean();
+      }
 
       function buildQueryString(queryParams, page = null) {
         const params = { ...queryParams };
@@ -119,6 +124,7 @@ module.exports = {
 
       res.render("user/product-list", {
         user: req.session.user,
+        customizeDoc,
         // product,
         products,
         categories,
@@ -178,39 +184,36 @@ module.exports = {
         variant.isOutOfStock = variant.stock <= 0;
       });
 
-      const relatedProducts = await Product.find({
-        category: product.category._id,
-        _id: { $ne: productId },
-        isActive: true,
-      }).limit(4).lean();
+      const userId = req.session.user;
 
-      const productData = await Product.find({ productId }).lean();
+      const [relatedProducts, productData, cart, customize] = await Promise.all([
+        Product.find({
+          category: product.category._id,
+          _id: { $ne: productId },
+          isActive: true,
+        }).limit(4).lean(),
+        Product.find({ _id: productId }).lean(),
+        Cart.findOne({ userId: userId }).lean(),
+        Customize.findOne({ userId: userId }).lean()
+      ]);
 
-      const cart = await Cart.findOne({ userId: req.session.user }).lean();
-      let existingQuantity;
+      let existingQuantity = 0;
       if (cart) {
         const existingItem = cart.items.find((item) => item.productId.toString() === productId);
-
         if (existingItem) {
           existingQuantity = existingItem.quantity;
-        } else {
-          existingQuantity = 0;
         }
-      } else {
-        existingQuantity = 0;
       }
 
       const productWishlist = product.wishlist;
 
-      const userId = req.session.user;
-
-      const customize = await Customize.findOne({ userId: userId }).lean();
-
       let status = false;
+      let customizeData = null;
       if (customize) {
         customize.products.forEach((item) => {
           if (item.productId.toString() === productId.toString()) {
             status = item.customizedProductOption;
+            customizeData = item;
           }
         });
       }
@@ -226,6 +229,7 @@ module.exports = {
         stocks,
         existingQuantity,
         customProduct: status,
+        customizeData: customizeData,
       });
     } catch (error) {
       res.status(500).send("Internal Server Error");

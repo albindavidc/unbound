@@ -4,485 +4,469 @@
 
 <head>
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css " />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-    crossorigin="anonymous"
-  />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 
   <style>
-    .form-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      flex-direction: column;
+    .crop-image-modal {
+      display: none;
+      position: fixed;
+      z-index: 1055;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
     }
 
-    .form-wrapper {
+    .crop-modal-content {
+      background-color: #ffffff;
+      margin: 60px auto;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 620px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      border: none;
+    }
+
+    .img-upload-card {
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      background-color: #f8fafc;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .img-upload-card:hover {
+      border-color: #94a3b8;
+      background-color: #f1f5f9;
+    }
+
+    .img-preview-box {
       width: 100%;
-      max-width: 600px;
-      padding: 20px;
-      background: #fff;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 12px;
+    }
+
+    .img-preview-box img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
     }
 
     .cropped-img-container {
       display: inline-block;
       position: relative;
-      margin: 10px;
+      margin-top: 8px;
     }
 
     .cropped-img {
       max-width: 100px;
       max-height: 100px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
     }
 
-    .remove-btn {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .imagemodal {
-      display: none;
-      position: fixed;
-      z-index: 5;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-
-    .modal-content {
-      margin: 10px auto;
-      padding: 20px;
-      background-color: #fff;
-      border: 1px solid #888;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 50%;
-      border-radius: 15px;
-      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .img-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-    }
-
-    .img-container img {
-      max-width: 100%;
-      height: auto;
+    .section-card {
       border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+      background: #ffffff;
     }
 
-    .padding {
-      padding: 40px 0 10px 0;
-    }
-
-    .userProfileMain {
-      width: 100%;
-      height: 30%;
-      margin: 0 auto;
-      background-color: rgb(0, 0, 0);
-    }
-
-    .userProfileH1 {
-      width: 100%;
-      margin: 10px;
-      font-family: "Baloo", cursive;
-      color: white;
-      font-size: 6vw;
-    }
-
-    .breadcrumbCls {
-      background-color: rgb(0, 0, 0);
+    .section-card .card-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 14px 20px;
+      font-weight: 600;
     }
   </style>
 
-  <!-- Edit Product Header -->
-  <section>
-    <div class="pb-5 text-center">
-      <div class="card userProfileMain rounded">
-        <h1 class="userProfileH1">Edit Product</h1>
+  <!-- Crop Image Modal -->
+  <div class="crop-image-modal" id="cropImageModal" tabindex="-1">
+    <div class="crop-modal-content">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="modal-title fw-bold mb-0">Crop Image</h5>
+        <button id="closeImageButton" type="button" class="btn-close" aria-label="Close"></button>
       </div>
-    </div>
-  </section>
-
-  <section>
-    <!-- Crop Image Modal -->
-    <div class="imagemodal" id="cropImageModal" tabindex="-1" aria-labelledby="cropImageModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
-            <button id="closeImageButton" style="margin: 10px" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="img-container">
-              <img id="imageToCrop" src="" />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button id="closeImageButton" style="margin: 10px" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" style="margin: 10px" class="btn btn-primary" id="cropButton">Crop</button>
-          </div>
+      <div class="modal-body p-0 mb-3 text-center">
+        <div style="max-height: 400px; overflow: hidden; border-radius: 8px;">
+          <img id="imageToCrop" src="" style="max-width: 100%;" />
         </div>
       </div>
+      <div class="d-flex justify-content-end gap-2">
+        <button id="cancelCropButton" type="button" class="btn btn-light border">Cancel</button>
+        <button type="button" class="btn btn-dark" id="cropButton">Crop & Save</button>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Edit Product -->
+  <!-- Content Header -->
   <section class="content-main">
     <form id="addProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" enctype="multipart/form-data">
-      <div class="container mt-4">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="card mb-4">
-              <div class="card-body">
-                <div class="mb-4">
-                  <label for="product-name" class="form-label">Product Name</label>
-                  <input type="text" value="<%= product.name %>" placeholder="Type here" class="form-control" name="name" id="product-name" />
-                  <div id="productNameError" class="text-danger"></div>
-                </div>
-                <div class="mb-4">
-                  <label for="status" class="form-label">Status</label>
-                  <select class="form-select" id="status" name="status" aria-label="Active or Inactive">
-                    <% if (product.isActive) { %>
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                    <% } else { %>
-                    <option value="false">Inactive</option>
-                    <option value="true">Active</option>
-                    <% } %>
-                  </select>
-                </div>
-                <div class="mb-4">
-                  <label for="product-description" class="form-label">Description</label>
-                  <input
-                    placeholder="Type here"
-                    value="<%= product.description.trim() %>"
-                    id="product-description"
-                    class="form-control"
-                    name="description"
-                  />
-                  <div id="productDescriptionError" class="text-danger"></div>
-                </div>
+      <div class="content-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="content-title card-title fw-bold">Edit Product</h2>
+          <p class="text-muted font-sm mb-0">Modify product details, pricing, inventory, variants, and image media</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="/admin/products" class="btn btn-light border d-inline-flex align-items-center gap-1">
+            <i class="material-icons md-arrow_back" style="font-size:18px;"></i> Back
+          </a>
+          <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-1">
+            <i class="material-icons md-save" style="font-size:18px;"></i> Save Product
+          </button>
+        </div>
+      </div>
 
-                <div class="row">
-                  <div class="col-lg-3">
-                    <div class="mb-4">
-                      <label class="form-label" for="actual-price">Actual Price</label>
-                      <input
-                        placeholder="Enter regular price"
-                        name="actualPrice"
-                        value="<%= product.actualPrice %>"
-                        type="number"
-                        class="form-control"
-                        id="actual-price"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-3">
-                    <div class="mb-4">
-                      <label class="form-label" for="bundle-price">Bundle Price</label>
-                      <input
-                        placeholder="Enter bundle price"
-                        name="bundlePrice"
-                        value="<%= product.bundlePrice %>"
-                        type="number"
-                        class="form-control"
-                        id="bundle-price"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-3">
-                    <div class="mb-4">
-                      <label class="form-label" for="max-bundle">Max Product in a Bundle</label>
-                      <input
-                        placeholder="Enter bundle price"
-                        name="bundleQuantity"
-                        value="<%= product.bundleQuantity %>"
-                        type="number"
-                        class="form-control"
-                        id="max-bundle"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-3">
-                    <div class="mb-4">
-                      <label class="form-label" for="max-product">Max Product per Person</label>
-                      <input
-                        placeholder="Enter bundle price"
-                        name="quantity"
-                        value="<%= product.quantity %>"
-                        type="number"
-                        class="form-control"
-                        id="max-product"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-12">
-                    <div class="mb-4">
-                      <label class="form-label" for="selling-price">Selling Price will calculate automatically with category and product offer</label>
-                      <input
-                        placeholder="Enter selling price"
-                        name="sellingPrice"
-                        value="<%= product.sellingPrice %>"
-                        type="number"
-                        class="form-control"
-                        id="selling-price"
-                        disabled
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label for="color" class="form-label">Color</label>
-                      <select name="variants[0][color]" id="color" class="form-select">
-                        <option value="<%= product.variants[0].color._id %>"><%= product.variants[0].color.name %></option>
-
-                        <% colors.forEach(color => { %> <% if (color.name !== product.variants[0].color.name) { %>
-                        <option value="<%= color._id %>"><%= color.name %></option>
-                        <% } %> <% }) %>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label for="size" class="form-label">Size</label>
-                      <select name="variants[0][size]" id="size" class="form-select">
-                        <option value="<%= product.variants[0].size._id %>"><%= product.variants[0].size.value %></option>
-
-                        <% sizes.forEach(size => { %> <% if (size.value !== product.variants[0].size.value) { %>
-                        <option value="<%= size._id %>"><%= size.value %></option>
-                        <% } %> <% }) %>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label for="stock" class="form-label">Stock</label>
-                      <input
-                        type="number"
-                        placeholder="Enter the stock"
-                        name="variants[0][stock]"
-                        value="<%= product.variants[0].stock %>"
-                        class="form-control"
-                        id="variant-stock"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label class="form-label" for="offer-discount-rate">Product Offer (%)</label>
-                      <input
-                        placeholder="Enter discount Rate(%)"
-                        name="offerDiscountRate"
-                        value="<%= product.offerDiscountRate %>"
-                        type="number"
-                        class="form-control"
-                        id="offer-discount-rate"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label for="category" class="form-label">Categories</label>
-                      <select name="category" id="category" class="form-select">
-                        <option value="<%= product.category._id %>"><%= product.category.name %></option>
-                        <% categories.forEach(category => { %> <% if (category.name !== product.category.name) { %>
-                        <option value="<%= category._id %>"><%= category.name %></option>
-                        <% } %> <% }) %>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="col-lg-4">
-                    <div class="mb-4">
-                      <label for="brand" class="form-label">Brand</label>
-                      <select name="brand" id="brand" class="form-select">
-                        <option value="<%= product.brand._id %>"><%= product.brand.name %></option>
-                        <% brands.forEach(brand => { %> <% if (brand.name !== product.brand.name) { %>
-                        <option value="<%= brand._id %>"><%= brand.name %></option>
-                        <% } %> <% }) %>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div class="row">
+        <!-- Left Main Details Column -->
+        <div class="col-lg-8">
+          <!-- General Info Card -->
+          <div class="card section-card">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="material-icons md-info text-muted"></i>
+              <h5 class="mb-0 text-dark fw-bold" style="font-size: 1rem;">General Information</h5>
             </div>
+            <div class="card-body">
+              <div class="mb-4">
+                <label for="product-name" class="form-label font-sm fw-bold">Product Name</label>
+                <input type="text" value="<%= product.name %>" placeholder="Enter product title" class="form-control" name="name" id="product-name" />
+                <div id="productNameError" class="text-danger font-sm mt-1"></div>
+              </div>
 
-            <div class="row">
-              <!-- Primary image upload with cropping -->
-              <div class="col-lg-4">
-                <div class="card mb-4">
-                  <div class="card-header">
-                    <h4 style="font-size: 1rem">Primary Image</h4>
-                  </div>
-                  <div class="card-body text-center">
-                    <div class="input-upload">
-                      <label for="primaryImageInput" class="form-label">
-                        <% if (product.primaryImages[0]) { %>
-                        <img id="preview1" src="/uploads/images/<%- product.primaryImages[0].name %>" alt="" width="150px" />
-                        <% } %>
-                      </label>
-                    </div>
-                    <div class="padding">
-                      <input type="file" class="form-control" id="primaryImageInput" accept="image/*" style="display: none" />
-                      <button id="primaryInputButton" type="button" style="color: white" class="btn rounded font-sm btn-dark">Upload Image</button>
-                      <div id="croppedPrimaryImages" style="display: none"></div>
-                    </div>
-                  </div>
-                </div>
+              <div class="mb-4">
+                <label for="product-description" class="form-label font-sm fw-bold">Description</label>
+                <textarea
+                  placeholder="Enter detailed description"
+                  id="product-description"
+                  class="form-control"
+                  name="description"
+                  rows="4"
+                ><%= product.description.trim() %></textarea>
+                <div id="productDescriptionError" class="text-danger font-sm mt-1"></div>
               </div>
-              <!-- Secondary images upload -->
-              <div class="col-lg-4">
-                <div class="card mb-4">
-                  <div class="card-header">
-                    <h4 style="font-size: 1rem">Secondary Image 1</h4>
-                  </div>
-                  <div class="card-body text-center">
-                    <div class="input-upload">
-                      <label for="secondaryImageInput1" class="form-label">
-                        <img
-                          id="preview2"
-                          src="<%= product.secondaryImages[0] ? `/uploads/images/${product.secondaryImages[0].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
-                          alt=""
-                          width="150px"
-                        />
-                      </label>
-                    </div>
-                    <div class="padding">
-                      <input type="file" class="form-control" id="secondaryImageInput1" style="display: none" />
-                      <button id="secondaryImageButton1" type="button" class="btn btn-dark" style="color: white">Upload Image</button>
-                      <div id="croppedSecondaryImage1" style="display: none"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="card mb-4">
-                  <div class="card-header">
-                    <h4 style="font-size: 1rem">Secondary Image 2</h4>
-                  </div>
-                  <div class="card-body text-center">
-                    <div class="input-upload">
-                      <label for="secondaryImageInput2" class="form-label">
-                        <img
-                          id="preview3"
-                          src="<%= product.secondaryImages[1] ? `/uploads/images/${product.secondaryImages[1].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
-                          alt=""
-                          width="150px"
-                        />
-                      </label>
-                    </div>
-                    <div class="padding">
-                      <input type="file" class="form-control" id="secondaryImageInput2" style="display: none" />
-                      <button id="secondaryImageButton2" style="color: white" type="button" class="btn btn-dark rounded font-sm">Upload Image</button>
-                      <div id="croppedSecondaryImage2" style="display: none"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="card mb-4">
-                  <div class="card-header">
-                    <h4 style="font-size: 1rem">Secondary Image 3</h4>
-                  </div>
-                  <div class="card-body text-center">
-                    <div class="input-upload">
-                      <label for="secondaryImageInput3" class="form-label">
-                        <img
-                          id="preview4"
-                          src="<%= product.secondaryImages[2] ? `/uploads/images/${product.secondaryImages[2].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
-                          alt=""
-                          width="150px"
-                        />
-                      </label>
-                    </div>
-                    <div class="padding">
-                      <input type="file" class="form-control" id="secondaryImageInput3" style="display: none" />
-                      <button id="secondaryImageButton3" style="color: white" type="button" class="btn btn-dark rounded font-sm">Upload Image</button>
-                      <div id="croppedSecondaryImage3" style="display: none"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="card mb-4">
-                  <div class="card-header">
-                    <h4 style="font-size: 1rem">Secondary Image 4</h4>
-                  </div>
-                  <div class="card-body text-center">
-                    <div class="input-upload">
-                      <label for="secondaryImageInput4" class="form-label">
-                        <img
-                          id="preview5"
-                          src="<%= product.secondaryImages[3] ? `/uploads/images/${product.secondaryImages[3].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
-                          alt=""
-                          width="150px"
-                        />
-                      </label>
-                    </div>
-                    <div class="padding">
-                      <!-- <div class="row">
-                        <div class="col-lg-6"> -->
-                      <input type="file" class="form-control" id="secondaryImageInput4" style="display: none" />
-                      <button id="secondaryImageButton4" style="color: white" type="button" class="btn btn-dark">Upload Image</button>
-                    </div>
-                    <div class="col-lg-6">
-                      <!-- <button
-                            onclick="deleteImage('<%- product.secondaryImages[3] ? product.secondaryImages[3].name : `` %>', '<%- product._id %>')"
-                            type="button"
-                            class="btn btn-md btn-danger"
-                            style="background-color: red; color: white"
-                          >
-                            <i class="bi bi-trash"> </i>Delete
-                          </button> -->
-                      <div id="croppedSecondaryImage4" style="display: none"></div>
-                    </div>
-                    <!-- </div>
-                    </div> -->
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div class="d-flex justify-content-center padding">
               <div class="row">
-                <div class="col text-center padding">
-                  <button class="btn btn-dark rounded font-sm" type="submit">Update</button>
-                  <a href="/admin/products" class="btn btn-light rounded font-sm">Cancel</a>
+                <div class="col-lg-6">
+                  <div class="mb-4">
+                    <label for="category" class="form-label font-sm fw-bold">Category</label>
+                    <select name="category" id="category" class="form-select">
+                      <option value="<%= product.category._id %>"><%= product.category.name %></option>
+                      <% categories.forEach(category => { %> <% if (category.name !== product.category.name) { %>
+                      <option value="<%= category._id %>"><%= category.name %></option>
+                      <% } %> <% }) %>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="mb-4">
+                    <label for="brand" class="form-label font-sm fw-bold">Brand</label>
+                    <select name="brand" id="brand" class="form-select">
+                      <option value="<%= product.brand._id %>"><%= product.brand.name %></option>
+                      <% brands.forEach(brand => { %> <% if (brand.name !== product.brand.name) { %>
+                      <option value="<%= brand._id %>"><%= brand.name %></option>
+                      <% } %> <% }) %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing & Inventory Card -->
+          <div class="card section-card">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="material-icons md-monetization_on text-muted"></i>
+              <h5 class="mb-0 text-dark fw-bold" style="font-size: 1rem;">Pricing & Inventory</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label class="form-label font-sm fw-bold" for="actual-price">Actual Price (₹)</label>
+                    <input
+                      placeholder="Regular price"
+                      name="actualPrice"
+                      value="<%= product.actualPrice %>"
+                      type="number"
+                      class="form-control"
+                      id="actual-price"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label class="form-label font-sm fw-bold" for="bundle-price">Bundle Price (₹)</label>
+                    <input
+                      placeholder="Bundle price"
+                      name="bundlePrice"
+                      value="<%= product.bundlePrice %>"
+                      type="number"
+                      class="form-control"
+                      id="bundle-price"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label class="form-label font-sm fw-bold" for="max-bundle">Max in Bundle</label>
+                    <input
+                      placeholder="Bundle max qty"
+                      name="bundleQuantity"
+                      value="<%= product.bundleQuantity %>"
+                      type="number"
+                      class="form-control"
+                      id="max-bundle"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label class="form-label font-sm fw-bold" for="max-product">Max per Person</label>
+                    <input
+                      placeholder="Per user limit"
+                      name="quantity"
+                      value="<%= product.quantity %>"
+                      type="number"
+                      class="form-control"
+                      id="max-product"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label font-sm text-muted" for="selling-price">Effective Selling Price (Auto-calculated via category & product offers)</label>
+                <input
+                  placeholder="Selling price"
+                  name="sellingPrice"
+                  value="<%= product.sellingPrice %>"
+                  type="number"
+                  class="form-control bg-light"
+                  id="selling-price"
+                  disabled
+                />
+              </div>
+
+              <hr class="my-4 text-muted opacity-25" />
+
+              <h6 class="fw-bold mb-3 text-dark font-sm">Variant & Offer Configuration</h6>
+              <div class="row">
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label for="color" class="form-label font-sm fw-bold">Color</label>
+                    <select name="variants[0][color]" id="color" class="form-select">
+                      <option value="<%= product.variants[0].color._id %>"><%= product.variants[0].color.name %></option>
+                      <% colors.forEach(color => { %> <% if (color.name !== product.variants[0].color.name) { %>
+                      <option value="<%= color._id %>"><%= color.name %></option>
+                      <% } %> <% }) %>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label for="size" class="form-label font-sm fw-bold">Size</label>
+                    <select name="variants[0][size]" id="size" class="form-select">
+                      <option value="<%= product.variants[0].size._id %>"><%= product.variants[0].size.value %></option>
+                      <% sizes.forEach(size => { %> <% if (size.value !== product.variants[0].size.value) { %>
+                      <option value="<%= size._id %>"><%= size.value %></option>
+                      <% } %> <% }) %>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label for="variant-stock" class="form-label font-sm fw-bold">Stock Quantity</label>
+                    <input
+                      type="number"
+                      placeholder="Stock"
+                      name="variants[0][stock]"
+                      value="<%= product.variants[0].stock %>"
+                      class="form-control"
+                      id="variant-stock"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                  <div class="mb-4">
+                    <label class="form-label font-sm fw-bold" for="offer-discount-rate">Product Offer (%)</label>
+                    <input
+                      placeholder="Offer %"
+                      name="offerDiscountRate"
+                      value="<%= product.offerDiscountRate %>"
+                      type="number"
+                      class="form-control"
+                      id="offer-discount-rate"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side Column -->
+        <div class="col-lg-4">
+          <!-- Status Card -->
+          <div class="card section-card">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="material-icons md-toggle_on text-muted"></i>
+              <h5 class="mb-0 text-dark fw-bold" style="font-size: 1rem;">Status & Visibility</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label for="status" class="form-label font-sm fw-bold">Publishing Status</label>
+                <select class="form-select" id="status" name="status" aria-label="Active or Inactive">
+                  <% if (product.isActive) { %>
+                  <option value="true" selected>Active</option>
+                  <option value="false">Inactive</option>
+                  <% } else { %>
+                  <option value="false" selected>Inactive</option>
+                  <option value="true">Active</option>
+                  <% } %>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Media Card -->
+          <div class="card section-card">
+            <div class="card-header d-flex align-items-center gap-2">
+              <i class="material-icons md-image text-muted"></i>
+              <h5 class="mb-0 text-dark fw-bold" style="font-size: 1rem;">Product Media</h5>
+            </div>
+            <div class="card-body">
+              <!-- Primary Image -->
+              <div class="mb-4">
+                <label class="form-label font-sm fw-bold mb-2">Primary Image</label>
+                <div class="img-upload-card">
+                  <div class="img-preview-box">
+                    <img
+                      id="preview1"
+                      src="<%= (product.primaryImages && product.primaryImages[0]) ? `/uploads/images/${product.primaryImages[0].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
+                      alt="Primary Preview"
+                    />
+                  </div>
+                  <input type="file" class="form-control" id="primaryImageInput" accept="image/*" style="display: none" />
+                  <div class="d-flex justify-content-center gap-2 mt-2">
+                    <button id="primaryInputButton" type="button" class="btn btn-sm btn-dark">
+                      <i class="material-icons md-upload me-1" style="font-size:16px;"></i> Upload
+                    </button>
+                    <% if (product.primaryImages && product.primaryImages[0]) { %>
+                      <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteImage('<%- product.primaryImages[0].name %>', '<%- product._id %>')">
+                        <i class="bi bi-trash"></i> Delete
+                      </button>
+                    <% } %>
+                  </div>
+                  <div id="croppedPrimaryImages" style="display: none"></div>
+                </div>
+              </div>
+
+              <!-- Secondary Images -->
+              <label class="form-label font-sm fw-bold mb-2">Secondary Images (Gallery)</label>
+              <div class="row g-3">
+                <!-- Slot 1 -->
+                <div class="col-6">
+                  <div class="img-upload-card p-2">
+                    <div class="img-preview-box" style="height: 110px;">
+                      <img
+                        id="preview2"
+                        src="<%= product.secondaryImages[0] ? `/uploads/images/${product.secondaryImages[0].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
+                        alt="Secondary 1"
+                      />
+                    </div>
+                    <input type="file" class="form-control" id="secondaryImageInput1" style="display: none" />
+                    <div class="d-flex justify-content-center gap-1 mt-1">
+                      <button id="secondaryImageButton1" type="button" class="btn btn-xs btn-dark py-1 px-2 font-xs">Upload</button>
+                      <% if (product.secondaryImages[0]) { %>
+                        <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2 font-xs" onclick="deleteImage('<%- product.secondaryImages[0].name %>', '<%- product._id %>')"><i class="bi bi-trash"></i></button>
+                      <% } %>
+                    </div>
+                    <div id="croppedSecondaryImage1" style="display: none"></div>
+                  </div>
+                </div>
+
+                <!-- Slot 2 -->
+                <div class="col-6">
+                  <div class="img-upload-card p-2">
+                    <div class="img-preview-box" style="height: 110px;">
+                      <img
+                        id="preview3"
+                        src="<%= product.secondaryImages[1] ? `/uploads/images/${product.secondaryImages[1].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
+                        alt="Secondary 2"
+                      />
+                    </div>
+                    <input type="file" class="form-control" id="secondaryImageInput2" style="display: none" />
+                    <div class="d-flex justify-content-center gap-1 mt-1">
+                      <button id="secondaryImageButton2" type="button" class="btn btn-xs btn-dark py-1 px-2 font-xs">Upload</button>
+                      <% if (product.secondaryImages[1]) { %>
+                        <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2 font-xs" onclick="deleteImage('<%- product.secondaryImages[1].name %>', '<%- product._id %>')"><i class="bi bi-trash"></i></button>
+                      <% } %>
+                    </div>
+                    <div id="croppedSecondaryImage2" style="display: none"></div>
+                  </div>
+                </div>
+
+                <!-- Slot 3 -->
+                <div class="col-6">
+                  <div class="img-upload-card p-2">
+                    <div class="img-preview-box" style="height: 110px;">
+                      <img
+                        id="preview4"
+                        src="<%= product.secondaryImages[2] ? `/uploads/images/${product.secondaryImages[2].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
+                        alt="Secondary 3"
+                      />
+                    </div>
+                    <input type="file" class="form-control" id="secondaryImageInput3" style="display: none" />
+                    <div class="d-flex justify-content-center gap-1 mt-1">
+                      <button id="secondaryImageButton3" type="button" class="btn btn-xs btn-dark py-1 px-2 font-xs">Upload</button>
+                      <% if (product.secondaryImages[2]) { %>
+                        <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2 font-xs" onclick="deleteImage('<%- product.secondaryImages[2].name %>', '<%- product._id %>')"><i class="bi bi-trash"></i></button>
+                      <% } %>
+                    </div>
+                    <div id="croppedSecondaryImage3" style="display: none"></div>
+                  </div>
+                </div>
+
+                <!-- Slot 4 -->
+                <div class="col-6">
+                  <div class="img-upload-card p-2">
+                    <div class="img-preview-box" style="height: 110px;">
+                      <img
+                        id="preview5"
+                        src="<%= product.secondaryImages[3] ? `/uploads/images/${product.secondaryImages[3].name}` : '../../admin-assets/imgs/theme/upload.svg' %>"
+                        alt="Secondary 4"
+                      />
+                    </div>
+                    <input type="file" class="form-control" id="secondaryImageInput4" style="display: none" />
+                    <div class="d-flex justify-content-center gap-1 mt-1">
+                      <button id="secondaryImageButton4" type="button" class="btn btn-xs btn-dark py-1 px-2 font-xs">Upload</button>
+                      <% if (product.secondaryImages[3]) { %>
+                        <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2 font-xs" onclick="deleteImage('<%- product.secondaryImages[3].name %>', '<%- product._id %>')"><i class="bi bi-trash"></i></button>
+                      <% } %>
+                    </div>
+                    <div id="croppedSecondaryImage4" style="display: none"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -492,8 +476,6 @@
     </form>
   </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
@@ -502,7 +484,7 @@
       try {
         const result = await Swal.fire({
           title: "Are you sure?",
-          text: "You won't be able to revert this!",
+          text: "You won't be able to revert this image deletion!",
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#3085d6",
@@ -523,7 +505,7 @@
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              text: "Something went wrong!",
+              text: "Failed to delete image!",
             });
           }
         }
@@ -540,6 +522,7 @@
     const cropImageModal = document.getElementById("cropImageModal");
     const cropButton = document.getElementById("cropButton");
     const closeImageButton = document.getElementById("closeImageButton");
+    const cancelCropButton = document.getElementById("cancelCropButton");
     const imageToCrop = document.getElementById("imageToCrop");
 
     let cropper;
@@ -547,9 +530,9 @@
 
     function setupImageCropping(inputId, previewId, croppedImagesDivId, buttonId) {
       const input = document.getElementById(inputId);
-      const preview = document.getElementById(previewId);
-      const croppedImagesDiv = document.getElementById(croppedImagesDivId);
       const button = document.getElementById(buttonId);
+
+      if (!button || !input) return;
 
       button.addEventListener("click", function () {
         currentImageInputId = inputId;
@@ -566,35 +549,53 @@
           reader.readAsDataURL(file);
         }
       });
+    }
 
-      function openCropModal(imageSrc) {
-        imageToCrop.src = imageSrc;
-        cropImageModal.style.display = "block";
-        if (cropper) {
-          cropper.destroy();
-        }
-        cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1,
-          viewMode: 3,
-        });
+    function openCropModal(imageSrc) {
+      if (!imageToCrop || !cropImageModal) return;
+      imageToCrop.src = imageSrc;
+      cropImageModal.style.display = "block";
+      if (cropper) {
+        cropper.destroy();
       }
+      cropper = new Cropper(imageToCrop, {
+        aspectRatio: 1,
+        viewMode: 3,
+      });
+    }
 
-      // Crop the image and add it to the appropriate container
+    const imageCroppingConfig = {
+      primaryImageInput: { previewId: "preview1", croppedDivId: "croppedPrimaryImages" },
+      secondaryImageInput1: { previewId: "preview2", croppedDivId: "croppedSecondaryImage1" },
+      secondaryImageInput2: { previewId: "preview3", croppedDivId: "croppedSecondaryImage2" },
+      secondaryImageInput3: { previewId: "preview4", croppedDivId: "croppedSecondaryImage3" },
+      secondaryImageInput4: { previewId: "preview5", croppedDivId: "croppedSecondaryImage4" }
+    };
+
+    if (cropButton) {
       cropButton.addEventListener("click", function () {
         if (!cropper) return;
 
+        const config = imageCroppingConfig[currentImageInputId];
+        if (!config) return;
+
         const canvas = cropper.getCroppedCanvas();
+        if (!canvas) return;
+
         canvas.toBlob(function (blob) {
+          if (!blob) return;
           const url = URL.createObjectURL(blob);
 
-          // Update the image preview
-          if (currentImageInputId === inputId) {
+          const preview = document.getElementById(config.previewId);
+          if (preview) {
             preview.src = url;
+            preview.style.display = "inline-block";
+          }
 
-            // Clear any existing cropped images
+          const croppedImagesDiv = document.getElementById(config.croppedDivId);
+          if (croppedImagesDiv) {
             croppedImagesDiv.innerHTML = "";
 
-            // Create and append the new cropped image
             const imgContainer = document.createElement("div");
             imgContainer.classList.add("cropped-img-container");
 
@@ -605,8 +606,9 @@
 
             imgContainer.appendChild(imgElement);
             croppedImagesDiv.appendChild(imgContainer);
+          }
 
-            // Hide the modal
+          if (cropImageModal) {
             cropImageModal.style.display = "none";
           }
         }, "image/png");
@@ -622,17 +624,14 @@
     setupImageCropping("secondaryImageInput3", "preview4", "croppedSecondaryImage3", "secondaryImageButton3");
     setupImageCropping("secondaryImageInput4", "preview5", "croppedSecondaryImage4", "secondaryImageButton4");
 
-    // Close the cropping modal
-    closeImageButton.addEventListener("click", function () {
-      cropImageModal.style.display = "none";
-    });
+    const closeCropModal = () => {
+      if (cropImageModal) {
+        cropImageModal.style.display = "none";
+      }
+    };
 
-    // // Close the cropping modal when clicking outside of it
-    // window.addEventListener("click", function (event) {
-    //   if (event.target === cropImageModal) {
-    //     cropImageModal.style.display = "none";
-    //   }
-    // });
+    if (closeImageButton) closeImageButton.addEventListener("click", closeCropModal);
+    if (cancelCropButton) cancelCropButton.addEventListener("click", closeCropModal);
 
     document.getElementById("addProductForm").addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -640,7 +639,7 @@
       let form = document.getElementById("addProductForm");
       let formData = new FormData(form);
 
-      // Add primary image to formData
+      // Add primary image to formData if cropped
       const primaryImage = document?.getElementById("croppedPrimaryImages")?.children[0]?.querySelector("img");
       const primaryBlobUrl = primaryImage?.dataset?.blob;
 
@@ -665,8 +664,8 @@
       await appendSecondaryImageToFormData(formData, 3);
 
       const result = await Swal.fire({
-        title: "Are you sure ? ",
-        text: "Do you want to update the product ?",
+        title: "Are you sure?",
+        text: "Do you want to update this product?",
         icon: "warning",
         showCancelButton: true,
         cancelButtonColor: "#d33",
@@ -677,37 +676,6 @@
 
       if (result.isConfirmed) {
         try {
-          let isNameValid = checkName(),
-            isDesciptionValid = checkDescription(),
-            isActualPriceValid = checkActualPrice(),
-            isBundlePriceValid = checkBundlePrice(),
-            isStockValid = checkVariantStock(),
-            isMaxProduct = checkMaxProduct(),
-            isMaxBundle = checkBundleMaxQuantity(),
-            isColor = checkColor(),
-            isSize = checkSize(),
-            isDiscountRate = checkOfferDiscountRate(),
-            isBrand = checkBrand(),
-            isCategory = checkCategory();
-
-          let isFormValid =
-            isNameValid &&
-            isDesciptionValid &&
-            isActualPriceValid &&
-            isBundlePriceValid &&
-            isStockValid &&
-            isMaxProduct &&
-            isMaxBundle &&
-            isColor &&
-            isSize &&
-            isDiscountRate &&
-            isBrand &&
-            isCategory;
-
-          if (!isFormValid) {
-            throw new Error("Form is not valid");
-          }
-
           const response = await fetch(form.action, {
             method: "POST",
             body: formData,
@@ -718,7 +686,7 @@
             Swal.fire({
               icon: "success",
               title: "Success",
-              text: "Product update successfully!",
+              text: "Product updated successfully!",
             }).then(() => {
               window.location.replace("/admin/products");
             });
@@ -726,7 +694,7 @@
             Swal.fire({
               icon: "error",
               title: "Error",
-              text: "Product updating failed...!",
+              text: data.message || "Product updating failed...!",
             });
           }
         } catch (error) {
@@ -739,363 +707,6 @@
         }
       }
     });
-
-    const form = document.getElementById("addProductForm");
-
-    const checkName = () => {
-      const nameEl = document.querySelector("#product-name");
-
-      const name = nameEl.value.trim();
-
-      if (!isRequired(name)) {
-        showError(nameEl, "Full name cannot be blank.");
-      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-        showError(nameEl, "Full name should not contain numbers.");
-      } else {
-        showSuccess(nameEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkDescription = () => {
-      const descriptionEl = document.querySelector("#product-description");
-      const description = descriptionEl.value.trim();
-
-      if (!isRequired(description)) {
-        showError(descriptionEl, "Description cannot be blank.");
-      } else {
-        showSuccess(descriptionEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkActualPrice = () => {
-      const acutalPriceEl = document.querySelector("#actual-price");
-      const acutalPrice = acutalPriceEl.value;
-
-      if (!isRequired(acutalPrice)) {
-        showError(acutalPriceEl, "Actual price cannot be blank");
-      } else if (parseFloat(acutalPrice) <= 0) {
-        showError(acutalPriceEl, "Actual price cannot be zero");
-      } else {
-        showSuccess(acutalPriceEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkBundlePrice = () => {
-      const bundlePriceEl = document.querySelector("#bundle-price");
-      const bundlePrice = bundlePriceEl.value;
-
-      if (!isRequired(bundlePrice)) {
-        showError(bundlePriceEl, "Bundle price cannot be blank");
-      } else if (parseFloat(bundlePrice) <= 0) {
-        showError(bundlePriceEl, "Bundle Price cannot be zero");
-      } else {
-        showSuccess(bundlePriceEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkVariantStock = () => {
-      const variantStockEl = document.querySelector("#variant-stock");
-      const variantStock = variantStockEl.value;
-
-      if (!isRequired(variantStock)) {
-        showError(variantStockEl, "Stock cannot be blank");
-      } else if (parseFloat(variantStock) <= 0) {
-        showError(variantStockEl, "Stock cannot be zero");
-      } else {
-        showSuccess(variantStockEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkMaxProduct = () => {
-      const maxProductPerPersonEl = document.querySelector("#max-product");
-      const maxProductPerPerson = maxProductPerPersonEl.value;
-
-      if (!isRequired(maxProductPerPerson)) {
-        showError(maxProductPerPersonEl, "Max product cannot be blank");
-      } else if (parseFloat(maxProductPerPerson) <= 0) {
-        showError(maxProductPerPersonEl, "Max product cannot be Zero");
-      } else {
-        showSuccess(maxProductPerPersonEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkBundleMaxQuantity = () => {
-      const maxProductPerPersonEl = document.querySelector("#max-bundle");
-      const maxProductPerPerson = maxProductPerPersonEl.value;
-
-      if (!isRequired(maxProductPerPerson)) {
-        showError(maxProductPerPersonEl, "Max product cannot be blank");
-      } else if (parseFloat(maxProductPerPerson) <= 0) {
-        showError(maxProductPerPersonEl, "Max product cannot be Zero");
-      } else {
-        showSuccess(maxProductPerPersonEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkColor = () => {
-      const colorEl = document.querySelector("#color");
-      const color = colorEl.value;
-
-      if (color === "selectColor") {
-        showError(colorEl, "Select a color");
-      } else {
-        showSuccess(colorEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkSize = () => {
-      const sizeEl = document.querySelector("#size");
-      const size = sizeEl.value;
-
-      if (size === "selectSize") {
-        showError(sizeEl, "Select a size");
-      } else {
-        showSuccess(sizeEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkOfferDiscountRate = () => {
-      const offerDiscountRateEl = document.querySelector("#offer-discount-rate");
-      const offerDiscountRate = offerDiscountRateEl.value;
-
-      if (!isRequired(offerDiscountRate)) {
-        showError(offerDiscountRateEl, "Offer discount rate cannot be blank");
-      } else if (parseFloat(offerDiscountRate) < 0) {
-        showError(offerDiscountRateEl, "Offer discount cannot be less than zero");
-      } else {
-        showSuccess(offerDiscountRateEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkBrand = () => {
-      const brandEl = document.querySelector("#brand");
-      const brand = brandEl.value;
-
-      if (brand === "selectBrand") {
-        showError(brandEl, "Select a brand");
-      } else {
-        showSuccess(brandEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const checkCategory = () => {
-      const categoryEl = document.querySelector("#category");
-      const category = categoryEl.value;
-
-      if (category === "selectCategory") {
-        showError(categoryEl, "Select a category");
-      } else {
-        showSuccess(categoryEl);
-        isValid = true;
-      }
-      return isValid;
-    };
-
-    const isRequired = (value) => (value === "" ? false : true);
-
-    const showError = (input, message) => {
-      const formField = input.parentElement;
-      formField.classList.remove("success", "is-valid");
-      input.classList.remove("success", "is-valid");
-      formField.classList.add("error", "is-invalid");
-      input.classList.add("error", "is-invalid");
-      const error = formField.querySelector("small");
-      error.textContent = message;
-    };
-
-    const showSuccess = (input) => {
-      const formField = input.parentElement;
-      formField.classList.remove("error", "is-invalid");
-      input.classList.remove("error", "is-invalid");
-      formField.classList.add("success", "is-valid");
-      input.classList.add("success", "is-valid");
-      const error = formField.querySelector("small");
-      if (error) {
-        error.textContent = "";
-      }
-    };
-
-    const debounce = (fn, delay = 500) => {
-      let timeoutId;
-      return (...args) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        timeoutId = setTimeout(() => {
-          fn.apply(null, args);
-        }, delay);
-      };
-    };
-
-    form.addEventListener(
-      "input",
-      debounce(function (e) {
-        switch (e.target.id) {
-          case "product-name":
-            checkName();
-            break;
-          case "product-description":
-            checkDescription();
-            break;
-          case "actual-price":
-            checkActualPrice();
-            break;
-
-          case "bundle-price":
-            checkBundlePrice();
-            break;
-          case "variant-stock":
-            checkVariantStock();
-            break;
-          case "max-product":
-            checkMaxProduct();
-            break;
-          case "max-bundle":
-            checkBundleMaxQuantity();
-            break;
-          case "color":
-            checkColor();
-            break;
-          case "size":
-            checkSize();
-            break;
-
-          case "offer-discount-rate":
-            checkOfferDiscountRate();
-            break;
-          case "brand":
-            checkBrand();
-            break;
-          case "category":
-            checkCategory();
-            break;
-        }
-      })
-    );
-
-    form.addEventListener(
-      "change",
-      debounce(function (e) {
-        switch (e.target.id) {
-          case "product-name":
-            checkName();
-            break;
-          case "product-description":
-            checkDescription();
-            break;
-          case "actual-price":
-            checkActualPrice();
-            break;
-
-          case "bundle-price":
-            checkBundlePrice();
-            break;
-          case "variant-stock":
-            checkVariantStock();
-            break;
-          case "max-product":
-            checkMaxProduct();
-            break;
-          case "max-bundle":
-            checkBundleMaxQuantity();
-            break;
-
-          case "color":
-            checkColor();
-            break;
-          case "size":
-            checkSize();
-            break;
-
-          case "offer-discount-rate":
-            checkOfferDiscountRate();
-            break;
-          case "brand":
-            checkBrand();
-            break;
-          case "category":
-            checkCategory();
-            break;
-        }
-      })
-    );
-
-    function validateForm() {
-      let isValid = false;
-
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        let isNameValid = checkName(),
-          isDesciptionValid = checkDescription(),
-          isActualPriceValid = checkActualPrice(),
-          isBundlePriceValid = checkBundlePrice(),
-          isStockValid = checkVariantStock(),
-          isMaxProduct = checkMaxProduct(),
-          isMaxBundle = checkBundleMaxQuantity(),
-          isColor = checkColor(),
-          isSize = checkSize(),
-          isDiscountRate = checkOfferDiscountRate(),
-          isBrand = checkBrand(),
-          isCategory = checkCategory();
-
-        let isFormValid =
-          isNameValid &&
-          isDesciptionValid &&
-          isActualPriceValid &&
-          isBundlePriceValid &&
-          isStockValid &&
-          isMaxProduct &&
-          isMaxBundle &&
-          isColor &&
-          isSize &&
-          isDiscountRate &&
-          isBrand &&
-          isCategory;
-        return isFormValid;
-      });
-
-      // Validate file inputs
-      const allowedExtensions = ["jpg", "jpeg", "png", "gif"];
-      const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach((fileInput, index) => {
-        const filePath = fileInput.value;
-        const fileExtension = filePath.split(".").pop().toLowerCase();
-
-        if (filePath && !allowedExtensions.includes(fileExtension)) {
-          Swal.fire({
-            icon: "error",
-            title: "Invalid File Type",
-            text: `File ${index + 1} is not an image. Please upload a file with one of the following extensions: ${allowedExtensions.join(", ")}.`,
-          });
-          isValid = false;
-        }
-      });
-
-      return isValid;
-    }
   </script>
   <%- include("../../partials/admin/footer") %>
 </head>

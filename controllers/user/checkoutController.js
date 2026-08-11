@@ -55,30 +55,23 @@ module.exports = {
   getCheckout: async (req, res) => {
     const userId = req.session.user;
 
-    const userCart = await Cart.findOne({ userId: userId }).populate(
-      "items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity"
-    );
+    const [userCart, user, address, getPayable, userWallet] = await Promise.all([
+      Cart.findOne({ userId: userId }).populate(
+        "items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity"
+      ),
+      User.findById(userId),
+      Address.find({ customerId: userId, delete: false }),
+      Cart.findOne({ userId }, { _id: 0, payable: 1 }),
+      Wallet.find({ userId: userId })
+    ]);
 
-    let user = await User.findById(userId);
-
-    // Correctly use map with async functions
     const productExistencePromises = userCart.items.map((item) => checkProductExistence(item));
     const productExistenceResults = await Promise.allSettled(productExistencePromises);
-
-    // Filter out the rejected promises to identify which items are not valid
     const invalidCartItems = productExistenceResults.filter((result) => result.status === "rejected").map((result) => result.reason);
 
-    // Correctly use map with async functions
     const stockAvailabilityPromises = userCart.items.map((item) => checkStockAvailability(item));
     const stockAvailabilityResults = await Promise.allSettled(stockAvailabilityPromises);
-
-    // Filter out the rejected promises to identify which items have insufficient stock
     const insufficientStockItems = stockAvailabilityResults.filter((result) => result.status === "rejected").map((result) => result.reason);
-
-    const address = await Address.find({
-      customerId: userId,
-      delete: false,
-    });
 
     let totalPrice = 0;
     let totalPriceBeforeOffer = 0;
@@ -126,22 +119,14 @@ module.exports = {
       isCOD = false;
     }
 
-    const userWallet = await Wallet.find({ userId: userId });
-
-    let newWallet;
+    let newWallet = 0;
     userWallet.forEach((items) => {
       newWallet = items.balance;
     });
 
-    let isInsufficient;
-    if (totalPrice > newWallet) {
-      isInsufficient = true;
-    } else {
-      isInsufficient = false;
-    }
+    let isInsufficient = totalPrice > newWallet;
 
-    const getPayable = await Cart.findOne({ userId }, { _id: 0, payable: 1 });
-    const payable = getPayable.payable;
+    const payable = getPayable ? getPayable.payable : 0;
 
     res.render("user/checkout", {
       user,

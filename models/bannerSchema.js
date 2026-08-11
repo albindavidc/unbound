@@ -23,7 +23,7 @@ const bannerSchema = new Schema(
     ],
     reference: {
       type: String,
-      required: true,
+      default: "",
     },
     isActive: {
       type: Boolean,

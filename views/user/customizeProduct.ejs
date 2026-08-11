@@ -86,12 +86,15 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <%- include('../partials/user/footer') %>
 
+<script id="product-data" type="application/json">
+  <%- JSON.stringify(product) %>
+</script>
 <script>
   document.getElementById("addCustomImage").addEventListener("click", () => {
     document.getElementById("customImageInput").click();
   });
 
-  const product = <%- JSON.stringify(product) %>;
+  const product = JSON.parse(document.getElementById("product-data").textContent);
 
   const productId = "<%=product._id%>";
   const canvas = new fabric.Canvas("canvas");
@@ -132,30 +135,35 @@
   let dbPromise = setupIndexedDB();
 
   // Save data to IndexedDB
-  async function saveToIndexedDB(productId, side, content, backgroundImage) {
+  async function saveToIndexedDB(productId, side, content, backgroundImage, dataUrl) {
     const db = await dbPromise;
-    const transaction = db.transaction("canvasStates", "readwrite");
-    const store = transaction.objectStore("canvasStates");
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction("canvasStates", "readwrite");
+      const store = transaction.objectStore("canvasStates");
 
-    const data = {
-      id: `${productId}-${side}`, 
-      productId,
-      side,
-      content,
-      backgroundImage,
-    };
+      const data = {
+        id: `${productId}-${side}`,
+        productId,
+        side,
+        content,
+        backgroundImage,
+        dataUrl,
+      };
 
-    const request = store.put(data);
+      const request = store.put(data);
 
-    request.onsuccess = () => {
-      console.log(`State saved for ${side} side.`);
-    };
+      request.onsuccess = () => {
+        console.log(`State saved for ${side} side.`);
+        resolve();
+      };
 
-    request.onerror = (event) => {
-      console.error("Failed to save data to IndexedDB:", event.target.errorCode);
-    };
+      request.onerror = (event) => {
+        console.error("Failed to save data to IndexedDB:", event.target.errorCode);
+        reject(event.target.error);
+      };
+    });
   }
-  
+
   // Load data from IndexedDB
   async function loadFromIndexedDB(productId, side) {
     const db = await dbPromise;
@@ -186,7 +194,7 @@
     fabric.Image.fromURL(imageUrl, function (img) {
       img.scaleToWidth(canvas.width);
       canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-      saveToIndexedDB(productId, side, canvas.toJSON(), img.src);
+      saveToIndexedDB(productId, side, canvas.toJSON(), img.src, canvas.toDataURL());
     });
   }
 
@@ -216,11 +224,12 @@
   }
 
   // Save the current state of the canvas
-  function saveState() {
+  async function saveState() {
     console.log(`Saving current state for side: ${currentSide}`);
     const content = canvas.toJSON();
     const backgroundImage = canvas.backgroundImage ? canvas.backgroundImage.getSrc() : null;
-    saveToIndexedDB(productId, currentSide, content, backgroundImage);
+    const dataUrl = canvas.toDataURL({ format: "png", multiplier: 1 });
+    await saveToIndexedDB(productId, currentSide, content, backgroundImage, dataUrl);
   }
 
   window.onload = async function () {
@@ -409,10 +418,13 @@
     }
   }
 
-  // Listen for changes to update layer list
-  canvas.on("object:modified", updateLayerList); // Update when an object is modified
-  canvas.on("object:added", updateLayerList); // Update when an object is added
-  canvas.on("object:removed", updateLayerList); // Update when an object is removed
+  // Listen for changes to update layer list and save state
+  canvas.on("object:modified", function () {
+    updateLayerList();
+    saveState();
+  });
+  canvas.on("object:added", updateLayerList);
+  canvas.on("object:removed", updateLayerList);
 
   async function gatherAllCanvasData(productId) {
     const sides = ["front", "back", "left", "right"];
@@ -424,11 +436,13 @@
         allData[side] = {
           content: state.content,
           backgroundImage: state.backgroundImage,
+          dataUrl: state.dataUrl || null,
         };
       } else {
         allData[side] = {
           content: null,
           backgroundImage: null,
+          dataUrl: null,
         };
       }
     }
@@ -464,7 +478,10 @@
     }
   }
 
-  document.getElementById("saveCustomized").addEventListener("click", () => {
+  document.getElementById("saveCustomized").addEventListener("click", async () => {
+    canvas.discardActiveObject();
+    canvas.renderAll();
+    await saveState();
     sendCanvasDataToBackend();
   });
 </script>
