@@ -45,7 +45,6 @@ router.post("/editCategory", adminAuth, categoryController.editCategory);
 router.get("/category/:id/list", adminAuth, categoryController.categoryListed);
 router.get("/category/:id/unlist", adminAuth, categoryController.categoryUnlisted);
 
-
 /**
  * Product Management Routes
  */
@@ -55,9 +54,7 @@ const upload = productUpload.fields([
   { name: "primaryImage", maxCount: 1 },
   { name: "secondaryImage", maxCount: 4 },
 ]);
-router.route("/add-product")
-.get(adminAuth, productController.getAddProducts)
-.post(adminAuth, upload, productController.addProducts);
+router.route("/add-product").get(adminAuth, productController.getAddProducts).post(adminAuth, upload, productController.addProducts);
 
 router.post("/product/action", productController.listOrUnlistProduct);
 router.delete("/product/deleteProduct", productController.deleteProduct);
@@ -81,50 +78,35 @@ router.patch("/update-stock", productController.updateStock);
  */
 router.get("/attributes", attributeController.getAttributes);
 
-router.route("/attributes/color/:id")
-.get(attributeController.getColor)
-.put(attributeController.editColor);
+router.route("/attributes/color/:id").get(attributeController.getColor).put(attributeController.editColor);
 
-router.route("/attributes/size/:id")
-.get(attributeController.getSize)
-.put(attributeController.editSize);
+router.route("/attributes/size/:id").get(attributeController.getSize).put(attributeController.editSize);
 
-router.route("/attributes/brand/:id")
-.get(attributeController.getBrand)
-.put(attributeController.editBrand);
+router.route("/attributes/brand/:id").get(attributeController.getBrand).put(attributeController.editBrand);
 
-router.route("/attributes/toggleListing/color/:id")
-.patch(attributeController.toggleListingColor);
+router.route("/attributes/toggleListing/color/:id").patch(attributeController.toggleListingColor);
 
-router.route("/attributes/toggleListing/size/:id")
-.patch(attributeController.toggleListingSize);
+router.route("/attributes/toggleListing/size/:id").patch(attributeController.toggleListingSize);
 
-router.route("/attributes/toggleListing/brand/:id")
-.patch(attributeController.toggleListingBrand);
+router.route("/attributes/toggleListing/brand/:id").patch(attributeController.toggleListingBrand);
 
-router.route("/attributes/delete-color/:id")
-.delete(attributeController.deleteColor);
+router.route("/attributes/delete-color/:id").delete(attributeController.deleteColor);
 
-router.route("/attributes/delete-size/:id")
-.delete(attributeController.deleteSize);
+router.route("/attributes/delete-size/:id").delete(attributeController.deleteSize);
 
-router.route("/attributes/delete-brand/:id")
-.delete(attributeController.deleteBrand);
+router.route("/attributes/delete-brand/:id").delete(attributeController.deleteBrand);
 
 router.post("/attributes/add-color", attributeController.addColor);
 router.post("/attributes/add-size", attributeController.addSize);
 router.post("/attributes/add-brand", attributeController.addBrand);
 
-
 /**
  * Order Management
  */
-router.route("/orderList")
-.get(orderController.getOrderList);
+router.route("/orderList").get(orderController.getOrderList);
 
 router.put("/orderList/updateOrder/:orderId", orderController.updateDeliveryStatus);
 router.get("/customize-download/:orderId/:itemId", orderController.productCustomized);
-
 
 /**
  * Coupon Management

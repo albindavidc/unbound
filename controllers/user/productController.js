@@ -72,19 +72,22 @@ module.exports = {
         sortQuery = {};
     }
 
+    const searchQuery = { name: { $regex: search, $options: "i" } };
+    const combinedQuery = { ...searchQuery, ...query, ...filterQuery };
+
     try {
-      const categories = await Category.find({ isListed: true }).lean();
-      const brand = await Brand.find({ isListed: true }).lean();
-      const size = await Size.find({}).lean();
-      const colors = await Color.find({ isListed: true }).lean();
-      const variants = await Variants.find({}).lean();
+      const [categories, brand, size, colors, variants, productCount] = await Promise.all([
+        Category.find({ isListed: true }).lean(),
+        Brand.find({ isListed: true }).lean(),
+        Size.find({}).lean(),
+        Color.find({ isListed: true }).lean(),
+        Variants.find({}).lean(),
+        Product.countDocuments(combinedQuery)
+      ]);
 
       const perPage = 9;
       const page = parseInt(req.query.page) || 1;
 
-      const searchQuery = { name: { $regex: search, $options: "i" } };
-      const combinedQuery = { ...searchQuery, ...query, ...filterQuery };
-      const productCount = await Product.countDocuments(combinedQuery);
 
       const products = await Product.find(combinedQuery)
         // .populate("variants.color")

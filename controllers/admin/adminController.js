@@ -67,160 +67,165 @@ const loadDashboard = async (req, res) => {
       console.log(`Start Date (UTC): ${startDateUTC}`);
       console.log(`End Date (UTC): ${endDateUTC}`);
 
-      const userCount = await User.find().countDocuments();
-      const productCount = await Product.find().countDocuments();
-      // const paymentMethods = ["Online", "Wallet", "COD"];
-
-      const order = await Order.aggregate([
-        {
-          $group: {
-            _id: "$paymentMethod",
-            users: { $addToSet: "$customerId" },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            paymentMethod: "$_id",
-            userCount: { $size: "$users" },
-          },
-        },
-      ]);
-
-      const orderBar = await Order.aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: startDate,
-              $lte: endDate,
+      const [
+        userCount,
+        productCount,
+        order,
+        orderBar,
+        bestSellingCat,
+        bestSellingBrands,
+        categoryCount,
+        brandCount
+      ] = await Promise.all([
+        User.countDocuments(),
+        Product.countDocuments(),
+        Order.aggregate([
+          {
+            $group: {
+              _id: "$paymentMethod",
+              users: { $addToSet: "$customerId" },
             },
           },
-        },
-        { $unwind: "$items" },
-        {
-          $lookup: {
-            from: "products",
-            localField: "items.productId",
-            foreignField: "_id",
-            as: "productInfo",
+          {
+            $project: {
+              _id: 0,
+              paymentMethod: "$_id",
+              userCount: { $size: "$users" },
+            },
           },
-        },
-        { $unwind: "$productInfo" },
-        {
-          $group: {
-            _id: "$items.productId",
-            productName: { $first: "$productInfo.name" },
-            totalQuantitySold: { $sum: "$items.quantity" },
-            totalRevenueForProduct: {
-              $sum: {
-                $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
+        ]),
+        Order.aggregate([
+          {
+            $match: {
+              createdAt: {
+                $gte: startDate,
+                $lte: endDate,
               },
             },
           },
-        },
-        {
-          $sort: {
-            totalQuantitySold: -1,
-          },
-        },
-      ]);
-
-      const bestSellingCat = await Order.aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: startDate,
-              $lte: endDate,
+          { $unwind: "$items" },
+          {
+            $lookup: {
+              from: "products",
+              localField: "items.productId",
+              foreignField: "_id",
+              as: "productInfo",
             },
           },
-        },
-        { $unwind: "$items" },
-        {
-          $lookup: {
-            from: "products",
-            localField: "items.productId",
-            foreignField: "_id",
-            as: "productInfo",
-          },
-        },
-        { $unwind: "$productInfo" },
-        {
-          $lookup: {
-            from: "categories",
-            localField: "productInfo.category",
-            foreignField: "_id",
-            as: "categoryInfo",
-          },
-        },
-        { $unwind: "$categoryInfo" },
-        {
-          $group: {
-            _id: "$categoryInfo._id",
-            categoryName: { $first: "$categoryInfo.name" },
-            categoryQuantitySold: { $sum: "$items.quantity" },
-            totalRevenueForCategory: {
-              $sum: {
-                $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
+          { $unwind: "$productInfo" },
+          {
+            $group: {
+              _id: "$items.productId",
+              productName: { $first: "$productInfo.name" },
+              totalQuantitySold: { $sum: "$items.quantity" },
+              totalRevenueForProduct: {
+                $sum: {
+                  $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
+                },
               },
             },
           },
-        },
-        {
-          $sort: {
-            categoryQuantitySold: -1,
-          },
-        },
-      ]);
-
-      const bestSellingBrands = await Order.aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: startDate,
-              $lte: endDate,
+          {
+            $sort: {
+              totalQuantitySold: -1,
             },
           },
-        },
-        { $unwind: "$items" },
-        {
-          $lookup: {
-            from: "products",
-            localField: "items.productId",
-            foreignField: "_id",
-            as: "productInfo",
-          },
-        },
-        { $unwind: "$productInfo" },
-        {
-          $lookup: {
-            from: "brands",
-            localField: "productInfo.brand",
-            foreignField: "_id",
-            as: "brandInfo",
-          },
-        },
-        { $unwind: "$brandInfo" },
-        {
-          $group: {
-            _id: "$brandInfo._id",
-            brandName: { $first: "$brandInfo.name" },
-            brandQuantitySold: { $sum: "$items.quantity" },
-            totalRevenueForBrand: {
-              $sum: {
-                $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
+        ]),
+        Order.aggregate([
+          {
+            $match: {
+              createdAt: {
+                $gte: startDate,
+                $lte: endDate,
               },
             },
           },
-        },
-        {
-          $sort: {
-            brandQuantitySold: -1,
+          { $unwind: "$items" },
+          {
+            $lookup: {
+              from: "products",
+              localField: "items.productId",
+              foreignField: "_id",
+              as: "productInfo",
+            },
           },
-        },
+          { $unwind: "$productInfo" },
+          {
+            $lookup: {
+              from: "categories",
+              localField: "productInfo.category",
+              foreignField: "_id",
+              as: "categoryInfo",
+            },
+          },
+          { $unwind: "$categoryInfo" },
+          {
+            $group: {
+              _id: "$categoryInfo._id",
+              categoryName: { $first: "$categoryInfo.name" },
+              categoryQuantitySold: { $sum: "$items.quantity" },
+              totalRevenueForCategory: {
+                $sum: {
+                  $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
+                },
+              },
+            },
+          },
+          {
+            $sort: {
+              categoryQuantitySold: -1,
+            },
+          },
+        ]),
+        Order.aggregate([
+          {
+            $match: {
+              createdAt: {
+                $gte: startDate,
+                $lte: endDate,
+              },
+            },
+          },
+          { $unwind: "$items" },
+          {
+            $lookup: {
+              from: "products",
+              localField: "items.productId",
+              foreignField: "_id",
+              as: "productInfo",
+            },
+          },
+          { $unwind: "$productInfo" },
+          {
+            $lookup: {
+              from: "brands",
+              localField: "productInfo.brand",
+              foreignField: "_id",
+              as: "brandInfo",
+            },
+          },
+          { $unwind: "$brandInfo" },
+          {
+            $group: {
+              _id: "$brandInfo._id",
+              brandName: { $first: "$brandInfo.name" },
+              brandQuantitySold: { $sum: "$items.quantity" },
+              totalRevenueForBrand: {
+                $sum: {
+                  $multiply: ["$items.quantity", { $toDouble: "$items.price" }],
+                },
+              },
+            },
+          },
+          {
+            $sort: {
+              brandQuantitySold: -1,
+            },
+          },
+        ]),
+        Category.countDocuments(),
+        Brand.countDocuments()
       ]);
-
-      const categoryCount = await Category.find().countDocuments();
-      const brandCount = await Brand.find().countDocuments();
 
       res.render("admin/dashboard", { userCount, productCount, order, orderBar, bestSellingCat, bestSellingBrands, categoryCount, brandCount });
     } catch (error) {

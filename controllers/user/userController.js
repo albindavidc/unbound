@@ -8,11 +8,10 @@ const Address = require("../../models/addressSchema");
 const Referral = require("../../models/referralSchema");
 const Wallet = require("../../models/walletSchema");
 const Cart = require("../../models/cartSchema");
-const Wishlist = require("../../models/wishlistSchema")
+const Wishlist = require("../../models/wishlistSchema");
 
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
-const { checkout } = require("../../routes/userRouter");
 
 const pageNotFound = async (req, res) => {
   try {
@@ -25,22 +24,22 @@ const pageNotFound = async (req, res) => {
 // Load Home Page
 const loadHomepage = async (req, res) => {
   try {
-    const userId = req.session.user;
-    let cart = await Cart.findOne({ userId });
-    let wishlist = await Wishlist.findOne({userId})
-    if (!cart) {
-      cart = new Cart({ userId });
-      await cart.save();
-    }
-    if (!wishlist) {
-      wishlist = new Wishlist({ userId });
-      await wishlist.save();
-    }
-
     if (req.session.user) {
-      return res.render("user/home", {
-        user: req.session.user,
-      });
+      const userId = req.session.user;
+      
+      const [cart, wishlist] = await Promise.all([
+        Cart.findOne({ userId }).lean(),
+        Wishlist.findOne({ userId }).lean()
+      ]);
+
+      if (!cart) {
+        await Cart.create({ userId });
+      }
+      if (!wishlist) {
+        await Wishlist.create({ userId });
+      }
+
+      return res.render("user/home", { user: userId });
     } else {
       res.render("user/signup");
     }
@@ -185,7 +184,7 @@ const verifyOtp = async (req, res) => {
         const addReferrals = await Referral.findOneAndUpdate(
           { referrer: matchingReferral.referrer._id },
           { $set: { referralCode: matchingReferral.referralCode }, $push: { referredUserDetails: { user: req.session.user, status: "Active" } } },
-          { new: true, upsert: true }
+          { new: true, upsert: true },
         );
 
         await User.findOneAndUpdate({ _id: req.session.user }, { $push: { referrals: addReferrals } }, { new: true, upsert: true });
