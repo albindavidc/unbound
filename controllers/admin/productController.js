@@ -26,10 +26,7 @@ module.exports = {
 
       const searchQuery = search
         ? {
-            $or: [
-              { name: { $regex: ".*" + search + ".*", $options: "i" } },
-              { description: { $regex: ".*" + search + ".*", $options: "i" } },
-            ],
+            $or: [{ name: { $regex: ".*" + search + ".*", $options: "i" } }, { description: { $regex: ".*" + search + ".*", $options: "i" } }],
           }
         : {};
 
@@ -61,7 +58,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
   },
 
@@ -119,7 +116,7 @@ module.exports = {
             size: await Size.findById(size),
             stock: parseInt(stock, 10), // Ensure stock is a number
           };
-        })
+        }),
       );
 
       const productExists = await Product.findOne({ name: productName });
@@ -161,27 +158,21 @@ module.exports = {
         const newCategoryOfferSellingPrice = newProduct.actualPrice * (1 - categoryOffer / 100);
 
         if (newProductOfferSellingPrice < newCategoryOfferSellingPrice) {
-          await Product.updateOne(
-            { _id: newProduct._id }, // Match all products in the given category
-            [
-              {
-                $set: {
-                  sellingPrice: Math.round(newProductOfferSellingPrice),
-                },
+          await Product.updateOne({ _id: newProduct._id }, [
+            {
+              $set: {
+                sellingPrice: Math.round(newProductOfferSellingPrice),
               },
-            ]
-          );
+            },
+          ]);
         } else {
-          await Product.updateOne(
-            { _id: newProduct._id }, // Match all products in the given category
-            [
-              {
-                $set: {
-                  sellingPrice: Math.round(newCategoryOfferSellingPrice),
-                },
+          await Product.updateOne({ _id: newProduct._id }, [
+            {
+              $set: {
+                sellingPrice: Math.round(newCategoryOfferSellingPrice),
               },
-            ]
-          );
+            },
+          ]);
         }
 
         res.json({ isvalid: true });
@@ -189,7 +180,7 @@ module.exports = {
         res.json({ isvalid: false });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   },
 
@@ -246,7 +237,7 @@ module.exports = {
       const productId = req.params.id;
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ isvalid: false, message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ isvalid: false, message: "Product not found" });
       }
 
       const files = req.files || {};
@@ -266,7 +257,7 @@ module.exports = {
             try {
               fs.unlinkSync(oldPath);
             } catch (err) {
-              console.warn('Failed to delete old primary image:', err.message);
+              console.warn("Failed to delete old primary image:", err.message);
             }
           }
         }
@@ -300,7 +291,7 @@ module.exports = {
             try {
               fs.unlinkSync(oldSecondaryPath);
             } catch (err) {
-              console.warn('Failed to delete old secondary image:', err.message);
+              console.warn("Failed to delete old secondary image:", err.message);
             }
           }
         }
@@ -332,9 +323,13 @@ module.exports = {
         const sizeId = typeof variant.size === "object" ? variant.size?._id : variant.size;
         const stockNum = parseInt(variant.stock, 10) || 0;
 
-        const existingVariant = product.variants ? product.variants.find(
-          (v) => (v.color ? String(v.color._id || v.color) : "") === String(colorId) && (v.size ? String(v.size._id || v.size) : "") === String(sizeId)
-        ) : null;
+        const existingVariant = product.variants
+          ? product.variants.find(
+              (v) =>
+                (v.color ? String(v.color._id || v.color) : "") === String(colorId) &&
+                (v.size ? String(v.size._id || v.size) : "") === String(sizeId),
+            )
+          : null;
 
         return {
           _id: existingVariant ? existingVariant._id : new mongoose.Types.ObjectId(),
@@ -365,7 +360,7 @@ module.exports = {
       // Calculate Offer & Selling Price
       const categoryId = req.body.category;
       const catOffer = categoryId ? await Category.findById(categoryId, { categoryOffer: 1 }) : null;
-      const categoryOffer = catOffer ? (catOffer.categoryOffer || 0) : 0;
+      const categoryOffer = catOffer ? catOffer.categoryOffer || 0 : 0;
       const productOffer = Number(req.body.offerDiscountRate) || 0;
       const actualPriceNum = Number(req.body.actualPrice) || 0;
 
@@ -393,15 +388,15 @@ module.exports = {
     try {
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Product not found" });
       }
 
       product.isActive = shouldList;
       await product.save();
 
-      return res.status(200).json({ success: true, message: "Product status updated" });
+      return res.status(HTTP_STATUS.OK).json({ success: true, message: "Product status updated" });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Server error", error });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error", error });
     }
   },
 
@@ -411,7 +406,7 @@ module.exports = {
 
       const product = await Product.findById(productId);
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Product not found" });
       }
 
       // Delete primary images if they exist
@@ -436,9 +431,9 @@ module.exports = {
       }
 
       await Product.findByIdAndDelete(productId);
-      return res.status(200).json({ success: true, message: "Product successfully deleted" });
+      return res.status(HTTP_STATUS.OK).json({ success: true, message: "Product successfully deleted" });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Server error", error });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error", error });
     }
   },
 
@@ -448,7 +443,7 @@ module.exports = {
       const product = await Product.findById(productId);
 
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Product not found" });
       }
 
       let imageDeleted = false;
@@ -481,13 +476,13 @@ module.exports = {
             console.warn("Failed to delete image file from disk:", err.message);
           }
         }
-        return res.status(200).json({ success: true, message: "Image deleted successfully" });
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "Image deleted successfully" });
       } else {
-        return res.status(404).json({ success: false, message: "Image not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Image not found" });
       }
     } catch (error) {
       console.error("Error in deleteImage:", error);
-      return res.status(500).json({ success: false, message: "Server error" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
     }
   },
 
@@ -527,7 +522,7 @@ module.exports = {
         totalPages,
       });
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
   },
 
@@ -535,27 +530,24 @@ module.exports = {
     try {
       const { variantId, stock } = req.body;
 
-      // Attempt to update the stock
       const product = await Product.findOneAndUpdate(
         { "variants._id": variantId },
         { $set: { "variants.$.stock": parseInt(stock, 10) } },
-        { new: true }
+        { new: true },
       );
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found." });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product not found." });
       }
 
-      // Save the updated product
       await product.save();
 
-      // Send a response indicating success
       res.json({
         message: "Stock updated successfully.",
         product: product,
       });
     } catch (error) {
-      res.status(500).json({ message: "An error occurred while updating the stock." });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while updating the stock." });
     }
   },
 };

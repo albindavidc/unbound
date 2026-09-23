@@ -56,7 +56,7 @@ const addCategory = async (req, res) => {
   try {
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
-      return res.status(400).json({ error: "Category already exists" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Category already exists" });
     }
 
     const newCategory = new Category({
@@ -84,7 +84,7 @@ const addCategory = async (req, res) => {
                 sellingPrice: Math.round(newProductOfferSellingPrice),
               },
             },
-          ]
+          ],
         );
       } else {
         await Product.updateOne(
@@ -95,14 +95,14 @@ const addCategory = async (req, res) => {
                 sellingPrice: Math.round(newCategoryOfferSellingPrice),
               },
             },
-          ]
+          ],
         );
       }
     }
 
     return res.json({ message: "Category added successfully" });
   } catch (error) {
-    return res.status(500).json({ error: "The first letter has to capital and should not leave any space in between" });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "The first letter has to capital and should not leave any space in between" });
   }
 };
 
@@ -111,11 +111,11 @@ const getCategoryDetails = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (!category) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Category not found" });
     }
     res.json(category);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Server error" });
   }
 };
 
@@ -126,7 +126,7 @@ const editCategory = async (req, res) => {
   try {
     const category = await Category.findById(id);
     if (!category) {
-      return res.status(404).json({ error: "Category not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Category not found" });
     }
 
     parseFloat(offer);
@@ -153,7 +153,7 @@ const editCategory = async (req, res) => {
                 sellingPrice: Math.round(newProductOfferSellingPrice),
               },
             },
-          ]
+          ],
         );
       } else {
         await Product.updateOne(
@@ -164,14 +164,14 @@ const editCategory = async (req, res) => {
                 sellingPrice: Math.round(newCategoryOfferSellingPrice),
               },
             },
-          ]
+          ],
         );
       }
     }
 
     res.redirect("/admin/category");
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 };
 

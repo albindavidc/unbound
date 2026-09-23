@@ -64,7 +64,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error loading order details:", error);
-      res.status(500).send("Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
     }
   },
 
@@ -116,7 +116,7 @@ module.exports = {
 
         // First, check if a rating already exists for the user and order
         const existingRating = product.ratings.find(
-          (rating) => rating.user.toString() === userId.toString() && rating.orderId.toString() === itemOrderId.toString()
+          (rating) => rating.user.toString() === userId.toString() && rating.orderId.toString() === itemOrderId.toString(),
         );
 
         if (existingRating) {
@@ -130,7 +130,7 @@ module.exports = {
                 // Add any other fields you want to update, e.g. rating, review, etc.
               },
             },
-            { new: true, upsert: true }
+            { new: true, upsert: true },
           );
         } else {
           // If rating doesn't exist, push a new one
@@ -145,7 +145,7 @@ module.exports = {
                 },
               },
             },
-            { new: true, upsert: true }
+            { new: true, upsert: true },
           );
         }
 
@@ -157,7 +157,7 @@ module.exports = {
       res.json({ success: true, message: "Order updated successfully" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
     }
   },
 
@@ -174,7 +174,7 @@ module.exports = {
     });
 
     if (!checkProductId) {
-      return res.status(404).send("No matching custom design for this product.");
+      return res.status(HTTP_STATUS.NOT_FOUND).send("No matching custom design for this product.");
     }
 
     const products = await Product.findOne({ _id: checkProductId.productId });

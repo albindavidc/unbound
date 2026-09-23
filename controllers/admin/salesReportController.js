@@ -201,7 +201,7 @@ module.exports = {
         totalPages,
       });
     } catch (error) {
-      res.status(500).json({ success: false, error: "An error occurred while fetching the sales report." });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, error: "An error occurred while fetching the sales report." });
     }
   },
 
@@ -222,7 +222,7 @@ module.exports = {
           const custName = order.customerId?.name || order.customerId?.email || order.userName || "Customer";
           const price = item.price || item.productId?.price || 0;
           const qty = item.quantity || 1;
-          const itemTotal = item.totalPrice || (price * qty);
+          const itemTotal = item.totalPrice || price * qty;
 
           let addrStr = "N/A";
           if (order.shippingAddress) {
@@ -241,7 +241,7 @@ module.exports = {
             status: order.status || "N/A",
             createdAt: order.createdAt ? new Date(order.createdAt).toISOString().split("T")[0] : "N/A",
           };
-        })
+        }),
       );
 
       const workBook = new excelJs.Workbook();
@@ -331,10 +331,10 @@ module.exports = {
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", "attachment; filename=SalesReport.xlsx");
       await workBook.xlsx.write(res);
-      res.status(200).end();
+      res.status(HTTP_STATUS.OK).end();
     } catch (err) {
       console.error("Error generating Excel:", err);
-      res.status(500).send("Internal Server Error generating Excel report");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error generating Excel report");
     }
   },
 
@@ -379,9 +379,9 @@ module.exports = {
 
       orders.forEach((order) => {
         (order.items || []).forEach((item) => {
-          totalQuantity += (item.quantity || 1);
+          totalQuantity += item.quantity || 1;
         });
-        totalPrice += (order.totalPrice || order.finalAmount || 0);
+        totalPrice += order.totalPrice || order.finalAmount || 0;
       });
 
       const margins = { left: 20, top: 110 };
@@ -403,13 +403,38 @@ module.exports = {
         doc.text("Order ID", margins.left, margins.top, { width: columnWidths.orderId, align: "left" });
         doc.text("Date", margins.left + columnWidths.orderId, margins.top, { width: columnWidths.date, align: "left" });
         doc.text("Customer", margins.left + columnWidths.orderId + columnWidths.date, margins.top, { width: columnWidths.customer, align: "left" });
-        doc.text("Products", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer, margins.top, { width: columnWidths.products, align: "left" });
-        doc.text("Total", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products, margins.top, { width: columnWidths.totalAmount, align: "left" });
-        doc.text("Payment", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products + columnWidths.totalAmount, margins.top, { width: columnWidths.paymentMethod, align: "left" });
-        doc.text("Status", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products + columnWidths.totalAmount + columnWidths.paymentMethod, margins.top, { width: columnWidths.status, align: "left" });
+        doc.text("Products", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer, margins.top, {
+          width: columnWidths.products,
+          align: "left",
+        });
+        doc.text("Total", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products, margins.top, {
+          width: columnWidths.totalAmount,
+          align: "left",
+        });
+        doc.text(
+          "Payment",
+          margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products + columnWidths.totalAmount,
+          margins.top,
+          { width: columnWidths.paymentMethod, align: "left" },
+        );
+        doc.text(
+          "Status",
+          margins.left +
+            columnWidths.orderId +
+            columnWidths.date +
+            columnWidths.customer +
+            columnWidths.products +
+            columnWidths.totalAmount +
+            columnWidths.paymentMethod,
+          margins.top,
+          { width: columnWidths.status, align: "left" },
+        );
 
         doc.strokeColor("#424649").lineWidth(1);
-        doc.moveTo(margins.left, margins.top + 18).lineTo(575, margins.top + 18).stroke();
+        doc
+          .moveTo(margins.left, margins.top + 18)
+          .lineTo(575, margins.top + 18)
+          .stroke();
         yPosition = margins.top + 25;
       };
 
@@ -419,7 +444,7 @@ module.exports = {
 
       orders.forEach((order) => {
         const orderDate = order.createdAt ? new Date(order.createdAt).toISOString().split("T")[0] : "N/A";
-        const productNames = (order.items || []).map((item) => `${item.productId?.name || item.name || 'Item'} (x${item.quantity || 1})`).join(", ");
+        const productNames = (order.items || []).map((item) => `${item.productId?.name || item.name || "Item"} (x${item.quantity || 1})`).join(", ");
         const customerName = order.customerId?.name || order.customerId?.email || order.userName || "Customer";
         const orderIdStr = order.orderId || (order._id ? order._id.toString().slice(-7).toUpperCase() : "N/A");
 
@@ -431,10 +456,34 @@ module.exports = {
         doc.text(orderIdStr, margins.left, yPosition, { width: columnWidths.orderId, align: "left" });
         doc.text(orderDate, margins.left + columnWidths.orderId, yPosition, { width: columnWidths.date, align: "left" });
         doc.text(customerName, margins.left + columnWidths.orderId + columnWidths.date, yPosition, { width: columnWidths.customer, align: "left" });
-        doc.text(productNames, margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer, yPosition, { width: columnWidths.products, align: "left" });
-        doc.text(`Rs. ${order.totalPrice || 0}`, margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products, yPosition, { width: columnWidths.totalAmount, align: "left" });
-        doc.text(order.paymentMethod || "Online", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products + columnWidths.totalAmount, yPosition, { width: columnWidths.paymentMethod, align: "left" });
-        doc.text(order.status || "Completed", margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products + columnWidths.totalAmount + columnWidths.paymentMethod, yPosition, { width: columnWidths.status, align: "left" });
+        doc.text(productNames, margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer, yPosition, {
+          width: columnWidths.products,
+          align: "left",
+        });
+        doc.text(
+          `Rs. ${order.totalPrice || 0}`,
+          margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products,
+          yPosition,
+          { width: columnWidths.totalAmount, align: "left" },
+        );
+        doc.text(
+          order.paymentMethod || "Online",
+          margins.left + columnWidths.orderId + columnWidths.date + columnWidths.customer + columnWidths.products + columnWidths.totalAmount,
+          yPosition,
+          { width: columnWidths.paymentMethod, align: "left" },
+        );
+        doc.text(
+          order.status || "Completed",
+          margins.left +
+            columnWidths.orderId +
+            columnWidths.date +
+            columnWidths.customer +
+            columnWidths.products +
+            columnWidths.totalAmount +
+            columnWidths.paymentMethod,
+          yPosition,
+          { width: columnWidths.status, align: "left" },
+        );
 
         yPosition += rowHeight;
       });
@@ -457,7 +506,7 @@ module.exports = {
       doc.end();
     } catch (err) {
       console.error("Error generating PDF:", err);
-      res.status(500).send("Internal Server Error generating PDF report");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error generating PDF report");
     }
   },
 };

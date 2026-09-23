@@ -17,7 +17,7 @@ module.exports = {
   addBanner: async (req, res) => {
     try {
       if (!req.files || !req.files.banner_images || req.files.banner_images.length === 0) {
-        return res.status(400).json({ success: false, message: "No files were uploaded." });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "No files were uploaded." });
       }
 
       const folderName = `banner-${Date.now()}`;
@@ -65,7 +65,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error adding banner:", error);
-      return res.status(500).json({
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Internal server error",
       });
@@ -81,12 +81,12 @@ module.exports = {
     try {
       const bannerId = req.params.id || req.query.id;
       if (!bannerId) {
-        return res.status(400).json({ success: false, message: "Banner ID is required" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Banner ID is required" });
       }
 
       const banner = await Banner.findById(bannerId);
       if (!banner) {
-        return res.status(404).json({ success: false, message: "Banner not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Banner not found" });
       }
 
       // Remove physical banner images from filesystem
@@ -109,7 +109,7 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error deleting banner:", error);
-      return res.status(500).json({
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Internal server error deleting banner",
       });

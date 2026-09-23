@@ -46,7 +46,7 @@ module.exports = {
     try {
       const existingCoupon = await Coupon.findOne({ couponCode });
       if (existingCoupon) {
-        return res.status(400).json({ error: "Coupon already exists" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Coupon already exists" });
       }
 
       const newCoupon = new Coupon({
@@ -60,7 +60,7 @@ module.exports = {
       await newCoupon.save();
       return res.json({ success: true, message: "Coupon added successfully" });
     } catch (error) {
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
     }
   },
 
@@ -69,11 +69,11 @@ module.exports = {
       const { id } = req.params;
       const coupon = await Coupon.findById(id);
       if (!coupon) {
-        return res.status(404).json({ success: false, message: "Coupon not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Coupon not found" });
       }
       res.json(coupon);
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
     }
   },
 
@@ -91,16 +91,16 @@ module.exports = {
           startingDate: req.body.startingDate,
           expiringDate: req.body.expiringDate,
         },
-        { new: true }
+        { new: true },
       );
 
       if (!updatedCoupon) {
-        return res.status(404).json({ success: false, message: "Coupon not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Coupon not found" });
       }
 
       res.json({ success: true, message: "Coupon updated successfully", coupon: updatedCoupon });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
     }
   },
 
@@ -116,7 +116,7 @@ module.exports = {
         return res.json({ success: false, message: "Coupon deletion incomplete" });
       }
     } catch (error) {
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
     }
   },
 };

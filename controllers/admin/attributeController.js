@@ -24,12 +24,12 @@ module.exports = {
     try {
       const color = await Color.findById(id);
       if (color) {
-        res.status(200).json(color);
+        res.status(HTTP_STATUS.OK).json(color);
       } else {
-        res.status(404).json({ error: "Color not found" });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Color not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch color" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to fetch color" });
     }
   },
 
@@ -39,12 +39,12 @@ module.exports = {
     try {
       const size = await Size.findById(id);
       if (size) {
-        res.status(200).json(size);
+        res.status(HTTP_STATUS.OK).json(size);
       } else {
-        res.status(404).json({ error: "Size not found" });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Size not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch size" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to fetch size" });
     }
   },
 
@@ -54,12 +54,12 @@ module.exports = {
     try {
       const brand = await Brand.findById(id);
       if (brand) {
-        res.status(200).json(brand);
+        res.status(HTTP_STATUS.OK).json(brand);
       } else {
-        res.status(404).json({ error: "Size not found" });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Size not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch brand" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to fetch brand" });
     }
   },
 
@@ -73,7 +73,7 @@ module.exports = {
       });
 
       if (existingColor) {
-        return res.status(400).json({ success: false, message: "Color name or hex already exists" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Color name or hex already exists" });
       }
 
       if (color && colorHex) {
@@ -82,12 +82,12 @@ module.exports = {
           hex: colorHex,
         });
         await newColor.save();
-        res.status(200).json({ success: true, message: "Color added successfully" });
+        res.status(HTTP_STATUS.OK).json({ success: true, message: "Color added successfully" });
       } else {
-        res.status(400).json({ success: false, message: "Missing color name or hex" });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Missing color name or hex" });
       }
     } catch (error) {
-      res.status(500).json({ success: false, message: "Failed to add color" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to add color" });
     }
   },
 
@@ -101,7 +101,7 @@ module.exports = {
 
       if (existingSize) {
         console.log(existingSize);
-        return res.status(400).json({ success: false, message: "Size already exists" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Size already exists" });
       }
 
       if (size) {
@@ -110,12 +110,12 @@ module.exports = {
         });
 
         await newSize.save();
-        return res.status(200).json({ success: true, message: "Size added successfully" });
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "Size added successfully" });
       }
 
-      return res.status(400).json({ success: false, message: "Size is required" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Size is required" });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Failed to add size" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to add size" });
     }
   },
 
@@ -131,7 +131,7 @@ module.exports = {
         });
 
         if (existingBrand) {
-          return res.status(400).json({ success: false, message: "Brand already exists" });
+          return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Brand already exists" });
         } else {
           const newBrand = new Brand({
             name: brand.toLowerCase(),
@@ -139,14 +139,14 @@ module.exports = {
           });
 
           await newBrand.save();
-          return res.status(200).json({ success: true, message: "Brand added successfully" });
+          return res.status(HTTP_STATUS.OK).json({ success: true, message: "Brand added successfully" });
         }
       } else {
-        return res.status(400).json({ success: false, message: "Brand name is required" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Brand name is required" });
       }
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ success: false, message: "Failed to add brand" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to add brand" });
     }
   },
 
@@ -161,7 +161,7 @@ module.exports = {
           name: colorName.toLowerCase(),
           hex: colorHex,
         },
-        { new: true }
+        { new: true },
       );
       if (color) {
         req.flash("success", "Editted Color attribute");
@@ -186,7 +186,7 @@ module.exports = {
         {
           value: size,
         },
-        { new: true }
+        { new: true },
       );
       if (sizeAttr) {
         req.flash("success", "Editted Size attribute");
@@ -211,7 +211,7 @@ module.exports = {
         {
           name: brand.toLowerCase(),
         },
-        { new: true }
+        { new: true },
       );
       if (newBrand) {
         req.flash("success", "Editted Brand attribute");
@@ -235,17 +235,17 @@ module.exports = {
       });
 
       if (productCount > 0) {
-        return res.status(400).json({ success: false, message: "Color is in use by some products" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Color is in use by some products" });
       } else {
         const result = await Color.findByIdAndDelete(id);
         if (result) {
-          return res.status(200).json({ success: true, message: "Color deleted successfully" });
+          return res.status(HTTP_STATUS.OK).json({ success: true, message: "Color deleted successfully" });
         } else {
-          return res.status(404).json({ success: false, message: "Color not found" });
+          return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Color not found" });
         }
       }
     } catch (error) {
-      return res.status(500).json({ error: "Failed to delete color" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to delete color" });
     }
   },
   deleteSize: async (req, res) => {
@@ -254,17 +254,17 @@ module.exports = {
       const productUsingSize = await Product.findOne({ "variants.size": id });
 
       if (productUsingSize) {
-        return res.status(400).json({ success: false, message: "Size is in use by a product" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Size is in use by a product" });
       } else {
         const result = await Size.findByIdAndDelete(id);
         if (result) {
-          res.status(200).json({ success: true, message: "Size deleted successfully" });
+          res.status(HTTP_STATUS.OK).json({ success: true, message: "Size deleted successfully" });
         } else {
-          res.status(404).json({ success: false, message: "Size not found" });
+          res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Size not found" });
         }
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete size" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to delete size" });
     }
   },
   deleteBrand: async (req, res) => {
@@ -273,17 +273,17 @@ module.exports = {
       const productsUsingBrand = await Product.find({ brand: id });
 
       if (productsUsingBrand.length > 0) {
-        return res.status(400).json({ success: false, message: "Brand is in use by some products" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Brand is in use by some products" });
       } else {
         const result = await Brand.findByIdAndDelete(id);
         if (result) {
-          res.status(200).json({ success: true, message: "Brand deleted successfully" });
+          res.status(HTTP_STATUS.OK).json({ success: true, message: "Brand deleted successfully" });
         } else {
-          res.status(404).json({ success: false, message: "Brand not found" });
+          res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Brand not found" });
         }
       }
     } catch (error) {
-      res.status(500).json({ success: false, message: "Failed to delete brand" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to delete brand" });
     }
   },
 
@@ -296,15 +296,15 @@ module.exports = {
         color.isDeleted = !color.isDeleted;
         await color.save();
         let status = color.isDeleted ? "Unlisted" : "Listed";
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
           color: color,
           message: `The Color : ${color.name} is ${status}`,
         });
       } else {
-        res.status(404).json({ error: "Color not found" });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Color not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to toggle listing status" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to toggle listing status" });
     }
   },
   toggleListingSize: async (req, res) => {
@@ -315,15 +315,15 @@ module.exports = {
         size.isDeleted = !size.isDeleted;
         await size.save();
         let status = size.isDeleted ? "Unlisted" : "Listed";
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
           size: size,
           message: `The Size : ${size.value} is ${status}`,
         });
       } else {
-        res.status(404).json({ error: "Size not found" });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Size not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to toggle listing status" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to toggle listing status" });
     }
   },
   toggleListingBrand: async (req, res) => {
@@ -334,15 +334,15 @@ module.exports = {
         brand.isActive = !brand.isActive;
         await brand.save();
         let status = brand.isActive ? "Unlisted" : "Listed";
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
           brand: brand,
           message: `The Brand : ${brand.name} is ${status}`,
         });
       } else {
-        res.status(404).json({ error: "Size not found" });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Size not found" });
       }
     } catch (error) {
-      res.status(500).json({ error: "Failed to toggle listing status" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to toggle listing status" });
     }
   },
 };
