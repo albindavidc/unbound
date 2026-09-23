@@ -1,5 +1,4 @@
 // userController.js
-
 require("dotenv").config();
 
 const User = require("../../models/userSchema");
@@ -17,7 +16,7 @@ const pageNotFound = async (req, res) => {
   try {
     return res.render("user/page-404");
   } catch (error) {
-    res.status(500).send("Server Error: Could not render 404 page.");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error: Could not render 404 page.");
   }
 };
 
@@ -26,11 +25,8 @@ const loadHomepage = async (req, res) => {
   try {
     if (req.session.user) {
       const userId = req.session.user;
-      
-      const [cart, wishlist] = await Promise.all([
-        Cart.findOne({ userId }).lean(),
-        Wishlist.findOne({ userId }).lean()
-      ]);
+
+      const [cart, wishlist] = await Promise.all([Cart.findOne({ userId }).lean(), Wishlist.findOne({ userId }).lean()]);
 
       if (!cart) {
         await Cart.create({ userId });
@@ -44,7 +40,7 @@ const loadHomepage = async (req, res) => {
       res.render("user/signup");
     }
   } catch (error) {
-    res.status(500).send(`Server error`);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(`Server error`);
   }
 };
 
@@ -58,7 +54,7 @@ const loadSignup = async (req, res) => {
       return res.render("user/signup");
     }
   } catch (error) {
-    res.status(500).send("Server Error");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
@@ -125,7 +121,7 @@ const signup = async (req, res) => {
 
     res.redirect("/verify-otp");
   } catch (error) {
-    res.status(500).send("Error in signup: " + error.message);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error in signup: " + error.message);
   }
 };
 
@@ -151,7 +147,7 @@ const verifyOtp = async (req, res) => {
       const passwordHash = await securePassword(user.password);
 
       if (!req.session.userOtp || !req.session.userData) {
-        return res.status(400).json({
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
           success: false,
           message: "Session expired, please try again.",
         });
@@ -200,13 +196,13 @@ const verifyOtp = async (req, res) => {
 
       res.json({ success: true });
     } else {
-      res.status(400).json({
+      res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "Invalid OTP, Please try again with recent OTP",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "An unexpected error occurred. Please try again later.",
     });
@@ -219,7 +215,7 @@ const resendOtp = async (req, res) => {
     const { email } = req.session.userData;
 
     if (!email) {
-      return res.status(400).json({ success: false, message: "Email not found in session" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Email not found in session" });
     }
 
     const otp = generateOtp();
@@ -228,15 +224,15 @@ const resendOtp = async (req, res) => {
     const emailSent = await sendVerificationEmail(email, otp);
 
     if (emailSent) {
-      res.status(200).json({ success: true, message: "OTP Resend Successfully" });
+      res.status(HTTP_STATUS.OK).json({ success: true, message: "OTP Resend Successfully" });
     } else {
-      res.status(500).json({
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Failed to resend OTP. Please try again",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Internal Server Error. Please try again",
     });
@@ -251,7 +247,7 @@ const loadLogin = async (req, res) => {
 
     return res.render("user/signup", { referrals, referrer });
   } catch (error) {
-    res.status(500).send("Error in loadLogin: " + error.message);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error in loadLogin: " + error.message);
   }
 };
 
@@ -301,7 +297,7 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, "i") } });
 
     if (!user) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "No account found with that email address.",
       });
@@ -315,7 +311,7 @@ const forgotPassword = async (req, res) => {
     const emailSent = await sendVerificationEmail(email, otp); // Send OTP to email
 
     if (!emailSent) {
-      return res.status(500).json({
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Failed to send OTP. Please try again.",
       });
@@ -323,7 +319,7 @@ const forgotPassword = async (req, res) => {
 
     res.render("user/forgot-password-verify-otp", { email, otp });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "An unexpected error occurred. Please try again later.",
     });
@@ -336,7 +332,7 @@ const forgotPassVerifyOtp = async (req, res) => {
     const { otp } = req.body;
     console.log(`OTP Sent: ${otp}`);
     if (!req.session.userOtp || !req.session.userData) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "Session expired, please try again.",
       });
@@ -353,13 +349,13 @@ const forgotPassVerifyOtp = async (req, res) => {
         message: "OTP verified, you can now reset your password.",
       });
     } else {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "Invalid OTP, please try again with a recent OTP.",
       });
     }
   } catch (error) {
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "An unexpected error occurred. Please try again later.",
     });
@@ -377,7 +373,7 @@ const passwordChange = async (req, res) => {
 
     // Check password strength
     if (password.length < 8 || !/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "Password must be at least 8 characters long and include both letters and numbers",
       });
@@ -386,7 +382,7 @@ const passwordChange = async (req, res) => {
     const user = req.session.userData;
 
     if (!user) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         success: false,
         message: "Session expired or invalid user data",
       });
@@ -407,7 +403,7 @@ const passwordChange = async (req, res) => {
 
     res.redirect("/login");
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "An unexpected error occurred. Please try again later.",
     });
@@ -429,13 +425,13 @@ const logout = async (req, res) => {
     }
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).send("Error in logout: " + err.message);
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error in logout: " + err.message);
       }
       return res.redirect("/login");
     });
   } catch (error) {
     console.log("Logout error", error);
-    res.status(500).send("Logout error: " + error.message);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Logout error: " + error.message);
   }
 };
 
@@ -486,19 +482,19 @@ const editProfile = async (req, res) => {
     const userId = req.session.user;
 
     if (!userId) {
-      return res.status(400).json({ message: "User not found in session" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "User not found in session" });
     }
 
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "User not found" });
     }
 
     const { fullName, phone } = req.body;
 
     if (!fullName || !phone) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "All fields are required" });
     }
 
     user.name = fullName.trim() || user.name;
@@ -506,9 +502,9 @@ const editProfile = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({ message: "Profile updated successfully", user });
+    res.status(HTTP_STATUS.OK).json({ message: "Profile updated successfully", user });
   } catch (error) {
-    res.status(500).json({ message: "An error occurred while updating the profile" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while updating the profile" });
   }
 };
 
@@ -517,11 +513,11 @@ const resetPassword = async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
 
   if (!oldPassword || !newPassword || !confirmPassword) {
-    return res.status(400).json({ message: "All fields are required" });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "All fields are required" });
   }
 
   if (!newPassword || newPassword !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords do not match." });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Passwords do not match." });
   }
 
   try {
@@ -529,16 +525,16 @@ const resetPassword = async (req, res) => {
 
     const isMatch = bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Old password is incorrect." });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Old password is incorrect." });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: "Password successfully reset." });
+    res.status(HTTP_STATUS.OK).json({ message: "Password successfully reset." });
   } catch (error) {
-    res.status(500).json({ message: "Server error." });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Server error." });
   }
 };
 
@@ -563,7 +559,7 @@ const addAddress = async (req, res) => {
     const newAddress = await Address.create(req.body);
 
     req.flash("success", "Address Added");
-    res.status(200).json({ success: true, message: "Address added successfully" });
+    res.status(HTTP_STATUS.OK).json({ success: true, message: "Address added successfully" });
   } catch (error) {
     req.flash("error", "Failed to add address. Please try again.");
     res.redirect("/address");
@@ -577,12 +573,12 @@ const getEditAddress = async (req, res) => {
   try {
     const address = await Address.findOne({ _id: addressId });
     if (address) {
-      res.status(200).json({ status: true, address });
+      res.status(HTTP_STATUS.OK).json({ status: true, address });
     } else {
-      res.status(404).json({ status: false, message: "Address not found" });
+      res.status(HTTP_STATUS.NOT_FOUND).json({ status: false, message: "Address not found" });
     }
   } catch (error) {
-    res.status(500).json({ status: false, message: "Internal server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ status: false, message: "Internal server error" });
   }
 };
 
@@ -597,11 +593,11 @@ const editAddress = async (req, res) => {
     });
 
     if (!address) {
-      return res.status(404).send({ message: "Address not found with id " + addressId });
+      return res.status(HTTP_STATUS.NOT_FOUND).send({ message: "Address not found with id " + addressId });
     }
 
     req.flash("success", "Address Edited");
-    res.status(200).json({ success: true, message: "Successfully edited address" });
+    res.status(HTTP_STATUS.OK).json({ success: true, message: "Successfully edited address" });
   } catch (error) {
     req.flash("error", "Error editing address. Please try again.");
     res.redirect("/address");
@@ -614,12 +610,12 @@ const deleteAddress = async (req, res) => {
   try {
     const result = await Address.findByIdAndUpdate(id, { delete: true }, { new: true });
     if (result) {
-      res.status(200).json({ message: "Address deleted successfully" });
+      res.status(HTTP_STATUS.OK).json({ message: "Address deleted successfully" });
     } else {
-      res.status(404).json({ message: "Address not found" });
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Address not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
   }
 };
 

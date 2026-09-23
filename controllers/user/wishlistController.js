@@ -19,9 +19,8 @@ module.exports = {
         },
       });
 
-      // If no wishlist exists for the user, initialize an empty wishlist object
       if (!wishlist) {
-        wishlist = { products: [] }; // Empty array of products
+        wishlist = { products: [] };
       }
 
       let products = [];
@@ -32,7 +31,7 @@ module.exports = {
       wishlist.products.forEach((wish) => {
         wish.products.forEach((product) => {
           products.push(product.productId);
-          productId = product.productId?._id; // Use optional chaining to prevent error
+          productId = product.productId?._id;
 
           if (product.productId && product.productId.variants) {
             product.productId.variants.forEach((variant) => {
@@ -77,7 +76,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).send("Internal Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
   },
 
@@ -93,7 +92,7 @@ module.exports = {
       });
 
       if (existingProduct) {
-        return res.status(404).json({ message: "Product already exists in the wishlist" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product already exists in the wishlist" });
       }
 
       await Product.updateOne({ _id: productId }, { $set: { wishlist: true } }, { upsert: true });
@@ -112,7 +111,7 @@ module.exports = {
         {
           new: true,
           upsert: true,
-        }
+        },
       );
       res.json({ success: true, message: "You have successfully added the favorates" });
     } catch (error) {

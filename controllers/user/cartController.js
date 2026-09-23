@@ -13,18 +13,18 @@ const handleCartUpdate = async (req, res, operation) => {
     const { id: productId, variant: variantId } = req.params;
 
     if (!productId || !variantId) {
-      return res.status(400).json({ success: false, message: "Product ID and Variant ID are required" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Product ID and Variant ID are required" });
     }
 
     const cart = await Cart.findOne({ userId: userID });
     if (!cart) {
-      return res.status(404).json({ success: false, message: "Cart not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Cart not found" });
     }
 
     const itemIndex = cart.items.findIndex((item) => item.productId.toString() === productId && item.variantId.toString() === variantId);
 
     if (itemIndex === -1) {
-      return res.status(404).json({ success: false, message: "Item not found in cart" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Item not found in cart" });
     }
 
     const item = cart.items[itemIndex];
@@ -35,7 +35,7 @@ const handleCartUpdate = async (req, res, operation) => {
     const stock = variant.stock;
 
     if (isNaN(stock) || stock <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid stock value" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid stock value" });
     }
 
     const incrementOrDecrement = operation === "increment";
@@ -49,21 +49,23 @@ const handleCartUpdate = async (req, res, operation) => {
 
     // Handle quantity limits
     if (incrementOrDecrement && item.quantity >= stock) {
-      return res.status(400).json({ success: false, message: `Quantity exceeds product stock. their only ${stock} stocks left`, stock });
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ success: false, message: `Quantity exceeds product stock. their only ${stock} stocks left`, stock });
     } else if (!incrementOrDecrement && item.quantity <= 1) {
-      return res.status(400).json({ success: false, message: "Cannot decrease quantity below 1" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Cannot decrease quantity below 1" });
     } else if (incrementOrDecrement && item.quantity >= product.quantity) {
-      return res.status(400).json({ success: false, message: "This is the max order for this order" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "This is the max order for this order" });
     }
 
     const price = Number(item.price);
     if (isNaN(price)) {
-      return res.status(400).json({ success: false, message: "Invalid price value" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid price value" });
     }
 
     const itemTotal = price * updatedQuantity;
     if (isNaN(itemTotal)) {
-      return res.status(400).json({ success: false, message: "Invalid itemTotal value" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid itemTotal value" });
     }
 
     cart.items[itemIndex].quantity = updatedQuantity;
@@ -75,9 +77,9 @@ const handleCartUpdate = async (req, res, operation) => {
 
     await cart.save();
 
-    return res.status(200).json({ success: true, cart: cart.items[itemIndex], totalPrice, carts: cart, stock });
+    return res.status(HTTP_STATUS.OK).json({ success: true, cart: cart.items[itemIndex], totalPrice, carts: cart, stock });
   } catch (error) {
-    return res.status(500).json({ success: false, message: "Server error", error: error.message });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -200,7 +202,7 @@ module.exports = {
         user: req.session.user,
       });
     } catch (error) {
-      res.status(500).json({ error: "An error occurred while fetching the cart." });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching the cart." });
     }
   },
 
@@ -218,19 +220,19 @@ module.exports = {
       const product = await Product.findById(productId).populate("variants.color").populate("variants.size").populate("variants.stock");
 
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Product not found" });
       }
 
       const selectedVariant = product.variants.find((variant) => variant.color._id.toString() === colorId && variant.size._id.toString() === sizeId);
 
       if (!selectedVariant) {
-        return res.status(404).json({ success: false, message: "Variant not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Variant not found" });
       }
 
       const variantId = selectedVariant._id;
 
       const existingCartItem = cart.items.find(
-        (item) => item.productId.toString() === productId && item.colorId.toString() === colorId && item.sizeId.toString() === sizeId
+        (item) => item.productId.toString() === productId && item.colorId.toString() === colorId && item.sizeId.toString() === sizeId,
       );
 
       if (existingCartItem) {
@@ -263,7 +265,7 @@ module.exports = {
       }
       res.json({ message: "Product added to cart", count: cart.items.length });
     } catch (error) {
-      res.status(500).json({ message: "Error adding product to cart" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Error adding product to cart" });
     }
   },
 
@@ -275,13 +277,13 @@ module.exports = {
     const cart = await Cart.findOne({ userId }).populate("items.productId");
 
     if (!cart) {
-      return res.status(404).json({ status: false, message: "Cart not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ status: false, message: "Cart not found" });
     }
 
     const itemIndex = cart.items.findIndex((item) => item.productId._id.toString() === productId && item.variantId.toString() === variantId);
 
     if (itemIndex === -1) {
-      return res.status(404).json({ status: false, message: "Item not found in cart" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ status: false, message: "Item not found in cart" });
     }
 
     cart.items.splice(itemIndex, 1);
@@ -293,9 +295,9 @@ module.exports = {
 
     await cart.save();
     if (cart) {
-      res.status(200).json({ success: true, message: `Product remove successfull` });
+      res.status(HTTP_STATUS.OK).json({ success: true, message: `Product remove successfull` });
     } else {
-      res.status(404).json({ success: false, message: "Product removal failed" });
+      res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Product removal failed" });
     }
   },
 

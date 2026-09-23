@@ -56,13 +56,11 @@ module.exports = {
     const userId = req.session.user;
 
     const [userCart, user, address, getPayable, userWallet] = await Promise.all([
-      Cart.findOne({ userId: userId }).populate(
-        "items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity"
-      ),
+      Cart.findOne({ userId: userId }).populate("items.productId items.colorId items.sizeId coupon items.quantity items.productId.bundleQuantity"),
       User.findById(userId),
       Address.find({ customerId: userId, delete: false }),
       Cart.findOne({ userId }, { _id: 0, payable: 1 }),
-      Wallet.find({ userId: userId })
+      Wallet.find({ userId: userId }),
     ]);
 
     const productExistencePromises = userCart.items.map((item) => checkProductExistence(item));
@@ -94,7 +92,7 @@ module.exports = {
         totalPrice -= couponDiscount;
 
         await Cart.findOneAndUpdate({ _id: userCart._id }, { $set: { totalPrice: totalPrice, couponDiscount: couponDiscount } });
-      } 
+      }
       // else {
       //   // If the total is less than the minimum purchase amount, remove the coupon
       //   userCart.coupon = undefined;
@@ -144,8 +142,6 @@ module.exports = {
       isInsufficient,
     });
   },
-
- 
 
   // Place Order
   placeOrder: async (req, res) => {
@@ -233,19 +229,19 @@ module.exports = {
               const product = await Product.findById(item.productId);
 
               if (!product) {
-                return res.status(404).json({ error: "Product not found" });
+                return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Product not found" });
               }
 
               const variant = product.variants.find(
-                (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
+                (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString(),
               );
 
               if (!variant) {
-                return res.status(404).json({ error: "Variant not found" });
+                return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Variant not found" });
               }
 
               if (variant.stock < item.quantity) {
-                return res.status(400).json({ error: "Insufficient stock" });
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Insufficient stock" });
               }
 
               variant.stock -= item.quantity;
@@ -264,14 +260,14 @@ module.exports = {
             req.session.orderDetails = orderPlaced;
 
             if (!orderPlaced) {
-              return res.status(500).json({ error: "Failed to create order" });
+              return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to create order" });
             }
 
             const userId = req.session.user;
 
             await Cart.clearCart(userId);
 
-            return res.status(200).json({
+            return res.status(HTTP_STATUS.OK).json({
               success: true,
               message: "Order has been placed successfully.",
             });
@@ -328,23 +324,23 @@ module.exports = {
             // reduce stock of the variant
             for (const item of userCart.items) {
               const product = await Product.findById(item.productId).catch((error) => {
-                return res.status(500).json({ error: "Failed to find product" });
+                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to find product" });
               });
 
               if (!product) {
-                return res.status(404).json({ error: "Product not found" });
+                return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Product not found" });
               }
 
               const variantIndex = product.variants.findIndex((variant) => variant._id.toString() === item.variantId.toString());
 
               if (variantIndex === -1) {
-                return res.status(404).json({ error: "Variant not found" });
+                return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Variant not found" });
               }
 
               product.variants[variantIndex].stock -= item.quantity;
 
               await product.save().catch((error) => {
-                return res.status(500).json({ error: "Failed to update product stock" });
+                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Failed to update product stock" });
               });
             }
 
@@ -362,7 +358,7 @@ module.exports = {
               await Coupon.findOneAndUpdate({ _id: userCart.coupon }, { $push: { usedBy: { userId: req.session.user } } });
             }
 
-            return res.status(200).json({
+            return res.status(HTTP_STATUS.OK).json({
               success: true,
               message: "Order has been placed successfully.",
             });
@@ -371,11 +367,11 @@ module.exports = {
           break;
 
         default:
-          return res.status(400).json({ error: "Invalid payment method" });
+          return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Invalid payment method" });
           break;
       }
     } catch (error) {
-      res.status(400).json({ message: "Detailed error message" });
+      res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Detailed error message" });
     }
   },
 
@@ -392,7 +388,7 @@ module.exports = {
       const isSignatureValid = hmac === razorpay_signature;
 
       if (!isSignatureValid) {
-        return res.status(400).json({ success: false, message: "Invalid signature" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid signature" });
       }
 
       // Proceed with stock update and order confirmation logic
@@ -404,14 +400,14 @@ module.exports = {
         const product = await Product.findById(item.productId);
 
         const variant = product.variants.find(
-          (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString()
+          (variant) => variant.size.toString() === item.sizeId.toString() && variant.color.toString() === item.colorId.toString(),
         );
 
         if (!variant) {
-          return res.status(404).json({ error: "Variant not found" });
+          return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Variant not found" });
         }
         if (variant.stock < item.quantity) {
-          return res.status(400).json({ error: "Insufficient stock" });
+          return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Insufficient stock" });
         }
 
         variant.stock -= item.quantity;
@@ -427,7 +423,7 @@ module.exports = {
       const order_id = orderID.orderId;
       const updateOrder = await Order.updateOne(
         { _id: order_id },
-        { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } }
+        { $set: { "items.$[].status": "Confirmed", "items.$[].paymentStatus": "Paid", status: "Confirmed", paymentStatus: "Paid" } },
       );
 
       let couponId = await Order.findOne({ _id: order_id }).populate("coupon");
@@ -443,14 +439,14 @@ module.exports = {
             {
               new: true,
               upsert: true,
-            }
+            },
           );
         }
       }
 
       return res.json({ success: true, message: "Payment verified successfully" });
     } catch (error) {
-      return res.status(500).json({ success: false, message: "Payment verification failed" });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Payment verification failed" });
     }
   },
 };

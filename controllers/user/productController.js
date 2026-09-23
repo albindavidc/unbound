@@ -82,7 +82,7 @@ module.exports = {
         Size.find({}).lean(),
         Color.find({ isListed: true }).lean(),
         Variants.find({}).lean(),
-        Product.countDocuments(combinedQuery)
+        Product.countDocuments(combinedQuery),
       ]);
 
       const perPage = 9;
@@ -150,7 +150,7 @@ module.exports = {
       });
     } catch (error) {
       console.log(error);
-      res.status(500).send("Error loading products");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error loading products");
     }
   },
 
@@ -172,7 +172,7 @@ module.exports = {
         .lean();
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product not found" });
       }
 
       let stocks;
@@ -191,10 +191,12 @@ module.exports = {
           category: product.category._id,
           _id: { $ne: productId },
           isActive: true,
-        }).limit(4).lean(),
+        })
+          .limit(4)
+          .lean(),
         Product.find({ _id: productId }).lean(),
         Cart.findOne({ userId: userId }).lean(),
-        Customize.findOne({ userId: userId }).lean()
+        Customize.findOne({ userId: userId }).lean(),
       ]);
 
       let existingQuantity = 0;
@@ -232,7 +234,7 @@ module.exports = {
         customizeData: customizeData,
       });
     } catch (error) {
-      res.status(500).send("Internal Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
     }
   },
 
@@ -255,12 +257,12 @@ module.exports = {
     const userId = req.session.user;
 
     if (!allCanvasData) {
-      return res.status(400).json({ error: "Product ID and canvas data are required." });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Product ID and canvas data are required." });
     }
     try {
       const customize = await Customize.findOne({ userId: userId });
 
-      productId, { userId: userId, "products.productId": productId, canvasData: allCanvasData }, { upsert: true }, { new: true };
+      (productId, { userId: userId, "products.productId": productId, canvasData: allCanvasData }, { upsert: true }, { new: true });
 
       if (!customize) {
         const newCustomize = new Customize({
@@ -292,7 +294,7 @@ module.exports = {
 
       res.json({ success: true, message: "Canvas saved successfully", customize });
     } catch (error) {
-      res.status(500).json({ error: "Error saving canvas data" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Error saving canvas data" });
     }
   },
 
@@ -319,7 +321,7 @@ module.exports = {
         res.json({ message: "Your product is not customized" });
       }
     } catch (error) {
-      res.status(500).json({ message: "Interal server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Interal server error" });
     }
   },
 };

@@ -62,13 +62,13 @@ module.exports = {
       const user = await User.findOne({ _id: req.session.user });
 
       if (!payment) {
-        return res.status(500).json({ success: false, message: "Failed to create payment" });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to create payment" });
       }
 
       res.json({ success: true, payment, user });
     } catch (error) {
       const { message } = error;
-      res.status(500).json({ success: false, message });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message });
     }
   },
 
@@ -100,7 +100,7 @@ module.exports = {
             ],
           });
           await newWallet.save();
-          return res.status(200).json({ success: true, message: "Wallet created successfully" });
+          return res.status(HTTP_STATUS.OK).json({ success: true, message: "Wallet created successfully" });
         } else {
           wallet.balance += Math.ceil(amount / 100);
           wallet.transactions.push({
@@ -111,14 +111,14 @@ module.exports = {
           });
 
           await wallet.save();
-          return res.status(200).json({
+          return res.status(HTTP_STATUS.OK).json({
             success: true,
             message: "Money added to wallet successfully",
           });
         }
       }
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
     }
   },
 };

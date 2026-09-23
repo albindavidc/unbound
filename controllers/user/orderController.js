@@ -14,6 +14,7 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 
 const { loadProductDetails } = require("./productController");
+const { Http2ServerRequest } = require("http2");
 
 module.exports = {
   // Get Orders
@@ -27,7 +28,7 @@ module.exports = {
     const order = await Order.find({ customerId: userId })
       .populate({
         path: "items.productId",
-        select: "name price primaryImages secondaryImages", // Select the fields you want from the product
+        select: "name price primaryImages secondaryImages",
       })
       .populate("items.color items.size shippingAddress")
 
@@ -85,21 +86,21 @@ module.exports = {
       const orders = await Order.findById(orderId);
       const payment = await Payment.find({ orderId: order._id });
 
-      let totalPrice
-      let newOrderId
-      let createdDate
+      let totalPrice;
+      let newOrderId;
+      let createdDate;
 
-      order.forEach(item =>{
-        totalPrice = item.totalPrice
-        newOrderId = item._id
-        createdDate = new Date(item.createdAt).toLocaleDateString()
-      })
+      order.forEach((item) => {
+        totalPrice = item.totalPrice;
+        newOrderId = item._id;
+        createdDate = new Date(item.createdAt).toLocaleDateString();
+      });
 
-      console.log(totalPrice, newOrderId, createdDate, "this is the total price")
+      console.log(totalPrice, newOrderId, createdDate, "this is the total price");
 
       res.render("user/order", { totalPrice, newOrderId, createdDate, order, orderId, user: req.session.user, user, orders, payment });
     } catch (error) {
-      res.status(500).send("Server Error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Server Error");
     }
   },
 
@@ -173,7 +174,7 @@ module.exports = {
                 "items.$.returnedOn": Date.now(),
               },
             },
-            { new: true }
+            { new: true },
           );
         } else if (orderReturnRefundMethod === "RefundToWallet") {
           const order = await Order.findOne({
@@ -223,7 +224,7 @@ module.exports = {
                 "items.$.returnedOn": Date.now(),
               },
             },
-            { new: true }
+            { new: true },
           );
         }
       } else if (action === "cancel") {
@@ -241,7 +242,7 @@ module.exports = {
                 "items.$.cancelledOn": Date.now(),
               },
             },
-            { new: true }
+            { new: true },
           );
         } else if (orderCancelRefundMethod === "RefundToWallet") {
           const order = await Order.findOne({
@@ -291,7 +292,7 @@ module.exports = {
                   "items.$.cancelledOn": Date.now(),
                 },
               },
-              { new: true }
+              { new: true },
             );
           } else {
             result = await Order.findOneAndUpdate(
@@ -306,19 +307,19 @@ module.exports = {
                   "items.$.cancelledOn": Date.now(),
                 },
               },
-              { new: true }
+              { new: true },
             );
           }
         }
       }
 
       if (!result) {
-        res.status(400).json({ message: "Detailed error message" });
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Detailed error message" });
       }
 
-      res.status(200).json({ success: true, message: `Order ${action}ed successfully` });
+      res.status(HTTP_STATUS.OK).json({ success: true, message: `Order ${action}ed successfully` });
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
     }
   },
 
@@ -327,13 +328,13 @@ module.exports = {
     try {
       const orderId = req.query.orderId;
       if (!orderId) {
-        return res.status(400).json({ success: false, message: "Order ID is missing" });
+        return res.status(Http2ServerRequest.BAD_REQUEST).json({ success: false, message: "Order ID is missing" });
       }
 
       const order = await Order.findById(orderId).populate("items.productId");
 
       if (!order) {
-        return res.status(404).json({ success: false, message: "Order not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Order not found" });
       }
 
       let totalQuantity = 0;
@@ -345,7 +346,6 @@ module.exports = {
         });
       }
 
-      // Create the PDF document
       const doc = new PDFDocument({ margin: 20, size: "A5" });
       let filename = "Order_Invoice.pdf";
       filename = encodeURIComponent(filename);
@@ -371,7 +371,6 @@ module.exports = {
       const rowHeight = 30;
       let yPosition = margin.top;
 
-      // Draw Header
       const drawHeader = () => {
         doc.moveTo(margin.left, yPosition).lineTo(550, yPosition).stroke();
 
@@ -479,7 +478,7 @@ module.exports = {
       doc.end();
     } catch (error) {
       console.log(error, "this is fantastic error");
-      res.status(500).json({ success: false, message: "Internal server error" });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
     }
   },
 
@@ -490,19 +489,19 @@ module.exports = {
       const { rating, review } = req.body;
 
       if (!rating || !review) {
-        return res.status(400).json({ success: false, message: "Rating and review are required" });
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Rating and review are required" });
       }
 
       const product = await Product.findById(productId);
       const userId = req.session.user;
 
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ success: false, message: "Product not found" });
       }
 
       // First, check if a rating already exists for the user and order
       const existingRating = product.ratings.find(
-        (rating) => rating.user.toString() === userId.toString() && rating.orderId.toString() === orderId.toString()
+        (rating) => rating.user.toString() === userId.toString() && rating.orderId.toString() === orderId.toString(),
       );
 
       if (existingRating) {
@@ -517,7 +516,7 @@ module.exports = {
               // Add any other fields you want to update, e.g. rating, review, etc.
             },
           },
-          { new: true, upsert: true }
+          { new: true, upsert: true },
         );
       } else {
         // If rating doesn't exist, push a new one
@@ -532,14 +531,14 @@ module.exports = {
               },
             },
           },
-          { new: true, upsert: true }
+          { new: true, upsert: true },
         );
       }
 
       res.json({ success: true, message: "Review added successfully!" });
     } catch (error) {
-      console.log(error, "this is error")
-      res.status(500).json({ success: false, message: "Server error. Please try again later" });
+      console.log(error, "this is error");
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error. Please try again later" });
     }
   },
 };
